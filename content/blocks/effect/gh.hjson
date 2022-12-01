@@ -1,0 +1,48 @@
+type: OverdriveProjector
+category: effect
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: sectorComplete
+			preset: jljd
+		}
+	]
+}
+requirements: [
+	copper/300
+	metaglass/220
+	titanium/360
+	plastanium/320
+	surge-alloy/180
+	hhhj/120
+	mc/560
+]
+
+size: 5
+hasPower: false
+hasItems: true
+hasLiquids: true
+itemCapacity: 30
+liquidCapacity: 30
+canOverdrive: false
+
+hasBoost: false
+reload: 60
+useTime: 256
+range: 512
+speedBoost: 4
+baseColor: FEB380
+phaseColor: FFD59E
+consumes: {
+	items: {
+		items: [
+			coal/10
+			spore-pod/8
+			pyratite/3
+			hhhj/2
+			mc/8
+		]
+	}
+	liquid: slag/0.6
+}

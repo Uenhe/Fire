@@ -1,0 +1,40 @@
+type: legs
+drag: 0.1
+speed: 0.6
+hitSize: 8
+health: 120
+armor: 3
+rotateSpeed: 4
+hovering: true
+canAttack: false
+targetable: false
+shadowElevation: 0.65
+groundLayer: 75
+allowLegStep: true
+itemCapacity: 20
+
+legCount: 4
+legMoveSpace: 2
+legPairOffset: 3
+legLength: 8
+legExtension: 0
+legBaseOffset: 2
+stepShake: 1
+legLengthScl: 1.6
+legSplashDamage: 5
+legSplashRange: 2
+rippleScale: 0.4
+legSpeed: 0.2
+
+abilities: [
+    {
+        type: ForceFieldAbility
+        radius: 50
+        regen: 0.30
+        max: 200.0
+        cooldown: 180
+    }
+]
+research: {
+    parent: hzgs
+}

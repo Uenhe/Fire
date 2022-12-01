@@ -1,0 +1,93 @@
+type: ItemTurret
+category: turret
+research: {
+	parent: yg
+	objectives: [
+		{
+			type: sectorComplete
+			preset: jljd
+		}
+	]
+}
+    
+requirements: [
+	copper/1450
+	thorium/1100
+	plastanium/650
+	silicon/800
+	titanium/800
+	surge-alloy/400
+	mc/350
+]
+health: 1500
+size:3
+spread: 4
+shots: 1
+alternate: true
+hasLiquids: true
+liquidCapacity: 45
+reload: 600
+restitution: 0.03
+range: 840
+shootCone: 85
+ammoPerShot: 6
+inaccuracy: 2
+rotateSpeed: 10
+shootSound: release
+consumes: {
+	coolant: {
+		amount: 0.4
+		optional: true
+	}
+}
+    
+ammoTypes: {
+	yjdk: {
+		type: MissileBulletType
+		speed: 3.3
+		lifetime: 240
+		damage: 285
+		width: 25
+		height: 28
+		shrinkY: 0
+		homingPower: 0.08
+		splashDamageRadius: 56
+		splashDamage: 305
+		makeFire: true
+		collidesGround: true
+		hitSound: mediumCannon
+		explodeRange: 20
+	}
+
+	yjbld: {
+		type: MissileBulletType
+		reloadMultiplier: 0.8
+		speed: 3.5
+		damage: 320
+		width: 25
+		height: 28
+		shrinkY: 0
+		lifetime: 240
+		homingPower: 0.12
+		splashDamageRadius: 72
+		splashDamage: 320
+		makeFire: true
+		collidesGround: true
+		hitSound: mediumCannon
+		explodeRange: 20
+		fragBullets: 1
+		fragBullet: {
+			type: MissileBulletType
+			damage: 660
+			speed: 2.4
+			lifetime: 120
+			width: 20
+			height: 24
+			shrinkY: 1
+			splashDamageRadius: 120
+			splashDamage: 840
+			status: blasted
+			statusDuration: 120
+		}
+	}
+}

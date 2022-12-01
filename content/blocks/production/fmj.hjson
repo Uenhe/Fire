@@ -1,0 +1,27 @@
+type: WallCrafter
+category: production
+requirements: [
+    copper/40
+    lead/20
+    titanium/15
+    silicon/25
+]
+
+health: 65
+size: 1
+drillTime: 120
+attribute: sm
+output: mc
+ambientSound: drill
+ambientSoundVolume: 0.01
+consumes: {
+    power: 0.4
+}
+
+research: {
+    parent: sc
+    objectives: [{
+        type: sectorComplete
+        preset: jljd
+    }]
+}

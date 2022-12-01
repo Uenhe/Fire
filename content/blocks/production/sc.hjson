@@ -1,0 +1,43 @@
+type: AttributeCrafter
+category: production
+requirements: [
+	copper/50
+	lead/30
+	silicon/25
+	metaglass/20
+]
+outputItem: mc/3
+attribute: cd
+maxBoost: 1
+craftTime: 180
+size: 2
+hasPower: true
+hasItems: true
+hasLiquids: true
+drawer: {
+	type: DrawMulti
+	drawers: [
+		{
+			type: DrawRegion
+			suffix: -bottom
+		}
+		{
+			type: DrawLiquidTile
+			drawLiquid: water
+		}
+			DrawDefault
+	]
+}
+consumes: {
+	liquid: water/0.2
+	power: 2.5
+}
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: sectorComplete
+			preset: jljd
+		}
+	]
+}

@@ -1,0 +1,57 @@
+type: drill
+size: 5
+health: 1000
+tier: 8
+drillTime: 165
+hardnessDrillMultiplier: 45
+liquidBoostIntensity: 2
+canOverdrive: true
+warmupSpeed: 0.02
+drillEffect: mineBig
+updateEffect: mineBig
+rotateSpeed: 1.5
+drawMineItem: true
+baseExplosiveness: 5
+destroyBullet: { 
+    type: PointBulletType
+    hitShake: 2
+    splashDamageRadius: 48
+    splashDamage: 120
+    speed: 0
+    lifetime: 2
+    collides: false
+    hitEffect: none
+    despawnEffect: {
+        type: WaveEffect
+        lifetime: 10
+        sizeFrom: 0, sizeTo: 30
+        strokeFrom:3, strokeTo:0
+        colorFrom: ffffff, colorTo: ffffff
+    }
+}
+consumes: {
+    liquid: {
+        liquid: water
+        amount: 0.2
+        booster: true
+        optional: true
+    }
+}
+itemCapacity: 30
+liquidCapacity: 30
+requirements: [	
+    copper/160
+    thorium/375
+    silicon/145
+    metaglass/80
+]
+category: production
+research: {
+    parent: hzgs
+    objectives: [
+        {
+            type: onSector
+            preset: jljd
+        }
+    ]
+}

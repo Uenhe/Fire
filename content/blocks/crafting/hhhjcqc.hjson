@@ -1,0 +1,25 @@
+type: GenericCrafter
+category: crafting
+research: hhhjtqq
+requirements: [
+	titanium/80
+	graphite/90
+	silicon/60
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+updateEffect: explosion
+
+craftTime: 100
+outputItem: hhhj/1
+consumes: {
+	power: 3
+	items: {
+		items: [
+			coal/1
+			zzhhhj/1
+		]
+	}
+}

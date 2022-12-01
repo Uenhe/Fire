@@ -1,0 +1,32 @@
+type: GenericCrafter
+category: crafting
+research: rnyl
+requirements: [
+	titanium/105
+	silicon/40
+	bl/60
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+craftEffect: smeltsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		drawDefault
+		drawFade
+	]
+}
+
+craftTime: 10
+outputItem: metaglass/2
+consumes: {
+        power: 2
+	items: {
+		items: [
+			lead/1
+			bl/2
+		]
+	}
+}

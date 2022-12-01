@@ -1,0 +1,46 @@
+type: AttributeCrafter
+category: crafting
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: jljd
+		}
+	]
+}
+requirements: [
+	copper/60
+	lead/45
+	graphite/30
+]
+
+hasPower: true
+hasLiquids: false
+itemCapacity: 20
+size: 2
+craftEffect: smeltsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		drawDefault
+		{
+			type: drawFlame
+			flameColor: FFE099
+		}
+	]
+}
+
+attribute: heat
+maxBoost: 1
+craftTime: 60
+outputItem: bl/3
+consumes: {
+	items: {
+		items: [
+			coal/1
+			sand/6
+		]
+	}
+	power: 0.5
+}

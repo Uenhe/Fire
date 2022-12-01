@@ -1,0 +1,34 @@
+type: GenericCrafter
+category: crafting
+research: {
+	parent: hhhjtqq
+	objectives: [
+		{
+			type: sectorComplete
+			preset: jljd
+		}
+	]
+}
+requirements: [
+	plastanium/55
+	silicon/60
+	titanium/105
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+craftEffect: smeltsmoke
+
+craftTime: 120
+outputItem: yjdk/2
+consumes: {
+	power: 2
+	items: {
+		items: [
+ 			silicon/2
+ 			copper/3
+			titanium/3
+		]
+        }
+}

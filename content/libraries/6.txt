@@ -1,0 +1,11 @@
+emm...如果你翻火种pack时看见有用的东西，拿走时一定要保留原注释啊qwq
+
+如何查阅mindustry源码？
+最优答案：https://github.com/anuken/mindustry
+如果遇到加载慢的情况，试试这个：https://kgithub.com/anuken/mindustry
+
+模组js写完进游戏报错？
+最优答案：进last_log.txt找原因
+last_log.txt存放路径：%mindustry%/last_log.txt
+这个路径是和saves，mods等文件夹同级的
+感觉woodjacket（硫缺铅）大佬的指点！

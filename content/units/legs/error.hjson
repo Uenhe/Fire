@@ -1,0 +1,50 @@
+type: legs
+drag: 0.1
+speed: 1
+hitSize: 23
+health: 126000
+armor: 40
+rotateSpeed: 2.7
+hovering: true
+shadowElevation: 0.65
+groundLayer: 75
+allowLegStep: true
+
+legCount: 8
+legMoveSpace: 1
+legPairOffset: 3
+legLength: 300
+legExtension: -15
+legBaseOffset: 10
+stepShake: 1
+legLengthScl: 1
+legSplashDamage: 32
+legSplashRange: 30
+rippleScale: 5
+legSpeed: 0.2
+
+weapons: [{
+        name: lgt
+        x: 9
+        y: -7
+        shootY: 7
+        reload: 15
+        shake: 3
+        rotate: true
+        rotateSpeed: 2
+        ejectEffect: casing1
+        shadow: 8
+        recoil: 3
+        top: false
+        bullet: {
+    type: "LaserBulletType",
+    damage: 1385,
+    colors: ["990033", "990033", "ffffff"],
+    hitSize: 6,
+    lifetime: 18.00,
+    drawSize: 1200.00,
+    collidesAir: true,
+    length: 320.00,
+    }
+    }
+]

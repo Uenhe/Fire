@@ -1,0 +1,40 @@
+type: GenericCrafter
+category: crafting
+research: {
+	parent: rnyl
+	objectives: [
+		{
+			type: onSector
+			preset: lhyj
+		}
+	]
+}
+requirements: [
+	copper/260
+	graphite/200
+	titanium/130
+	surge-alloy/80
+]
+
+size: 3
+hasPower: true
+hasLiquids: false
+itemCapacity: 30
+craftEffect: smeltsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		drawDefault
+		{
+			type: drawFlame
+			flameColor: FFEF99
+		}
+	]
+}
+
+craftTime: 10
+outputItem: silicon/2
+consumes: {
+	power: 10
+	items: {items: [sand/3]}
+}

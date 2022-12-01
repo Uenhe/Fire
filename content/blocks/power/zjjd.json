@@ -1,0 +1,21 @@
+{
+    "type": "PowerNode",
+    "name": "zjjd",
+    "size":2,
+    "health":225,
+    "category": "power",
+    "requirements": [
+        "lead/10","bl/10","dt/5"
+    ],
+    "maxNodes": 5,
+    "laserRange": 25
+    "research": {
+        "parent": "hzgs"
+        "objectives": [
+            {
+                "type": "sectorComplete"
+                "preset": "lhyj"
+            }
+        ]
+    }
+}

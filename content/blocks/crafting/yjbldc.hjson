@@ -1,0 +1,27 @@
+type: GenericCrafter
+category: crafting
+research: dkc
+requirements: [
+	plastanium/60
+	silicon/80
+	titanium/125
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+craftEffect: formsmoke
+updateEffect: explosion
+
+craftTime: 240
+outputItem: yjbld/1
+consumes: {
+	power: 1.5
+	items: {
+		items: [
+			yjdk/2
+			blast-compound/1
+		]
+	}
+
+}

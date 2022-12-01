@@ -1,0 +1,145 @@
+type: ItemTurret
+category: turret
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: jljd
+		}
+	]
+}
+    
+requirements: [
+	copper/200
+	lead/125
+	silicon/80
+	titanium/125
+]
+
+health: 800   
+size: 2
+spread: 4
+shots: 1
+alternate: true
+hasLiquids: true
+liquidCapacity: 20
+restitution: 0.03
+reload: 42.86
+range: 250
+shootCone: 85
+inaccuracy: 2
+rotateSpeed: 10
+shootSound: artillery
+consumes: {
+	coolant: {
+		amount: 0.2
+		optional: true
+	}
+}
+    
+ammoTypes: {
+	copper: {
+		type: ArtilleryBulletType
+		damage: 20
+		speed: 6
+		lifetime: 130
+		knockback: 1.6
+		width: 12
+		height: 12
+		collidesTiles: false
+		splashDamageRadius: 13.75
+		splashDamage: 24
+		reloadMultiplier: 0.9
+		pierceArmor: true
+	}
+      
+	lead: {
+		type: ArtilleryBulletType
+		damage: 12
+		speed: 10
+		lifetime: 130
+		knockback: 1.6
+		width: 8
+		height: 8
+		collidesTiles: false
+		splashDamageRadius: 15.25
+		splashDamage: 18
+		reloadMultiplier: 1.8
+		pierceArmor: true
+	}
+      
+	metaglass: {
+		type: ArtilleryBulletType
+		damage: 60
+		speed: 6
+		lifetime: 130
+		knockback: 1.6
+		width: 12
+		height: 12
+		collidesTiles: false
+		splashDamageRadius: 12.25
+		splashDamage: 34
+		collidesGround: true
+		explodeRange: 30
+		reloadMultiplier: 1.2
+		pierceArmor: true
+		fragBullets: 16
+		fragBullet: {
+			type: BasicBulletType
+			damage: 18
+			speed: 8.5
+			lifetime: 15
+			width: 10
+			height: 12
+			shrinkY: 1
+			pierceArmor: true
+		}
+	}
+    
+	zzhhhj: {
+		type: ArtilleryBulletType
+		damage: 60
+		speed: 6
+		lifetime: 130
+		knockback: 1.6
+		width: 12
+		height: 12
+		collidesTiles: false
+		splashDamageRadius: 22.25
+		splashDamage: 80
+		collidesGround: true
+		explodeRange: 30
+		reloadMultiplier: 0.7
+		pierceArmor: true
+		fragBullets: 8
+		status: blasted
+		statusDuration: 180
+		fragBullet: {
+			type: BasicBulletType
+			damage: 45
+ 			speed: 2.2
+			lifetime: 35
+			status: melting
+			statusDuration: 300
+			width: 10
+			height: 12
+			shrinkY: 1
+			pierceArmor: true
+		}
+	}
+
+	graphite: {
+		type: ArtilleryBulletType
+		damage: 15
+		speed: 5
+		lifetime: 130
+		knockback: 1.6
+		width: 12
+		height: 12
+		collidesTiles: false
+		splashDamageRadius: 19.25
+		splashDamage: 45
+		pierceArmor: true
+	}
+}

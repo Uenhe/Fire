@@ -1,0 +1,35 @@
+type: GenericCrafter
+category: crafting
+research: hhhjtqq
+requirements: [
+	lead/120
+	metaglass/45
+	graphite/125
+	titanium/80
+	surge-alloy/35
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+craftEffect: smeltsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		drawArcSmelt
+		drawDefault
+		drawFade
+	]
+}
+
+craftTime: 120
+outputItem: dt/2
+consumes: {
+	power: 3.33
+	items: {
+		items: [
+			copper/2
+			silicon/3
+		]
+	}
+}

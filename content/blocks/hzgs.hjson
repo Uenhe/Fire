@@ -1,0 +1,9 @@
+type: LightBlock
+health: 160
+size: 2
+alwaysUnlocked: true
+buildVisibility: hidden
+research: {
+	root: true
+	requiresUnlock: false
+}
