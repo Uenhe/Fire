@@ -1,4 +1,6 @@
 # Mindustry Mod - Fire
+- [English](README.md) | [中文](README_zh.md)
+
 A Mindustry Mod that adds a lot of WEIRD things. WiP.
 
 Notices that there are two author: Uenhe & Raindance, but Raindance is so lazy that he doesn't want to register a Github account...
@@ -39,6 +41,3 @@ Notices that there are two author: Uenhe & Raindance, but Raindance is so lazy t
 - Adds 5 new support ground units, can step over most terrain
 - Light tank, high movement speed
 - Guardian unit, with high health & armor
-
-#### Other:
-- Adds 10+ items & liquids
