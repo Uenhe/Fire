@@ -1,7 +1,7 @@
 # Mindustry Mod - Fire
 - [English](README.md) | [中文](README_zh.md)
 
-一个奇奇怪怪又十分核锂的mod...
+一个奇奇怪怪又十分核锂的mod...仍在制作中
 
 注：这个mod由两个人制作：飞雨和我，但是飞雨懒得不想注册个Github账号...
 
