@@ -1,4 +1,4 @@
-# Mindustry Mod - Fire
+# Mindustry Mod - 火种
 - [English](README.md) | [中文](README_zh.md)
 
 一个奇奇怪怪又十分核锂的mod...仍在制作中
