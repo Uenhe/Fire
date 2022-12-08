@@ -35,7 +35,7 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 - Adds Timber Burner, which is able to output coal and generate power by burning timber
 - Advanced Overdrive Dome, need a lot of flammable materials to function
 - 5*5 Buildable Core, extremely well armored
-- Advanced Power Node, with longer range than Large Power Node
+- Advanced Power Node, with longer range than Large Power Node, also can store a number of power
 - Advanced Drill, works without power and faster than Blast Drill * 2
 
 #### Units:
