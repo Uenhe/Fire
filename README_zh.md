@@ -1,7 +1,9 @@
 # Mindustry Mod - 火种
 - [English](README.md) | [中文](README_zh.md)
 
-一个奇奇怪怪又十分核锂的mod...仍在制作中
+一个奇奇怪怪又十分核锂的mod...WiP
+
+警告：GitHub上的代码是不完全的，请不要下载它并在Mindustry中游玩！！！
 
 注：这个mod由两个人制作：飞雨和我，但是飞雨懒得不想注册个Github账号...
 
