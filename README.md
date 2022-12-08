@@ -3,7 +3,9 @@
 
 A Mindustry Mod that adds a lot of WEIRD things. WiP.
 
-Notices that there are two author: Uenhe & Raindance, but Raindance is so lazy that he doesn't want to register a Github account...
+Warning: The codes in GitHub is UNFINISHED, plz don't download it and play in Mindustry!!!
+
+Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that he doesn't want to register a Github account...
 
 ## Content
 
