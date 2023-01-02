@@ -1,9 +1,11 @@
 type: LightBlock
-health: 160
-size: 2
-alwaysUnlocked: true
 buildVisibility: hidden
+alwaysUnlocked: true
 research: {
 	root: true
 	requiresUnlock: false
 }
+
+health: 2147483647
+armor: 2147483647
+size: 2

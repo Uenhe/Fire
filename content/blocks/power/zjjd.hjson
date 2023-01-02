@@ -1,0 +1,25 @@
+type: PowerNode
+category: power
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: sectorComplete
+			preset: lhyj
+		}
+	]
+}
+requirements: [
+	lead/10
+	bl/10
+	dt/5
+]
+
+health: 225
+size: 2
+
+maxNodes: 8
+laserRange: 25
+consumesPower: true
+outputsPower: true
+consumes: {powerBuffered: 20000}

@@ -1,21 +1,26 @@
 type: AttributeCrafter
 category: production
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: bzxw
+		}
+	]
+}
 requirements: [
 	copper/60
 	lead/80
 	titanium/45
 	silicon/45
 ]
-outputItem: spore-pod/2
-craftTime: 80
+
 size: 3
 hasPower: true
-hasItems: true
 hasLiquids: true
 itemCapacity: 20
 liquidCapacity: 30
-
-attribute: spores
 drawer: {
 	type: DrawMulti
 	drawers: [
@@ -35,17 +40,12 @@ drawer: {
 		}
 	]
 }
-maxBoost: 3.5
 
+attribute: spores
+maxBoost: 3.5
+craftTime: 80
+outputItem: spore-pod/2
 consumes: {
 	power: 2.5
 	liquid: water/0.5
-}
-
-research: {
-	parent: sc
-	objectives: [{
-		type: sectorComplete
-		preset: jljd
-	}]
 }

@@ -1,11 +1,9 @@
 type: GenericCrafter
 category: crafting
 requirements: [
-	lead/180
-	thorium/125
 	graphite/85
+	thorium/125
 	silicon/100
-	metaglass/65
 ]
 
 size: 2
@@ -21,5 +19,4 @@ consumes: {
 			thorium/2
 		]
 	}
-
 }

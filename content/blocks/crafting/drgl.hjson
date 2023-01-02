@@ -27,7 +27,7 @@ drawer: {
 		drawDefault
 		{
 			type: drawFlame
-			flameColor: FFEF99
+			flameColor: ffef99
 		}
 	]
 }

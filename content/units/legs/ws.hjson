@@ -1,47 +1,9 @@
-type: legs
-drag: 0.3//惯性
-speed: 0.45
-hitSize: 16//碰撞体积
-health: 940
-armor: 5 //护甲值
-rotateSpeed: 3.4 //旋转速度
-hovering: true
-canAttack: false
-targetable: false
-shadowElevation: 0.65
-groundLayer: 75
-allowLegStep: true
-itemCapacity: 50
-
-legCount: 6     //腿数量
-legMoveSpace: 2 //腿落地距离倍率
-legPairOffset: 4 //腿移动时间间隔
-legLength: 20    //腿长
-legExtension: 0 //小腿纵向偏移量
-legBaseOffset: 2
-stepShake: 1
-legLengthScl: 1.6
-legSplashDamage: 5
-legSplashRange: 2
-rippleScale: 0.4
-legSpeed: 0.2
-
-abilities: [
-    {
-        type: ForceFieldAbility
-        radius: 120
-        regen: 2
-        max: 780
-        cooldown: 160
-    }
-    {
-        type: StatusFieldAbility
-        effect: overclock
-        duration: 360.0
-        reload: 360.0
-        range: 120.0
-    }
-]
 research: {
-    parent: ky
+	parent: ky
+	objectives: [
+		{
+			type: sectorComplete
+			preset: bzxw
+		}
+	]
 }

@@ -2,15 +2,15 @@ type: GenericCrafter
 category: crafting
 research: dkc
 requirements: [
-	plastanium/60
-	silicon/80
 	titanium/125
+	silicon/80
+	plastanium/60
 ]
 
 size: 2
 hasPower: true
 hasLiquids: false
-craftEffect: formsmoke
+craftEffect: smeltsmoke
 updateEffect: explosion
 
 craftTime: 240
@@ -19,9 +19,8 @@ consumes: {
 	power: 1.5
 	items: {
 		items: [
-			yjdk/2
 			blast-compound/1
+			yjdk/2
 		]
 	}
-
 }

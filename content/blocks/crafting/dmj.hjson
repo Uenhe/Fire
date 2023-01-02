@@ -3,14 +3,14 @@ category: crafting
 research: dgj
 requirements: [
 	graphite/100
-	silicon/40
 	titanium/85
+	silicon/40
 ]
 
 size: 2
 hasPower: true
 hasLiquids: false
-craftEffect: formsmoke
+craftEffect: smeltsmoke
 drawer: {
 	type: DrawMulti
 	drawers: [

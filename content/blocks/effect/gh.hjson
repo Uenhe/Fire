@@ -5,35 +5,30 @@ research: {
 	objectives: [
 		{
 			type: sectorComplete
-			preset: jljd
+			preset: htdl
 		}
 	]
 }
 requirements: [
 	copper/300
 	metaglass/220
-	titanium/360
-	plastanium/320
-	surge-alloy/180
-	hhhj/120
-	mc/560
+	titanium/255
+	plastanium/145
+	mc/180
 ]
 
 size: 5
 hasPower: false
-hasItems: true
 hasLiquids: true
+hasBoost: false
 itemCapacity: 30
 liquidCapacity: 30
-canOverdrive: false
+lightRadius: 512
 
-hasBoost: false
 reload: 60
-useTime: 256
+useTime: 270
 range: 512
-speedBoost: 4
-baseColor: FEB380
-phaseColor: FFD59E
+speedBoost: 3.2
 consumes: {
 	items: {
 		items: [

@@ -1,14 +1,14 @@
 type: GenericCrafter
 category: crafting
-research: {
-	parent: hhhjcqc
-	objectives: [
-		{
-			type: sectorComplete
-			preset: jljd
-		}
-	]
-}
+//research: {
+//	parent: hhhjcqc
+//	objectives: [
+//		{
+//			type: sectorComplete
+//			preset: hacj
+//		}
+//	]
+//}
 requirements: [
 	lead/220
 	metaglass/175
@@ -36,7 +36,6 @@ drawer: {
 		{
 			type: DrawLiquidTile
 			drawLiquid: yd
-			drawLiquidLight: true
 		}
 		DrawDefault
 	]

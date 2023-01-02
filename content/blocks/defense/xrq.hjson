@@ -2,15 +2,15 @@ type: regenProjector
 category: defense
 requirements: [xrt/24]
 
-health: 5250
+health: 4800
 armor: 2
 size: 2
 hasPower: false
-hasItems: true
+hasItems: false
 hasLiquids: true
 canOverdrive: false
 
-range: 2
+range: 1
 healPercent: 0.024
 optionalMultiplier: 2
 consumes: {

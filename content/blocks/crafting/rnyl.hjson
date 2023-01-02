@@ -26,7 +26,7 @@ drawer: {
 		drawDefault
 		{
 			type: drawFlame
-			flameColor: FFE099
+			flameColor: ffe099
 		}
 	]
 }
@@ -34,12 +34,12 @@ drawer: {
 attribute: heat
 maxBoost: 1
 craftTime: 60
-outputItem: bl/3
+outputItem: bl/6
 consumes: {
 	items: {
 		items: [
-			coal/1
 			sand/6
+			coal/1
 		]
 	}
 	power: 0.5

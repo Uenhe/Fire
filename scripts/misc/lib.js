@@ -26,8 +26,8 @@ exports.techDsAvailable = () =>
     Vars.state == null
     || Vars.state.rules.infiniteResources
     || !Vars.player
-//|| Vars.player.team().cores().find(boolf(v => v.block.name == lib.modName + "-dimension-technology-core"))
-// || Vars.player.team().cores().find(boolf(v => v.block.name == lib.modName + "-dimension-technology-core-3"))
+    //|| Vars.player.team().cores().find(boolf(v => v.block.name == lib.modName + "-dimension-technology-core"))
+    //|| Vars.player.team().cores().find(boolf(v => v.block.name == lib.modName + "-dimension-technology-core-3"))
 exports.mod = Vars.mods.locateMod(exports.modName);
 exports.raycaster = (func) => new Geometry.Raycaster({ accept: func });
 exports.isDev = () => exports.mod.meta.version.indexOf("dev") >= 0;

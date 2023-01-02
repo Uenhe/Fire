@@ -1,0 +1,46 @@
+type: ContinuousTurret
+category: turret
+//research: {
+//	parent: js
+//	objectives: [
+//		{
+//			type: onSector
+//			preset: jljd
+//		}
+//	]
+//}
+requirements: [
+	copper/350
+	graphite/240
+	titanium/200
+	silicon/220
+	plastanium/180
+]
+
+health: 1760
+size: 3
+hasPower: true
+hasItems: false
+hasLiquids: true
+liquidCapacity: 60
+
+shootSound: tractorbeam
+loopSoundVolume: 1
+loopSound: flux
+shootWarmupSpeed: 0.16
+shootCone: 360
+aimChangeSpeed: 1.8
+rotateSpeed: 1.4
+shootY: 4
+range: 225
+shootType: {
+	type: PointLaserBulletType
+	damage: 160
+	status: melting
+	statusDuration: 150
+	hitColor: ffa166
+}
+consumes: {
+	power: 6.666
+	liquid: slag/0.25
+}

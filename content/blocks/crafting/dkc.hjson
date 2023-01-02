@@ -5,14 +5,14 @@ research: {
 	objectives: [
 		{
 			type: sectorComplete
-			preset: jljd
+			preset: bzxw
 		}
 	]
 }
 requirements: [
-	plastanium/55
-	silicon/60
 	titanium/105
+	silicon/60
+	plastanium/55
 ]
 
 size: 2
@@ -26,9 +26,9 @@ consumes: {
 	power: 2
 	items: {
 		items: [
- 			silicon/2
- 			copper/3
+			copper/3
 			titanium/3
+			silicon/2
 		]
         }
 }

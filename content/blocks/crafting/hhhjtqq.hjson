@@ -10,9 +10,9 @@ research: {
 	]
 }
 requirements: [
-	copper/220
-	lead/125
-	silicon/80
+	lead/85
+	graphite/55
+	titanium/40
 ]
 
 size: 2

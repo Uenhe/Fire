@@ -9,28 +9,22 @@ research: {
 		}
 	]
 }
-    
 requirements: [
-	copper/200
-	lead/125
-	silicon/80
-	titanium/125
+	copper/105
+	lead/60
+	titanium/35
 ]
 
 health: 800   
 size: 2
-spread: 4
-shots: 1
-alternate: true
 hasLiquids: true
 liquidCapacity: 20
-restitution: 0.03
 reload: 42.86
 range: 250
 shootCone: 85
 inaccuracy: 2
 rotateSpeed: 10
-shootSound: artillery
+shootSound: bang
 consumes: {
 	coolant: {
 		amount: 0.2
@@ -41,6 +35,7 @@ consumes: {
 ammoTypes: {
 	copper: {
 		type: ArtilleryBulletType
+		sprite: fire-js-bullet
 		damage: 20
 		speed: 6
 		lifetime: 130
@@ -50,12 +45,14 @@ ammoTypes: {
 		collidesTiles: false
 		splashDamageRadius: 13.75
 		splashDamage: 24
+		ammoMultiplier: 2
 		reloadMultiplier: 0.9
 		pierceArmor: true
 	}
       
 	lead: {
 		type: ArtilleryBulletType
+		sprite: fire-js-bullet
 		damage: 12
 		speed: 10
 		lifetime: 130
@@ -65,12 +62,14 @@ ammoTypes: {
 		collidesTiles: false
 		splashDamageRadius: 15.25
 		splashDamage: 18
+		ammoMultiplier: 2
 		reloadMultiplier: 1.8
 		pierceArmor: true
 	}
       
 	metaglass: {
 		type: ArtilleryBulletType
+		sprite: fire-js-bullet
 		damage: 60
 		speed: 6
 		lifetime: 130
@@ -81,7 +80,7 @@ ammoTypes: {
 		splashDamageRadius: 12.25
 		splashDamage: 34
 		collidesGround: true
-		explodeRange: 30
+		ammoMultiplier: 3
 		reloadMultiplier: 1.2
 		pierceArmor: true
 		fragBullets: 16
@@ -99,6 +98,7 @@ ammoTypes: {
     
 	zzhhhj: {
 		type: ArtilleryBulletType
+		sprite: fire-js-bullet
 		damage: 60
 		speed: 6
 		lifetime: 130
@@ -109,7 +109,7 @@ ammoTypes: {
 		splashDamageRadius: 22.25
 		splashDamage: 80
 		collidesGround: true
-		explodeRange: 30
+		ammoMultiplier: 4
 		reloadMultiplier: 0.7
 		pierceArmor: true
 		fragBullets: 8
@@ -128,9 +128,9 @@ ammoTypes: {
 			pierceArmor: true
 		}
 	}
-
 	graphite: {
 		type: ArtilleryBulletType
+		sprite: fire-js-bullet
 		damage: 15
 		speed: 5
 		lifetime: 130
@@ -140,6 +140,24 @@ ammoTypes: {
 		collidesTiles: false
 		splashDamageRadius: 19.25
 		splashDamage: 45
+		ammoMultiplier: 4
 		pierceArmor: true
+	}
+	ybd: {
+		type: ArtilleryBulletType
+		sprite: fire-js-bullet
+		damage: 15
+		speed: 4
+		lifetime: 163
+		knockback: 1.6
+		width: 15
+		height: 15
+		collidesTiles: false
+		splashDamageRadius: 32
+		splashDamage: 160
+		ammoMultiplier: 5
+		pierceArmor: true
+		status: burning
+		statusDuration: 230
 	}
 }
