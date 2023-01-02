@@ -1,11 +1,11 @@
 name: fire
 displayName: Fire
 author: 飞雨a_ssylfyzgmz && -Uenhe饨咂-
-version: 1.0.0
+version: 1.0.1
 minGameVersion: 140
 repo: Uenhe/Fire
 
-subtitle: >_  v1.0.0
+subtitle: >_  v1.0.1
 description: '
 	[royal[]]A Mindustry Mod that adds a lots of WEIRD things.
 	一个奇奇怪怪又十分核锂的mod...
@@ -22,6 +22,9 @@ description: '
 	如果你觉得该mod很棒的话，一定要去GitHub给这个项目点个星星啊！
 	
 	[white[]]更新记录一览：
+	
+	v1.0.1
+	紧急修复了关于战役的几个bug
 	
 	v1.0.0
 	火种正式版的诞生！
