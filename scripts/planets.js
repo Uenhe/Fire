@@ -23,10 +23,11 @@ lst.prebuildBase = false
 lst.orbitRadius = 64
 lst.startSector = 0
 lst.defaultCore = Blocks.coreShard
-lst.atmosphereColor = Color.valueOf('4d1b7e')
+lst.atmosphereColor = Color.valueOf('4d1b8f')
 lst.atmosphereRadIn = 0.05
 lst.atmosphereRadOut = 0.5
-lst.iconColor = Color.valueOf('8e4dee')
+lst.iconColor = Color.valueOf('8e4dff')
+lst.hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems)
 
 const jljd = new SectorPreset('jljd', lst, 0)
 jljd.difficulty = 6
