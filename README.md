@@ -1,9 +1,7 @@
 # Mindustry Mod - Fire
 - [English](README.md) | [中文](README_zh.md)
 
-A Mindustry Mod that adds a lot of WEIRD things. WiP.
-
-Warning: The codes in GitHub is UNFINISHED, plz don't download it and play in Mindustry!!!
+A Mindustry Mod that adds a lot of WEIRD things...
 
 Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that he doesn't want to register a Github account...
 
@@ -26,11 +24,12 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 #### Campaign:
 
 - Adds new planet - Lisertar, with several preset sectors and its own tech tree
+- Warning: The campaign of this mod is UNFINISHED
 
 #### Blocks:
 
-- 10+ Factories
-- 5 Turrets
+- 20+ Factories
+- 6 Turrets
 - Adds Dam Wall, which is able to be placed on deep water
 - Adds Flesh Wall, has the ability of repair itself
 - Adds Tree Chopper, which is able to chop trees and output timber
@@ -42,6 +41,6 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 
 #### Units:
 - Adds Omicron as core unit, and also can be produced by upgrading Beta
-- Adds 5 new support ground units, can step over most terrain
-- Light tank, high movement speed
+- Adds 3 new support ground units, can step over most terrain
+- Adds 1 new KAMIKAZE air unit, flys toward enemies and self-destructs
 - More high-tier units
