@@ -9,7 +9,7 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 
 ### Vanilla changes:
 
-- Sand & Dark Sand now are "playermineable", you can directly mine it without drills
+- Sand & Dark Sand now are "playermineable", you can directly mine it without drills (Can be configured in Settings-Game)
 - Sand Water, Dark Sand Water, Dark Sand Tainted Water now are mineable
 - Slightly decrease the influence of ore hardness on drill speed of Laser & Blast Drill
 - Laser Drill: Slightly increase Base drill speed ( 1.93/s -> 2/s )
