@@ -1,0 +1,99 @@
+type: ItemTurret
+category: turret
+//research: {
+//	parent: yg
+//	objectives: [
+//		{
+//			type: onSector
+//			preset: hhys
+//		}
+//	]
+//}
+requirements: [
+	copper/1450
+	titanium/800
+	thorium/1100
+	silicon/800
+	plastanium/650
+	surge-alloy/400
+	mc/350
+]
+
+health: 1500
+size: 3
+hasLiquids: true
+liquidCapacity: 45
+reload: 600
+range: 500
+shootCone: 60
+recoil: 1
+shake: 4
+ammoPerShot: 6
+inaccuracy: 0
+rotateSpeed: 1
+shootSound: missileLaunch
+consumes: {
+	coolant: {
+		amount: 0.5
+		optional: true
+	}
+}
+    
+ammoTypes: {
+	yjdk: {
+		type: MissileBulletType
+		damage: 285
+		speed: 3.33
+		lifetime: 150
+		width: 25
+		height: 28
+		despawnShake: 3
+		homingPower: 0.08
+		buildingDamageMultiplier: 0.2
+		splashDamageRadius: 56
+		splashDamage: 305
+		collidesGround: true
+		shootEffect: shootBig
+		smokeEffect: shootSmokeMissile
+		hitEffect: massiveExplosion
+		hitSound: mediumCannon
+	}
+	yjbld: {
+		type: MissileBulletType
+		reloadMultiplier: 0.8
+		damage: 320
+		speed: 3.5
+		lifetime: 220
+		rangeChange: 270
+		width: 25
+		height: 28
+		despawnShake: 5
+		homingPower: 0.12
+		buildingDamageMultiplier: 0.2
+		splashDamageRadius: 72
+		splashDamage: 320
+		makeFire: true
+		collidesGround: true
+		shootEffect: shootBig
+		smokeEffect: shootSmokeMissile
+		hitEffect: massiveExplosion
+		hitSound: mediumCannon
+		fragBullets: 3
+		fragBullet: {
+			type: MissileBulletType
+			damage: 220
+			speed: 2.4
+			lifetime: 120
+			width: 20
+			height: 24
+			shrinkY: 1
+			despawnShake: 2
+			hitEffect: blastExplosion
+			buildingDamageMultiplier: 0.2
+			splashDamageRadius: 120
+			splashDamage: 780
+			status: blasted
+			statusDuration: 120
+		}
+	}
+}

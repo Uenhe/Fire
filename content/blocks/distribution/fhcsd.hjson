@@ -1,0 +1,22 @@
+type: conveyor
+category: distribution
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: lhyj
+		}
+	]
+}
+requirements: [
+	metaglass/1
+	titanium/1
+	thorium/1
+]
+
+health: 85
+size: 1
+
+speed: 0.21
+displayedSpeed: 25

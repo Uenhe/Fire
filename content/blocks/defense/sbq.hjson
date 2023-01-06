@@ -1,0 +1,19 @@
+type: wall
+category: defense
+research: {
+	parent: js
+	objectives: [
+		{
+			type: onSector
+			preset: htdl
+		}
+	]
+}
+requirements: [
+	metaglass/3
+	titanium/4
+]
+
+health: 720
+size: 1
+requiresWater: true

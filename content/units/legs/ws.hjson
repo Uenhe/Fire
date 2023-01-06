@@ -1,0 +1,9 @@
+research: {
+	parent: ky
+	objectives: [
+		{
+			type: sectorComplete
+			preset: bzxw
+		}
+	]
+}

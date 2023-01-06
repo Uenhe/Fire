@@ -1,0 +1,76 @@
+type: legs
+health: 128000
+armor: 34
+
+drag: 0.1
+speed: 1
+hitSize: 23
+rotateSpeed: 2.7
+hovering: true
+shadowElevation: 0.65
+groundLayer: 75
+allowLegStep: true
+
+legCount: 8
+legMoveSpace: 1
+legPairOffset: 3
+legLength: 300
+legExtension: -15
+legBaseOffset: 10
+stepShake: 1
+legLengthScl: 1
+legSplashDamage: 32
+legSplashRange: 30
+rippleScale: 5
+legSpeed: 0.2
+
+weapons: [
+	{
+		name: error-sapper
+		x: 8
+		y: -5
+		reload: 12
+		rotate: true
+		rotateSpeed: 6
+		alternate: true
+		mirror: true
+		shootSound: sap
+		bullet: {
+			type: SapBulletType
+			damage: 165
+			lifetime: 30
+			length: 128
+			width: 2
+			knockback: -1
+			sapStrength: 0.6
+			shootEffect: shootSmall
+			color: 990003
+			hitColor: 990003
+		}
+	}
+	{
+		name: error-laser
+		x: 9
+		y: -7
+		shootY: 7
+		reload: 15
+		shake: 3
+		rotate: true
+		rotateSpeed: 2
+		shadow: 8
+		recoil: 3
+		top: false
+		shootSound: shootBig
+		shoot: {
+			shots: 3
+			shotDelay: 8
+		}
+		bullet: {
+			type: ShrapnelBulletType
+			damage: 525
+			length: 320
+			width: 20
+			toColor: 990003
+		}
+	}
+]

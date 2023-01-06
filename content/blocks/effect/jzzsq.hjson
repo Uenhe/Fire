@@ -1,0 +1,24 @@
+type: buildTurret
+category: effect
+//research: {
+//	parent: hzgs
+//	objectives: [
+//		{
+//			type: sectorComplete
+//			preset: hacj
+//		}
+//	]
+//}
+requirements: [
+	lead/170
+	silicon/120
+	thorium/75
+	dt/50
+]
+
+health: 865
+size: 2
+
+range: 285
+buildSpeed: 0.75
+consumes: {power: 2}

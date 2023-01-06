@@ -1,0 +1,45 @@
+type: tank
+
+health: 200
+armor: 5
+squareShape: true
+omniMovement: false
+rotateMoveFirst: true
+outlineColor: 2d2f39
+hitSize: 12
+treadPullOffset: 3
+treadRects: [
+	{
+		type: jf
+		x: -20
+		y: -25
+		width: 14
+		height: 51
+	}
+]
+speed: 6.5
+rotateSpeed: 3.5
+
+weapons: [
+	{
+		name: ssp
+		layerOffset: 0.0001
+		x: 0
+		y: -0.75
+		reload: 50
+		shootY: 4.5
+		recoil: 1
+		rotate: true
+		rotateSpeed: 18
+		mirror: false
+		heatColor: f9350f
+		cooldownTime: 30
+		bullet: {
+			damage:8
+			speed:10
+			lifetime:12
+			width:2
+			height:3
+		}
+	}
+]

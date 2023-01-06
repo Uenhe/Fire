@@ -1,0 +1,11 @@
+type: wall
+category: defense
+research: sbq
+requirements: [
+	metaglass/12
+	titanium/16
+]
+
+health: 2880
+size: 2
+requiresWater: true

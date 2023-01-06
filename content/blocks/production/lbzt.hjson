@@ -1,0 +1,59 @@
+type: drill
+category: production
+//research: {
+//	parent: hzgs
+//	objectives: [
+//		{
+//			type: sectorComplete
+//			preset: hacj
+//		}
+//	]
+//}
+requirements: [	
+	copper/160
+	metaglass/80
+	thorium/375
+	silicon/145
+]
+
+health: 1120
+size: 5
+itemCapacity: 30
+liquidCapacity: 30
+rotateSpeed: 8
+warmupSpeed: 0.001
+drawRim: true
+drawMineItem: true
+drillEffect: mineHuge
+updateEffect: mineBig
+baseExplosiveness: 5
+destroyBullet: {
+	lifetime: 2
+	speed: 0
+	hitShake: 2
+	splashDamageRadius: 48
+	splashDamage: 180
+	collides: false
+	sprite: circle-bullet
+	despawnEffect: {
+		type: WaveEffect
+		lifetime: 10
+		sizeFrom: 0, sizeTo: 40
+		strokeFrom: 3, strokeTo: 0
+		colorFrom: ffffff, colorTo: ffffff
+	}
+}
+
+tier: 8
+drillTime: 165
+hardnessDrillMultiplier: 45
+liquidBoostIntensity: 2
+warmupSpeed: 0.02
+consumes: {
+	liquid: {
+		liquid: water
+		amount: 0.2
+		booster: true
+		optional: true
+	}
+}
