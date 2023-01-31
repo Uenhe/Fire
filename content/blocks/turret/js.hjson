@@ -2,6 +2,11 @@ type: ItemTurret
 category: turret
 research: {
 	parent: hzgs
+	requirements: [
+		copper/250
+		lead/160
+		titanium/90
+	]
 	objectives: [
 		{
 			type: onSector

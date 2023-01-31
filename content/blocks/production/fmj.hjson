@@ -2,6 +2,12 @@ type: WallCrafter
 category: production
 research: {
 	parent: hzgs
+	requirements: [
+		copper/50
+		lead/35
+		titanium/25
+		silicon/30
+	]
 	objectives: [
 		{
 			type: onSector

@@ -1,11 +1,11 @@
-name: fire
-displayName: Fire
-author: 飞雨a_ssylfyzgmz && -Uenhe饨咂-
-version: 1.0.1
+name: 'fire'
+displayName: 'Fire'
+author: '飞雨a_ssylfyzgmz && -Uenhe饨咂-'
+version: 1.0.3
 minGameVersion: 140
-repo: Uenhe/Fire
+repo: 'Uenhe/Fire'
 
-subtitle: >_  v1.0.1
+subtitle: '>_  v1.0.3'
 description: '
 	[royal[]]A Mindustry Mod that adds a lots of WEIRD things.
 	一个奇奇怪怪又十分核锂的mod...
@@ -22,6 +22,17 @@ description: '
 	如果你觉得该mod很棒的话，一定要去GitHub给这个项目点个星星啊！
 	
 	[white[]]更新记录一览：
+	
+	v1.0.3
+	又修复了关于战役的几个bug
+	减少了离塞塔的一些基础方块的研究消耗
+	感谢 NJSAAA 重绘的 守护 的贴图（名称以群内为准，乐死我了）
+	
+	v1.0.2
+	重绘了一些方块的贴图
+	给装甲核心添加了力墙（注：方块数据有变动，导致装有旧版装甲核心的图会损坏）
+	在设置里添加了手挖沙的开关
+	关于存档损坏：请先回滚版本到v1.0.1，然后将所有图的装甲核心拆除或摧毁，确认后再更新版本！
 	
 	v1.0.1
 	紧急修复了关于战役的几个bug

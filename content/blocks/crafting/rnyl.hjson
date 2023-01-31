@@ -2,6 +2,11 @@ type: AttributeCrafter
 category: crafting
 research: {
 	parent: hzgs
+	requirements: [
+		copper/120
+		lead/90
+		graphite/60
+	]
 	objectives: [
 		{
 			type: onSector
@@ -36,11 +41,11 @@ maxBoost: 1
 craftTime: 60
 outputItem: bl/6
 consumes: {
+	power: 0.5
 	items: {
 		items: [
 			sand/6
 			coal/1
 		]
 	}
-	power: 0.5
 }

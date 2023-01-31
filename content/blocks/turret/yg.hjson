@@ -2,19 +2,18 @@ type: ItemTurret
 category: turret
 research: {
 	parent: js
-	objectives: [
-		{
-			type: onSector
-			preset: jljd
-		}
+	requirements: [
+		titanium/500
+		thorium/320
+		silicon/275
+		jmbl/180
 	]
 }
 requirements: [
-	copper/220
-	titanium/180
-	thorium/150
-	silicon/175
-	jmbl/70
+	titanium/140
+	thorium/110
+	silicon/85
+	jmbl/65
 ]
 
 health: 1080

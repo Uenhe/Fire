@@ -34,7 +34,7 @@ Blocks.wave.ammoTypes.put(FireLiquids.yd, (() => {
 	ammo.status = FireStatuses.ds
 	ammo.damage = 4.55
 	return ammo
-})(),)
+})(),) //波浪液氮弹药添加
 Blocks.tsunami.ammoTypes.put(FireLiquids.yd, (() => {
 	const ammo = new JavaAdapter(LiquidBulletType, {})
 	ammo.liquid = FireLiquids.yd
@@ -49,7 +49,7 @@ Blocks.tsunami.ammoTypes.put(FireLiquids.yd, (() => {
 	ammo.statusDuration = 240
 	ammo.damage = 6.25
 	return ammo
-})(),)
+})(),) //海啸液氮弹药添加
 
 Blocks.laserDrill.drillTime = 270
 Blocks.laserDrill.hardnessDrillMultiplier = 45

@@ -1,10 +1,13 @@
 const lib = require('misc/lib')
 const sS = require('misc/sectorSize')
+const FireItems = require('items')
 
-const lst = new JavaAdapter(Planet, {load(){
-	this.meshLoader = prov(() => new HexMesh(lst, 6))
-	this.super$load()
-}}, 'lst', Planets.sun, 1)
+const lst = new JavaAdapter(Planet, {
+	load(){
+		this.meshLoader = prov(() => new HexMesh(lst, 6))
+		this.super$load()
+	}
+}, 'lst', Planets.sun, 1)
 sS.planetGrid(lst, 3)
 lst.generator = new SerpuloPlanetGenerator()
 lst.bloom = false
@@ -17,11 +20,12 @@ lst.enemyCoreSpawnReplace = false
 lst.allowLaunchSchematics = false
 lst.allowLaunchLoadout = false
 lst.allowSectorInvasion = false
-lst.allowWaveSimulation = false
+lst.allowWaveSimulation = true
 lst.enemyCoreSpawnReplace = false
 lst.prebuildBase = false
 lst.orbitRadius = 64
 lst.startSector = 0
+lst.sectorSeed = 3
 lst.defaultCore = Blocks.coreShard
 lst.atmosphereColor = Color.valueOf('4d1b8f')
 lst.atmosphereRadIn = 0.05

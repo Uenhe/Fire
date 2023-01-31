@@ -9,6 +9,7 @@ research: {
 		}
 	]
 }
+researchCostMultiplier: 0.6
 requirements: [
 	copper/60
 	lead/80

@@ -65,3 +65,7 @@ ybd.frameTime = 4
 ybd.frames = 11
 exports.ybd = ybd
 lib.addToResearch(ybd, {parent: 'yjdk',})
+
+const lisertarItems = new Seq()
+lisertarItems.addAll(bl, dt, zzhhhj, hhhj, lhjj, jmbl, mc, xrt, yjdk, yjbld, ybd)
+exports.lisertarItems = lisertarItems

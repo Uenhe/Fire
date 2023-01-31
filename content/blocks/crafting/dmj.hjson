@@ -1,10 +1,17 @@
 type: GenericCrafter
 category: crafting
-research: dgj
+research: {
+	parent: dgj
+	requirements: [
+		graphite/160
+		titanium/200
+		silicon/180
+	]
+}
 requirements: [
-	graphite/100
-	titanium/85
-	silicon/40
+	graphite/45
+	titanium/75
+	silicon/60
 ]
 
 size: 2

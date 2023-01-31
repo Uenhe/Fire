@@ -1,10 +1,17 @@
 type: GenericCrafter
 category: crafting
-research: rnyl
+research: {
+	parent: rnyl
+	requirements: [
+		lead/200
+		titanium/135
+		silicon/160
+	]
+}
 requirements: [
-	titanium/105
-	silicon/40
-	bl/60
+	lead/75
+	titanium/40
+	silicon/55
 ]
 
 size: 2
