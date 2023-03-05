@@ -1,18 +1,18 @@
 type: ConsumeGenerator
 category: power
 requirements: [
-	lead/125
-	titanium/85
-	thorium/75
-	silicon/175
-	dt/45
+	lead/150
+	thorium/90
+	silicon/225
+	plastanium/115
+	dt/60
 ]
 research: {
 	parent: zjjd
 	objectives: [
 		{
 			type: sectorComplete
-			preset: lhyj
+			preset: lfsm
 		}
 	]
 }
@@ -61,7 +61,7 @@ drawer: {
 	]
 }
 
-itemDuration: 180
+itemDuration: 120
 powerProduction: 48
 consumes: {
 	itemFlammable: {minFlammability: 1.15}

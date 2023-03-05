@@ -1,4 +1,4 @@
-type: GenericCrafter
+//type: GenericCrafter
 category: crafting
 research: {
 	parent: dgj
@@ -26,7 +26,7 @@ drawer: {
 	]
 }
 
-craftTime: 120
+craftTime: 90
 outputItem: jmbl/1
 consumes: {
 	power: 2

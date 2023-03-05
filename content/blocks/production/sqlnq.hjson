@@ -1,0 +1,40 @@
+type: GenericCrafter
+category: production
+research: {
+	parent: swzzsj
+	objectives: [
+		{
+			type: sectorComplete
+			preset: bzxw
+		}
+	]
+}
+requirements: [
+	lead/50
+	graphite/30
+	metaglass/30
+	titanium/20
+]
+
+size: 2
+hasPower: true
+hasItems: false
+hasLiquids: true
+drawer: {
+	type: DrawMulti
+	drawers: [
+		{
+			type: DrawRegion
+			suffix: -bottom
+		}
+		{
+			type: DrawLiquidTile
+			drawLiquid: water
+		}
+		DrawDefault
+	]
+}
+
+craftTime: 20
+outputLiquid: water/0.4
+consumes: {power: 3.5}

@@ -35,6 +35,6 @@ drawer: {
 craftTime: 10
 outputItem: silicon/2
 consumes: {
-	power: 10
+	power: 12
 	items: {items: [sand/3]}
 }

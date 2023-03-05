@@ -1,0 +1,51 @@
+type: GenericCrafter
+category: crafting
+research: {
+	parent: swzzsj
+	objectives: [
+		{
+			type: onSector
+			preset: bzxw
+		}
+	]
+}
+requirements: [
+	copper/45
+	lead/70
+	graphite/30
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+updateEffect: pulverizeMedium
+craftEffect: blastsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		{
+			type: DrawRegion
+			suffix: -bottom
+		}
+		{
+			type: DrawRegion
+			suffix: -spinner
+			rotateSpeed: 10
+			spinSprite: true
+		}
+		DrawDefault
+		DrawFade
+	]
+}
+
+craftTime: 30
+outputItem: scrap/2
+consumes: {
+	power: 0.5
+	items: {
+		items: [
+			copper/1
+			lead/1
+		]
+	}
+}

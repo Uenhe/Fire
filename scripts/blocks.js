@@ -1,9 +1,29 @@
+//注: 此处仅负责方块的特殊效果, 一般参数请移步json部分.
+
 //const AssemblerUnitPlan = Packages.mindustry.world.blocks.units.UnitAssembler.assemblerUnitPlan
 const lib = require('misc/lib')
 const FireItems = require('items')
+const FireStatuses = require('statuses')
 const FireUnits = require('units')
 
+function newBlock(type, name) {
+	exports[type, name] = (() => {
+		let block = extend(type, name, {})
+		return block
+	})()
+} //json方块初始化函数...用于其他js文件的引用
+
+//炮塔
+
+newBlock(ItemTurret, 'yg') //魇光
+
+//运输
+
+newBlock(Conveyor, 'fhcsd') //复合传送带
+
 //工厂
+
+newBlock(GenericCrafter, 'dmj') //钢化玻璃打磨机
 
 //工厂-木材焚烧厂
 /*
@@ -72,25 +92,6 @@ mcfsc.buildType = prov(() => {
 		},
 	}, mcfsc)
 })
-mcfsc.category = Category.crafting
-mcfsc.buildVisibility = BuildVisibility.shown
-mcfsc.requirements = ItemStack.with(
-	Items.copper, 50,
-	Items.lead, 25,
-	Items.metaglass, 15,
-	Items.graphite, 20,
-)
-mcfsc.size = 2
-mcfsc.hasPower = true
-mcfsc.hasItems = true
-mcfsc.hasLiquids = false
-mcfsc.powerProduction = 3.5
-mcfsc.itemDuration = itemDuration
-mcfsc.generateEffect = Fx.generatespark
-mcfsc.drawer = new DrawMulti(new DrawDefault(), new DrawWarmupRegion())
-mcfsc.ambientSound = Sounds.steam
-mcfsc.ambientSoundVolume = 0.01
-mcfsc.consumeItem(input)
 exports.mcfsc = mcfsc
 
 //效果
@@ -106,9 +107,11 @@ const shieldHealth = 400
 const cooldown = 0.8
 const cooldownBrokenBase = 0.8 //定义力墙接口
 const zjhx = extend(CoreBlock, 'zjhx', {
-	canBreak(tile) {return Vars.state.teams.cores(tile.team()).size > 1}, //当核心数大于1时可被拆除
-	canReplace(other) {return other.alwaysReplace}, //可被放置
-	canPlaceOn(tile, team) {return true}, //可被放置(?)
+	canBreak(tile){
+		if(this.team = Team.derelict) return true //灰队? 不就是用来回收资源的吗(
+		return Vars.state.teams.cores(tile.team()).size > 1 //当核心数大于1时可被拆除
+	},
+	canPlaceOn(tile, team) {return true}, //可被放置
 	init(){
 		this.updateClipRadius(radius + 3)
 		this.super$init()
@@ -136,7 +139,7 @@ const zjhx = extend(CoreBlock, 'zjhx', {
 		Lines.stroke(1)
 		Lines.poly(x * Vars.tilesize + this.offset, y * Vars.tilesize + this.offset, 6, radius)
 		Draw.color()
-	}, //方块放置预览力墙绘制
+	} //方块放置预览力墙绘制
 })
 zjhx.buildType = prov(() => {
 	var broken = true
@@ -149,10 +152,6 @@ zjhx.buildType = prov(() => {
 			if(!broken && radius * radscl > 1) Fx.forceShrink.at(this.x, this.y, radius * radscl, this.team.color)
 			this.super$onRemoved()
 		}, //方块被移除时力墙收缩效果(?)
-		pickedUp(){
-			this.super$pickedUp()
-			radscl = warmup = 0
-		}, 
 		inFogTo(viewer) {return false},
 		updateTile(){
 			radscl = Mathf.lerpDelta(radscl, broken ? 0 : warmup, 0.05)
@@ -198,9 +197,8 @@ zjhx.buildType = prov(() => {
 			if(!broken) {
 				Draw.z(Layer.shields)
 				Draw.color(this.team.color, Color.white, Mathf.clamp(hit))
-				if(Core.settings.getBool('animatedshields')) {
-					Fill.poly(this.x, this.y, 6, radius * radscl)
-				}else {
+				if(Core.settings.getBool('animatedshields')) {Fill.poly(this.x, this.y, 6, radius * radscl)}
+				else{
 					Lines.stroke(1.5)
 					Draw.alpha(0.09 + Mathf.clamp(0.08 * hit))
 					Fill.poly(this.x, this.y, 6, radius * radscl)
@@ -224,59 +222,52 @@ zjhx.buildType = prov(() => {
 			buildup = read.f()
 			radscl = read.f()
 			warmup = read.f()
-		}, //write和read部分可以让值被存档&读取
+		} //write和read部分可以让值被存档&读取
 	}, zjhx)
 })
-zjhx.category = Category.effect
-zjhx.buildVisibility = BuildVisibility.shown
-zjhx.researchCostMultiplier = 0.4
-zjhx.requirements = ItemStack.with(
-	Items.copper, 9000,
-	Items.lead, 8500,
-	Items.metaglass, 2500,
-	Items.titanium, 4000,
-	Items.thorium, 3500,
-	Items.silicon, 6000,
-	Items.plastanium, 1000,
-)
-zjhx.health = 11200
-zjhx.armor = 8
-zjhx.size = 5
-zjhx.itemCapacity = 10500
-zjhx.unitType = FireUnits.gnj
-zjhx.unitCapModifier = 12
 exports.zjhx = zjhx
 
 //效果-Javelin机甲平台
 //部分代码来自创世神mod
 const javelinPad = extend(CoreBlock, 'javelinPad', {
 	canBreak(tile){return Vars.state.teams.cores(tile.team()).size > 1},
-	canReplace(other){return other.alwaysReplace},
-	canPlaceOn(tile, team){return true},
+	canPlaceOn(tile, team, rotation){return true}
 })
 javelinPad.buildType = prov(() => {
 	return new JavaAdapter(CoreBlock.CoreBuild, {
 		onRemoved() {Vars.state.teams.unregisterCore(this)}
 	}, javelinPad)
 })
-javelinPad.category = Category.effect
-javelinPad.buildVisibility = BuildVisibility.shown
-javelinPad.alwaysReplace = false
-javelinPad.replaceable = false
-javelinPad.requirements = ItemStack.with(
-	Items.lead, 350,
-	Items.titanium, 500,
-	Items.silicon, 450,
-	Items.plastanium, 400,
-	Items.phaseFabric, 200,
-)
-javelinPad.health = 1200
-javelinPad.size = 2
-javelinPad.itemCapacity = 0
-javelinPad.unloadable = false
-javelinPad.unitType = FireUnits.javelin
-javelinPad.unitCapModifier = 0
 exports.javelinPad = javelinPad
+
+//效果-篝火
+const gh = extend(OverdriveProjector, 'gh', {})
+gh.buildType = prov(() => {
+	return new JavaAdapter(OverdriveProjector.OverdriveBuild, {
+		updateTile(){
+			this.super$updateTile()
+			if(this.efficiency > 0){
+				Groups.unit.intersect(this.x - 512, this.y - 512, 1024, 1024, cons(unit => {
+					if(unit.team == this.team && Intersector.isInRegularPolygon(24, this.x, this.y, 512, 0, unit.x, unit.y)) {unit.apply(FireStatuses.inspired, 60)}
+					if(unit.team != this.team && Intersector.isInRegularPolygon(24, this.x, this.y, 512, 0, unit.x, unit.y)) {unit.apply(StatusEffects.sapped, 60)}
+				}))
+				if(Mathf.chanceDelta(0.02)) {Fx.blastsmoke.at(this.x + Mathf.range(20), this.y + Mathf.range(20))}
+				if(Mathf.chanceDelta(0.02)) {Fx.generatespark.at(this.x + Mathf.range(20), this.y + Mathf.range(20))}
+			}
+		},
+		draw(){
+			this.super$draw()
+			if(this.efficiency > 0){
+				Draw.color(Color.valueOf('feb380'), 1)
+				Lines.stroke(2)
+				Lines.circle(this.x, this.y, 512)
+				Draw.alpha(0.25)
+				Fill.circle(this.x, this.y, 512)
+			}
+		}
+	}, gh)
+})
+exports.gh = gh
 
 /*
 这里本来是想用装配厂的装配机来做单位的...但是做出来的单位只能用装配机的AI, 不然会报错, 故搁置, 转移到普通空军厂里.

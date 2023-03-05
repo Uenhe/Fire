@@ -1,4 +1,4 @@
-type: OverdriveProjector
+//type: OverdriveProjector
 category: effect
 research: {
 	parent: hzgs

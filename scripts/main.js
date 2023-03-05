@@ -1,3 +1,4 @@
+require('abilities')
 require('blocks')
 require('fx')
 require('items')

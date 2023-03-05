@@ -22,4 +22,5 @@ maxNodes: 8
 laserRange: 25
 consumesPower: true
 outputsPower: true
+enableDrawStatus: false //只会显示红灯是吧, 灯都给你ban咯
 consumes: {powerBuffered: 20000}

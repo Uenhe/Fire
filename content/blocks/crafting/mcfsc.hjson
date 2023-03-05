@@ -1,1 +1,31 @@
+//type: ConsumeGenerator
+category: crafting
 research: fmj
+requirements: [
+	copper/50
+	lead/25
+	metaglass/15
+	graphite/20
+]
+
+size: 2
+hasItems: true
+hasLiquids: false
+ambientSound: steam
+ambientSoundVolume: 0.01
+generateEffect: generatespark
+drawer: {
+	type: DrawMulti
+	drawers: [
+		DrawDefault
+		DrawWarmupRegion
+	]
+}
+
+itemDuration: 30
+powerProduction: 3.5
+consumes: {
+	items: {
+		items: [mc/1]
+	}
+}

@@ -1,8 +1,9 @@
-const sm = Attribute.add('sm')
-const cd = Attribute.add('cd')
+const lib = require('misc/lib')
 const FireLiquids = require('liquids')
 const FireStatuses = require('statuses')
 const FireUnits = require('units')
+const sm = Attribute.add('sm')
+const cd = Attribute.add('cd')
 
 Blocks.sandWater.itemDrop = Items.sand
 Blocks.darksandWater.itemDrop = Items.sand
@@ -16,7 +17,7 @@ Events.on(EventType.ClientLoadEvent, e => {
 		Blocks.darksandTaintedWater.playerUnmineable = !b
 	})
 }) //设置-游戏-手挖沙 开关
-Core.settings.defaults('allowSandMining', false)
+//Core.settings.defaults('allowSandMining', false)
 Blocks.sporePine.attributes.set(sm, 1.5)
 Blocks.snowPine.attributes.set(sm, 1.5)
 Blocks.pine.attributes.set(sm, 1.5)
@@ -34,7 +35,7 @@ Blocks.wave.ammoTypes.put(FireLiquids.yd, (() => {
 	ammo.status = FireStatuses.ds
 	ammo.damage = 4.55
 	return ammo
-})(),) //波浪液氮弹药添加
+})()) //波浪液氮弹药添加
 Blocks.tsunami.ammoTypes.put(FireLiquids.yd, (() => {
 	const ammo = new JavaAdapter(LiquidBulletType, {})
 	ammo.liquid = FireLiquids.yd
@@ -49,7 +50,7 @@ Blocks.tsunami.ammoTypes.put(FireLiquids.yd, (() => {
 	ammo.statusDuration = 240
 	ammo.damage = 6.25
 	return ammo
-})(),) //海啸液氮弹药添加
+})()) //海啸液氮弹药添加
 
 Blocks.laserDrill.drillTime = 270
 Blocks.laserDrill.hardnessDrillMultiplier = 45
@@ -60,17 +61,17 @@ Blocks.mechanicalPump.pumpAmount = 0.12
 Blocks.impulsePump.pumpAmount = 2 / 9
 
 Blocks.groundFactory.plans.add(
-	new UnitFactory.UnitPlan(FireUnits.sh, 1500, ItemStack.with(Items.lead, 20, Items.titanium, 25, Items.silicon, 30)),
+	new UnitFactory.UnitPlan(FireUnits.sh, 1500, ItemStack.with(Items.lead, 20, Items.titanium, 25, Items.silicon, 30))
 )
 Blocks.airFactory.plans.add(
 	new UnitFactory.UnitPlan(UnitTypes.alpha, 2400, ItemStack.with(Items.copper, 30, Items.lead, 40, Items.silicon, 30)),
-	new UnitFactory.UnitPlan(FireUnits.firefly, 2400, ItemStack.with(Items.lead, 20, Items.metaglass, 10, Items.coal, 10, Items.silicon, 15)),
+	new UnitFactory.UnitPlan(FireUnits.firefly, 2400, ItemStack.with(Items.lead, 20, Items.metaglass, 10, Items.coal, 10, Items.silicon, 15))
 )
 Blocks.additiveReconstructor.addUpgrade(UnitTypes.alpha, UnitTypes.beta)
 Blocks.additiveReconstructor.addUpgrade(FireUnits.sh, FireUnits.ky)
 Blocks.multiplicativeReconstructor.addUpgrade(UnitTypes.beta, FireUnits.gnj)
 Blocks.multiplicativeReconstructor.addUpgrade(FireUnits.ky, FireUnits.ws)
-//Blocks.exponentialReconstructor.addUpgrade(FireUnits.ws, FireUnits.bh)
+Blocks.exponentialReconstructor.addUpgrade(FireUnits.ws, FireUnits.bh)
 //Blocks.tetrativeReconstructor.addUpgrade(FireUnits.bh, FireUnits.sy)
 
 UnitTypes.alpha.coreUnitDock = true
@@ -78,3 +79,5 @@ UnitTypes.beta.coreUnitDock = true
 UnitTypes.gamma.coreUnitDock = true
 UnitTypes.alpha.defaultCommand = UnitCommand.mineCommand
 UnitTypes.beta.defaultCommand = UnitCommand.mineCommand
+lib.addToResearch(UnitTypes.alpha, {parent: 'air-factory'})
+lib.addToResearch(UnitTypes.beta, {parent: 'alpha'})

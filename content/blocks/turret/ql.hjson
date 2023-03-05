@@ -1,14 +1,14 @@
 type: ItemTurret
 category: turret
-//research: {
-//	parent: yg
-//	objectives: [
-//		{
-//			type: onSector
-//			preset: hhys
-//		}
-//	]
-//}
+research: {
+	parent: yg
+	objectives: [
+		{
+			type: SectorComplete
+			preset: hhys
+		}
+	]
+}
 requirements: [
 	copper/1450
 	titanium/800

@@ -5,15 +5,15 @@ requirements: [
 	silicon/25
 	dt/10
 ]
-//research: {
-//	parent: hzgs
-//	objectives: [
-//		{
-//			type: onSector
-//			preset: hacj
-//		}
-//	]
-//}
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: hacj
+		}
+	]
+}
 
 health: 320
 size: 2

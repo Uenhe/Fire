@@ -37,6 +37,7 @@ drawer: {
 }
 
 attribute: heat
+boostScale: 0.334
 maxBoost: 1
 craftTime: 60
 outputItem: bl/6

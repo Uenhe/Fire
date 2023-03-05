@@ -1,14 +1,14 @@
 type: ContinuousTurret
 category: turret
-//research: {
-//	parent: js
-//	objectives: [
-//		{
-//			type: onSector
-//			preset: jljd
-//		}
-//	]
-//}
+research: {
+	parent: js
+	objectives: [
+		{
+			type: onSector
+			preset: zrhs
+		}
+	]
+}
 requirements: [
 	copper/350
 	graphite/240

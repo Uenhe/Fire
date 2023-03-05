@@ -1,14 +1,14 @@
 type: buildTurret
 category: effect
-//research: {
-//	parent: hzgs
-//	objectives: [
-//		{
-//			type: sectorComplete
-//			preset: hacj
-//		}
-//	]
-//}
+research: {
+	parent: buildingHealer
+	objectives: [
+		{
+			type: sectorComplete
+			preset: hacj
+		}
+	]
+}
 requirements: [
 	lead/170
 	silicon/120

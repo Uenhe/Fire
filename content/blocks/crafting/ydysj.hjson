@@ -1,14 +1,14 @@
 type: GenericCrafter
 category: crafting
-//research: {
-//	parent: hhhjcqc
-//	objectives: [
-//		{
-//			type: sectorComplete
-//			preset: hacj
-//		}
-//	]
-//}
+research: {
+	parent: hhhjcqc
+	objectives: [
+		{
+			type: sectorComplete
+			preset: zrhs
+		}
+	]
+}
 requirements: [
 	lead/220
 	metaglass/175
@@ -42,7 +42,7 @@ drawer: {
 }
 
 craftTime: 120	
-outputLiquid: yd/0.83
+outputLiquid: yd/0.833
 consumes: {
 	power: 6.66
 	items: {

@@ -1,4 +1,4 @@
-type: conveyor
+//type: conveyor
 category: distribution
 research: {
 	parent: hzgs

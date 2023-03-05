@@ -1,0 +1,17 @@
+//type: CoreBlock
+category: effect
+requirements: [
+	lead/350
+	titanium/500
+	silicon/450
+	plastanium/400
+	phase-fabric/200
+]
+
+health: 1200
+size: 2
+itemCapacity: 0
+
+unitType: javelin
+unitCapModifier: 0
+unloadable: false

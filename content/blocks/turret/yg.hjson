@@ -1,4 +1,4 @@
-type: ItemTurret
+//type: ItemTurret
 category: turret
 research: {
 	parent: js
@@ -22,7 +22,7 @@ hasLiquids: true
 liquidCapacity: 20
 reload: 24
 range: 220
-shootCone: 85
+shootCone: 30
 inaccuracy: 2
 rotateSpeed: 10
 shootSound: shootBig
@@ -157,7 +157,7 @@ ammoTypes: {
 	}
 	thorium: {
 		type: LaserBulletType
-		damage: 105
+		damage: 135
 		length: 230
 		lifetime: 16
 		width: 30
@@ -185,7 +185,7 @@ ammoTypes: {
 	}
 	surge-alloy: {
 		type: LaserBulletType
-		damage: 115
+		damage: 105
 		length: 265
 		lifetime: 16
 		rangeChange: 35
@@ -200,7 +200,7 @@ ammoTypes: {
 		lightningLength: 0.8
 		lightningDelay: 1.2
 		lightningLengthRand: 10
-		lightningDamage: 16
+		lightningDamage: 24
 		lightningAngleRand: 30
 		status: shocked
 		ammoMultiplier: 5

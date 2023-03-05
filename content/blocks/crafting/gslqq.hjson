@@ -1,14 +1,14 @@
 type: GenericCrafter
 category: crafting
-//research: {
-//	parent: hhhjtqq
-//	objectives: [
-//		{
-//			type: sectorComplete
-//			preset: hacj
-//		}
-//	]
-//}
+research: {
+	parent: hhhjtqq
+	objectives: [
+		{
+			type: sectorComplete
+			preset: zrhs
+		}
+	]
+}
 requirements: [
 	copper/110
 	graphite/75

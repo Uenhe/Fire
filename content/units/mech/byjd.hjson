@@ -1,0 +1,31 @@
+type: mech
+speed: 0.5
+hitSize: 6
+rotateSpeed: 8
+health: 690
+armor: 7
+drownTimeMultiplier: 3
+mechFrontSway: 0.4
+mechSideSway: 0.3
+
+weapons: [
+	{
+		name: byjd-weapon
+		top: false
+		x: 4
+		y: 1
+		shootY: 2
+		reload: 15
+		recoil: 5
+		shake: 2
+		ejectEffect: casing1
+		bullet: {
+		type: BasicBulletType
+			speed: 4
+			damage: 55
+			width: 10
+			height: 13
+			lifetime: 60
+		} 
+	}
+]

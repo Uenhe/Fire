@@ -8,7 +8,7 @@ yd.viscosity = 0.4
 yd.effect = FireStatuses.ds
 yd.barColor = Color.valueOf('f0ffff')
 yd.gasColor = Color.valueOf('c1e8f5')
-//yd.lightColor = Color.valueOf('0097f5').a(0.2)
+yd.lightColor = Color.valueOf('0097f532')
 yd.boilPoint = 0.55
 exports.yd = yd
-lib.addToResearch(yd, {parent: 'cryofluid',})
+lib.addToResearch(yd, {parent: 'cryofluid'})

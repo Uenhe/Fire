@@ -1,14 +1,14 @@
 type: drill
 category: production
-//research: {
-//	parent: hzgs
-//	objectives: [
-//		{
-//			type: sectorComplete
-//			preset: hacj
-//		}
-//	]
-//}
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: hacj
+		}
+	]
+}
 requirements: [	
 	copper/160
 	metaglass/80

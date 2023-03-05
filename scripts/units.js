@@ -1,5 +1,8 @@
+const FireAbilities = require('abilities')
+
 //陆军-爬辅
 
+//爬辅-守护
 const sh = extend(UnitType, 'sh', {})
 sh.constructor = prov(() => extend(UnitTypes.merui.constructor.get().class, {}))
 sh.hovering = true
@@ -30,10 +33,11 @@ sh.legStraightness = 0.3
 sh.legMoveSpace = 1
 sh.legSpeed = 0.2
 sh.legGroupSize = 3
-sh.rippleScale = 0.4
-sh.abilities.add(new ForceFieldAbility(44, 0.25, 180, 400))
+sh.rippleScale = 0.2
+sh.abilities.add(new ForceFieldAbility(44, 0.25, 200, 400))
 exports.sh = sh
 
+//爬辅-抗御
 const ky = extend(UnitType, 'ky', {})
 ky.constructor = prov(() => extend(UnitTypes.cleroi.constructor.get().class, {}))
 ky.hovering = true
@@ -62,11 +66,14 @@ ky.legMaxLength = 1.1
 ky.legLengthScl = 1.6
 ky.legMoveSpace = 1
 ky.legSpeed = 0.2
-ky.rippleScale = 0.4
-ky.abilities.add(new ForceFieldAbility(54, 0.3, 220, 340))
-ky.abilities.add(new RepairFieldAbility(40, 60, 40))
+ky.rippleScale = 0.3
+ky.abilities.add(
+	new ForceFieldAbility(54, 0.35, 280, 340),
+	new RepairFieldAbility(40, 60, 40),
+)
 exports.ky = ky
 
+//爬辅-卫戍
 const ws = extend(UnitType, 'ws', {})
 ws.constructor = prov(() => extend(UnitTypes.anthicus.constructor.get().class, {}))
 ws.hovering = true
@@ -87,8 +94,8 @@ ws.canAttack = false
 ws.targetable = false
 ws.legCount = 6
 ws.legLength = 22
-ws.legExtension = 0
-ws.legBaseOffset = 2
+ws.legExtension = 2
+ws.legBaseOffset = 8
 ws.legPairOffset = 4
 ws.legMinLength = 0.2
 ws.legMaxLength = 1.1
@@ -97,8 +104,10 @@ ws.legMoveSpace = 1
 ws.legSpeed = 0.2
 ws.legGroupSize = 3
 ws.rippleScale = 0.4
-ws.abilities.add(new ForceFieldAbility(64, 0.5, 200, 300))
-ws.abilities.add(new StatusFieldAbility(StatusEffects.overclock, 360, 360, 80))
+ws.abilities.add(
+	new ForceFieldAbility(72, 0.6, 400, 300, 4, 45), //此处45为旋转角度(roration), 边数(sides)为4, 此时成正方形
+	new StatusFieldAbility(StatusEffects.overclock, 360, 360, 80),
+)
 ws.weapons.add((() => {
 	const weapon = new PointDefenseWeapon('fire-point-defense-weapon')
 	weapon.reload = 10
@@ -118,19 +127,45 @@ ws.weapons.add((() => {
 })())
 exports.ws = ws
 
-/* TODO 仍未完工的爬辅线
+//爬辅-庇护
 const bh = extend(UnitType, 'bh', {})
 bh.constructor = prov(() => extend(UnitTypes.tecta.constructor.get().class, {}))
 bh.hovering = true
-bh.health = 
-bh.armor = 
-bh.speed = 
-bh.drag = 
-bh.hitSize = 
-bh.rotateSpeed = 
-bh.itemCapacity = 
+bh.health = 7200
+bh.armor = 10
+bh.speed = 0.4
+bh.drag = 0.3
+bh.hitSize = 24
+bh.rotateSpeed = 2.4
+bh.itemCapacity = 100
+bh.drownTimeMultiplier = 2.4
+bh.stepShake = 1
+bh.shadowElevation = 0.25
+bh.groundLayer = Layer.legUnit
+bh.allowLegStep = true
+bh.lockLegBase = true
+bh.legContinuousMove = true
+bh.canAttack = false
+bh.targetable = false
+bh.legCount = 6
+bh.legLength = 28
+bh.legExtension = -15
+bh.legBaseOffset = 6
+bh.legPairOffset = 2
+bh.legMinLength = 0.3
+bh.legMaxLength = 1.2
+bh.legLengthScl = 1
+bh.legMoveSpace = 1
+bh.legSpeed = 0.3
+bh.legGroupSize = 3
+bh.rippleScale = 1
+bh.abilities.add(
+	FireAbilities.EnergyForceFieldAbility(80, 1, 750, 270, 6, 0, 10, 10, 20, 15),
+	new RepairFieldAbility(80, 30, 120) //第一个是回血量, 第二个冷却, 第三个范围
+)
 exports.bh = bh
 
+/* TODO 仍未完工的爬辅线
 const sy = extend(UnitType, 'sy', {})
 sy.constructor = prov(() => extend(UnitTypes.collaris.constructor.get().class, {}))
 sy.hovering = true
@@ -146,6 +181,7 @@ exports.sy = sy
 
 //空军-常规
 
+//奥密克戎
 const gnj = extend(UnitType, 'gnj', {})
 gnj.constructor = prov(() => extend(UnitTypes.poly.constructor.get().class, {}))
 gnj.defaultCommand = UnitCommand.rebuildCommand
@@ -169,10 +205,12 @@ gnj.mineTier = 4
 gnj.mineSpeed = 8.5
 gnj.buildRange = 240
 gnj.buildSpeed = 3
-gnj.abilities.add(new RepairFieldAbility(20, 300, 40))
-gnj.abilities.add(new ShieldRegenFieldAbility(20, 80, 300, 40))
-gnj.abilities.add(new StatusFieldAbility(StatusEffects.overclock, 300, 300, 40))
-gnj.abilities.add(new StatusFieldAbility(StatusEffects.overdrive, 300, 300, 40))
+gnj.abilities.add(
+	new RepairFieldAbility(20, 300, 40),
+	new ShieldRegenFieldAbility(20, 80, 300, 40),
+	new StatusFieldAbility(StatusEffects.overclock, 300, 300, 40),
+	new StatusFieldAbility(StatusEffects.overdrive, 300, 300, 40)
+)
 gnj.weapons.add((() => {
 	const weapon = new Weapon('fire-gnj-weapon')
 	weapon.reload = 12

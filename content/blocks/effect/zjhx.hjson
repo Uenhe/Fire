@@ -1,9 +1,30 @@
-//research: {
-//	parent: hzgs
-//	objectives: [
-//		{
-//			type: sectorComplete
-//			preset: lhyj
-//		}
-//	]
-//}
+//type: CoreBlock
+category: effect
+research: {
+	parent: hzgs
+	objectives: [
+		{
+			type: onSector
+			preset: hacj
+		}
+	]
+}
+researchCostMultiplier: 0.4
+requirements: [
+	copper/9000
+	lead/8500
+	metaglass/2500
+	titanium/4000
+	thorium/3500
+	silicon/6000
+	plastanium/1000
+]
+
+health: 11200
+armor: 8
+size: 5
+itemCapacity: 10500
+buildCostMultiplier: 0.6
+
+unitType: gnj
+unitCapModifier: 12

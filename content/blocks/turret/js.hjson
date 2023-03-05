@@ -75,7 +75,7 @@ ammoTypes: {
 	metaglass: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
-		damage: 60
+		damage: 26
 		speed: 6
 		lifetime: 130
 		knockback: 1.6
@@ -83,16 +83,16 @@ ammoTypes: {
 		height: 12
 		collidesTiles: false
 		splashDamageRadius: 12.25
-		splashDamage: 34
+		splashDamage: 40
 		collidesGround: true
 		ammoMultiplier: 3
 		reloadMultiplier: 1.2
 		pierceArmor: true
-		fragBullets: 16
+		fragBullets: 12
 		fragBullet: {
 			type: BasicBulletType
-			damage: 18
-			speed: 8.5
+			damage: 10
+			speed: 6
 			lifetime: 15
 			width: 10
 			height: 12
@@ -104,7 +104,7 @@ ammoTypes: {
 	zzhhhj: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
-		damage: 60
+		damage: 90
 		speed: 6
 		lifetime: 130
 		knockback: 1.6
@@ -122,7 +122,7 @@ ammoTypes: {
 		statusDuration: 180
 		fragBullet: {
 			type: BasicBulletType
-			damage: 45
+			damage: 55
  			speed: 2.2
 			lifetime: 35
 			status: melting
@@ -136,7 +136,7 @@ ammoTypes: {
 	graphite: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
-		damage: 15
+		damage: 40
 		speed: 5
 		lifetime: 130
 		knockback: 1.6
@@ -151,7 +151,7 @@ ammoTypes: {
 	ybd: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
-		damage: 15
+		damage: 25
 		speed: 4
 		lifetime: 163
 		knockback: 1.6
@@ -163,6 +163,6 @@ ammoTypes: {
 		ammoMultiplier: 5
 		pierceArmor: true
 		status: burning
-		statusDuration: 230
+		statusDuration: 240
 	}
 }
