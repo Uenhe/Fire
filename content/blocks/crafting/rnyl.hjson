@@ -9,7 +9,7 @@ research: {
 	]
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: jljd
 		}
 	]
@@ -28,16 +28,16 @@ craftEffect: smeltsmoke
 drawer: {
 	type: DrawMulti
 	drawers: [
-		drawDefault
+		DrawDefault
 		{
-			type: drawFlame
+			type: DrawFlame
 			flameColor: ffe099
 		}
 	]
 }
 
 attribute: heat
-boostScale: 0.334
+boostScale: 0.333334
 maxBoost: 1
 craftTime: 60
 outputItem: bl/6

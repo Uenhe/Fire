@@ -11,7 +11,7 @@ research: {
 	parent: zjjd
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: lfsm
 		}
 	]

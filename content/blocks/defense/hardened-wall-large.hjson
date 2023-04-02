@@ -1,0 +1,14 @@
+type: wall
+category: defense
+research: hardened-wall
+requirements: [
+	metaglass/12
+	hardened-alloy/24
+]
+
+health: 5120
+armor: 15
+size: 2
+placeableLiquid: true
+insulated: true
+absorbLasers: true

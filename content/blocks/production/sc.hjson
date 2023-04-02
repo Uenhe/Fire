@@ -4,7 +4,7 @@ research: {
 	parent: fmj
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: htdl
 		}
 	]
@@ -30,7 +30,7 @@ drawer: {
 			type: DrawLiquidTile
 			drawLiquid: water
 		}
-			DrawDefault
+		DrawDefault
 	]
 }
 

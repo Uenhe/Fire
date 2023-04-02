@@ -21,15 +21,15 @@ craftEffect: smeltsmoke
 drawer: {
 	type: DrawMulti
 	drawers: [
-		drawDefault
-		drawFade
+		DrawDefault
+		DrawFade
 	]
 }
 
 craftTime: 10
 outputItem: metaglass/2
 consumes: {
-        power: 2
+	power: 2
 	items: {
 		items: [
 			lead/1

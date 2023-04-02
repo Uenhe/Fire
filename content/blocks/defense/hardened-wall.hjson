@@ -1,0 +1,21 @@
+type: wall
+category: defense
+research: {
+	parent: sbq
+	objectives: [
+		{
+			type: SectorComplete
+			preset: hacj
+		}
+	]
+}
+requirements: [
+	metaglass/3
+	hardened-alloy/6
+]
+
+health: 1280
+armor: 15
+placeableLiquid: true
+insulated: true
+absorbLasers: true

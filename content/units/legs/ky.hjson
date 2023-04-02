@@ -2,7 +2,7 @@ research: {
 	parent: sh
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: lhyj
 		}
 	]

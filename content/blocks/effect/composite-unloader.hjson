@@ -1,0 +1,23 @@
+//type: DirectonalUnloader
+category: effect
+requirements: [
+	metaglass/15
+	titanium/30
+	thorium/15
+	silicon/25
+]
+research: {
+	parent: fhcsd
+	objectives: [
+		{
+			type: sectorComplete
+			preset: hacj
+		}
+	]
+}
+
+health: 85
+size: 1
+underBullets: true
+
+allowCoreUnload: true

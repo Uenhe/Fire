@@ -1,0 +1,40 @@
+type: GenericCrafter
+category: crafting
+research: {
+	parent: dmj
+	objectives: [
+		{
+			type: SectorComplete
+			preset: bzxw
+		}
+	]
+}
+requirements: [
+	titanium/105
+	silicon/60
+	plastanium/55
+]
+
+size: 2
+hasPower: true
+hasLiquids: false
+drawer: {
+	type: DrawMulti
+	drawers: [
+		DrawDefault
+		DrawFade
+	]
+}
+
+craftTime: 120
+outputItem: logic-alloy/2
+consumes: {
+	power: 2
+	items: {
+		items: [
+			copper/3
+			titanium/2
+			silicon/3
+		]
+	}
+}

@@ -3,28 +3,29 @@ category: turret
 research: {
 	parent: hzgs
 	requirements: [
-		copper/250
-		lead/160
-		titanium/90
+		copper/160
+		lead/120
+		titanium/55
 	]
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: jljd
 		}
 	]
 }
 requirements: [
-	copper/105
+	copper/100
 	lead/60
-	titanium/35
+	titanium/30
 ]
 
 health: 800   
 size: 2
 hasLiquids: true
 liquidCapacity: 20
-reload: 42.86
+
+reload: 42.857143
 range: 250
 shootCone: 85
 inaccuracy: 2
@@ -36,7 +37,6 @@ consumes: {
 		optional: true
 	}
 }
-    
 ammoTypes: {
 	copper: {
 		type: ArtilleryBulletType
@@ -54,7 +54,6 @@ ammoTypes: {
 		reloadMultiplier: 0.9
 		pierceArmor: true
 	}
-      
 	lead: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
@@ -71,7 +70,6 @@ ammoTypes: {
 		reloadMultiplier: 1.8
 		pierceArmor: true
 	}
-      
 	metaglass: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
@@ -100,7 +98,6 @@ ammoTypes: {
 			pierceArmor: true
 		}
 	}
-    
 	zzhhhj: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
@@ -148,7 +145,7 @@ ammoTypes: {
 		ammoMultiplier: 4
 		pierceArmor: true
 	}
-	ybd: {
+	detonation-compound: {
 		type: ArtilleryBulletType
 		sprite: fire-js-bullet
 		damage: 25

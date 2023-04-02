@@ -20,6 +20,7 @@ health: 1080
 size: 2
 hasLiquids: true
 liquidCapacity: 20
+
 reload: 24
 range: 220
 shootCone: 30
@@ -27,14 +28,12 @@ inaccuracy: 2
 rotateSpeed: 10
 shootSound: shootBig
 coolantMultiplier: 0.9
-
 consumes: {
 	coolant: {
 		amount: 0.2
 		optional: true
 	}
 }
-	
 ammoTypes: {
 	copper: {
 		type: LaserBulletType

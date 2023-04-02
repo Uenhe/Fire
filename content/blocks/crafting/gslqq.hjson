@@ -4,7 +4,7 @@ research: {
 	parent: hhhjtqq
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: zrhs
 		}
 	]

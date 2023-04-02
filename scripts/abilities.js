@@ -1,7 +1,7 @@
-/* 
+/*
 * @author <Uenhe>
-原版力墙+自己琢磨缝合...出现了! 集力墙, 反弹子弹和破盾释放电弧于一身的单位能力场!
-20230113: v141更新, anuke改了单位力墙 (加了 sides & roration 接口), 此处重新适配. 新增旋转力墙, 将roration = 361来开启!
+* 原版力墙+自己琢磨缝合...出现了! 集力墙, 反弹子弹和破盾释放电弧于一身的单位能力场!
+* 20230113: v141更新, anuke改了单位力墙 (加了 sides & roration 接口), 此处重新适配. 新增旋转力墙, 将roration = 361来开启!
 */
 const EnergyForceFieldAbility = (radius, regen, max, cooldown, sides, roration, chance, damage, length, amount) => { //力墙半径, 力墙每帧回复量, 力墙最大盾容, 力墙冷却所需帧, 力墙边数, 力墙旋转角度, 子弹反弹几率 (参考原版布墙), 闪电伤害, 闪电长度, 闪电数量; 将chance = -1, damage = 0, length = 0, amount = 0来将其当作正常力墙使用
 	var realRoration = roration

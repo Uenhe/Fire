@@ -1,10 +1,10 @@
 type: LiquidTurret
 category: turret
 research: {
-	parent: yg
+	parent: js
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: zrhs
 		}
 	]
@@ -31,7 +31,7 @@ recoil: 2
 shootCone: 60
 shootEffect: shootLiquid
 
-consumes: {power: 3.333}
+consumes: {power: 3.333333}
 ammoTypes: {
 	water: {
 		type: LiquidBulletType
@@ -101,7 +101,7 @@ ammoTypes: {
 		puddleSize: 11
 		orbSize: 6
 		drag: 0.001
-		status: ds
+		status: frostbite
 		statusDuration: 270
 		buildingDamageMultiplier: 0.6
 		ammoMultiplier: 0.6

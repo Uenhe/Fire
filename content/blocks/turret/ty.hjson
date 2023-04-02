@@ -1,7 +1,6 @@
 type: ItemTurret
 category: turret
-/*
-research: {
+/*research: {
 	parent: yg
 	objectives: [
 		{
@@ -9,18 +8,17 @@ research: {
 			preset: jljd
 		}
 	]
-}
-*/
+}*/
 requirements: [
 	copper/800
-	metaglass/400
-	titanium/650
-	silicon/550
-	surge-alloy/200
-	mc/250
+	metaglass/275
+	titanium/325
+	silicon/450
+	hardened-alloy/225
 ]
 
-health: 2160
+health: 2880
+armor: 6
 size: 4
 liquidCapacity: 60
 reload: 60

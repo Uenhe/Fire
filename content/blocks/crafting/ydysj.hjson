@@ -42,9 +42,9 @@ drawer: {
 }
 
 craftTime: 120	
-outputLiquid: yd/0.833
+outputLiquid: yd/0.833334
 consumes: {
-	power: 6.66
+	power: 6.666666
 	items: {
 		items: [
 			blast-compound/5

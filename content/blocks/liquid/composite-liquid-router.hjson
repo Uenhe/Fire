@@ -1,0 +1,23 @@
+type: LiquidRouter
+category: liquid
+research: {
+	parent: fhcsd
+	objectives: [
+		{
+			type: SectorComplete
+			preset: hacj
+		}
+	]
+}
+requirements: [
+	metaglass/8
+	titanium/12
+	thorium/6
+	plastanium/8
+]
+
+health: 85
+size: 1
+liquidCapacity: 120
+solid: false
+underBullets: true

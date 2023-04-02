@@ -1,0 +1,46 @@
+type: GenericCrafter
+category: crafting
+research: {
+	parent: hhhjcqc
+	objectives: [
+		{
+			type: SectorComplete
+			preset: hhys
+		}
+	]
+}
+requirements: [
+	graphite/135
+	thorium/50
+	silicon/90
+	plastanium/80
+]
+
+size: 3
+hasPower: true
+hasLiquids: false
+itemCapacity: 20
+craftEffect: smeltsmoke
+drawer: {
+	type: DrawMulti
+	drawers: [
+		DrawDefault
+		{
+			type: DrawFlame
+			flameColor: ffef99
+		}
+	]
+}
+
+craftTime: 60
+outputItem: hardened-alloy/3
+consumes: {
+	power: 10
+	items: {
+		items: [
+			hhhj/3
+			plastanium/6
+			thorium/3
+		]
+	}
+}

@@ -39,7 +39,7 @@ weapons : [
 		x: 8
 		y: 1
 		shootSound: artillery
-		shootEffect: casing2
+		ejectEffect: casing2
 		bullet: {
 			type: ArtilleryBulletType
 			sprite: shell

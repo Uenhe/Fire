@@ -4,7 +4,7 @@ research: {
 	parent: swzzsj
 	objectives: [
 		{
-			type: onSector
+			type: SectorComplete
 			preset: bzxw
 		}
 	]

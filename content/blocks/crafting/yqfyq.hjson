@@ -13,7 +13,7 @@ hasLiquids: true
 craftTime: 60
 outputLiquid: ozone/0.2
 consumes: {
-	power: 3.33
+	power: 3.333333
 	items: {
 		items: [
 			thorium/2

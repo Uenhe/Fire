@@ -2,7 +2,7 @@ research: {
 	parent: hzgs
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: hspy
 		}
 	]

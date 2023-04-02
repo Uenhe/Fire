@@ -10,19 +10,19 @@ research: {
 	]
 }
 requirements: [
-	copper/1450
-	titanium/800
-	thorium/1100
-	silicon/800
-	plastanium/650
-	surge-alloy/400
-	mc/350
+	copper/650
+	thorium/375
+	silicon/425
+	plastanium/250
+	hardened-alloy/225
 ]
 
-health: 1500
+health: 2160
+armor: 5
 size: 3
 hasLiquids: true
 liquidCapacity: 45
+
 reload: 600
 range: 500
 shootCone: 60
@@ -38,9 +38,8 @@ consumes: {
 		optional: true
 	}
 }
-    
 ammoTypes: {
-	yjdk: {
+	logic-alloy: {
 		type: MissileBulletType
 		damage: 285
 		speed: 3.33
@@ -48,7 +47,7 @@ ammoTypes: {
 		width: 25
 		height: 28
 		despawnShake: 3
-		homingPower: 0.08
+		homingPower: 0.16
 		buildingDamageMultiplier: 0.2
 		splashDamageRadius: 56
 		splashDamage: 305
@@ -58,7 +57,7 @@ ammoTypes: {
 		hitEffect: massiveExplosion
 		hitSound: mediumCannon
 	}
-	yjbld: {
+	detonation-compound: {
 		type: MissileBulletType
 		reloadMultiplier: 0.8
 		damage: 320
@@ -93,7 +92,6 @@ ammoTypes: {
 			splashDamageRadius: 120
 			splashDamage: 780
 			status: blasted
-			statusDuration: 120
 		}
 	}
 }

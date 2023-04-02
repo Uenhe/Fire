@@ -1,11 +1,11 @@
-name: 'fire'
-displayName: 'Fire'
-author: '飞雨a_ssylfyzgmz && -Uenhe饨咂-'
-version: '1.1.0'
-minGameVersion: 141
-repo: 'Uenhe/Fire'
+name: fire
+displayName: Fire
+author: 飞雨a_ssylfyzgmz && -Uenhe饨咂-
+version: 1.1.1
+minGameVersion: 143
+repo: Uenhe/Fire
 
-subtitle: '>_  v1.1.0'
+subtitle: v1.1.1 aparts v143
 description: '
 	[royal[]]A Mindustry Mod that adds a lots of WEIRD things.
 	一个奇奇怪怪又十分核锂的mod...
@@ -22,6 +22,22 @@ description: '
 	如果你觉得该mod很棒的话，一定要去GitHub给这个项目点个星星啊！
 	
 	[white[]]更新记录一览：
+	
+	v1.1.1
+	复合材料系运输器件来临！包括物品桥，液体桥，液体路由器，物品装卸器！
+	物品调整-删除（一级爆裂导弹及其弹壳，云爆弹），增加（硬化合金，震爆混合物，逻辑合金）
+	新炮塔-潮怨，作为幽灵上位，拥有强大的正面输出能力
+	新方块-硬化合金墙，良好的防御墙体
+	新单位-烛光，作为T2空风
+	裂变钻头调整-类型变为冲击钻，以降低游戏低帧带来的影响
+	灼阳调整-护甲上调 (13->18)
+	萤火调整-伤害下调 (45->25)
+	炙热火山调整-地震造成伤害上调，禁用水汽冷凝器
+	水汽冷凝器调整-科技树中地图前置变为炙热火山
+	千里，天眼调整-造价下调并加入硬化合金
+	击碎调整-造价下调
+	魇光贴图重绘
+	修复了战役图的一些bug
 	
 	v1.1.0
 	战役地图-实装（昏暗车间，恒河要塞）；新增（凛风山脉，炙热火山）

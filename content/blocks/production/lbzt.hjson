@@ -1,15 +1,15 @@
-type: drill
+type: BurstDrill
 category: production
 research: {
 	parent: hzgs
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: hacj
 		}
 	]
 }
-requirements: [	
+requirements: [
 	copper/160
 	metaglass/80
 	thorium/375
@@ -18,14 +18,15 @@ requirements: [
 
 health: 1120
 size: 5
-itemCapacity: 30
+itemCapacity: 75
 liquidCapacity: 30
-rotateSpeed: 8
-warmupSpeed: 0.001
-drawRim: true
-drawMineItem: true
-drillEffect: mineHuge
-updateEffect: mineBig
+drillEffect: {
+	type: MultiEffect
+	effects: [
+		mineImpact
+		drillSteam
+	]
+}
 baseExplosiveness: 5
 destroyBullet: {
 	lifetime: 2
@@ -34,7 +35,6 @@ destroyBullet: {
 	splashDamageRadius: 48
 	splashDamage: 180
 	collides: false
-	sprite: circle-bullet
 	despawnEffect: {
 		type: WaveEffect
 		lifetime: 10
@@ -45,15 +45,12 @@ destroyBullet: {
 }
 
 tier: 8
-drillTime: 165
-hardnessDrillMultiplier: 45
-liquidBoostIntensity: 2
-warmupSpeed: 0.02
+drillTime: 50
+shake: 4
+baseArrowColor: 989aa4
 consumes: {
 	liquid: {
 		liquid: water
 		amount: 0.2
-		booster: true
-		optional: true
 	}
 }

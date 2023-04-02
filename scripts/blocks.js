@@ -8,7 +8,7 @@ const FireUnits = require('units')
 
 function newBlock(type, name) {
 	exports[type, name] = (() => {
-		let block = extend(type, name, {})
+		const block = extend(type, name, {})
 		return block
 	})()
 } //json方块初始化函数...用于其他js文件的引用
@@ -16,6 +16,12 @@ function newBlock(type, name) {
 //炮塔
 
 newBlock(ItemTurret, 'yg') //魇光
+
+//生产
+
+/*const lbzt = new BurstDrill('lbzt') //裂变钻头
+lbzt.drillTime = Math.round(125 / 3)
+exports.lbzt = lbzt*/
 
 //运输
 
@@ -28,7 +34,7 @@ newBlock(GenericCrafter, 'dmj') //钢化玻璃打磨机
 //工厂-木材焚烧厂
 /*
 * @author <guiY>
-代码来自Extra Utilities mod
+* 代码来自Extra Utilities mod
 */
 const craftTime = 30
 const itemDuration = 30
@@ -99,7 +105,7 @@ exports.mcfsc = mcfsc
 //效果-装甲核心
 /*
 * @author <Uenhe>
-实际上就是把原版的力墙抄了过来, 再根据js作相应调整, 不过还是花了我一天时间...我好蔡, 悲
+* 实际上就是把原版的力墙抄了过来, 再根据js作相应调整, 不过还是花了我一天时间...我好蔡, 悲
 */
 const radius = 96
 const range = 96
@@ -151,7 +157,7 @@ zjhx.buildType = prov(() => {
 		onRemoved(){
 			if(!broken && radius * radscl > 1) Fx.forceShrink.at(this.x, this.y, radius * radscl, this.team.color)
 			this.super$onRemoved()
-		}, //方块被移除时力墙收缩效果(?)
+		}, 
 		inFogTo(viewer) {return false},
 		updateTile(){
 			radscl = Mathf.lerpDelta(radscl, broken ? 0 : warmup, 0.05)
@@ -166,7 +172,6 @@ zjhx.buildType = prov(() => {
 				broken = true
 				buildup = shieldHealth
 				Fx.shieldBreak.at(this.x, this.y, radius * radscl, this.team.color)
-				if (this.team != Vars.state.rules.defaultTeam) {Events.fire(Trigger.forceProjectorBreak)}
 			}
 			if(hit > 0) {hit -= 1 / 5 * Time.delta}
 			if(radius * radscl > 0 && !broken) {Groups.bullet.intersect(this.x - radius * radscl, this.y - radius * radscl, radius * radscl * 2, radius * radscl * 2, cons(bullet => {
@@ -186,7 +191,7 @@ zjhx.buildType = prov(() => {
 		}, //当逻辑sensor这个块的heat属性时, 返回buildup的值
 		draw(){
 			this.super$draw()
-			if (buildup > 0) {
+			if(buildup > 0) {
 				Draw.alpha(buildup / shieldHealth * 0.75)
 				Draw.z(Layer.blockAdditive)
 				Draw.blend(Blending.additive)
@@ -228,7 +233,7 @@ zjhx.buildType = prov(() => {
 exports.zjhx = zjhx
 
 //效果-Javelin机甲平台
-//部分代码来自创世神mod
+//移除核心不清物品代码部分来自创世神mod
 const javelinPad = extend(CoreBlock, 'javelinPad', {
 	canBreak(tile){return Vars.state.teams.cores(tile.team()).size > 1},
 	canPlaceOn(tile, team, rotation){return true}
@@ -240,10 +245,35 @@ javelinPad.buildType = prov(() => {
 })
 exports.javelinPad = javelinPad
 
+//效果-复合装卸器
+//低帧装卸代码部分来自创世神mod
+const compositeUnloader = extend(DirectionalUnloader, 'composite-unloader', {
+	setStats(){
+		this.super$setStats()
+		this.stats.remove(Stat.speed)
+		this.stats.add(Stat.speed, 25, StatUnit.itemsSecond)
+	}
+})
+compositeUnloader.speed = 25
+compositeUnloader.buildType = () => {
+	var counter = 0
+	return extend(DirectionalUnloader.DirectionalUnloaderBuild, compositeUnloader, {
+		updateTile(){
+			counter += this.edelta()
+			while(counter >= 60 / 25) {
+				this.unloadTimer = 25
+				this.super$updateTile()
+				counter -= 60 / 25
+			}
+		}
+	})
+}
+exports.compositeUnloader = compositeUnloader
+
 //效果-篝火
-const gh = extend(OverdriveProjector, 'gh', {})
-gh.buildType = prov(() => {
-	return new JavaAdapter(OverdriveProjector.OverdriveBuild, {
+const gh = new OverdriveProjector('gh')
+gh.buildType = () => {
+	return extend(OverdriveProjector.OverdriveBuild, gh, {
 		updateTile(){
 			this.super$updateTile()
 			if(this.efficiency > 0){
@@ -257,7 +287,7 @@ gh.buildType = prov(() => {
 		},
 		draw(){
 			this.super$draw()
-			if(this.efficiency > 0){
+			if(this.efficiency > 0 & Core.settings.getBool('showBlockRange')){
 				Draw.color(Color.valueOf('feb380'), 1)
 				Lines.stroke(2)
 				Lines.circle(this.x, this.y, 512)
@@ -265,8 +295,8 @@ gh.buildType = prov(() => {
 				Fill.circle(this.x, this.y, 512)
 			}
 		}
-	}, gh)
-})
+	})
+}
 exports.gh = gh
 
 /*

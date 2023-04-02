@@ -1,0 +1,183 @@
+type: ItemTurret
+category: turret
+/*research: {
+	parent: yg
+	objectives: [
+		{
+			type: SectorComplete
+			preset: jljd
+		}
+	]
+}*/
+requirements: [
+	copper/1350
+	graphite/475
+	phase-fabric/325
+	surge-alloy/275
+	hardened-alloy/550
+]
+
+health: 4320
+armor: 10
+size: 4
+hasLiquids: true
+liquidCapacity: 75
+canOverdrive: false
+
+reload: 8
+range: 360
+shootCone: 24
+inaccuracy: 2
+maxAmmo: 60
+recoil: 4
+recoilTime: 10
+shake: 2.2
+rotateSpeed: 6.5
+shootSound: shootBig
+ammoUseEffect: casing3
+coolantMultiplier: 0.9
+consumes: {
+	coolant: {
+		amount: 1.2
+		optional: true
+	}
+}
+shoot: {
+	type: ShootAlternate
+	shots: 2
+	barrels: 3
+	spread: 6.3
+}
+ammoTypes: {
+	graphite: {
+		type: BasicBulletType
+		speed: 8
+		damage: 80
+		hitSize: 6
+		width: 18
+		height: 25
+		lifetime: 47
+		knockback: 0.4
+		ammoMultiplier: 8
+		reloadMultiplier: 1.7
+		shootEffect: shootBig
+	}
+	thorium: {
+		type: BasicBulletType
+		speed: 8
+		damage: 90
+		hitSize: 6
+		width: 20
+		height: 27
+		lifetime: 46
+		knockback: 0.8
+		pierceCap: 4
+		pierceBuilding: true
+		pierceArmor: true
+		ammoMultiplier: 4
+		status: corroded
+		statusDuration: 120
+		shootEffect: shootBig
+		fragBullets: 4
+		fragBullet: {
+			type: BasicBulletType
+			speed: 4
+			damage: 35
+			width: 8
+			height: 11
+			lifetime: 10
+			pierceArmor: true
+		}
+	}
+	detonation-compound: {
+		type: BasicBulletType
+		speed: 8
+		damage: 105
+		hitSize: 6
+		width: 18
+		height: 25
+		lifetime: 46
+		knockback: 0.7
+		pierceCap: 2
+		pierceBuilding: true
+		makeFire: true
+		ammoMultiplier: 12
+		reloadMultiplier: 1.3
+		status: burning
+		statusDuration: 240
+		frontColor: f8ad42
+		backColor: f68021
+		shootEffect: shootBig
+		hitEffect: {
+			type: MultiEffect
+			effects: [
+				hitBulletSmall
+				fireHit
+			]
+		}
+		fragBullets: 2
+		fragBullet: {
+			type: BulletType
+			speed: 4
+			lifetime: 1
+			splashDamage: 145
+			splashDamageRadius: 65
+			collides: false
+			collidesTiles: false
+			hittable: false
+			status: blasted
+			hitSound: mediumCannon
+			hitSoundVolume: 0.5
+			hitEffect: pulverize
+			despawnEffect: {
+				type: WaveEffect
+				lifetime: 24
+				sizeFrom: 0, sizeTo: 65
+				strokeFrom: 4, strokeTo: 0
+				colorFrom: f8ad42, colorTo: ffffff
+			}
+		}
+	}
+	hardened-alloy: {
+		type: BasicBulletType
+		speed: 6
+		damage: 375
+		hitSize: 7.2
+		width: 22
+		height: 36
+		lifetime: 84
+		knockback: 2.4
+		rangeChange: 140
+		pierceCap: 2
+		pierceBuilding: true
+		pierceArmor: true
+		ammoMultiplier: 4
+		reloadMultiplier: 0.3
+		status: melting
+		statusDuration: 240
+		frontColor: bf92f9
+		backColor: 6d56bf
+		shootEffect: shootBig
+		fragBullets: 6
+		fragBullet: {
+			type: BulletType
+			speed: 48
+			lifetime: 1
+			splashDamage: 175
+			splashDamageRadius: 82
+			collides: false
+			collidesTiles: false
+			hittable: false
+			hitSound: largeCannon
+			hitSoundVolume: 0.5
+			hitEffect: pulverizeMedium
+			despawnEffect: {
+				type: WaveEffect
+				lifetime: 15
+				sizeFrom: 0, sizeTo: 82
+				strokeFrom: 4, strokeTo: 0
+				colorFrom: bf92f9, colorTo: ffffff
+			}
+		}
+	}
+}

@@ -1,6 +1,6 @@
 type: flying
 health: 76000
-armor: 13
+armor: 18
 lowAltitude: true
 speed: 0.2
 drag: 0.08

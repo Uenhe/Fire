@@ -1,0 +1,9 @@
+research: {
+	parent: firefly
+	objectives: [
+		{
+			type: SectorComplete
+			preset: lhyj
+		}
+	]
+}

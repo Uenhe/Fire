@@ -4,7 +4,7 @@ research: {
 	parent: rnyl
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: lhyj
 		}
 	]
@@ -24,9 +24,9 @@ craftEffect: smeltsmoke
 drawer: {
 	type: DrawMulti
 	drawers: [
-		drawDefault
+		DrawDefault
 		{
-			type: drawFlame
+			type: DrawFlame
 			flameColor: ffef99
 		}
 	]

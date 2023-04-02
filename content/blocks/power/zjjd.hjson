@@ -4,7 +4,7 @@ research: {
 	parent: hzgs
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: lhyj
 		}
 	]
@@ -17,10 +17,10 @@ requirements: [
 
 health: 225
 size: 2
+enableDrawStatus: false //只会显示红灯是吧, 灯都给你ban咯
 
 maxNodes: 8
 laserRange: 25
 consumesPower: true
 outputsPower: true
-enableDrawStatus: false //只会显示红灯是吧, 灯都给你ban咯
 consumes: {powerBuffered: 20000}

@@ -21,8 +21,8 @@ craftEffect: smeltsmoke
 drawer: {
 	type: DrawMulti
 	drawers: [
-		drawDefault
-		drawFade
+		DrawDefault
+		DrawFade
 	]
 }
 

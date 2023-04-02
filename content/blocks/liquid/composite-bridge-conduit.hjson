@@ -1,0 +1,25 @@
+type: LiquidBridge
+category: liquid
+research: {
+	parent: composite-bridge-conveyor
+	objectives: [
+		{
+			type: SectorComplete
+			preset: hacj
+		}
+	]
+}
+requirements: [
+	metaglass/6
+	titanium/8
+	thorium/3
+	plastanium/3
+]
+
+health: 85
+size: 1
+hasPower: false
+liquidCapacity: 16
+range: 8
+
+pulse: true

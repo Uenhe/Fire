@@ -9,7 +9,7 @@ research: {
 	parent: hzgs
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: hacj
 		}
 	]
@@ -43,7 +43,7 @@ healPercent: 0.04
 optionalMultiplier: 1.5
 optionalUseTime: 200
 consumes: {
-	power: 1.666
+	power: 1.666666
 	items: {
 		items: [{item: silicon, amount: 1}]
 		booster: true

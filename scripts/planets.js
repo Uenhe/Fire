@@ -124,7 +124,7 @@ exports.lfsm = lfsm
 lib.addToResearch(lfsm, {
 	parent: 'hhys',
 	objectives: Seq.with(
-		new Objectives.SectorComplete(hspy),
+		new Objectives.SectorComplete(hhys),
 		new Objectives.Produce(FireItems.dt)
 	)
 })

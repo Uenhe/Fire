@@ -296,7 +296,7 @@ exports.javelin = javelin
 const firefly = extend(UnitType, 'firefly', {})
 firefly.constructor = prov(() => extend(UnitTypes.horizon.constructor.get().class, {}))
 firefly.flying = true
-firefly.health = 140
+firefly.health = 150
 firefly.armor = 3
 firefly.speed = 1.6
 firefly.drag = 0.04
@@ -322,7 +322,7 @@ firefly.weapons.add((() => {
 	weapon.shootSound = Sounds.explosion
 	weapon.bullet = (() => {
 		const bullet = new ShrapnelBulletType()
-		bullet.damage = 35
+		bullet.damage = 25
 		bullet.length = 70
 		bullet.width = 17
 		bullet.killShooter = true
@@ -333,3 +333,45 @@ firefly.weapons.add((() => {
 	return weapon
 })())
 exports.firefly = firefly
+
+
+const candlelight = extend(UnitType, 'candlelight', {})
+candlelight.constructor = prov(() => extend(UnitTypes.horizon.constructor.get().class, {}))
+candlelight.flying = true
+candlelight.health = 280
+candlelight.armor = 4
+candlelight.speed = 2.7
+candlelight.drag = 0.04
+candlelight.accel = 0.08
+candlelight.rotateSpeed = 6
+candlelight.hitSize = 14
+candlelight.circleTarget = true
+candlelight.faceTarget = true
+candlelight.lowAltitude = false
+candlelight.engineOffset = 5.6
+candlelight.itemCapacity = 25
+candlelight.abilities.add(new MoveLightningAbility(2, 13, 0.4, 0, 1.2, 1.6, Color.valueOf('a9d8ff')))
+candlelight.weapons.add((() => {
+	const weapon = new Weapon('fire-candlelight-weapon')
+	weapon.shoot = ShootSpread(5, 36)
+	weapon.reload = 600
+	weapon.x = 0
+	weapon.y = 0
+	weapon.shootCone = 180
+	weapon.mirror = false
+	weapon.top = true
+	weapon.shootOnDeath = true
+	weapon.shootSound = Sounds.explosion
+	weapon.bullet = (() => {
+		const bullet = new ShrapnelBulletType()
+		bullet.damage = 65
+		bullet.length = 65
+		bullet.width = 18
+		bullet.killShooter = true
+		bullet.hitEffect = Fx.pulverize
+		bullet.hitSound = Sounds.explosion
+		return bullet
+	})()
+	return weapon
+})())
+exports.candlelight = candlelight

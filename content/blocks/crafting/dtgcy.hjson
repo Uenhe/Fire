@@ -21,16 +21,16 @@ craftEffect: {
 drawer: {
 	type: DrawMulti
 	drawers: [
-		drawArcSmelt
-		drawDefault
-		drawFade
+		DrawArcSmelt
+		DrawDefault
+		DrawFade
 	]
 }
 
 craftTime: 120
 outputItem: dt/2
 consumes: {
-	power: 3.333
+	power: 3.333333
 	items: {
 		items: [
 			copper/2

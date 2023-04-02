@@ -27,7 +27,7 @@ drawer: {
 craftTime: 45
 outputItem: xrt/1
 consumes: {
-	power: 1.666
+	power: 1.666666
 	items:{
 		items: [
 			plastanium/3
