@@ -24,12 +24,10 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 #### Campaign:
 
 - Adds new planet - Lisertar, with several preset sectors and its own tech tree
-- Warning: The campaign of this mod is UNFINISHED
 
 #### Blocks:
 
-- 20+ Factories
-- 6 Turrets
+- More Factories and Turrets
 - Adds Dam Wall, which is able to be placed on deep water
 - Adds Flesh Wall, has the ability of repair itself
 - Adds Tree Chopper, which is able to chop trees and output timber
@@ -38,9 +36,11 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 - 5*5 Buildable Core, extremely well armored
 - Advanced Power Node, with longer range than Large Power Node, also can store a number of power
 - Advanced Drill, works without power and faster than Blast Drill * 2
+- Javelin Pad from Mindustry v5
 
 #### Units:
 - Adds Omicron as core unit, and also can be produced by upgrading Beta
-- Adds 3 new support ground units, can step over most terrain
-- Adds 1 new KAMIKAZE air unit, flys toward enemies and self-destructs
+- Adds 4 new support ground units, can step over most terrain
+- Adds 2 new KAMIKAZE air unit, flys toward enemies and self-destructs
 - More high-tier units
+- Javelin Ship from Mindustry v5

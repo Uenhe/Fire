@@ -17,12 +17,6 @@ function newBlock(type, name) {
 
 newBlock(ItemTurret, 'yg') //魇光
 
-//生产
-
-/*const lbzt = new BurstDrill('lbzt') //裂变钻头
-lbzt.drillTime = Math.round(125 / 3)
-exports.lbzt = lbzt*/
-
 //运输
 
 newBlock(Conveyor, 'fhcsd') //复合传送带
@@ -235,14 +229,20 @@ exports.zjhx = zjhx
 //效果-Javelin机甲平台
 //移除核心不清物品代码部分来自创世神mod
 const javelinPad = extend(CoreBlock, 'javelinPad', {
-	canBreak(tile){return Vars.state.teams.cores(tile.team()).size > 1},
-	canPlaceOn(tile, team, rotation){return true}
+	canBreak(tile){
+		return (Vars.state.teams.cores(tile.team()).size > 1 || Vars.state.isEditor())
+	},
+	canPlaceOn(tile, team, rotation){
+		return true
+	}
 })
-javelinPad.buildType = prov(() => {
-	return new JavaAdapter(CoreBlock.CoreBuild, {
-		onRemoved() {Vars.state.teams.unregisterCore(this)}
-	}, javelinPad)
-})
+javelinPad.buildType = () => {
+	return extend(CoreBlock.CoreBuild, javelinPad, {
+		onRemoved(){
+			Vars.state.teams.unregisterCore(this)
+		}
+	})
+}	
 exports.javelinPad = javelinPad
 
 //效果-复合装卸器
@@ -260,7 +260,7 @@ compositeUnloader.buildType = () => {
 	return extend(DirectionalUnloader.DirectionalUnloaderBuild, compositeUnloader, {
 		updateTile(){
 			counter += this.edelta()
-			while(counter >= 60 / 25) {
+			while(counter >= 60 / 25){
 				this.unloadTimer = 25
 				this.super$updateTile()
 				counter -= 60 / 25
@@ -298,91 +298,3 @@ gh.buildType = () => {
 	})
 }
 exports.gh = gh
-
-/*
-这里本来是想用装配厂的装配机来做单位的...但是做出来的单位只能用装配机的AI, 不然会报错, 故搁置, 转移到普通空军厂里.
-const limit = lib.createBuildLimit(5)
-const fireflyAssembler = extend(UnitAssembler, 'fireflyAssembler', {
-	canPlaceOn(tile, team, rotation) {
-		if (limit.canBuild(Vars.player.team())) {return true}
-		if (Vars.state.isEditor()) return true
-		return this.super$canPlaceOn(tile, team, rotation)
-	},
-	drawPlace(x, y, rotation, valid){
-		if (!limit.canBuild(Vars.player.team())) {this.drawPlaceText(Core.bundle.format('maxPlacementMessage') + ' 5', x, y, valid)}
-	},
-})
-fireflyAssembler.buildType = prov(() => {
-	return new JavaAdapter(UnitAssembler.UnitAssemblerBuild, {
-		add(){
-			this.super$add()
-			if (this.team != Team.derelict) {limit.addBuild(this.team)}
-		},
-		readBase(read){
-			this.super$readBase(read)
-			if (this.team != Team.derelict) {limit.addBuild(this.team)}
-		},
-		remove(){
-			if (this.added) limit.removeBuild(this.team)
-			this.super$remove()
-		},
-	}, fireflyAssembler)
-})
-fireflyAssembler.category = Category.units
-fireflyAssembler.buildVisibility = BuildVisibility.shown
-fireflyAssembler.requirements = ItemStack.with(
-	Items.copper, 160,
-	Items.lead, 180,
-	Items.graphite, 125,
-	Items.silicon, 275,
-)
-fireflyAssembler.health = 420
-fireflyAssembler.size = 3
-fireflyAssembler.areaSize = 3
-fireflyAssembler.droneType = FireUnits.firefly
-fireflyAssembler.dronesCreated = 6
-fireflyAssembler.droneConstructTime = 2400
-fireflyAssembler.plans.add(new AssemblerUnitPlan(FireUnits.firefly, 60, PayloadStack.list(FireUnits.firefly, 1, Blocks.copperWallLarge, 1)))
-exports.fireflyAssembler = fireflyAssembler
-
-const limit = lib.createBuildLimit(2)
-const javelinPad = extend(CoreBlock, 'javelinPad', {
-	setStats(){
-		this.super$setStats()
-		this.stats.remove(Stat.buildTime)
-	},
-	canBreak(tile){return Vars.state.teams.cores(tile.team()).size > 1},
-	canPlaceOn(tile, team, rotation) {
-		if (limit.canBuild(Vars.player.team())) {return true}
-		//if (tile == null) return false
-		if (Vars.state.isEditor()) return true
-		//if (team.core() == null || (!Vars.state.rules.infiniteResources && !team.core().items.has(this.requirements, Vars.state.rules.buildCostMultiplier))) return false
-		return this.super$canPlaceOn(tile, team, rotation)
-	},
-	drawPlace(x, y, rotation, valid){
-		const player = Vars.player
-		const rules = Vars.state.rules
-		const team = player.team()
-		if ((team.core() != null && !team.core().items.has(this.requirements, rules.buildCostMultiplier)) && !rules.infiniteResources) {this.drawPlaceText(Core.bundle.get('bar.noresources'), x, y, false)}
-		if (!Vars.world.tile(x, y)) {return}
-		if (!limit.canBuild(Vars.player.team())) {this.drawPlaceText(Core.bundle.format('maxPlacementMessage') + ' 2', x, y, valid)}
-	},
-})
-javelinPad.buildType = prov(() => {
-	return new JavaAdapter(CoreBlock.CoreBuild, {
-		add(){
-			this.super$add()
-			if (this.team != Team.derelict) {limit.addBuild(this.team)}
-		},
-		readBase(read){
-			this.super$readBase(read)
-			if (this.team != Team.derelict) {limit.addBuild(this.team)}
-		},
-		remove(){
-			if (this.added) limit.removeBuild(this.team)
-			this.super$remove()
-		},
-		onRemoved() {Vars.state.teams.unregisterCore(this)}
-	}, javelinPad)
-})
-*/

@@ -2,10 +2,10 @@ type: GenericCrafter
 category: crafting
 research: logic-alloy-processor
 requirements: [
-	titanium/170
-	thorium/50
-	silicon/120
-	plastanium/70
+	titanium/70
+	thorium/45
+	silicon/65
+	plastanium/30
 ]
 
 size: 2
