@@ -45,7 +45,7 @@ destroyBullet: {
 }
 
 tier: 8
-drillTime: 50
+drillTime: 45
 shake: 4
 baseArrowColor: 989aa4
 consumes: {

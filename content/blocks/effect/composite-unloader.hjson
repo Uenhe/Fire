@@ -10,7 +10,7 @@ research: {
 	parent: fhcsd
 	objectives: [
 		{
-			type: sectorComplete
+			type: SectorComplete
 			preset: hacj
 		}
 	]

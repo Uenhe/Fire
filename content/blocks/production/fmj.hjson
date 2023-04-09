@@ -10,7 +10,7 @@ research: {
 	]
 	objectives: [
 		{
-			type: onSector
+			type: OnSector
 			preset: htdl
 		}
 	]

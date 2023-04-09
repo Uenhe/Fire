@@ -1,11 +1,11 @@
 name: fire
 displayName: Fire
 author: 飞雨a_ssylfyzgmz && -Uenhe饨咂-
-version: 1.1.1
+version: 1.1.2
 minGameVersion: 143
 repo: Uenhe/Fire
 
-subtitle: v1.1.1 adapts v143
+subtitle: v1.1.2 adapts v143
 description: '
 	[royal[]]A Mindustry Mod that adds a lots of WEIRD things.
 	一个奇奇怪怪又十分核锂的mod...
@@ -22,6 +22,12 @@ description: '
 	如果你觉得该mod很棒的话，一定要去GitHub给这个项目点个星星啊！
 	
 	[white[]]更新记录一览：
+	
+	v1.1.2
+	裂变钻头调整-速度上调 (30.00->33.33)
+	震爆物混合器调整-造价下调
+	修复了战役图的一些bug
+	加入了一个彩蛋
 	
 	v1.1.1
 	复合材料系运输器件来临！包括物品桥，液体桥，液体路由器，物品装卸器！

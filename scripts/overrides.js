@@ -57,6 +57,11 @@ Blocks.blastDrill.drillTime = 255
 Blocks.blastDrill.hardnessDrillMultiplier = 45
 
 Blocks.phaseConveyor.itemCapacity = 15
+Blocks.distributor.buildType = () => extend(Router.RouterBuild, Blocks.distributor, {
+	canControl(){
+		return true
+	}
+})
 
 Blocks.mechanicalPump.pumpAmount = 0.12
 Blocks.impulsePump.pumpAmount = 2 / 9

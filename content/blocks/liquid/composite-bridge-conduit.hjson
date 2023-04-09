@@ -1,7 +1,7 @@
 type: LiquidBridge
 category: liquid
 research: {
-	parent: composite-bridge-conveyor
+	parent: composite-liquid-router
 	objectives: [
 		{
 			type: SectorComplete
