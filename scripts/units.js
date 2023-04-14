@@ -161,7 +161,7 @@ bh.legGroupSize = 3
 bh.rippleScale = 1
 bh.abilities.add(
 	FireAbilities.EnergyForceFieldAbility(80, 1, 750, 270, 6, 0, 10, 10, 20, 15),
-	new RepairFieldAbility(80, 30, 120) //第一个是回血量, 第二个冷却, 第三个范围
+	new RepairFieldAbility(80, 30, 120) //第一个回血量, 第二个冷却, 第三个范围
 )
 exports.bh = bh
 
@@ -310,7 +310,7 @@ firefly.engineOffset = 5.6
 firefly.itemCapacity = 15
 firefly.abilities.add(new MoveLightningAbility(2, 8, 0.1, 0, 1.2, 1.6, Color.valueOf('a9d8ff')))
 firefly.weapons.add((() => {
-	const weapon = new Weapon('fire-firefly-weapon')
+	const weapon = new Weapon('')
 	weapon.shoot = ShootSpread(3, 60)
 	weapon.reload = 600
 	weapon.x = 3
