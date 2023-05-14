@@ -1,21 +1,5 @@
-type: AttributeCrafter
+//type: AttributeCrafter
 category: production
-research: {
-	parent: hzgs
-	objectives: [
-		{
-			type: onSector
-			preset: bzxw
-		}
-	]
-}
-researchCostMultiplier: 0.6
-requirements: [
-	copper/60
-	lead/80
-	titanium/45
-	silicon/45
-]
 
 size: 3
 hasPower: true

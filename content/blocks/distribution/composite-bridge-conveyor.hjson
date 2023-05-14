@@ -1,20 +1,5 @@
-type: ItemBridge
+//type: ItemBridge
 category: distribution
-research: {
-	parent: fhcsd
-	objectives: [
-		{
-			type: SectorComplete
-			preset: hacj
-		}
-	]
-}
-requirements: [
-	metaglass/4
-	titanium/6
-	thorium/4
-	plastanium/4
-]
 
 health: 85
 size: 1

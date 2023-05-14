@@ -1,20 +1,5 @@
-type: AttributeCrafter
+//type: AttributeCrafter
 category: production
-research: {
-	parent: fmj
-	objectives: [
-		{
-			type: SectorComplete
-			preset: htdl
-		}
-	]
-}
-requirements: [
-	copper/50
-	lead/30
-	metaglass/20
-	silicon/25
-]
 
 size: 2
 hasPower: true
@@ -34,7 +19,7 @@ drawer: {
 	]
 }
 
-attribute: cd
+attribute: grass
 maxBoost: 1
 craftTime: 240
 outputItem: mc/4

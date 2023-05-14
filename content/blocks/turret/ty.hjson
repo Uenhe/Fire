@@ -1,21 +1,5 @@
-type: ItemTurret
+//type: ItemTurret
 category: turret
-/*research: {
-	parent: yg
-	objectives: [
-		{
-			type: sectorComplete
-			preset: jljd
-		}
-	]
-}*/
-requirements: [
-	copper/800
-	metaglass/275
-	titanium/325
-	silicon/450
-	hardened-alloy/225
-]
 
 health: 2880
 armor: 6

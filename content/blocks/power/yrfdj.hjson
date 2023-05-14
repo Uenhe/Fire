@@ -1,21 +1,5 @@
-type: ConsumeGenerator
+//type: ConsumeGenerator
 category: power
-requirements: [
-	lead/150
-	thorium/90
-	silicon/225
-	plastanium/115
-	dt/60
-]
-research: {
-	parent: zjjd
-	objectives: [
-		{
-			type: SectorComplete
-			preset: lfsm
-		}
-	]
-}
 
 health: 840
 size: 3

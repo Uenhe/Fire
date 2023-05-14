@@ -1,14 +1,14 @@
-const lib = require('misc/lib')
 const FireStatuses = require('statuses')
 
-const yd = new Liquid('yd', Color.valueOf('f0ffff'))
-yd.heatCapacity = 2.5
-yd.temperature = -2.1
-yd.viscosity = 0.4
-yd.effect = FireStatuses.frostbite
-yd.barColor = Color.valueOf('f0ffff')
-yd.gasColor = Color.valueOf('c1e8f5')
-yd.lightColor = Color.valueOf('0097f532')
-yd.boilPoint = 0.55
-exports.yd = yd
-lib.addToResearch(yd, {parent: 'cryofluid'})
+const liquidNitrogen = new Liquid('liquid-nitrogen', Color.valueOf('f0ffff'))
+Object.assign(liquidNitrogen, {
+	heatCapacity: 2.5,
+	temperature: -2.1,
+	viscosity: 0.4,
+	boilPoint: -1.7,
+	effect: FireStatuses.frostbite,
+	barColor: Color.valueOf('f0ffff'),
+	gasColor: Color.valueOf('c1e8f5'),
+	lightColor: Color.valueOf('0097f532')
+})
+exports.liquidNitrogen = liquidNitrogen

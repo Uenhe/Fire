@@ -1,14 +1,5 @@
 //type: ItemTurret
 category: turret
-research: {
-	parent: js
-	requirements: [
-		titanium/500
-		thorium/320
-		silicon/275
-		jmbl/180
-	]
-}
 requirements: [
 	titanium/140
 	thorium/110

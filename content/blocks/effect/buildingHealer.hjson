@@ -1,19 +1,5 @@
-type: regenProjector
+//type: regenProjector
 category: effect
-requirements: [
-	titanium/30
-	silicon/25
-	dt/10
-]
-research: {
-	parent: hzgs
-	objectives: [
-		{
-			type: OnSector
-			preset: hacj
-		}
-	]
-}
 
 health: 320
 size: 2

@@ -1,14 +1,5 @@
-type: ItemTurret
+//type: ItemTurret
 category: turret
-/*research: {
-	parent: yg
-	objectives: [
-		{
-			type: SectorComplete
-			preset: jljd
-		}
-	]
-}*/
 requirements: [
 	copper/1350
 	graphite/475
@@ -141,7 +132,7 @@ ammoTypes: {
 	hardened-alloy: {
 		type: BasicBulletType
 		speed: 6
-		damage: 375
+		damage: 285
 		hitSize: 7.2
 		width: 22
 		height: 36
@@ -153,6 +144,7 @@ ammoTypes: {
 		pierceArmor: true
 		ammoMultiplier: 4
 		reloadMultiplier: 0.3
+		buildingDamageMultiplier: 0.2
 		status: melting
 		statusDuration: 240
 		frontColor: bf92f9
@@ -163,8 +155,9 @@ ammoTypes: {
 			type: BulletType
 			speed: 48
 			lifetime: 1
-			splashDamage: 175
-			splashDamageRadius: 82
+			splashDamage: 105
+			splashDamageRadius: 57
+			buildingDamageMultiplier: 0.2
 			collides: false
 			collidesTiles: false
 			hittable: false
@@ -174,7 +167,7 @@ ammoTypes: {
 			despawnEffect: {
 				type: WaveEffect
 				lifetime: 15
-				sizeFrom: 0, sizeTo: 82
+				sizeFrom: 0, sizeTo: 57
 				strokeFrom: 4, strokeTo: 0
 				colorFrom: bf92f9, colorTo: ffffff
 			}

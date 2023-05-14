@@ -1,9 +1,0 @@
-research: {
-	parent: ws
-	objectives: [
-		{
-			type: OnSector
-			preset: hacj
-		}
-	]
-}

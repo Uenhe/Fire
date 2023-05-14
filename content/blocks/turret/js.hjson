@@ -1,26 +1,12 @@
-type: ItemTurret
+//type: ItemTurret
 category: turret
-research: {
-	parent: hzgs
-	requirements: [
-		copper/160
-		lead/120
-		titanium/55
-	]
-	objectives: [
-		{
-			type: OnSector
-			preset: jljd
-		}
-	]
-}
 requirements: [
 	copper/100
 	lead/60
 	titanium/30
 ]
 
-health: 800   
+health: 800
 size: 2
 hasLiquids: true
 liquidCapacity: 20
@@ -40,7 +26,6 @@ consumes: {
 ammoTypes: {
 	copper: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 20
 		speed: 6
 		lifetime: 130
@@ -56,7 +41,6 @@ ammoTypes: {
 	}
 	lead: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 12
 		speed: 10
 		lifetime: 130
@@ -72,7 +56,6 @@ ammoTypes: {
 	}
 	metaglass: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 26
 		speed: 6
 		lifetime: 130
@@ -100,7 +83,6 @@ ammoTypes: {
 	}
 	zzhhhj: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 90
 		speed: 6
 		lifetime: 130
@@ -132,7 +114,6 @@ ammoTypes: {
 	}
 	graphite: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 40
 		speed: 5
 		lifetime: 130
@@ -147,7 +128,6 @@ ammoTypes: {
 	}
 	detonation-compound: {
 		type: ArtilleryBulletType
-		sprite: fire-js-bullet
 		damage: 25
 		speed: 4
 		lifetime: 163

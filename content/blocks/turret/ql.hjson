@@ -1,21 +1,5 @@
-type: ItemTurret
+//type: ItemTurret
 category: turret
-research: {
-	parent: yg
-	objectives: [
-		{
-			type: SectorComplete
-			preset: hhys
-		}
-	]
-}
-requirements: [
-	copper/650
-	thorium/375
-	silicon/425
-	plastanium/250
-	hardened-alloy/225
-]
 
 health: 2160
 armor: 5

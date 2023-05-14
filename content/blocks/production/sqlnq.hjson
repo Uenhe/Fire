@@ -1,20 +1,5 @@
-type: GenericCrafter
+//type: GenericCrafter
 category: production
-research: {
-	parent: swzzsj
-	objectives: [
-		{
-			type: sectorComplete
-			preset: zrhs
-		}
-	]
-}
-requirements: [
-	lead/50
-	graphite/30
-	metaglass/30
-	titanium/20
-]
 
 size: 2
 hasPower: true

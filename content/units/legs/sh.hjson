@@ -1,9 +1,0 @@
-research: {
-	parent: hzgs
-	objectives: [
-		{
-			type: SectorComplete
-			preset: hspy
-		}
-	]
-}

@@ -1,21 +1,5 @@
-type: ContinuousTurret
+//type: ContinuousTurret
 category: turret
-research: {
-	parent: js
-	objectives: [
-		{
-			type: OnSector
-			preset: zrhs
-		}
-	]
-}
-requirements: [
-	copper/350
-	graphite/240
-	titanium/200
-	silicon/220
-	plastanium/180
-]
 
 health: 1760
 size: 3
@@ -30,7 +14,7 @@ loopSound: flux
 shootWarmupSpeed: 0.16
 shootCone: 360
 aimChangeSpeed: 1.8
-rotateSpeed: 1.4
+rotateSpeed: 1.2
 shootY: 4
 range: 225
 shootType: {
@@ -41,6 +25,6 @@ shootType: {
 	hitColor: ffa166
 }
 consumes: {
-	power: 6.666
+	power: 6.666666
 	liquid: slag/0.25
 }

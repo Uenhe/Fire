@@ -1,9 +1,0 @@
-research: {
-	parent: sh
-	objectives: [
-		{
-			type: SectorComplete
-			preset: lhyj
-		}
-	]
-}

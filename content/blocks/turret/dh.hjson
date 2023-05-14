@@ -1,21 +1,5 @@
-type: LiquidTurret
+//type: LiquidTurret
 category: turret
-research: {
-	parent: js
-	objectives: [
-		{
-			type: SectorComplete
-			preset: zrhs
-		}
-	]
-}
-requirements: [
-	lead/420
-	metaglass/175
-	thorium/150
-	plastanium/140
-	surge-alloy/65
-]
 
 health: 2560
 size: 3
@@ -91,9 +75,9 @@ ammoTypes: {
 		statusDuration: 270
 		ammoMultiplier: 0.6
 	}
-	yd: {
+	liquid-nitrogen: {
 		type: LiquidBulletType
-		liquid: yd
+		liquid: liquid-nitrogen
 		damage: 7.25
 		lifetime: 54
 		speed: 6

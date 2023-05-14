@@ -1,20 +1,5 @@
-type: BurstDrill
+//type: BurstDrill
 category: production
-research: {
-	parent: hzgs
-	objectives: [
-		{
-			type: OnSector
-			preset: hacj
-		}
-	]
-}
-requirements: [
-	copper/160
-	metaglass/80
-	thorium/375
-	silicon/145
-]
 
 health: 1120
 size: 5
