@@ -1,9 +1,0 @@
-//type: buildTurret
-category: effect
-
-health: 865
-size: 2
-
-range: 285
-buildSpeed: 0.75
-consumes: {power: 2}
