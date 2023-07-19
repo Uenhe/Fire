@@ -42,26 +42,24 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
         if(unit.shield < max) unit.shield += Time.delta * regen;
         if(unit.shield > 0f){
             radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
-            Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2, realRad() * 2, b -> {
-                if(b.team != unit.team && b.type.absorbable && Intersector.isInRegularPolygon(sides, unit.x, unit.y, realRad(), rotation, b.x, b.y) && unit.shield > 0){
+            Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
+                if(bullet.team != unit.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, unit.x, unit.y, realRad(), rotation, bullet.x, bullet.y) && unit.shield > 0f){
                     boolean collision = true;
-                    Fx.absorb.at(b);
-                    if(b.vel.len() > 0.1f && b.type.reflectable && Mathf.chance(chanceDeflect / b.damage)){
-                        b.trns(-b.vel.x, -b.vel.y);
-                        float penX = Math.abs(unit.x - b.x);
-                        float penY = Math.abs(unit.y - b.y);
-                        if(penX > penY){
-                            b.vel.x *= -1f;
+                    Fx.absorb.at(bullet);
+                    if(bullet.vel.len() > 0.1f && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)){
+                        bullet.trns(-bullet.vel.x, -bullet.vel.y);
+                        if(Math.abs(unit.x - bullet.x) > Math.abs(unit.y - bullet.y)){
+                            bullet.vel.x *= -1f;
                         }else{
-                            b.vel.y *= -1f;
+                            bullet.vel.y *= -1f;
                         }
-                        b.owner = unit;
-                        b.team = unit.team;
-                        b.time += 1f;
+                        bullet.owner = unit;
+                        bullet.team = unit.team;
+                        bullet.time += 1f;
                         collision = false;
                     }
-                    if(collision) b.absorb();
-                    if(unit.shield <= b.damage){
+                    if(collision) bullet.absorb();
+                    if(unit.shield <= bullet.damage){
                         unit.shield -= cooldown * regen;
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
                         Sounds.spark.at(unit, Mathf.random(0.1f * lightningAmount, 0.15f * lightningAmount));
@@ -69,8 +67,7 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
                             Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, Mathf.random(360), lightningLength);
                         }
                     }
-                    float dmg = collision ? b.damage : b.damage * 2f;
-                    unit.shield -= dmg;
+                    unit.shield -= collision ? bullet.damage : bullet.damage * 2f;
                     alpha = 1f;
                 }
             });

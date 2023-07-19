@@ -1,6 +1,5 @@
 package fire.world.blocks.production;
 
-import arc.Core;
 import arc.audio.Sound;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -67,10 +66,10 @@ public class EnergyCrafter extends GenericCrafter{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(efficiency > 0f){
+            if(consValid(this)){
                 fraction = Mathf.lerpDelta(fraction, 0f, craftTime / 4000f * timeScale);
-                indexer.eachBlock(this, explosionRadius, b -> true, b -> {
-                    if(b != null && b.block == block && b.efficiency > 0f && b != this) instability += Time.delta;
+                indexer.eachBlock(this, explosionRadius, b -> true, build -> {
+                    if(build != null && build.block == this.block && consValid(build) && build != this) instability += Time.delta;
                 });
             }
             if(instability > maxInstability) kill();
@@ -92,7 +91,7 @@ public class EnergyCrafter extends GenericCrafter{
         @Override
         public void onDestroyed(){
             super.onDestroyed();
-            if(state.rules.reactorExplosions && efficiency > 0f){
+            if(state.rules.reactorExplosions && consValid(this)){
                 //create explosion.
                 Damage.damage(x, y, explosionRadius * time(), explosionDamage * time());
                 explodeEffect.at(this);
@@ -114,8 +113,7 @@ public class EnergyCrafter extends GenericCrafter{
         @Override
         public void draw(){
             super.draw();
-            if(team == Team.derelict) return;
-            if(efficiency > 0f){
+            if(consValid(this)){
                 flash += (1f + instability / maxInstability * 6f) * Time.delta;
                 Draw.z(Layer.effect);
                 Lines.stroke(2.5f, color);

@@ -5,12 +5,14 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
 import fire.input.FireBinding;
+import mindustry.ai.types.CommandAI;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.Ability;
+import mindustry.gen.Player;
 import mindustry.gen.Unit;
 
-import static fire.FireLib.desktop;
+import static mindustry.Vars.tilesize;
 
 public class DashAbility extends Ability{
     /** Unstable... */
@@ -34,6 +36,11 @@ public class DashAbility extends Ability{
     @Override
     public void update(Unit unit){
         super.update(unit);
+        dash(unit);
+    }
+
+    public void dash(Unit unit){
+        float length = unit.speed() * speedMultiplier;
         if(cooldownTimer < invincibleTime){
             float offset = unit.type.engineOffset / 2f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f));
             float cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset);
@@ -43,10 +50,14 @@ public class DashAbility extends Ability{
         }
         if(cooldownTimer < cooldown){
             cooldownTimer += Time.delta;
-        }else if(unit.moving() && desktop() && Core.input.keyDown(FireBinding.unit_ability)){
+        }else if(
+            //I hate this condition
+            (unit.controller() instanceof Player && Core.input.keyDown(FireBinding.unit_ability))
+            || (unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, length * unit.dragMultiplier * tilesize) && Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, command.targetPos.x, command.targetPos.y)) < 15f)
+        ){
             cooldownTimer = 0f;
             unit.apply(StatusEffects.invincible, invincibleTime);
-            unit.vel.setLength(unit.speed() * speedMultiplier);
+            unit.vel.setLength(length);
             dashEffect.at(unit);
         }
     }

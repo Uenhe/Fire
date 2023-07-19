@@ -3,6 +3,7 @@ package fire;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureRegion;
+import mindustry.gen.Building;
 
 public class FireLib{
     public static Color color(String hex){
@@ -23,5 +24,9 @@ public class FireLib{
 
     public static boolean desktop(){
         return Core.app.isDesktop();
+    }
+
+    public static boolean consValid(Building build){
+        return build.efficiency > 0f;
     }
 }

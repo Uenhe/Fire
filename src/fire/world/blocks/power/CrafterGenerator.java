@@ -11,6 +11,8 @@ import mindustry.world.blocks.power.ConsumeGenerator;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
 
+import static fire.FireLib.consValid;
+
 public class CrafterGenerator extends ConsumeGenerator{
     public Item outputItem = Items.copper;
 
@@ -37,7 +39,7 @@ public class CrafterGenerator extends ConsumeGenerator{
         public void updateTile(){
             super.updateTile();
             full = items.get(outputItem) >= itemCapacity;
-            if(consValid() && !full){
+            if(consValid(this) && !full){
                 p += getProgressIncrease(itemDuration);
                 gp += getProgressIncrease(itemDuration);
             }
@@ -50,26 +52,22 @@ public class CrafterGenerator extends ConsumeGenerator{
                 gp %= 1;
                 generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
             }
-            productionEfficiency = Mathf.num(consValid()) * Mathf.num(!full);
+            productionEfficiency = Mathf.num(consValid(this)) * Mathf.num(!full);
             dump(outputItem);
             produced(outputItem);
-            warmup = Mathf.lerpDelta(warmup, Mathf.num(consValid() && !full), 0.05f);
+            warmup = Mathf.lerpDelta(warmup, Mathf.num(consValid(this) && !full), 0.05f);
         }
 
         @Override
         public float getPowerProduction(){
-            return Mathf.num(consValid()) * Mathf.num(!full) * powerProduction;
+            return Mathf.num(consValid(this)) * Mathf.num(!full) * powerProduction;
         }
 
         @Override
         public BlockStatus status(){
-            if(consValid() && !full) return BlockStatus.active;
-            if(full && consValid()) return BlockStatus.noOutput;
+            if(consValid(this) && !full) return BlockStatus.active;
+            if(full && consValid(this)) return BlockStatus.noOutput;
             return BlockStatus.noInput;
-        }
-
-        protected boolean consValid(){
-            return efficiency > 0f;
         }
 
         @Override

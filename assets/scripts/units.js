@@ -356,6 +356,7 @@ omicron.weapons.add(
 
 //先锋
 const pioneer = Object.assign(new UnitType("pioneer"), {
+    aiController: () => new FlyingDashAI(),
     defaultCommand: UnitCommand.repairCommand,
     drag: 0.05,
     accel: 0.1,
@@ -363,15 +364,23 @@ const pioneer = Object.assign(new UnitType("pioneer"), {
     engineOffset: 13,
     engineSize: 7,
     itemCapacity: 30,
-    buildSpeed: 2.6,
+    buildSpeed: 3.2,
     lowAltitude: true,
     abilities: Seq.with(
-        new DashAbility(10, 24, 120, new Effect(40, e => {
-            Draw.color(e.color, Color.darkGray, e.fin());
-            Angles.randLenVectors(e.id, 6, 6 + e.fin() * 8, (x, y) => {
-                Fill.square(e.x + x, e.y + y, e.fout() * 3 + 0.5, 45);
+        new DashAbility(10, 12, 120, new MultiEffect(
+            new Effect(40, e => {
+                Draw.color(e.color, Color.darkGray, e.fin());
+                Angles.randLenVectors(e.id, 6, 6 + e.fin() * 8, (x, y) => {
+                    Fill.square(e.x + x, e.y + y, 3.5 + e.fout() * 3, 45);
+                })
+            }),
+            new Effect(40, e => {
+                Draw.color(e.color, Color.darkGray, e.fin());
+                Angles.randLenVectors(e.id, 4, 4 + e.fin() * 6, (x, y) => {
+                    Fill.circle(e.x + x, e.y + y, 3 + e.fout() * 2);
+                })
             })
-        }))
+        ))
     )
 });
 setup(pioneer, payload, 5600, 7, 30, 20.25/7.5, 3);

@@ -20,7 +20,7 @@ import mindustry.ui.Bar;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static fire.FireLib.format;
+import static fire.FireLib.*;
 import static mindustry.Vars.*;
 
 public class ForceCoreBlock extends BuildableCoreBlock{
@@ -48,7 +48,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     public void setStats(){
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth);
-        stats.add(Stat.cooldownTime, (int)(shieldHealth / cooldownBroken / 60), StatUnit.seconds);
+        stats.add(Stat.cooldownTime, (int)(shieldHealth / cooldownBroken / 60f), StatUnit.seconds);
         stats.add(Stat.range, radius / tilesize, StatUnit.blocks);
     }
 
@@ -87,7 +87,6 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(team == Team.derelict) return;
             radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
             if(Mathf.chanceDelta(buildup / shieldHealth * 0.1)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
@@ -105,12 +104,12 @@ public class ForceCoreBlock extends BuildableCoreBlock{
             }
             if(hit > 0) hit -= 0.2f * Time.delta;
             if(realRad() > 0 && !broken){
-                Groups.bullet.intersect(x - realRad(), y - realRad(), realRad() * 2, realRad() * 2, b -> {
-                    if(b.team != team && b.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, realRad(), shieldRotation, b.x, b.y)){
-                        b.absorb();
-                        Fx.absorb.at(b);
+                Groups.bullet.intersect(x - realRad(), y - realRad(), realRad() * 2, realRad() * 2, bullet -> {
+                    if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, realRad(), shieldRotation, bullet.x, bullet.y)){
+                        bullet.absorb();
+                        Fx.absorb.at(bullet);
                         hit = 1f;
-                        buildup += b.damage;
+                        buildup += bullet.damage;
                     }
                 });
             }

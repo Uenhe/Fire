@@ -35,6 +35,7 @@ public class ArmorWall extends Wall{
 
     public class ArmorWallBuild extends WallBuild{
         protected float extraArmor;
+
         @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
@@ -47,7 +48,7 @@ public class ArmorWall extends Wall{
         @Override
         public void draw(){
             super.draw();
-            //a hacky way to update extraArmor without updateTile()
+            //might be a hacky way to update extraArmor without updateTile()
             extraArmor = armorIncrease * (1f - (health / maxHealth)) * 100f;
         }
     }

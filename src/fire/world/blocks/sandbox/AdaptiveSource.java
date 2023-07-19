@@ -15,7 +15,6 @@ public class AdaptiveSource extends PowerSource{
         hasItems = true;
         hasLiquids = true;
         update = true;
-        noUpdateDisabled = true;
         displayFlow = false;
         canOverdrive = true;
     }

@@ -6,6 +6,7 @@ function getClz(name){
 };
 var fire = getClz("fire");
 importPackage(fire);
+importPackage(fire.ai.types);
 importPackage(fire.entities.abilities);
 importPackage(fire.type);
 importPackage(fire.world.blocks.defense);

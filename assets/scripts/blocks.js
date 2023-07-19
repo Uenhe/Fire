@@ -1108,7 +1108,17 @@ chopper.consumePower(24/60);
 const treeFarm = Object.assign(new AttributeCrafter("sc"), {
     hasPower: true,
     hasLiquids: true,
-    //TODO updateEffect.
+    updateEffect: Object.assign(new Effect(60, e => {
+        Draw.color(Color.valueOf("6aa85e"));
+        Draw.alpha(e.fslope());
+        Fx.rand.setSeed(e.id);
+        for(var i = 0; i < 2; i += 1){
+            Fx.v.trns(Fx.rand.random(360), Fx.rand.random(e.finpow() * 9)).add(e.x, e.y);
+            Fill.circle(Fx.v.x, Fx.v.y, Fx.rand.random(1.4, 2.4))
+        }
+    }), {
+        layer: Layer.bullet - 1
+    }),
     drawer: new DrawMulti(
         new DrawRegion("-bottom"),
         new DrawLiquidTile(Liquids.water),
@@ -1164,7 +1174,17 @@ const biomassCultivator = Object.assign(new AttributeCrafter("swzzsj"), {
     hasLiquids: true,
     itemCapacity: 20,
     liquidCapacity: 30,
-    //TODO updateEffect.
+    updateEffect: Object.assign(new Effect(60, e => {
+        Draw.color(Color.valueOf("9e78dc"));
+        Draw.alpha(e.fslope());
+        Fx.rand.setSeed(e.id);
+        for(var i = 0; i < 2; i += 1){
+            Fx.v.trns(Fx.rand.random(360), Fx.rand.random(e.finpow() * 12)).add(e.x, e.y);
+            Fill.circle(Fx.v.x, Fx.v.y, Fx.rand.random(1.8, 2.8))
+        }
+    }), {
+        layer: Layer.bullet - 1
+    }),
     drawer: new DrawMulti(
         new DrawRegion("-bottom"),
         new DrawLiquidTile(Liquids.water),
@@ -1289,12 +1309,9 @@ setup(compositeBridgeConduit, liqu, ItemStack.with(
 
 
 //电力-导体节点
-const conductorPowerNode = Object.assign(new PowerNode("zjjd"), {
-    enableDrawStatus: false, //只显示红灯是吧, 灯都给你ban咯
+const conductorPowerNode = Object.assign(new BatteryNode("zjjd"), {
     maxNodes: 8,
-    laserRange: 25,
-    consumesPower: true,
-    outputsPower: true
+    laserRange: 25
 });
 setup(conductorPowerNode, powe, ItemStack.with(
     Items.lead, 10,
@@ -2039,6 +2056,7 @@ const campfire = Object.assign(new UnitOverdriveProjector("gh"), {
     speedBoost: 3.2,
     allyStatus: statues.inspired,
     enemyStatus: StatusEffects.sapped,
+    statusDuration: 60,
     updateEffectChance: 0.03,
     updateEffect: new MultiEffect(
         Fx.blastsmoke,

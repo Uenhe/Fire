@@ -14,12 +14,13 @@ import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.world.blocks.defense.OverdriveProjector;
 
-import static fire.FireLib.getSetting;
+import static fire.FireLib.*;
 
 public class UnitOverdriveProjector extends OverdriveProjector{
     public StatusEffect
         allyStatus = StatusEffects.overclock,
         enemyStatus = StatusEffects.sapped;
+    public float statusDuration = 60f;
     public float updateEffectChance = 0.04f;
     public Effect updateEffect = Fx.none;
 
@@ -38,11 +39,11 @@ public class UnitOverdriveProjector extends OverdriveProjector{
         @Override
         public void updateTile(){
             super.updateTile();
-            if(efficiency > 0f){
-                Units.nearby(team, x, y, range, u -> u.apply(allyStatus, 60f));
-                Units.nearbyEnemies(team, x - range, y - range, range * 2f, range * 2f, u -> {
-                    if(u.within(x, y, range)) u.apply(enemyStatus, 60f);
-                });
+            if(consValid(this)){
+                Units.nearby(null, x, y, range, unit -> unit.apply(unit.team == this.team ? allyStatus : enemyStatus, statusDuration));
+                //Units.nearbyEnemies(team, x - range, y - range, range * 2f, range * 2f, u -> {
+                //    if(u.within(x, y, range)) u.apply(enemyStatus, 60f);
+                //});
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }
@@ -53,7 +54,7 @@ public class UnitOverdriveProjector extends OverdriveProjector{
         public void draw(){
             super.draw();
             if(getSetting("showBlockRange")){
-                Draw.color(efficiency > 0f ? Pal.redLight : Color.black, 1f);
+                Draw.color(consValid(this) ? Pal.redLight : Color.black, 1f);
                 Lines.stroke(1.5f);
                 Lines.circle(x, y, range);
                 Draw.alpha(0.2f);
