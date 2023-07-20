@@ -35,7 +35,7 @@ lengscl, movespace, groupsize, ripscl, lockbase, continuousmove){
 
 
 
-/*========陆========*/
+/* ==== 陆 ==== */
 
 
 
@@ -50,9 +50,9 @@ const guarding = Object.assign(new UnitType("sh"), {
     targetable: false
 });
 setup(guarding, legs, 140, 3, 8, 0.6, 4);
-setupLegs(guarding, 4, 8, 0.2, 0, 2, 3, 1.6, 1.4, 2, 0.2, true, false);
+setupLegs(guarding, 4, 8, 0.2, 0, 2, 3, 1.6, 1.4, 2, 0.2, true, true);
 guarding.abilities.add(
-    new ForceFieldAbility(44, 0.25, 200, 400)
+    new ForceFieldAbility(44, 20/60, 200, 400)
 );
 
 
@@ -68,9 +68,9 @@ const resisting = Object.assign(new UnitType("ky"), {
     targetable: false,
 });
 setup(resisting, legs, 420, 5, 12, 0.54, 3.6);
-setupLegs(resisting, 4, 10, 0.2, 0, 2, 3, 1.6, 1.4, 2, 0.3, true, false);
+setupLegs(resisting, 4, 10, 0.2, 0, 2, 3, 1.6, 1.4, 2, 0.3, true, true);
 resisting.abilities.add(
-    new ForceFieldAbility(54, 0.35, 280, 340),
+    new ForceFieldAbility(54, 36/60, 280, 340),
     new RegenFieldAbility(60/60, 40, Color.valueOf("8cfffb"), 120, 3)
 );
 
@@ -87,9 +87,9 @@ const garrison = Object.assign(new UnitType("ws"), {
     targetable: false,
 });
 setup(garrison, legs, 930, 6, 16, 0.45, 2.7);
-setupLegs(garrison, 6, 22, 0.2, 2, 8, 4, 1.6, 1.1, 3, 0.4, true, false);
+setupLegs(garrison, 6, 22, 0.2, 2, 8, 4, 1.6, 1.1, 3, 0.4, true, true);
 garrison.abilities.add(
-    new ForceFieldAbility(72, 0.6, 400, 300, 4, 45),
+    new ForceFieldAbility(72, 60/60, 400, 300, 4, 45),
     new StatusFieldAbility(StatusEffects.overclock, 360, 360, 80)
 );
 garrison.weapons.add(
@@ -98,8 +98,7 @@ garrison.weapons.add(
         x: 5, y: 2,
         targetInterval: 10,
         targetSwitchInterval: 15,
-        bullet: Object.assign(new BulletType(), {
-            damage: 10,
+        bullet: Object.assign(new BulletType(1, 10), {
             maxRange: 125,
             shootEffect: Fx.sparkShoot,
             hitEffect: Fx.pointHit
@@ -120,9 +119,9 @@ const shelter = Object.assign(new UnitType("bh"), {
     canAttack: false
 });
 setup(shelter, legs, 7200, 10, 24, 0.4, 2.4);
-setupLegs(shelter, 6, 28, 0.3, -15, 6, 2, 1, 1, 3, 1, true, false);
+setupLegs(shelter, 6, 28, 0.3, -15, 6, 2, 1, 1, 3, 1, true, true);
 shelter.abilities.add(
-    new EnergyForceFieldAbility(80, 120/60, 1050, 270, 10, 10, 20, 15),
+    new EnergyForceFieldAbility(80, 150/60, 1050, 270, 10, 10, 20, 15),
     new RegenFieldAbility(150/60, 120, Color.valueOf("8cfffb"), 120, 3)
 );
 
@@ -257,7 +256,7 @@ const error = Object.assign(new UnitType("error"), {
     shadowElevation: 0.65
 });
 setup(error, legs, 128000, 34, 23, 7.5/7.5, 2.7);
-setupLegs(error, 8, 300, 0.2, -15, 10, 3, 1, 1, 3, 5, false, true);
+setupLegs(error, 8, 300, 0.2, -15, 10, 3, 1, 1, 3, 5, false, false);
 error.weapons.add(
     Object.assign(new Weapon("error-sapper"), {
         reload: 12,

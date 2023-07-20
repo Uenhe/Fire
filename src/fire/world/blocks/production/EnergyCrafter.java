@@ -13,7 +13,6 @@ import mindustry.content.Fx;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.entities.Lightning;
-import mindustry.game.Team;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -69,7 +68,9 @@ public class EnergyCrafter extends GenericCrafter{
             if(consValid(this)){
                 fraction = Mathf.lerpDelta(fraction, 0f, craftTime / 4000f * timeScale);
                 indexer.eachBlock(this, explosionRadius, b -> true, build -> {
-                    if(build != null && build.block == this.block && consValid(build) && build != this) instability += Time.delta;
+                    if(build != null && build.block == this.block && consValid(build) && build != this){
+                        instability += Time.delta;
+                    }
                 });
             }
             if(instability > maxInstability) kill();
@@ -82,8 +83,9 @@ public class EnergyCrafter extends GenericCrafter{
             color = circleColor[colorCount];
             rotation = Mathf.random(360);
             Sounds.release.at(this, Mathf.random(0.45f, 0.55f));
-            for(int i = 0; i < (instability > maxInstability / 2f ? lightningAmount * 2 : lightningAmount); i += 1){
-                Lightning.create(team, color, lightningDamage, x, y, (i - 1) * 45f, (int)(size * 2 + instability * 0.03));
+            int realLightningAmount = instability > maxInstability / 2f ? lightningAmount * 2 : lightningAmount;
+            for(int i = 0; i < realLightningAmount; i += 1){
+                Lightning.create(team, color, lightningDamage, x, y, (i - 1) * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
             }
             fraction = 1.05f;
         }
@@ -92,7 +94,7 @@ public class EnergyCrafter extends GenericCrafter{
         public void onDestroyed(){
             super.onDestroyed();
             if(state.rules.reactorExplosions && consValid(this)){
-                //create explosion.
+                //create explosion
                 Damage.damage(x, y, explosionRadius * time(), explosionDamage * time());
                 explodeEffect.at(this);
                 explodeSound.at(this);

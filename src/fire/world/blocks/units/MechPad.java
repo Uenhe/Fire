@@ -1,6 +1,8 @@
 package fire.world.blocks.units;
 
 import fire.world.blocks.storage.BuildableCoreBlock;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.state;
 
@@ -9,6 +11,18 @@ public class MechPad extends BuildableCoreBlock{
         super(name);
         itemCapacity = 0;
         unloadable = false;
+    }
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        if(canBeBuilt() && requirements.length > 0) stats.add(Stat.buildTime, buildCost / 60f, StatUnit.seconds);
+    }
+
+    @Override
+    public void setBars(){
+        super.setBars();
+        removeBar("capacity");
     }
 
     public class MechPadBuild extends CoreBuild{

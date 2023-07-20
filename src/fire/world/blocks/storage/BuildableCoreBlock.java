@@ -6,7 +6,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.state;
 
-public class BuildableCoreBlock extends CoreBlock {
+public class BuildableCoreBlock extends CoreBlock{
     public BuildableCoreBlock(String name){
         super(name);
     }

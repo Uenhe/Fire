@@ -6,12 +6,13 @@ import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
 import mindustry.world.blocks.defense.Wall;
 
-import static fire.FireLib.format;
+import static fire.FireLib.*;
 import static mindustry.Vars.*;
 
 public class ArmorWall extends Wall{
-    /** Armor that wall increases when loses every 1% health. */
-    public float armorIncrease = 0.1f;
+    /** Armor increases in total. */
+    public float armorIncrease = 10f;
+    public float maxHealthLose = 0.5f;
 
     public ArmorWall(String name){
         super(name);
@@ -20,16 +21,17 @@ public class ArmorWall extends Wall{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(FireStat.maxArmorIncrease, armorIncrease * 100f);
+        stats.add(FireStat.maxArmorIncrease, armorIncrease);
     }
 
     @Override
     public void setBars(){
         super.setBars();
-        addBar("armor", (ArmorWallBuild e) -> new Bar(
-            () -> format("bar.armorincrease", (int)(armor + e.extraArmor), (int)(armor + armorIncrease * 100f)),
+        float max = armor + armorIncrease;
+        addBar("armorincrease", (ArmorWallBuild build) -> new Bar(
+            () -> format("bar.armorincrease", (int)(armor + build.extraArmor), (int)max),
             () -> Pal.accent,
-            () -> (armor + e.extraArmor) / (armor + armorIncrease * 100f)
+            () -> (armor + build.extraArmor) / max
         ));
     }
 
@@ -39,7 +41,7 @@ public class ArmorWall extends Wall{
         @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
-            if(Mathf.zero(healthMul)) return health + 1f;
+            if(Mathf.zero(healthMul)) return health() + 1f;
             float dmg = (damage - extraArmor) / healthMul;
             if(dmg < 1f) dmg = damage * minArmorDamage;
             return dmg;
@@ -49,7 +51,7 @@ public class ArmorWall extends Wall{
         public void draw(){
             super.draw();
             //might be a hacky way to update extraArmor without updateTile()
-            extraArmor = armorIncrease * (1f - (health / maxHealth)) * 100f;
+            extraArmor = Math.min((1f - (health() / maxHealth())) / maxHealthLose * armorIncrease, armorIncrease);
         }
     }
 }

@@ -14,7 +14,7 @@ const frostbite = extend(StatusEffect, "frostbite", {
 frostbite.init(() => {
     frostbite.opposite(StatusEffects.melting, StatusEffects.burning);
     frostbite.affinity(StatusEffects.blasted, (unit, result, time) => {
-        unit.damagePierce(transitionDamage)
+        unit.damagePierce(frostbite.transitionDamage)
     })
 });
 

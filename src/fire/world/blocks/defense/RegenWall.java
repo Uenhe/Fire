@@ -23,7 +23,7 @@ public class RegenWall extends RegenProjector{
     public float chanceHeal = -1f;
     /** {@link mindustry.world.blocks.defense.Wall} */
     public float chanceDeflect = -1f;
-    /** How much should wall heal at collision. */
+    /** How much wall heals at collision. Bases on bullet damage. */
     public float regenPercent = 0.1f;
     /** {@link mindustry.type.Item} */
     public float frameTime = 3f;
@@ -97,8 +97,7 @@ public class RegenWall extends RegenProjector{
                 bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)
             ){
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);
-                float penX = Math.abs(x - bullet.x), penY = Math.abs(y - bullet.y);
-                if(penX > penY){
+                if(Math.abs(x - bullet.x) > Math.abs(y - bullet.y)){
                     bullet.vel.x *= -1;
                 }else{
                     bullet.vel.y *= -1;
@@ -120,8 +119,7 @@ public class RegenWall extends RegenProjector{
         public void draw(){
             super.draw();
             Draw.rect(atlas(name + count), x, y);
-            if(flashHit){
-                if(hit < 0.0001f) return;
+            if(flashHit && hit >= 0.0001f){
                 Draw.color(flashColor);
                 Draw.alpha(hit * 0.5f);
                 Draw.blend(Blending.additive);

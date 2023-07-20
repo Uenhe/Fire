@@ -41,9 +41,6 @@ public class UnitOverdriveProjector extends OverdriveProjector{
             super.updateTile();
             if(consValid(this)){
                 Units.nearby(null, x, y, range, unit -> unit.apply(unit.team == this.team ? allyStatus : enemyStatus, statusDuration));
-                //Units.nearbyEnemies(team, x - range, y - range, range * 2f, range * 2f, u -> {
-                //    if(u.within(x, y, range)) u.apply(enemyStatus, 60f);
-                //});
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance)){
                     updateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
                 }

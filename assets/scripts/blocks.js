@@ -19,7 +19,19 @@ function setup(b, cat, req, size, health){
     if(health) b.health = health
 };
 
-
+function destroyBullet(damage, radius, lifetime){
+    return Object.assign(new BulletType(1, 0), {
+        lifetime: lifetime,
+        splashDamage: damage,
+        splashDamageRadius: radius,
+        hitEffect: Object.assign(new WaveEffect(), {
+            lifetime: lifetime,
+            sizeFrom: 0, sizeTo: radius,
+            strokeFrom: 4, strokeTo: 0,
+            colorFrom: Color.white, colorTo: Color.white
+        })
+    })
+};
 
 const fireCompany = Object.assign(new LightBlock("hzgs"), {
     buildVisibility: BuildVisibility.hidden,
@@ -194,10 +206,10 @@ const nightmare = Object.assign(new ItemTurret("yg"), {
     coolantMultiplier: 0.95
 });
 setup(nightmare, turr, ItemStack.with(
-    Items.titanium, 140,
-    Items.thorium, 110,
-    Items.silicon, 85,
-    items.mirrorglass, 55
+    Items.titanium, 75,
+    Items.thorium, 60,
+    Items.silicon, 35,
+    items.mirrorglass, 25
 ), 2, 1080);
 nightmare.consumeCoolant(12/60);
 nightmare.ammo(
@@ -884,6 +896,9 @@ magneticRail.ammo(
         pierceCap: 30,
         pierceBuilding: true,
         collidesGround: true,
+        reflectable: false,
+        absorbable: false,
+        hittable: false,
         backColor: MRcolor,
         frontColor: Color.white,
         trailColor: MRcolor,
@@ -955,6 +970,9 @@ magneticRail.ammo(
             pierceCap: 1,
             pierceBuilding: true,
             collidesGround: true,
+            reflectable: false,
+            absorbable: false,
+            hittable: false,
             backColor: MRcolor,
             frontColor: Color.white,
             trailColor: MRcolor,
@@ -1020,6 +1038,9 @@ magneticRail.ammo(
                 splashDamageRadius: 120,
                 splashDamage: 180,
                 collidesGround: true,
+                reflectable: false,
+                absorbable: false,
+                hittable: false,
                 backColor: MRcolor,
                 frontColor: Color.white,
                 trailColor: MRcolor
@@ -1033,6 +1054,9 @@ magneticRail.ammo(
         rangeChange: 45 * Vars.tilesize,
         splashDamageRadius: 180,
         splashDamage: 11500,
+        reflectable: false,
+        absorbable: false,
+        hittable: false,
         backColor: MRcolor,
         frontColor: Color.white,
         trailColor: MRcolor,
@@ -1067,6 +1091,9 @@ magneticRail.ammo(
             splashDamageRadius: 180,
             splashDamage: 4560,
             collidesGround: true,
+            reflectable: false,
+            absorbable: false,
+            hittable: false,
             backColor: MRcolor,
             frontColor: Color.white,
             trailColor: MRcolor
@@ -1219,6 +1246,7 @@ const fissionDrill = Object.assign(new BurstDrill("lbzt"), {
         Fx.drillSteam
     ),
     baseExplosiveness: 5,
+    destroyBullet: destroyBullet(800, 28, 15),
     tier: 8,
     drillTime: 45,
     shake: 4,
@@ -1315,10 +1343,9 @@ const conductorPowerNode = Object.assign(new BatteryNode("zjjd"), {
 });
 setup(conductorPowerNode, powe, ItemStack.with(
     Items.lead, 10,
-    items.glass, 10,
     items.conductor, 5
 ), 2, 225);
-conductorPowerNode.consumePowerBuffered(20000);
+conductorPowerNode.consumePowerBuffered(25000);
 
 
 
@@ -1328,6 +1355,7 @@ const flameGenerator = Object.assign(new ConsumeGenerator("yrfdj"), {
     itemCapacity: 20,
     liquidCapacity: 30,
     baseExplosiveness: 5,
+    destroyBullet: destroyBullet(640, 20, 15),
     generateEffect: new MultiEffect(
         Fx.explosion,
         Fx.fuelburn,
@@ -1342,7 +1370,7 @@ const flameGenerator = Object.assign(new ConsumeGenerator("yrfdj"), {
         new DrawLiquidRegion(Liquids.cryofluid)
     ),
     itemDuration: 120,
-    powerProduction: 2400/60
+    powerProduction: 5760/60
 });
 setup(flameGenerator, powe, ItemStack.with(
     Items.lead, 120,
@@ -1364,7 +1392,7 @@ const burstReactor = Object.assign(new ImpactReactor("burst-reactor"), {
     ambientSoundVolume: 0.06,
     ambientSound: Sounds.pulse,
     itemDuration: 240,
-    powerProduction: 108000/60,
+    powerProduction: 120000/60,
     warmupSpeed: 0.0008,
     explosionRadius: 120,
     explosionDamage: 11600,
@@ -1416,7 +1444,8 @@ const hardenedWall = Object.assign(new ArmorWall("hardened-wall"), {
     placeableLiquid: true,
     insulated: true,
     absorbLasers: true,
-    armorIncrease: 0.2
+    armorIncrease: 20,
+    maxHealthLose: 0.7
 });
 setup(hardenedWall, defe, ItemStack.with(
     Items.metaglass, 3,
@@ -1431,7 +1460,8 @@ const hardenedWallLarge = Object.assign(new ArmorWall("hardened-wall-large"), {
     placeableLiquid: true,
     insulated: true,
     absorbLasers: true,
-    armorIncrease: 0.2
+    armorIncrease: 20,
+    maxHealthLose: 0.7
 });
 setup(hardenedWallLarge, defe, ItemStack.with(
     Items.metaglass, 12,
@@ -1442,6 +1472,7 @@ setup(hardenedWallLarge, defe, ItemStack.with(
 
 //防御-血肉墙
 const fleshWall = Object.assign(new RegenWall("xrq"), {
+    enableDrawStatus: false,
     healPercent: 5/60,
     optionalMultiplier: 2,
     chanceHeal: 0.15,
@@ -1508,6 +1539,7 @@ const metaglassPlater = Object.assign(new GenericCrafter("dgj"), {
     ),
     hasPower: true,
     hasLiquids: false,
+    itemCapacity: 20,
     craftEffect: Fx.smeltsmoke,
     drawer: new DrawMulti(
         new DrawDefault(),
@@ -2075,7 +2107,7 @@ campfire.consumeItems(ItemStack.with(
     items.kindlingAlloy, 4,
     items.flamefluidCrystal, 4
 ));
-campfire.consumeLiquid(Liquids.slag, 36/60);
+campfire.consumeLiquid(Liquids.slag, 24/60);
 
 
 
@@ -2218,6 +2250,7 @@ module.exports = {
     fleshSynthesizer: fleshSynthesizer,
     liquidNitrogenCompressor: liquidNitrogenCompressor,
     hardenedAlloySmelter: hardenedAlloySmelter,
+    magneticAlloyFormer: magneticAlloyFormer,
     hardenedAlloyCrucible: hardenedAlloyCrucible,
     fleshReconstructor: fleshReconstructor,
     buildingHealer: buildingHealer,

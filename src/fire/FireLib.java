@@ -29,4 +29,8 @@ public class FireLib{
     public static boolean consValid(Building build){
         return build.efficiency > 0f;
     }
+
+    public static void debug(Building build, String text){
+        build.block.drawPlaceText(text, build.tileX(), build.tileY(), true);
+    }
 }

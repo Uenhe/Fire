@@ -9,7 +9,7 @@ public class FlyingDashAI extends FlyingAI{
     public void updateMovement(){
         super.updateMovement();
         for(Ability a : unit.abilities){
-            if(a instanceof DashAbility) ((DashAbility) a).dash(unit);
+            if(a instanceof DashAbility) ((DashAbility)a).dash(unit);
         }
     }
 }

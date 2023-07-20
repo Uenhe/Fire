@@ -11,7 +11,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
-import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -66,7 +65,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
         Draw.color(Pal.gray);
-        Lines.stroke(3);
+        Lines.stroke(3f);
         Lines.poly(x * tilesize + offset, y * tilesize + offset, 6, radius);
         Draw.color(player.team().color);
         Lines.stroke(1f);
@@ -87,24 +86,24 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.05f);
-            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1)){
+            radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.06f);
+            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
             }
             warmup = Mathf.lerpDelta(warmup, 1f, 0.1f);
-            if(buildup > 0){
+            if(buildup > 0f){
                 float scale = !broken ? cooldownNormal : cooldownBroken;
                 buildup -= delta() * scale;
             }
-            if(broken && buildup <= 0) broken = false;
+            if(broken && buildup <= 0f) broken = false;
             if(buildup >= shieldHealth && !broken){
                 broken = true;
                 buildup = shieldHealth;
                 Fx.shieldBreak.at(x, y, realRad(), team.color);
             }
-            if(hit > 0) hit -= 0.2f * Time.delta;
+            if(hit > 0f) hit -= 0.2f * Time.delta;
             if(realRad() > 0 && !broken){
-                Groups.bullet.intersect(x - realRad(), y - realRad(), realRad() * 2, realRad() * 2, bullet -> {
+                Groups.bullet.intersect(x - realRad(), y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
                     if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, realRad(), shieldRotation, bullet.x, bullet.y)){
                         bullet.absorb();
                         Fx.absorb.at(bullet);
@@ -128,8 +127,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         @Override
         public void draw(){
             super.draw();
-            if(team == Team.derelict) return;
-            if(buildup > 0){
+            if(buildup > 0f){
                 Draw.alpha(buildup / shieldHealth * 0.75f);
                 Draw.z(Layer.blockAdditive);
                 Draw.blend(Blending.additive);
