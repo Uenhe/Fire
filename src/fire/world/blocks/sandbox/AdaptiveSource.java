@@ -2,12 +2,11 @@ package fire.world.blocks.sandbox;
 
 import mindustry.type.Item;
 import mindustry.type.Liquid;
-import mindustry.world.blocks.sandbox.PowerSource;
 import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.content;
 
-public class AdaptiveSource extends PowerSource{
+public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
     public int itemPerSec = 100;
 
     public AdaptiveSource(String name){
@@ -39,27 +38,25 @@ public class AdaptiveSource extends PowerSource{
     }
 
     public class AdaptiveSourceBuild extends PowerSourceBuild{
-        protected int itemCount, liquidCount;
         protected float counter;
 
         @Override
         public void updateTile(){
-            super.updateTile();
             counter += edelta();
             float limit = 60f / itemPerSec;
-            itemCount = itemCount >= content.items().size - 1 ? 0 : itemCount + 1;
-            liquidCount = liquidCount >= content.liquids().size - 1 ? 0 : liquidCount + 1;
-            Item item = content.item(itemCount);
-            Liquid liquid = content.liquid(liquidCount);
             while(counter >= limit){
-                items.set(item, 1);
-                dump(item);
-                items.set(item, 0);
-                counter -= limit;
+                for(Item item : content.items()){
+                    items.set(item, 1);
+                    dump(item);
+                    items.set(item, 0);
+                    counter -= limit;
+                }
             }
             liquids.clear();
-            liquids.add(liquid, liquidCapacity);
-            dumpLiquid(liquid);
+            for(Liquid liquid: content.liquids()){
+                liquids.add(liquid, liquidCapacity);
+                dumpLiquid(liquid);
+            }
         }
     }
 }

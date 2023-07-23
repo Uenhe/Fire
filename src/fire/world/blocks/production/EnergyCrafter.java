@@ -18,12 +18,11 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
-import mindustry.world.blocks.production.GenericCrafter;
 
 import static mindustry.Vars.*;
 import static fire.FireLib.*;
 
-public class EnergyCrafter extends GenericCrafter{
+public class EnergyCrafter extends mindustry.world.blocks.production.GenericCrafter{
     /** {@link mindustry.world.blocks.power.PowerGenerator} */
     public float
         explosionRadius = 240f,

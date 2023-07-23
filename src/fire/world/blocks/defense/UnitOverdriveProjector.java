@@ -12,11 +12,10 @@ import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
-import mindustry.world.blocks.defense.OverdriveProjector;
 
 import static fire.FireLib.*;
 
-public class UnitOverdriveProjector extends OverdriveProjector{
+public class UnitOverdriveProjector extends mindustry.world.blocks.defense.OverdriveProjector{
     public StatusEffect
         allyStatus = StatusEffects.overclock,
         enemyStatus = StatusEffects.sapped;

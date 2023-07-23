@@ -3,10 +3,9 @@ package fire.world.blocks.power;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import mindustry.gen.Building;
-import mindustry.world.blocks.power.PowerNode;
 import mindustry.world.meta.BlockStatus;
 
-public class BatteryNode extends PowerNode{
+public class BatteryNode extends mindustry.world.blocks.power.PowerNode{
     public BatteryNode(String name){
         super(name);
         consumesPower = true;

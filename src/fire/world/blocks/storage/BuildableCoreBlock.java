@@ -2,11 +2,10 @@ package fire.world.blocks.storage;
 
 import mindustry.game.Team;
 import mindustry.world.Tile;
-import mindustry.world.blocks.storage.CoreBlock;
 
 import static mindustry.Vars.state;
 
-public class BuildableCoreBlock extends CoreBlock{
+public class BuildableCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     public BuildableCoreBlock(String name){
         super(name);
     }

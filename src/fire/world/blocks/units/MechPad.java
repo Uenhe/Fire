@@ -1,12 +1,11 @@
 package fire.world.blocks.units;
 
-import fire.world.blocks.storage.BuildableCoreBlock;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.state;
 
-public class MechPad extends BuildableCoreBlock{
+public class MechPad extends fire.world.blocks.storage.BuildableCoreBlock{
     public MechPad(String name){
         super(name);
         itemCapacity = 0;

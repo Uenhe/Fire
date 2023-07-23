@@ -49,11 +49,11 @@ const adaptiveSource = Object.assign(new AdaptiveSource("adaptive-source"), {
     category: dist,
     health: 250,
     size: 1,
-    liquidCapacity: 300,
+    liquidCapacity: 100,
     laserRange: 25,
     maxNodes: 500,
     powerProduction: 10000000/60,
-    itemPerSec: 3600
+    itemPerSec: 2000
 });
 
 
@@ -1238,7 +1238,7 @@ biomassCultivator.consumePower(180/60);
 
 
 //生产-裂变钻头
-const fissionDrill = Object.assign(new BurstDrill("lbzt"), {
+const fissionDrill = Object.assign(new AdaptBurstDrill("lbzt"), {
     itemCapacity: 75,
     liquidCapacity: 30,
     drillEffect: new MultiEffect(
@@ -2191,7 +2191,7 @@ setup(javelinPad, effe, ItemStack.with(
 
 
 //效果-复合装卸器
-const compositeUnloader = Object.assign(new CompositeUnloader("composite-unloader"), {
+const compositeUnloader = Object.assign(new AdaptDirectionalUnloader("composite-unloader"), {
     underBullets: true,
     speed: 25,
     allowCoreUnload: true

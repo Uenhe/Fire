@@ -4,12 +4,11 @@ import arc.math.Mathf;
 import fire.world.meta.FireStat;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
-import mindustry.world.blocks.defense.Wall;
 
 import static fire.FireLib.*;
 import static mindustry.Vars.*;
 
-public class ArmorWall extends Wall{
+public class ArmorWall extends mindustry.world.blocks.defense.Wall{
     /** Armor increases in total. */
     public float armorIncrease = 10f;
     public float maxHealthLose = 0.5f;

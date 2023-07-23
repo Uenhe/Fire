@@ -5,11 +5,10 @@ package fire.world.blocks.defense;
 import arc.math.Mathf;
 import arc.util.Tmp;
 import mindustry.graphics.Drawf;
-import mindustry.world.blocks.defense.RegenProjector;
 
 import static mindustry.Vars.*;
 
-public class FixedRegenProjector extends RegenProjector{
+public class FixedRegenProjector extends mindustry.world.blocks.defense.RegenProjector{
     public FixedRegenProjector(String name){
         super(name);
     }

@@ -10,7 +10,6 @@ import fire.world.meta.FireStat;
 import mindustry.content.Fx;
 import mindustry.entities.TargetPriority;
 import mindustry.gen.Bullet;
-import mindustry.world.blocks.defense.RegenProjector;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Env;
 import mindustry.world.meta.Stat;
@@ -18,7 +17,7 @@ import mindustry.world.meta.Stat;
 import static fire.FireLib.atlas;
 import static mindustry.Vars.tilesize;
 
-public class RegenWall extends RegenProjector{
+public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
     /** Wall healing itself chance at collision. -1 to disable. */
     public float chanceHeal = -1f;
     /** {@link mindustry.world.blocks.defense.Wall} */

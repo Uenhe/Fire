@@ -7,13 +7,12 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Items;
 import mindustry.type.Item;
-import mindustry.world.blocks.power.ConsumeGenerator;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
 
 import static fire.FireLib.consValid;
 
-public class CrafterGenerator extends ConsumeGenerator{
+public class CrafterGenerator extends mindustry.world.blocks.power.ConsumeGenerator{
     public Item outputItem = Items.copper;
 
     public CrafterGenerator(String name){
@@ -32,25 +31,20 @@ public class CrafterGenerator extends ConsumeGenerator{
     }
 
     public class CrafterGeneratorBuild extends ConsumeGeneratorBuild{
-        protected float p, gp;
+        protected float progress, gp;
         protected boolean full;
 
         @Override
         public void updateTile(){
-            super.updateTile();
             full = items.get(outputItem) >= itemCapacity;
             if(consValid(this) && !full){
-                p += getProgressIncrease(itemDuration);
-                gp += getProgressIncrease(itemDuration);
-            }
-            if(p > 1f && !full){
-                items.add(outputItem, 1);
-                p %= 1;
-            }
-            if(gp > 1 && !full){
-                consume();
-                gp %= 1;
-                generateEffect.at(x + Mathf.range(3f), y + Mathf.range(3f));
+                progress += getProgressIncrease(itemDuration);
+                if(progress >= 1f){
+                    progress %= 1f;
+                    items.add(outputItem, 1);
+                    consume();
+                    generateEffect.at(x + Mathf.range(size * 4f), y + Mathf.range(size * 4));
+                }
             }
             productionEfficiency = Mathf.num(consValid(this)) * Mathf.num(!full);
             dump(outputItem);
@@ -66,21 +60,20 @@ public class CrafterGenerator extends ConsumeGenerator{
         @Override
         public BlockStatus status(){
             if(consValid(this) && !full) return BlockStatus.active;
-            if(full && consValid(this)) return BlockStatus.noOutput;
+            if(full) return BlockStatus.noOutput;
             return BlockStatus.noInput;
         }
 
         @Override
         public void write(Writes write){
             super.write(write);
-            write.f(p);
-            write.f(gp);
+            write.f(progress);
         }
 
         @Override
         public void read(Reads read, byte revision){
             super.read(read, revision);
-            p = read.f();
+            progress = read.f();
             gp = read.f();
         }
     }
