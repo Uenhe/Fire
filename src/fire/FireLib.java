@@ -6,6 +6,7 @@ import arc.graphics.g2d.TextureRegion;
 import mindustry.gen.Building;
 
 public class FireLib{
+
     public static Color color(String hex){
         return Color.valueOf(hex);
     }
