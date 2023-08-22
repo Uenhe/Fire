@@ -12,12 +12,12 @@ import mindustry.entities.abilities.Ability;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 public class DashAbility extends Ability{
     /** Unstable... */
     public float speedMultiplier;
-    /** How many frames unit becomes invincible after dashing. */
+    /** The tick unit becomes invincible after dashing. */
     public float invincibleTime;
     /** Dash cooldown. */
     public float cooldown;
@@ -26,11 +26,11 @@ public class DashAbility extends Ability{
 
     protected float cooldownTimer;
 
-    public DashAbility(float speedMul, float invTime, float cd, Effect dashFx){
-        speedMultiplier = speedMul;
-        invincibleTime = invTime;
-        cooldown = cd;
-        dashEffect = dashFx;
+    public DashAbility(float speedMul, float invincibleTime, float cooldown, Effect dashFx){
+        this.speedMultiplier = speedMul;
+        this.invincibleTime = invincibleTime;
+        this.cooldown = cooldown;
+        this.dashEffect = dashFx;
     }
 
     @Override
@@ -39,8 +39,12 @@ public class DashAbility extends Ability{
         dash(unit);
     }
 
-    public void dash(Unit unit){
-        float length = unit.speed() * speedMultiplier;
+    protected boolean correctRot(Unit unit, float tarX, float tarY){
+        return Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, tarX, tarY)) < 15f;
+    }
+
+    public void dash(Unit unit, float targetX, float targetY){
+        float dst = unit.speed() * speedMultiplier * unit.dragMultiplier * state.rules.dragMultiplier * tilesize;
         if(cooldownTimer < invincibleTime){
             float offset = unit.type.engineOffset / 2f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f));
             float cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset);
@@ -52,13 +56,24 @@ public class DashAbility extends Ability{
             cooldownTimer += Time.delta;
         }else if(
             //I hate this condition
-            (unit.controller() instanceof Player && Core.input.keyDown(FireBinding.unit_ability))
-            || (unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, length * unit.dragMultiplier * tilesize) && Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, command.targetPos.x, command.targetPos.y)) < 15f)
+            (
+                (
+                    unit.controller() instanceof Player && Core.input.keyDown(FireBinding.unit_ability)
+                ) || (
+                    unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, dst) && correctRot(unit, command.targetPos.x, command.targetPos.y)
+                ) || (
+                    targetX == 0f && targetY == 0f && !unit.within(targetX, targetY, dst) && correctRot(unit, targetX, targetY)
+                )
+            ) && unit.moving()
         ){
             cooldownTimer = 0f;
             unit.apply(StatusEffects.invincible, invincibleTime);
-            unit.vel.setLength(length);
+            unit.vel.setLength(unit.speed() * speedMultiplier);
             dashEffect.at(unit);
         }
+    }
+
+    public void dash(Unit unit){
+        dash(unit, 0f, 0f);
     }
 }

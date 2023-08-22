@@ -11,7 +11,7 @@ public class AdaptBurstDrill extends mindustry.world.blocks.production.BurstDril
         @Override
         public void updateTile(){
             if(dominantItem == null) return;
-            if(timer(timerDump, Mathf.floor(drillTime / size / size))){
+            if(timer(timerDump, Mathf.floor(drillTime / Mathf.sqr(size)))){
                 dump(dominantItem);
             }
             super.updateTile();
