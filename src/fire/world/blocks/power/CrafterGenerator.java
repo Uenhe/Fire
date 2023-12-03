@@ -68,6 +68,7 @@ public class CrafterGenerator extends mindustry.world.blocks.power.ConsumeGenera
         public void write(Writes write){
             super.write(write);
             write.f(progress);
+            write.f(gp);
         }
 
         @Override

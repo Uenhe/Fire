@@ -9,6 +9,7 @@ public class MechPad extends fire.world.blocks.storage.BuildableCoreBlock{
     public MechPad(String name){
         super(name);
         itemCapacity = 0;
+        unitCapModifier = 0;
         unloadable = false;
     }
 

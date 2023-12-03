@@ -1,79 +1,77 @@
 package fire.entities.abilities;
 
 import arc.Core;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
 import arc.math.Angles;
-import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 import fire.input.FireBinding;
 import mindustry.ai.types.CommandAI;
 import mindustry.content.StatusEffects;
-import mindustry.entities.Effect;
-import mindustry.entities.abilities.Ability;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
+import mindustry.graphics.Layer;
 
 import static mindustry.Vars.*;
 
-public class DashAbility extends Ability{
+public class DashAbility extends mindustry.entities.abilities.Ability{
     /** Unstable... */
     public float speedMultiplier;
-    /** The tick unit becomes invincible after dashing. */
+    /** The tick unit becomes invincible while dashing. */
     public float invincibleTime;
     /** Dash cooldown. */
     public float cooldown;
-    /** Effect blooms while dashing. */
-    public Effect dashEffect;
+    /** The number of afterimages to be displayed while dashing. */
+    public int afterimage;
 
-    protected float cooldownTimer;
+    private float timerCooldown;
 
-    public DashAbility(float speedMul, float invincibleTime, float cooldown, Effect dashFx){
+    public DashAbility(float speedMul, float invincibleTime, float cooldown, int afterimage){
         this.speedMultiplier = speedMul;
         this.invincibleTime = invincibleTime;
         this.cooldown = cooldown;
-        this.dashEffect = dashFx;
+        this.afterimage = afterimage;
     }
 
     @Override
     public void update(Unit unit){
-        super.update(unit);
-        dash(unit);
-    }
+        float dst = unit.speed() * speedMultiplier * tilesize * 2f;
 
-    protected boolean correctRot(Unit unit, float tarX, float tarY){
-        return Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, tarX, tarY)) < 15f;
-    }
-
-    public void dash(Unit unit, float targetX, float targetY){
-        float dst = unit.speed() * speedMultiplier * unit.dragMultiplier * state.rules.dragMultiplier * tilesize;
-        if(cooldownTimer < invincibleTime){
-            float offset = unit.type.engineOffset / 2f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f));
-            float cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset);
-            float cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
-            float chance = Mathf.lerpDelta(invincibleTime, cooldownTimer, 0.16f);
-            if(Mathf.chanceDelta(chance / invincibleTime)) dashEffect.at(cx, cy);
-        }
-        if(cooldownTimer < cooldown){
-            cooldownTimer += Time.delta;
+        if(timerCooldown < cooldown){
+            timerCooldown += Time.delta;
         }else if(
             //I hate this condition
             (
                 (
-                    unit.controller() instanceof Player && Core.input.keyDown(FireBinding.unit_ability)
+                    unit.controller() instanceof Player && Core.app.isDesktop() && Core.input.keyDown(FireBinding.unit_ability)
                 ) || (
-                    unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, dst) && correctRot(unit, command.targetPos.x, command.targetPos.y)
-                ) || (
-                    targetX == 0f && targetY == 0f && !unit.within(targetX, targetY, dst) && correctRot(unit, targetX, targetY)
+                    unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, dst) && correctRot(unit, command.targetPos)
                 )
             ) && unit.moving()
         ){
-            cooldownTimer = 0f;
+            timerCooldown %= cooldown;
             unit.apply(StatusEffects.invincible, invincibleTime);
             unit.vel.setLength(unit.speed() * speedMultiplier);
-            dashEffect.at(unit);
         }
     }
 
-    public void dash(Unit unit){
-        dash(unit, 0f, 0f);
+    public void draw(Unit unit){
+        if(timerCooldown > invincibleTime) return;
+
+        Draw.color(Color.white);
+        Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
+        for(int i = 0; i < afterimage; i++){
+            float offset = unit.type.engineOffset * 0.5f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * 8);
+            float cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset);
+            float cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
+            Draw.alpha(0.8f * (1f - (timerCooldown / invincibleTime)) * (1f - (float)(i / afterimage)));
+            Draw.rect(unit.type.name, cx, cy, unit.rotation - 90f);
+        }
+        Draw.reset();
+    }
+
+    protected boolean correctRot(Unit unit, Vec2 other){
+        return Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, other.x, other.y)) < 15f;
     }
 }

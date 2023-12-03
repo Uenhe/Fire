@@ -1,18 +1,22 @@
 package fire.entities.abilities;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Strings;
 import arc.util.Time;
 import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.tilesize;
-import static fire.FireLib.format;
 
 public class RegenFieldAbility extends Ability{
     public float healAmount, healRadius, lineSpeed, lineStroke;
@@ -31,7 +35,15 @@ public class RegenFieldAbility extends Ability{
 
     @Override
     public String localized(){
-        return format("ability.fire-regenfield", healAmount * 60, healRadius / tilesize);
+        return Core.bundle.get("ability.fire-regenfield");
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(healAmount * 60f, 2) + StatUnit.perSecond.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(healRadius / tilesize, 2) + StatUnit.blocks.localized());
+        t.row();
     }
 
     @Override
@@ -41,7 +53,7 @@ public class RegenFieldAbility extends Ability{
             if(u.damaged()) targets.add(u);
         });
         boolean draws = false;
-        for(Unit target : targets){
+        for(var target : targets){
             if(target.damaged()){
                 target.heal(healAmount);
                 draws = true;

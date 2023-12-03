@@ -1,0 +1,87 @@
+type: PowerTurret
+category: turret
+shootSound: malignShoot
+loopSound: spellLoop
+loopSoundVolume: 1.3
+size: 5
+velocityRnd: 0.15
+heatRequirement: 90
+maxHeatEfficiency: 2
+warmupMaintainTime: 30
+minWarmup: 0.96
+shootWarmupSpeed: 0.03
+shootY: 20
+outlineColor: darkOutline
+reload: 9
+range: 370
+shootCone: 100
+scaledHealth: 370
+rotateSpeed: 2
+recoil: 0.5
+recoilTime: 30
+shake: 3
+
+consumes: {
+  power: 10
+}
+shoot: {
+  type: ShootSummon
+  x: 0
+  y: 0
+  radius: 11
+  spread: 48
+}
+
+shootType: {
+  type: FlakBulletType,
+  sprite: "missile-large"
+  speed: 8
+  damage: 70
+  lifetime: 45
+  width: 12
+  height: 22
+  hitSize: 7
+  shootEffect: shootSmokeSquareBig
+  smokeEffect: shootSmokeDisperse
+  ammoMultiplier: 1
+  hitColor: "d370d3"
+  backColor: "d370d3"
+  trailColor: "d370d3"
+  frontColor: white
+  trailWidth: 3
+  trailLength: 12
+  hitEffect: hitSquaresColor
+  despawnEffect: hitBulletColor
+  trailEffect: colorSpark
+  trailRotation: true
+  collidesGround: true
+  trailInterval: 3
+  lightning: 1
+  lightningCone: 15
+  lightningLength: 20
+  lightningLengthRand: 30
+  lightningDamage: 20
+  homingPower: 0.17
+  homingDelay: 19
+  homingRange: 160
+  explodeRange: 160
+  explodeDelay: 0
+  flakInterval: 20
+  despawnShake: 3
+  fragSpread: 0
+  fragRandomSpread: 0
+  fragBullet: {
+    type: LaserBulletType
+    damage: 65
+    colors: ["d370d340", "d370d3", "ffffff"]
+    width: 19
+    hitEffect: hitLancer
+    sideAngle: 175
+    sideWidth: 1
+    sideLength: 40
+    lifetime: 22
+    drawSize: 400
+    length: 180
+    pierceCap: 2
+  }
+}

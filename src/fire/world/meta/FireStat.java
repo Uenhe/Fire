@@ -9,5 +9,10 @@ public class FireStat{
         baseHealChance = new Stat("baseHealChance"),
         maxArmorIncrease = new Stat("maxArmorIncrease"),
         allyStatusEffect = new Stat("allyStatusEffect", StatCat.function),
-        enemyStatusEffect = new Stat("enemyStatusEffect", StatCat.function);
+        enemyStatusEffect = new Stat("enemyStatusEffect", StatCat.function),
+
+        deflectChance = new Stat("deflectChance", StatCat.function),
+        lightningDamage0 = new Stat("lightningDamage0", StatCat.function),
+        lightningLength = new Stat("lightningLength", StatCat.function),
+        lightningAmount = new Stat("lightningAmount", StatCat.function);
 }

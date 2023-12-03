@@ -1,5 +1,6 @@
 package fire.world.blocks.defense;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -49,7 +50,7 @@ public class UnitOverdriveProjector extends mindustry.world.blocks.defense.Overd
         @Override
         public void draw(){
             super.draw();
-            if(getSetting("showBlockRange")){
+            if(Core.settings.getBool("showBlockRange")){
                 Draw.color(consValid(this) ? Pal.redLight : Color.black, 1f);
                 Lines.stroke(1.5f);
                 Lines.circle(x, y, range);

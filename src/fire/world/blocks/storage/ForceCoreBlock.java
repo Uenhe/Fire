@@ -1,23 +1,17 @@
 package fire.world.blocks.storage;
 
-import arc.graphics.Blending;
-import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
+import arc.graphics.*;
+import arc.graphics.g2d.*;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.util.Time;
-import arc.util.io.Reads;
-import arc.util.io.Writes;
+import arc.util.io.*;
 import mindustry.content.Fx;
 import mindustry.gen.Groups;
-import mindustry.graphics.Layer;
-import mindustry.graphics.Pal;
+import mindustry.graphics.*;
 import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
+import mindustry.world.meta.*;
 
 import static fire.FireLib.*;
 import static mindustry.Vars.*;
@@ -29,7 +23,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         shieldHealth = 750f,
         cooldownNormal = 1.2f,
         cooldownBroken = 1.5f,
-        shieldRotation = 0f;
+        rotation = 0f;
     /** {@link mindustry.world.blocks.defense.ForceProjector} */
     public int sides = 6;
 
@@ -74,7 +68,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     }
 
     public class ForceCoreBuild extends CoreBuild{
-        protected float buildup, radscl, hit, warmup;
+        protected float buildup, scl, hit, warmup;
         protected boolean broken = true;
 
         @Override
@@ -86,7 +80,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            radscl = Mathf.lerpDelta(radscl, broken ? 0f : warmup, 0.06f);
+            scl = Mathf.lerpDelta(scl, broken ? 0f : warmup, 0.06f);
             if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f)){
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
             }
@@ -104,7 +98,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
             if(hit > 0f) hit -= 0.2f * Time.delta;
             if(realRad() > 0 && !broken){
                 Groups.bullet.intersect(x - realRad(), y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
-                    if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, realRad(), shieldRotation, bullet.x, bullet.y)){
+                    if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, realRad(), rotation, bullet.x, bullet.y)){
                         bullet.absorb();
                         Fx.absorb.at(bullet);
                         hit = 1f;
@@ -115,7 +109,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         }
 
         protected float realRad(){
-            return radius * radscl;
+            return radius * scl;
         }
 
         @Override
@@ -139,14 +133,14 @@ public class ForceCoreBlock extends BuildableCoreBlock{
                 Draw.color(team.color, Color.white, Mathf.clamp(hit));
                 if(renderer.animateShields){
                     Draw.z(Layer.shields + 0.001f * hit);
-                    Fill.poly(x, y, sides, realRad(), shieldRotation);
+                    Fill.poly(x, y, sides, realRad(), rotation);
                 }else{
                     Draw.z(Layer.shields);
                     Lines.stroke(1.5f);
                     Draw.alpha(0.09f + Mathf.clamp(0.08f * hit));
-                    Fill.poly(x, y, sides, realRad(), shieldRotation);
+                    Fill.poly(x, y, sides, realRad(), rotation);
                     Draw.alpha(1f);
-                    Lines.poly(x, y, sides, realRad(), shieldRotation);
+                    Lines.poly(x, y, sides, realRad(), rotation);
                     Draw.reset();
                 }
             }
@@ -158,7 +152,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
             super.write(write);
             write.bool(broken);
             write.f(buildup);
-            write.f(radscl);
+            write.f(scl);
             write.f(warmup);
         }
 
@@ -167,7 +161,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
             super.read(read, revision);
             broken = read.bool();
             buildup = read.f();
-            radscl = read.f();
+            scl = read.f();
             warmup = read.f();
         }
     }

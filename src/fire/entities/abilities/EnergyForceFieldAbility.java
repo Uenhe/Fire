@@ -1,9 +1,13 @@
 package fire.entities.abilities;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
+import arc.scene.ui.layout.Table;
+import arc.util.Strings;
 import arc.util.Time;
+import fire.world.meta.FireStat;
 import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.abilities.ForceFieldAbility;
@@ -11,17 +15,14 @@ import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
-
-import static mindustry.Vars.tilesize;
-import static fire.FireLib.format;
+import mindustry.world.meta.StatUnit;
 
 public class EnergyForceFieldAbility extends ForceFieldAbility{
     public int lightningLength;
     public int lightningAmount;
     public float lightningDamage;
     public float chanceDeflect;
-    public float rotateSpeed = 1f;
-    public boolean rotate = false;
+    public float rotateSpeed = -1f;
     public Color lightningColor = Pal.surge;
 
     private static final float deflectDamageMul = 2f;
@@ -36,13 +37,26 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
 
     @Override
     public String localized(){
-        return format("ability.fire-energyforcefield", radius / tilesize, regen * 60f, max, cooldown / 60f, sides, chanceDeflect, lightningDamage, lightningLength / tilesize, lightningAmount);
+        return Core.bundle.get("ability.fire-energyforcefield");
+    }
+
+    @Override
+    public void addStats(Table t){
+        super.addStats(t);
+        t.add("[lightgray]" + FireStat.deflectChance.localized() + ": [white]" + Strings.autoFixed(chanceDeflect, 2));
+        t.row();
+        t.add("[lightgray]" + FireStat.lightningDamage0.localized() + ": [white]" + Strings.autoFixed(lightningDamage, 2));
+        t.row();
+        t.add("[lightgray]" + FireStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength, 2) + StatUnit.blocks.localized());
+        t.row();
+        t.add("[lightgray]" + FireStat.lightningAmount.localized() + ": [white]" + Strings.autoFixed(lightningAmount, 2));
+        t.row();
     }
 
     @Override
     public void update(Unit unit){
-        if(rotate) rotation += rotateSpeed * Time.delta;
-        if(rotation > 360f) rotation -= 360f;
+        if(rotateSpeed > 0f) rotation += rotateSpeed * Time.delta;
+        rotation %= 360f;
         alpha = Math.max(alpha - Time.delta / 10f, 0f);
         if(unit.shield < max) unit.shield += regen * Time.delta;
         if(unit.shield > 0f){
@@ -74,7 +88,7 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
                         unit.shield -= cooldown * regen;
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
                         Sounds.spark.at(unit, Mathf.random(0.45f, 0.55f));
-                        for(int i = 0; i < lightningAmount; i += 1){
+                        for(int i = 0; i < lightningAmount; i++){
                             Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, (i - 1) * (360f / lightningAmount), lightningLength);
                         }
                     }
