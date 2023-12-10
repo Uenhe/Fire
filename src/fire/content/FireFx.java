@@ -7,6 +7,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.entities.Effect;
@@ -24,14 +25,12 @@ public class FireFx{
          */
 
         return new Effect(lifetime, range * 2f, e -> {
-
-            Object data = e.data != null ? e.data : range;
             Draw.color(color);
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
 
-            for(int i = 0; i <= (float)data / spacing; i++){
+            for(int i = 0; i <= range / spacing; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
-                float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * (float)data - i * spacing) / spacing)) * (0.6f + track * 0.4f);
+                float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144f * Draw.scl * f, 144f * Draw.scl * f, e.rotation - 90f);
             }
 
@@ -39,7 +38,7 @@ public class FireFx{
             Lines.stroke(track * 2f);
 
             for(int i : Mathf.signs){
-                Lines.lineAngle(e.x + Tmp.v1.x * i, e.y + Tmp.v1.y * i, e.rotation, (float)data * (0.75f + track / 4f) * Mathf.curve(e.fout(Interp.pow5Out), 0f, 0.1f));
+                Lines.lineAngle(e.x + Tmp.v1.x * i, e.y + Tmp.v1.y * i, e.rotation, range * (0.75f + track / 4f) * Mathf.curve(e.fout(Interp.pow5Out), 0f, 0.1f));
             }
         });
     }
@@ -50,9 +49,9 @@ public class FireFx{
         final float[] w = new float[range];
 
         return new Effect(lifetime, e -> {
-
             byte a = (byte)Mathf.randomSeed(e.id, 0, range - 1);
             float r = radius * e.fout();
+            float orbSize = 2f * e.fout() + 1f;
 
             if(!state.isPaused()){
                 w[a] += Time.delta * speed * e.fout(Interp.pow2Out);
@@ -65,17 +64,16 @@ public class FireFx{
             y += e.y;
 
             for(int i = 0; i < amount; i++) {
-
                 float
                     angle = 360f / amount * i,
                     angle0 = Angles.angle(e.x, e.y, x, y),
 
-                    ax = e.x + r * Mathf.sinDeg(angle + angle0),
-                    ay = e.y + r * Mathf.cosDeg(angle + angle0);
+                    cx = e.x + r * Mathf.sinDeg(angle + angle0),
+                    cy = e.y + r * Mathf.cosDeg(angle + angle0);
 
                 Draw.color(colors[i]);
-                Lines.circle(ax, ay, 2f);
-                Fill.circle(ax, ay, 2f);
+                Lines.circle(cx, cy, orbSize);
+                Fill.circle(cx, cy, orbSize);
             }
         });
     }

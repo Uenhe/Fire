@@ -92,6 +92,8 @@ public class FireMod extends mindustry.mod.Mod{
 
         var mainDialog = new BaseDialog(format("mainTitle", name, version));
         setupDialog(mainDialog);
+        mainDialog.buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210f, 64f);
+
         mainDialog.cont.pane(t -> {
 
             t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107f).width(359f).pad(3f);
@@ -130,6 +132,7 @@ public class FireMod extends mindustry.mod.Mod{
                     }
                 }).size(256f, 64f);
                 t.row();
+
             }else{
 
                 t.button(("@linkGithub"), () -> {

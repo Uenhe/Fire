@@ -27,20 +27,23 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
     public void setBars(){
         super.setBars();
         float max = armor + armorIncrease;
-        addBar("armorincrease", (ArmorWallBuild build) -> new Bar(
-            () -> format("bar.armorincrease", (int)(armor + build.extraArmor), (int)max),
+        addBar("currentarmor", (ArmorWallBuild build) -> new Bar(
+            () -> format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
             () -> Pal.accent,
             () -> (armor + build.extraArmor) / max
         ));
     }
 
     public class ArmorWallBuild extends WallBuild{
-        protected float extraArmor;
+        public float extraArmor;
 
         @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
-            if(Mathf.zero(healthMul)) return health() + 1f;
+            if(Mathf.zero(healthMul)){
+                return health() + 1f;
+            }
+
             float dmg = (damage - extraArmor) / healthMul;
             if(dmg < 1f) dmg = damage * minArmorDamage;
             return dmg;

@@ -34,15 +34,17 @@ public class NeoplasmStatusEffect extends mindustry.type.StatusEffect{
             //buff neoplasm-about unit
             unit.healthMultiplier *= healthMultiplier;
             unit.heal(regenPercent * Time.delta * unit.maxHealth);
-            if(unit.shield < maxShield) unit.shield = Math.min(unit.shield + regenPercent * Time.delta * maxShield, maxShield);
+            if(unit.shield < maxShield){
+                unit.shield = Math.min(unit.shield + regenPercent * Time.delta * maxShield, maxShield);
+            }
         }else{
 
             //nerf otherwise
             unit.damageContinuousPierce(damage);
             unit.healthMultiplier *= unfHealthMultiplier;
         }
-        if(Mathf.chanceDelta(effectChance)){
 
+        if(Mathf.chanceDelta(effectChance)){
             Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2f));
             effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0f, color, parentizeEffect ? unit : null);
         }

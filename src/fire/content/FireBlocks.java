@@ -6,7 +6,6 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
-import arc.math.Mathf;
 import fire.entities.bullets.VariableBulletType;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
@@ -107,13 +106,14 @@ public class FireBlocks{
         //effect
         buildingHealer, campfire, skyDome, buildIndicator, coreArmored, javelinPad, compositeUnloader;
 
-    private static BulletType destroyBullet(float damagee, float radius, float lifetimee){
+    private static BulletType destroyBullet(float dmg, float radius){
         return new BulletType(1f, 0f){{
-            lifetime = lifetimee;
-            splashDamage = damagee;
+            float time = 15f;
+            lifetime = time;
+            splashDamage = dmg;
             splashDamageRadius = radius;
             despawnEffect = hitEffect = new WaveEffect(){{
-                lifetime = lifetimee;
+                lifetime = time;
                 sizeFrom = 0f;
                 sizeTo = radius;
                 strokeFrom = 4f;
@@ -567,7 +567,7 @@ public class FireBlocks{
         gambler = new JackpotTurret("gambler"){{
             float chargeTime = 120f;
             Color[] colors = new Color[] {Color.valueOf("d99d73"), Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
-            Effect chargeFx = FireFx.jackpotChargeEffect(chargeTime, 0.2f, 40f, 4, colors);
+            Effect chargeFx = FireFx.jackpotChargeEffect(chargeTime, 0.15f, 40f, 4, colors);
 
             requirements(Category.turret, with(
                 FireItems.hardenedAlloy, 50
@@ -579,24 +579,27 @@ public class FireBlocks{
             reload = 120f;
             range = 320f;
             shootCone = 0.1f;
-            recoil = 0f;
-            rotateSpeed = 3f;
-            coolantMultiplier = 0.075f;
-            moveWhileCharging = true;
-            shootSound = Sounds.shotgun;
+            recoil = 3f;
+            rotateSpeed = 4f;
             centerChargeEffect = true;
+            shootSound = Sounds.shotgun;
             shoot.firstShotDelay = chargeTime;
 
             jackpotAmmo.add(
 
 
-                new JackpotAmmo(Items.copper, 0.5f, new ShootPattern(){{firstShotDelay=chargeTime;}}, new VariableBulletType(14f, 7.1f, 30f, 1f, 200f){{
+                new JackpotAmmo(Items.copper, 0.5f,
+                    new ShootAlternate(4f){{
+                        shots = barrels = 3;
+                        firstShotDelay = chargeTime;
+                    }}
+                , new VariableBulletType(19f, 2.1f, 30f, 1f, 200f){{
                     lifetime = 30f;
-                    width = 8f;
-                    height = 10f;
+                    width = 6f;
+                    height = 12f;
 
                     chargeEffect = chargeFx;
-                    shootEffect = FireFx.gamblerShootEffect(60f, 21);
+                    shootEffect = FireFx.gamblerShootEffect(60f, 4);
                     frontColor = Color.white;
                     backColor = hitColor = colors[0];
                 }}),
@@ -617,7 +620,7 @@ public class FireBlocks{
                         height = 10f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(60f, 3);
+                        shootEffect = FireFx.gamblerShootEffect(60f, 2);
                         frontColor = Color.white;
                         backColor = hitColor = colors[1];
                     }}
@@ -640,7 +643,7 @@ public class FireBlocks{
                         height = 10f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(25f, 2);
+                        shootEffect = FireFx.gamblerShootEffect(25f, 1);
                         frontColor = Color.white;
                         backColor = hitColor = colors[2];
                     }}
@@ -663,7 +666,7 @@ public class FireBlocks{
                         height = 10f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(15f, 2);
+                        shootEffect = FireFx.gamblerShootEffect(15f, 1);
                         frontColor = Pal.sapBullet;
                         backColor = hitColor = colors[3];
                     }}
@@ -987,27 +990,27 @@ public class FireBlocks{
             size = 4;
             liquidCapacity = 75f;
             canOverdrive = false;
-            reload = 300f;
-            range = 360f;
+            reload = 270f;
+            range = 600f;
             shootCone = 6f;
             recoil = 5f;
-            rotateSpeed = 1f;
-            coolantMultiplier = 0.08f;
+            rotateSpeed = 2.7f;
+            coolantMultiplier = 0.8f;
             targetGround = false;
             moveWhileCharging = false;
             shootSound = Sounds.laser;
             shoot.firstShotDelay = chargeTime;
 
-            consumePower(10f);
+            consumePower(32f);
             consumeCoolant(1f);
 
-            shootType = new VariableBulletType(5.9f, 0.1f, accelTimee, 8f, 200){{
+            shootType = new VariableBulletType(9.99f, 0.01f, accelTimee, 8f, 1800f){{
                 lifetime = accelTimee + 20f;
                 width = 0f;
                 height = 0f;
-                pierceCap = 50;
+                pierceCap = 10;
                 collidesGround = false;
-                homingRange = 96f;
+                homingRange = 120f;
                 homingPower = 0.2f;
                 homingDelay = accelTimee;
 
@@ -1031,16 +1034,9 @@ public class FireBlocks{
                 }).rotWithParent(true);
 
                 hitEffect = new Effect(14f, e -> {
-                    Draw.color(Color.white, col, e.fin());
-                    e.scaled(7f, s -> {
-                        Lines.stroke(0.5f + s.fout());
-                        Lines.circle(e.x, e.y, s.fin() * 5f);
-                    });
-                    Lines.stroke(0.5f + e.fout());
-                    Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) -> {
-                        Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3 + 1f);
-                    });
-                    Drawf.light(e.x, e.y, 20f, col, 0.6f * e.fout());
+                    Draw.color(col, Color.lightGray, e.fin());
+                    Angles.randLenVectors(e.id, 12, 5f + e.finpow() * 18f, (x, y) ->
+                        Fill.square(e.x + x, e.y + y, e.fout() * 2.2f + 0.5f, 45f));
                 });
 
                 //create lightning while bullet flying
@@ -1055,8 +1051,8 @@ public class FireBlocks{
                 fragRandomSpread = 0f;
                 fragSpread = 60f;
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(10f, 105){{
-                    lifetime = 35f;
+                fragBullet = new BasicBulletType(10f, 225f){{
+                    lifetime = 40f;
                     width = 3.2f;
                     height = 4f;
                     collidesGround = false;
@@ -1075,6 +1071,7 @@ public class FireBlocks{
 
         magneticRail = new ItemTurret("magnetic-rail"){{
             float chargeTime = 150f;
+            float radius = 1200f;
             var col = Color.valueOf("ec7458");
 
             requirements(Category.turret, with(
@@ -1088,10 +1085,10 @@ public class FireBlocks{
             liquidCapacity = 1800f;
             canOverdrive = false;
             reload = 300f;
-            range = 1080f;
-            shootCone = 0.1f;
-            recoil = 5f;
-            rotateSpeed = 1f;
+            range = radius;
+            shootCone = 0.5f;
+            recoil = 10f;
+            rotateSpeed = 1.2f;
             coolantMultiplier = 0.075f;
             moveWhileCharging = false;
             shootSound = Sounds.laser;
@@ -1260,13 +1257,14 @@ public class FireBlocks{
             ammo(
 
                 FireItems.conductor, new BasicBulletType(60f, 2400f){{
-                    lifetime = 36f;
+                    lifetime = 21f;
                     width = 24f;
                     height = 30f;
-                    trailLength = 12;
+                    trailLength = 11;
                     trailWidth = 6;
                     splashDamageRadius = 210f;
                     splashDamage = 1200f;
+                    ammoMultiplier = 1;
                     pierceCap = 30;
                     pierceBuilding = true;
                     collidesGround = true;
@@ -1278,7 +1276,7 @@ public class FireBlocks{
                     frontColor = Color.white;
                     trailColor = col;
                     chargeEffect = new MultiEffect(
-                        FireFx.railChargeEffect(chargeTime, col, 2f, range, 80f)
+                        FireFx.railChargeEffect(chargeTime, col, 3f, radius, 80f)
                     );
                     despawnEffect = new MultiEffect(
 
@@ -1436,14 +1434,15 @@ public class FireBlocks{
                 }},
 
                 FireItems.hardenedAlloy, new BasicBulletType(60f, 15000f){{
-                    float extraRange = 360f;
+                    float extraRange = 400f;
 
-                    lifetime = 24f;
+                    lifetime = 35f;
                     width = height = 0f;
                     hitSize = 12;
                     rangeChange = extraRange;
                     splashDamageRadius = 180f;
                     splashDamage = 11500f;
+                    ammoMultiplier = 1;
                     reflectable = false;
                     absorbable = false;
                     hittable = false;
@@ -1452,7 +1451,7 @@ public class FireBlocks{
                     frontColor = Color.white;
                     trailColor = col;
                     chargeEffect = new MultiEffect(
-                        FireFx.railChargeEffect(chargeTime, col, 2f, range + extraRange, 80f)
+                        FireFx.railChargeEffect(chargeTime, col, 3f, radius + extraRange, 80f)
                     );
                     parts.addAll(
                         new HaloPart(){{
@@ -1631,7 +1630,7 @@ public class FireBlocks{
                 Fx.drillSteam
             );
             baseExplosiveness = 5f;
-            destroyBullet = destroyBullet(800f, 28f, 15f);
+            destroyBullet = destroyBullet(800f, 28f);
             tier = 8;
             drillTime = 45f;
             shake = 4f;
@@ -1727,7 +1726,7 @@ public class FireBlocks{
             itemCapacity = 20;
             liquidCapacity = 30f;
             baseExplosiveness = 5f;
-            destroyBullet = destroyBullet(640f, 20f, 15f);
+            destroyBullet = destroyBullet(640f, 20f);
             generateEffect = new MultiEffect(
                 Fx.explosion,
                 Fx.fuelburn,

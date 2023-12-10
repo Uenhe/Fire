@@ -64,9 +64,9 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     }
 
     public class EnergyCrafterBuild extends GenericCrafterBuild{
-        protected float instability, fraction, flash;
-        protected int rotation, colorCounter, realLightningAmount = lightningAmount;
-        protected Color color = circleColor[0];
+        public float instability, fraction, flash;
+        public int rotation, colorCounter, realLightningAmount = lightningAmount;
+        public Color color = circleColor[0];
 
         @Override
         public void updateTile(){
@@ -79,7 +79,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             boolean wasUnstable = instability > 0f;
 
             if(consValid(this)){
-                fraction = Mathf.lerpDelta(fraction, 0f, craftTime / 4000f * timeScale);
+                fraction = Mathf.lerpDelta(fraction, 0f, craftTime * 0.00025f * timeScale);
                 indexer.eachBlock(this, explosionRadius, b -> true, build -> {
                     if(build != null && build.block == this.block && consValid(build) && build != this){
                         instability += Time.delta;
@@ -87,7 +87,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 });
             }
 
-            if(wasUnstable && Mathf.chanceDelta((instability / maxInstability) * 0.75f)){
+            if(wasUnstable && efficiency > 0f && Mathf.chanceDelta((instability / maxInstability) * 0.05f)){
                 createLightning();
             }
 
@@ -136,14 +136,15 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         protected void createBullet(){
             float rand = Mathf.random(360f);
+            Sounds.release.at(this, Mathf.random(0.45f, 0.55f));
             for(int i = 0; i < fragBullets; i++){
                 fragBullet.create(this, x, y, 360f / fragBullets * i + rand);
             }
         }
 
         protected void createLightning(){
+            Sounds.release.at(this, Mathf.random(0.45f, 0.55f));
             for(int i = 0; i < realLightningAmount; i++){
-                Sounds.release.at(this, Mathf.random(realLightningAmount * 0.05f, realLightningAmount * 0.06f));
                 Lightning.create(team, color, lightningDamage, x, y, (i - 1) * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
             }
         }

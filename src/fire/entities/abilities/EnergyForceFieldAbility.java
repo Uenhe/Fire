@@ -47,7 +47,7 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
         t.row();
         t.add("[lightgray]" + FireStat.lightningDamage0.localized() + ": [white]" + Strings.autoFixed(lightningDamage, 2));
         t.row();
-        t.add("[lightgray]" + FireStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength, 2) + StatUnit.blocks.localized());
+        t.add("[lightgray]" + FireStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength, 2) + " " + StatUnit.blocks.localized());
         t.row();
         t.add("[lightgray]" + FireStat.lightningAmount.localized() + ": [white]" + Strings.autoFixed(lightningAmount, 2));
         t.row();

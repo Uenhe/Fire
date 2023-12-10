@@ -5,13 +5,18 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.geom.Vec2;
+import arc.scene.ui.layout.Table;
+import arc.util.Strings;
 import arc.util.Time;
 import fire.input.FireBinding;
+import fire.world.meta.FireStat;
 import mindustry.ai.types.CommandAI;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.*;
 
@@ -35,19 +40,30 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     @Override
+    public String localized(){
+        return Core.bundle.get("ability.fire-dash");
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + FireStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+    }
+
+    @Override
     public void update(Unit unit){
-        float dst = unit.speed() * speedMultiplier * tilesize * 2f;
+        float dst = unit.speed() * speedMultiplier * tilesize * 1.3f;
 
         if(timerCooldown < cooldown){
             timerCooldown += Time.delta;
         }else if(
-            //I hate this condition
             (
-                (
-                    unit.controller() instanceof Player && Core.app.isDesktop() && Core.input.keyDown(FireBinding.unit_ability)
-                ) || (
-                    unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, dst) && correctRot(unit, command.targetPos)
-                )
+                (unit.controller() instanceof Player && Core.app.isDesktop() && Core.input.keyDown(FireBinding.unit_ability))
+            ||
+                (unit.controller() instanceof CommandAI command && command.hasCommand() && !unit.within(command.targetPos, dst) && correctRot(unit, command.targetPos))
+
             ) && unit.moving()
         ){
             timerCooldown %= cooldown;
@@ -72,6 +88,6 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     protected boolean correctRot(Unit unit, Vec2 other){
-        return Angles.angleDist(unit.rotation, Angles.angle(unit.x, unit.y, other.x, other.y)) < 15f;
+        return Angles.near(unit.rotation, Angles.angle(unit.x, unit.y, other.x, other.y), 15f);
     }
 }

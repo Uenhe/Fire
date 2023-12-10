@@ -10,7 +10,6 @@ import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.entities.Units;
-import mindustry.entities.abilities.Ability;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 import mindustry.world.meta.Stat;
@@ -18,7 +17,7 @@ import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.tilesize;
 
-public class RegenFieldAbility extends Ability{
+public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public float healAmount, healRadius, lineSpeed, lineStroke;
     public Color lineColor;
 
@@ -42,7 +41,7 @@ public class RegenFieldAbility extends Ability{
     public void addStats(Table t){
         t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(healAmount * 60f, 2) + StatUnit.perSecond.localized());
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(healRadius / tilesize, 2) + StatUnit.blocks.localized());
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(healRadius / tilesize, 2) + " " + StatUnit.blocks.localized());
         t.row();
     }
 

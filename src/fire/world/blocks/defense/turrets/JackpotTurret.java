@@ -30,12 +30,12 @@ public class JackpotTurret extends ItemTurret{
         @Override
         protected void updateShooting(){
             if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
-                var type = new JackpotAmmo();
+                JackpotAmmo type = new JackpotAmmo();
 
                 if(peekAmmo() == jackpotAmmo.peek().type){
                     type = jackpotAmmo.peek();
                 }else{
-                    for(var e : jackpotAmmo) if(e.type == peekAmmo()){
+                    for(JackpotAmmo e : jackpotAmmo) if(e.type == peekAmmo()){
                         int i = Mathf.chance(e.chance) ? 1 : 0;
                         type = jackpotAmmo.get(jackpotAmmo.indexOf(e) + i);
                     }
@@ -43,7 +43,6 @@ public class JackpotTurret extends ItemTurret{
 
                 shoot(type);
                 reloadCounter %= reload;
-
             }
         }
 

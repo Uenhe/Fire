@@ -14,5 +14,7 @@ public class FireStat{
         deflectChance = new Stat("deflectChance", StatCat.function),
         lightningDamage0 = new Stat("lightningDamage0", StatCat.function),
         lightningLength = new Stat("lightningLength", StatCat.function),
-        lightningAmount = new Stat("lightningAmount", StatCat.function);
+        lightningAmount = new Stat("lightningAmount", StatCat.function),
+        invincibleTime = new Stat("invincibleTime", StatCat.function);
+
 }

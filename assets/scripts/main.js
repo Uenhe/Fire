@@ -1,8 +1,7 @@
 //why are you still here...?
 
-var block = Blocks.distributor
-var build = block.buildType.get().class
-block.buildType = () => extend(build, block, {
+var build = Blocks.distributor.buildType.get().class;
+Blocks.distributor.buildType = () => extend(build, Blocks.distributor, {
     canControl(){
         return true
     }

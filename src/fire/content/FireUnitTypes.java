@@ -277,16 +277,14 @@ public class FireUnitTypes{
                             float size = 4f;
 
                             Draw.color(Pal.neoplasm2, Pal.neoplasmMid, Pal.neoplasm1, e.fin());
-                            Angles.randLenVectors(e.id, amount, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) -> {
-                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * size);
-                            });
+                            Angles.randLenVectors(e.id, amount, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) ->
+                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * size));
                         });
                         hitEffect = despawnEffect = new Effect(14f, e -> {
                             Draw.color(Pal.neoplasm2, Pal.neoplasmMid, e.fin());
                             Lines.stroke(0.5f + e.fout());
-                            Angles.randLenVectors(e.id, 6, 1f + e.fin() * 15f, e.rotation, 50f, (x, y) -> {
-                                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f);
-                            });
+                            Angles.randLenVectors(e.id, 6, 1f + e.fin() * 15f, e.rotation, 50f, (x, y) ->
+                                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1f + e.fout() * 3f));
                         });
                     }};
                 }}
@@ -496,7 +494,7 @@ public class FireUnitTypes{
             lowAltitude = true;
 
             abilities.add(
-                new DashAbility(10f, 12f, 120f, 6)
+                new DashAbility(8f, 12f, 120f, 6)
             );
 
             weapons.add(
@@ -757,6 +755,7 @@ public class FireUnitTypes{
             drag = 0.08f;
             accel = 0.15f;
             rotateSpeed = 2f;
+            buildSpeed = 1f;
             itemCapacity = 280;
             engineOffset = 6f;
             lowAltitude = true;
