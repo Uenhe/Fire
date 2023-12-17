@@ -27,15 +27,15 @@ public class FireStatusEffects{
             transitionDamage = 22f;
             effect = new Effect(40f, e -> {
                 Draw.color(frostbite.color);
-                Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
-                });
+                Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) ->
+                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f)
+                );
             });
             init(() -> {
                 opposite(StatusEffects.melting, StatusEffects.burning);
-                affinity(StatusEffects.blasted, (unit, result, time) -> {
-                    unit.damagePierce(frostbite.transitionDamage);
-                });
+                affinity(StatusEffects.blasted, (unit, result, time) ->
+                    unit.damagePierce(frostbite.transitionDamage)
+                );
             });
         }};
 
@@ -65,9 +65,9 @@ public class FireStatusEffects{
             maxShield = 1200f;
             effect = new Effect(40f, e -> {
                 Draw.color(overgrown.color);
-                Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) -> {
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f);
-                });
+                Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) ->
+                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f)
+                );
             });
         }};
 

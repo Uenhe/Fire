@@ -24,7 +24,7 @@ import java.util.Arrays;
 public class FireOverride{
 
     private static UnitType[] unitUpgrade(UnitType from, UnitType to){
-        var a = Arrays.copyOf(((Reconstructor) Blocks.tetrativeReconstructor).upgrades.get(0), 2);
+        var a = Arrays.copyOf(((Reconstructor)Blocks.tetrativeReconstructor).upgrades.get(0), 2);
         a[0] = from;
         a[1] = to;
         return a;

@@ -7,27 +7,20 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.util.Log;
-import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.entities.Effect;
 
-import static mindustry.Vars.state;
 import static mindustry.Vars.tilesize;
 
 public class FireFx{
 
+    /** Special thanks to Extra Utilities mod. */
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){
-
-        /*
-         * special thanks to Extra Utilities mod,
-         * TODO absolutely require rewritten in java...
-         */
-
         return new Effect(lifetime, range * 2f, e -> {
-            Draw.color(color);
+
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
 
+            Draw.color(color);
             for(int i = 0; i <= range / spacing; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
@@ -36,7 +29,6 @@ public class FireFx{
 
             Tmp.v1.trns(e.rotation, 0f, (2f - track) * tilesize * width);
             Lines.stroke(track * 2f);
-
             for(int i : Mathf.signs){
                 Lines.lineAngle(e.x + Tmp.v1.x * i, e.y + Tmp.v1.y * i, e.rotation, range * (0.75f + track / 4f) * Mathf.curve(e.fout(Interp.pow5Out), 0f, 0.1f));
             }
@@ -44,32 +36,19 @@ public class FireFx{
     }
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
-
-        byte range = Byte.MAX_VALUE;
-        final float[] w = new float[range];
-
         return new Effect(lifetime, e -> {
-            byte a = (byte)Mathf.randomSeed(e.id, 0, range - 1);
-            float r = radius * e.fout();
+
             float orbSize = 2f * e.fout() + 1f;
-
-            if(!state.isPaused()){
-                w[a] += Time.delta * speed * e.fout(Interp.pow2Out);
-                w[a] %= 360f;
-            }
-
-            float x = Mathf.cos(w[a]);
-            float y = Mathf.sin(w[a]);
-            x += e.x;
-            y += e.y;
+            float r = radius * e.fout();
+            float w = e.time * speed * e.fout(Interp.swingOut);
+            float x = Mathf.cos(w) + e.x;
+            float y = Mathf.sin(w) + e.y;
 
             for(int i = 0; i < amount; i++) {
+                float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
                 float
-                    angle = 360f / amount * i,
-                    angle0 = Angles.angle(e.x, e.y, x, y),
-
-                    cx = e.x + r * Mathf.sinDeg(angle + angle0),
-                    cy = e.y + r * Mathf.cosDeg(angle + angle0);
+                    cx = e.x + r * Mathf.sinDeg(angle),
+                    cy = e.y + r * Mathf.cosDeg(angle);
 
                 Draw.color(colors[i]);
                 Lines.circle(cx, cy, orbSize);
@@ -81,9 +60,8 @@ public class FireFx{
     public static Effect gamblerShootEffect(float lifetime, int amount){
         return new Effect(lifetime, e -> {
             Draw.color(e.color, Color.lightGray, e.fin());
-            Angles.randLenVectors(e.id, amount, 5f + e.finpow() * 22f, (x, y) -> {
-                Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45f);
-            });
+            Angles.randLenVectors(e.id, amount, 5f + e.finpow() * 22f, (x, y) ->
+                Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45f));
         });
     }
 }

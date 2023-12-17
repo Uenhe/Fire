@@ -84,11 +84,9 @@ public class FireMod extends mindustry.mod.Mod{
 
         var historyDialog = new BaseDialog(format("historyTitle", name));
         setupDialog(historyDialog);
-        historyDialog.cont.pane(t -> {
-
-            t.add("@history").left().growX().wrap().width(800f).maxWidth(1024f).pad(4f).labelAlign(Align.left);
-
-        }).grow().center().maxWidth(1024f);
+        historyDialog.cont.pane(t ->
+            t.add("@history").left().growX().wrap().width(800f).maxWidth(1024f).pad(4f).labelAlign(Align.left)
+        ).grow().center().maxWidth(1024f);
 
         var mainDialog = new BaseDialog(format("mainTitle", name, version));
         setupDialog(mainDialog);

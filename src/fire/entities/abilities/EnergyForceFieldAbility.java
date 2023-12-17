@@ -15,9 +15,12 @@ import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
+import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 public class EnergyForceFieldAbility extends ForceFieldAbility{
+
+    /** {@link mindustry.entities.bullet.LightningBulletType#calculateRange()} */
     public int lightningLength;
     public int lightningAmount;
     public float lightningDamage;
@@ -25,7 +28,7 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
     public float rotateSpeed = -1f;
     public Color lightningColor = Pal.surge;
 
-    private static final float deflectDamageMul = 2f;
+    private static final float DEFLECT_DAMAGE_MUL = 2f;
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, float chance, float damage, int length, int amount){
         super(radius, regen, max, cooldown);
@@ -43,11 +46,11 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
     @Override
     public void addStats(Table t){
         super.addStats(t);
-        t.add("[lightgray]" + FireStat.deflectChance.localized() + ": [white]" + Strings.autoFixed(chanceDeflect, 2));
+        t.add("[lightgray]" + Stat.baseDeflectChance.localized() + ": [white]" + Strings.autoFixed(chanceDeflect, 2));
         t.row();
-        t.add("[lightgray]" + FireStat.lightningDamage0.localized() + ": [white]" + Strings.autoFixed(lightningDamage, 2));
+        t.add("[lightgray]" + Stat.lightningDamage.localized() + ": [white]" + Strings.autoFixed(lightningDamage, 2));
         t.row();
-        t.add("[lightgray]" + FireStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength, 2) + " " + StatUnit.blocks.localized());
+        t.add("[lightgray]" + FireStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength * 0.75f, 2) + " " + StatUnit.blocks.localized());
         t.row();
         t.add("[lightgray]" + FireStat.lightningAmount.localized() + ": [white]" + Strings.autoFixed(lightningAmount, 2));
         t.row();
@@ -55,10 +58,13 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
 
     @Override
     public void update(Unit unit){
-        if(rotateSpeed > 0f) rotation += rotateSpeed * Time.delta;
-        rotation %= 360f;
         alpha = Math.max(alpha - Time.delta / 10f, 0f);
+        if(rotateSpeed > 0f){
+            rotation += rotateSpeed * Time.delta;
+            rotation %= 360f;
+        }
         if(unit.shield < max) unit.shield += regen * Time.delta;
+
         if(unit.shield > 0f){
             radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
             Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
@@ -77,10 +83,10 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
                         bullet.time += 1f;
                         collision = false;
                     }
-                    float dmg = bullet.damage * deflectDamageMul;
+                    float dmg = bullet.damage * DEFLECT_DAMAGE_MUL;
                     if(collision){
                         bullet.absorb();
-                        dmg /= deflectDamageMul;
+                        dmg /= DEFLECT_DAMAGE_MUL;
                     }
                     unit.shield -= dmg;
                     if(unit.shield <= 0f){

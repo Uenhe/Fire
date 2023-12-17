@@ -6,6 +6,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.io.Reads;
@@ -14,7 +15,6 @@ import mindustry.content.Fx;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.entities.Lightning;
-import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -35,13 +35,11 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     public Effect explodeEffect = Fx.none;
     /** {@link mindustry.world.blocks.power.PowerGenerator} */
     public Sound explodeSound = Sounds.none;
-    public boolean destabilizes = true;
     public float maxInstability = 360f;
     public float stabilizeInterval = 60f;
-    public BulletType fragBullet;
-    public int fragBullets = 6;
     public float lightningDamage = 80f;
     public int lightningAmount = 8;
+    public Sound craftSound = Sounds.none;
     public Color baseColor = Color.valueOf("faaaaa");
     public Color[] circleColor = {Pal.plastanium, Pal.lightishOrange};
     private final int timerStabilize = timers++;
@@ -54,13 +52,13 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-        if(destabilizes) Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, explosionRadius, Pal.placing);
+        Drawf.dashCircle(x * tilesize + offset, y * tilesize + offset, explosionRadius, Pal.placing);
     }
 
     @Override
     public void setBars(){
         super.setBars();
-        if(destabilizes) addBar("instability", (EnergyCrafterBuild e) -> new Bar("bar.instability", Pal.sap, () -> e.instability / maxInstability));
+        addBar("instability", (EnergyCrafterBuild e) -> new Bar("bar.instability", Pal.sap, () -> e.instability / maxInstability));
     }
 
     public class EnergyCrafterBuild extends GenericCrafterBuild{
@@ -71,15 +69,13 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Override
         public void updateTile(){
             super.updateTile();
-            if(!destabilizes) return;
-
             if(instability > maxInstability) kill();
 
-            instability = Math.max(instability, 0f);
             boolean wasUnstable = instability > 0f;
+            instability = Math.max(instability, 0f);
+            fraction = Interp.smoother.apply(1f - progress);
 
             if(consValid(this)){
-                fraction = Mathf.lerpDelta(fraction, 0f, craftTime * 0.00025f * timeScale);
                 indexer.eachBlock(this, explosionRadius, b -> true, build -> {
                     if(build != null && build.block == this.block && consValid(build) && build != this){
                         instability += Time.delta;
@@ -91,8 +87,8 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 createLightning();
             }
 
-            if(timer(timerStabilize, stabilizeInterval)){
-                if(wasUnstable) Fx.healBlockFull.at(x, y, size, color, block);
+            if(wasUnstable && timer(timerStabilize, stabilizeInterval)){
+                Fx.healBlockFull.at(x, y, size, color, block);
                 instability -= maxInstability * 0.1f;
             }
         }
@@ -100,16 +96,11 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Override
         public void craft(){
             super.craft();
-            if(fragBullet != null){
-                createBullet();
-            }else{
-                colorCounter = colorCounter >= circleColor.length - 1 ? 0 : colorCounter + 1;
-                color = circleColor[colorCounter];
-                rotation = Mathf.random(360);
-                realLightningAmount = instability > maxInstability / 2f ? lightningAmount * 2 : lightningAmount;
-                createLightning();
-                fraction = 1.05f;
-            }
+            colorCounter = colorCounter >= circleColor.length - 1 ? 0 : colorCounter + 1;
+            color = circleColor[colorCounter];
+            rotation = Mathf.random(360);
+            realLightningAmount = (int)(lightningAmount * (1 + instability / maxInstability));
+            createLightning();
         }
 
         @Override
@@ -127,23 +118,15 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Override
         public void drawSelect(){
             super.drawSelect();
-            if(destabilizes) Drawf.dashCircle(x, y, explosionRadius, team.color);
+            Drawf.dashCircle(x, y, explosionRadius, team.color);
         }
 
         protected float time(){
             return (timeScale - 1f) * 0.5f + 1f;
         }
 
-        protected void createBullet(){
-            float rand = Mathf.random(360f);
-            Sounds.release.at(this, Mathf.random(0.45f, 0.55f));
-            for(int i = 0; i < fragBullets; i++){
-                fragBullet.create(this, x, y, 360f / fragBullets * i + rand);
-            }
-        }
-
         protected void createLightning(){
-            Sounds.release.at(this, Mathf.random(0.45f, 0.55f));
+            craftSound.at(this, Mathf.random(0.45f, 0.55f));
             for(int i = 0; i < realLightningAmount; i++){
                 Lightning.create(team, color, lightningDamage, x, y, (i - 1) * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
             }
@@ -152,12 +135,10 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Override
         public void draw(){
             super.draw();
-            if(!destabilizes) return;
             if(consValid(this)){
                 flash += (1f + instability / maxInstability * 6f) * Time.delta;
                 Draw.z(Layer.effect);
                 Lines.stroke(2.5f, color);
-                Draw.alpha(1f - progress);
                 Lines.arc(x, y, size * 5f, fraction, rotation);
             }
             if(instability > maxInstability / 3f && Core.settings.getBool("showBlockRange")){

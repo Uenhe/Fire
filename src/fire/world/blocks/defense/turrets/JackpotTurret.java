@@ -4,10 +4,12 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
+import fire.world.meta.FireStatValues;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.type.Item;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.meta.Stat;
 
 public class JackpotTurret extends ItemTurret{
     public Seq<JackpotAmmo> jackpotAmmo = new Seq<>();
@@ -21,8 +23,18 @@ public class JackpotTurret extends ItemTurret{
     public void init(){
         super.init();
         for(var ammo : jackpotAmmo){
+            ammo.type.ammoMultiplier = 1;
             ammoTypes.put(ammo.item, ammo.type);
         }
+    }
+
+
+
+    @Override
+    public void setStats(){
+        super.setStats();
+        stats.remove(Stat.ammo);
+        stats.add(Stat.ammo, FireStatValues.ammo(jackpotAmmo, 0));
     }
 
     public class JackpotTurretBuild extends ItemTurretBuild{

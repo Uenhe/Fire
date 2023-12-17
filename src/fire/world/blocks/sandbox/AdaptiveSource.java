@@ -1,10 +1,9 @@
 package fire.world.blocks.sandbox;
 
-import mindustry.type.Item;
-import mindustry.type.Liquid;
 import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.content;
+import static mindustry.Vars.tilesize;
 
 public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
     public int itemPerSec = 100;
@@ -16,6 +15,12 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         update = true;
         displayFlow = false;
         canOverdrive = true;
+    }
+
+    @Override
+    public void drawPlace(int x, int y, int rotation, boolean valid){
+        drawPotentialLinks(x, y);
+        drawOverlay(x * tilesize + offset, y * tilesize + offset, rotation);
     }
 
     @Override
@@ -45,7 +50,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
             counter += edelta();
             float limit = 60f / itemPerSec;
             while(counter >= limit){
-                for(Item item : content.items()){
+                for(var item : content.items()){
                     items.set(item, 1);
                     dump(item);
                     items.set(item, 0);
@@ -53,7 +58,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
                 }
             }
             liquids.clear();
-            for(Liquid liquid: content.liquids()){
+            for(var liquid: content.liquids()){
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }

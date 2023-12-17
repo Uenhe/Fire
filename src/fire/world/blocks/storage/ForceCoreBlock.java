@@ -68,8 +68,8 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     }
 
     public class ForceCoreBuild extends CoreBuild{
-        protected float buildup, scl, hit, warmup;
-        protected boolean broken = true;
+        public float buildup, scl, hit, warmup;
+        public boolean broken = true;
 
         @Override
         public void onRemoved(){

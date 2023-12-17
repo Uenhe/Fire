@@ -81,7 +81,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
             float offset = unit.type.engineOffset * 0.5f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * 8);
             float cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset);
             float cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
-            Draw.alpha(0.8f * (1f - (timerCooldown / invincibleTime)) * (1f - (float)(i / afterimage)));
+            Draw.alpha(0.6f * (1f - (timerCooldown / invincibleTime)) * (1f - (float)(i / afterimage)));
             Draw.rect(unit.type.name, cx, cy, unit.rotation - 90f);
         }
         Draw.reset();
