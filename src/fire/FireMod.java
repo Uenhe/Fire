@@ -2,8 +2,9 @@ package fire;
 
 import arc.Core;
 import arc.Events;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
-import arc.util.Align;
+import arc.util.Scaling;
 import fire.content.*;
 import fire.input.FireBinding;
 import fire.world.meta.FireAttribute;
@@ -12,6 +13,7 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.dialogs.SettingsMenuDialog;
 
 import java.util.Objects;
 
@@ -24,16 +26,6 @@ public class FireMod extends mindustry.mod.Mod{
         linkRaindance = "https://space.bilibili.com/516898377",
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
-
-    private static void setupDialog(BaseDialog dialog){
-        dialog.addCloseListener();
-        dialog.buttons.button("@close", dialog::hide).size(210f, 64f);
-    }
-
-    private static void addContent(Table table, UnlockableContent content, boolean wasFirst){
-        var t = table.button("?", Styles.grayPanel, () -> ui.content.show(content)).size(40f).pad(10f);
-        if(wasFirst) t.right();
-    }
 
     public FireMod(){
         Events.on(EventType.ClientLoadEvent.class, e -> {
@@ -73,6 +65,17 @@ public class FireMod extends mindustry.mod.Mod{
             });
 
             t.checkPref("showBlockRange", true);
+
+            t.checkPref("showLogs", true);
+
+            t.pref(new SettingsMenuDialog.SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
+
+                @Override
+                public void add(SettingsMenuDialog.SettingsTable table){
+                    table.button(name, () -> showDialog()).size(210f, 64f);
+                    table.row();
+                }
+            });
         });
     }
 
@@ -85,8 +88,8 @@ public class FireMod extends mindustry.mod.Mod{
         var historyDialog = new BaseDialog(format("historyTitle", name));
         setupDialog(historyDialog);
         historyDialog.cont.pane(t ->
-            t.add("@history").left().growX().wrap().width(800f).maxWidth(1024f).pad(4f).labelAlign(Align.left)
-        ).grow().center().maxWidth(1024f);
+            t.add("@history").left().width(1024f).maxWidth(1280f).pad(4f)
+        ).maxWidth(1024f);
 
         var mainDialog = new BaseDialog(format("mainTitle", name, version));
         setupDialog(mainDialog);
@@ -97,20 +100,24 @@ public class FireMod extends mindustry.mod.Mod{
             t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107f).width(359f).pad(3f);
             t.row();
 
-            t.add(Core.bundle.format("contentMain", version)).left().growX().wrap().width(800f).maxWidth(1024f).pad(4f).labelAlign(Align.left);
+            t.add(Core.bundle.format("contentMain", version)).left().width(800f).maxWidth(1024f).pad(4f);
             t.row();
 
             t.row();
-            addContent(t, FireBlocks.adaptiveSource, true);
-            addContent(t, FireBlocks.blossom, false);
-            addContent(t, FireBlocks.fleshReconstructor, false);
-            addContent(t, FireBlocks.hardenedAlloyCrucible, false);
-            addContent(t, FireUnitTypes.hatchet, false);
-            addContent(t, FireStatusEffects.overgrown, false);
-            addContent(t, FireStatusEffects.disintegrated, false);
+            addContent(t, FireBlocks.adaptiveSource);
+            addContent(t, FireBlocks.blossom);
+            addContent(t, FireBlocks.gambler);
+            addContent(t, FireBlocks.magneticSphere);
+            addContent(t, FireBlocks.magneticAlloyFormer);
+            addContent(t, FireBlocks.electromagnetismDiffuser);
+            addContent(t, FireBlocks.fleshReconstructor);
+            addContent(t, FireUnitTypes.hatchet);
+            addContent(t, FireUnitTypes.pioneer);
+            addContent(t, FireStatusEffects.overgrown);
+            addContent(t, FireStatusEffects.disintegrated);
             t.row();
 
-            t.add("@contentSecondary").left().growX().wrap().width(800f).maxWidth(1024f).pad(4f).labelAlign(Align.left);
+            t.add("@contentSecondary").left().width(800f).maxWidth(1024f).pad(4f);
             t.row();
 
             if(Objects.equals(Core.settings.getString("locale"), "zh_CN")){
@@ -141,7 +148,31 @@ public class FireMod extends mindustry.mod.Mod{
                 }).size(256f, 64f);
                 t.row();
             }
-        }).grow().center().maxWidth(1024f);
+        }).maxWidth(1024f);
         mainDialog.show();
+    }
+
+    private static void setupDialog(BaseDialog dialog){
+        dialog.addCloseListener();
+        dialog.buttons.button("@close", dialog::hide).size(210f, 64f);
+    }
+
+
+
+    private static void addContent(Table table, UnlockableContent content){
+        table.table(Styles.grayPanel, t -> {
+
+            t.left().button(new TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(Scaling.fit);
+            t.left().table(info -> {
+
+                var end = Objects.equals(Core.settings.getString("locale"), "zh_CN") ? Core.bundle.get("stringEnd") : ".";
+                var detail = content.description.substring(0, content.description.indexOf(end));
+                info.left().add("[accent]" + content.localizedName).left();
+                info.row();
+                info.left().add(detail).left();
+            });
+
+        }).growX().pad(5f);
+        table.row();
     }
 }

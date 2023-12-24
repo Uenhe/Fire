@@ -17,7 +17,7 @@ import static mindustry.game.Objectives.*;
 
 public class RisetarTechTree{
 
-    //Copied from origin JS file, a kind of mess.
+    /** Copied from origin JS file, a kind of mess. */
     private static void add(UnlockableContent content, String parent){
         var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();
@@ -70,7 +70,9 @@ public class RisetarTechTree{
                     );
                     node(kindlingExtractor, () -> {
                         node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () -> {});
-                        node(hardenedAlloySmelter, with(new SectorComplete(eternityRiverStronghold)), () -> {});
+                        node(hardenedAlloySmelter, with(new SectorComplete(eternityRiverStronghold)), () ->
+                            node(hardenedAlloyCrucible, with(new SectorComplete(urgentSupport)), () -> {})
+                        );
                     });
                 });
             });
@@ -87,10 +89,14 @@ public class RisetarTechTree{
             node(smasher, with(new OnSector(landingBase)), () -> {
                 node(damWall, with(new OnSector(beachLanding)), () -> {
                     node(damWallLarge, () -> {});
-                    node(hardenedWall, with(new SectorComplete(darkWorkshop)), () -> {});
+                    node(hardenedWall, with(new SectorComplete(darkWorkshop)), () ->
+                        node(hardenedWallLarge, with(new OnSector(urgentSupport)), () -> {})
+                    );
                 });
                 node(nightmare, () ->
-                    node(distance, with(new SectorComplete(eternityRiverStronghold)), () -> {})
+                    node(distance, with(new SectorComplete(eternityRiverStronghold)), () ->
+                        node(grudge, with(new SectorComplete(urgentSupport)), () -> {})
+                    )
                 );
                 node(seaquake, with(new SectorComplete(scorchingVolcano)), () -> {});
                 node(ignite, with(new OnSector(scorchingVolcano)), () -> {});
@@ -111,12 +117,14 @@ public class RisetarTechTree{
                 node(darksandPlain, with(new SectorComplete(landingBase), new Research(nightmare)), () -> {
                     node(cornerOfZero, with(new SectorComplete(darksandPlain)), () ->
                         node(beachLanding, with(new SectorComplete(cornerOfZero)), () ->
-                            node(darkWorkshop, with(new SectorComplete(beachLanding), new Research(garrison)), () -> {})
+                            node(darkWorkshop, with(new SectorComplete(beachLanding), new Research(garrison)), () ->
+                                node(urgentSupport, with(new SectorComplete(darkWorkshop), new Research(distance)), () -> {})
+                            )
                         )
                     );
-                    node(sporeFiord, with(new SectorComplete(darksandPlain)), () -> {
-                        node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () -> {});
-                    });
+                    node(sporeFiord, with(new SectorComplete(darksandPlain)), () ->
+                        node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () -> {})
+                    );
                     node(eternityRiverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
                         node(chillyMountains, with(new SectorComplete(eternityRiverStronghold), new Produce(conductor)), () -> {})
                     );

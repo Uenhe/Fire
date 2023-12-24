@@ -17,6 +17,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.pattern.ShootSummon;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -226,6 +227,12 @@ public class FireUnitTypes{
             drownTimeMultiplier = 3f;
             healColor = Pal.neoplasm1;
 
+            abilities.add(
+                new MoveEffectAbility(0f, 0f, Pal.neoplasm1, FireStatusEffects.overgrown.effect, 4f){{
+                    minVelocity = 0f;
+                }}
+            );
+
             weapons.add(
                 new Weapon("large-weapon"){{
                     reload = 15f;
@@ -251,6 +258,12 @@ public class FireUnitTypes{
             speed = 0.6f;
             drownTimeMultiplier = 3f;
             healColor = Pal.neoplasm1;
+
+            abilities.add(
+                new MoveEffectAbility(0f, 0f, Pal.neoplasm1, FireStatusEffects.overgrown.effect, 4f){{
+                    minVelocity = 0f;
+                }}
+            );
 
             weapons.add(
                 new Weapon("flamethrower"){{
@@ -308,6 +321,9 @@ public class FireUnitTypes{
                     maxTargets = 40;
                     healPercent = 0.1f;
                     color = Color.valueOf("ff3300");
+                }},
+                new MoveEffectAbility(0f, 0f, Pal.neoplasm1, FireStatusEffects.overgrown.effect, 4f){{
+                    minVelocity = 0f;
                 }}
             );
 
@@ -509,6 +525,7 @@ public class FireUnitTypes{
                     mirror = false;
                     rotate = true;
                     shootSound = Sounds.laser;
+
                     bullet = new EmpBulletType(){{
                         float rad = 60f;
 

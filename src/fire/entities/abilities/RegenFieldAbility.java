@@ -54,7 +54,7 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
         boolean draws = false;
         for(var target : targets){
             if(target.damaged()){
-                target.heal(healAmount);
+                target.heal(healAmount * Time.delta);
                 draws = true;
             }
         }

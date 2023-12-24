@@ -96,6 +96,6 @@ public class JackpotTurret extends ItemTurret{
             this.type = type;
         }
 
-        public JackpotAmmo(){}
+        JackpotAmmo(){}
     }
 }

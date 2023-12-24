@@ -9,7 +9,7 @@ public class FireSectorPresets{
 
         landingBase, darksandPlain, cornerOfZero, beachLanding,
         darkWorkshop, sporeFiord, scorchingVolcano, eternityRiverStronghold,
-        chillyMountains;
+        chillyMountains, urgentSupport;
 
     public static void load(){
 
@@ -59,6 +59,12 @@ public class FireSectorPresets{
         chillyMountains = new SectorPreset("lfsm", risetar, 168){{
             difficulty = 9;
             captureWave = 17;
+            addStartingItems = true;
+        }};
+
+        urgentSupport = new SectorPreset("urgent-support", risetar, 119){{
+            difficulty = 9;
+            captureWave = 60;
             addStartingItems = true;
         }};
     }

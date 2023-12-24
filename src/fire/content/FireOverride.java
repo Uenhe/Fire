@@ -48,13 +48,13 @@ public class FireOverride{
         //region block turret
 
         Blocks.wave.liquidCapacity += 10f;
-        ((LiquidTurret) Blocks.wave).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
+        ((LiquidTurret)Blocks.wave).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
             damage = 4.55f;
             knockback = 0.7f;
             drag = 0.001f;
         }});
         Blocks.tsunami.liquidCapacity += 20f;
-        ((LiquidTurret) Blocks.tsunami).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
+        ((LiquidTurret)Blocks.tsunami).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
             speed = 4f;
             damage = 6.25f;
             lifetime = 49f;
@@ -69,37 +69,37 @@ public class FireOverride{
         //endregion
         //region block production
 
-        ((Drill) Blocks.laserDrill).drillTime -= 10f;
-        ((Drill) Blocks.laserDrill).hardnessDrillMultiplier -= 5f;
-        ((Drill) Blocks.blastDrill).drillTime -= 25f;
-        ((Drill) Blocks.blastDrill).hardnessDrillMultiplier -= 5f;
+        ((Drill)Blocks.laserDrill).drillTime -= 10f;
+        ((Drill)Blocks.laserDrill).hardnessDrillMultiplier -= 5f;
+        ((Drill)Blocks.blastDrill).drillTime -= 25f;
+        ((Drill)Blocks.blastDrill).hardnessDrillMultiplier -= 5f;
 
         //endregion
         //region block distribution
 
         Blocks.phaseConveyor.itemCapacity += 5;
-        ((ItemBridge) Blocks.phaseConveyor).transportTime -= 1f;
-        ((MassDriver) Blocks.massDriver).rotateSpeed += 5f;
-        ((MassDriver) Blocks.massDriver).bulletSpeed += 9.5f;
+        ((ItemBridge)Blocks.phaseConveyor).transportTime -= 1f;
+        ((MassDriver)Blocks.massDriver).rotateSpeed += 5f;
+        ((MassDriver)Blocks.massDriver).bulletSpeed += 9.5f;
 
         //endregion
         //region block liquid
 
-        ((Pump) Blocks.mechanicalPump).pumpAmount += 0.2f / 60f;
-        ((Pump) Blocks.impulsePump).pumpAmount += 1.2f / 9f / 60f;
+        ((Pump)Blocks.mechanicalPump).pumpAmount += 0.2f / 60f;
+        ((Pump)Blocks.impulsePump).pumpAmount += 1.2f / 9f / 60f;
         Blocks.phaseConduit.liquidCapacity += 14f;
 
         //endregion
         //region units
 
-        ((UnitFactory) Blocks.groundFactory).plans.add(
+        ((UnitFactory)Blocks.groundFactory).plans.add(
             new UnitFactory.UnitPlan(FireUnitTypes.guarding, 1500f, ItemStack.with(
                 Items.lead, 20,
                 Items.titanium, 25,
                 Items.silicon, 30
             ))
         );
-        ((UnitFactory) Blocks.airFactory).plans.add(
+        ((UnitFactory)Blocks.airFactory).plans.add(
             new UnitFactory.UnitPlan(UnitTypes.alpha, 2400f, ItemStack.with(
                 Items.copper, 30,
                 Items.lead, 40,
@@ -112,18 +112,18 @@ public class FireOverride{
                 Items.silicon, 15
             ))
         );
-        ((Reconstructor) Blocks.additiveReconstructor).upgrades.add(
+        ((Reconstructor)Blocks.additiveReconstructor).upgrades.add(
             unitUpgrade(UnitTypes.alpha, UnitTypes.beta),
             unitUpgrade(FireUnitTypes.guarding, FireUnitTypes.resisting),
             unitUpgrade(FireUnitTypes.blade, FireUnitTypes.hatchet),
             unitUpgrade(FireUnitTypes.firefly, FireUnitTypes.candlelight)
         );
-        ((Reconstructor) Blocks.multiplicativeReconstructor).upgrades.add(
+        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
             unitUpgrade(UnitTypes.beta, FireUnitTypes.omicron),
             unitUpgrade(FireUnitTypes.resisting, FireUnitTypes.garrison),
             unitUpgrade(FireUnitTypes.hatchet, FireUnitTypes.castle)
         );
-        ((Reconstructor) Blocks.exponentialReconstructor).upgrades.add(
+        ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
             unitUpgrade(FireUnitTypes.omicron, FireUnitTypes.pioneer),
             unitUpgrade(FireUnitTypes.garrison, FireUnitTypes.shelter)
         );
@@ -131,8 +131,8 @@ public class FireOverride{
         //endregion
         //region block effect
 
-        ((LightBlock) Blocks.illuminator).brightness += 0.25f;
-        ((LightBlock) Blocks.illuminator).radius += 60f;
+        ((LightBlock)Blocks.illuminator).brightness += 0.25f;
+        ((LightBlock)Blocks.illuminator).radius += 60f;
 
         //endregion
         //region unit

@@ -35,6 +35,7 @@ public class VariableBulletType extends mindustry.entities.bullet.BasicBulletTyp
             /*
              * if variable motion ends and bullet has homing ability, check if there's any target.
              * remove it if no target.
+             * no ally-healing support currently.
              */
             /** {@link mindustry.entities.bullet.BulletType#updateHoming(Bullet)} */
             if(homingRange > 0.0001f && b.time >= homingDelay){

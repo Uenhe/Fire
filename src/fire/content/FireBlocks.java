@@ -3,7 +3,7 @@ package fire.content;
 import arc.graphics.Color;
 import arc.graphics.g2d.*;
 import arc.math.*;
-import fire.entities.bullets.VariableBulletType;
+import fire.entities.bullets.*;
 import fire.world.blocks.defense.*;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import fire.world.blocks.power.*;
@@ -118,10 +118,11 @@ public class FireBlocks{
         adaptiveSource = new AdaptiveSource("adaptive-source"){{
             requirements(Category.distribution, BuildVisibility.sandboxOnly, with());
             liquidCapacity = 100f;
-            laserRange = 25f;
+            laserRange = 200f;
             maxNodes = 500;
             powerProduction = 166666667f;
             itemPerSec = 2000;
+            autolink = drawRange = false;
         }};
 
         fireCompany = new LightBlock("hzgs"){{
@@ -997,9 +998,10 @@ public class FireBlocks{
             consumeCoolant(1f);
 
             shootType = new VariableBulletType(9.9f, 0.1f, acceltime, 8f, 1800f){{
-                lifetime = acceltime + 20f;
+                lifetime = acceltime + 600f;
                 width = 0f;
                 height = 0f;
+                hitSize = 6f;
                 pierceCap = 10;
                 ammoMultiplier = 1;
                 collidesGround = false;
@@ -1048,8 +1050,8 @@ public class FireBlocks{
 
                 hitEffect = new Effect(14f, e -> {
                     Draw.color(col, Color.lightGray, e.fin());
-                    Angles.randLenVectors(e.id, 12, 5f + e.finpow() * 18f, (x, y) ->
-                        Fill.square(e.x + x, e.y + y, e.fout() * 2.2f + 0.5f, 45f));
+                    Angles.randLenVectors(e.id, 12, 9f + e.finpow() * 22f, (x, y) ->
+                        Fill.square(e.x + x, e.y + y, e.fout() * 3.2f + 1.5f, 45f));
                 });
 
                 //create lightning while bullet flying
@@ -1059,13 +1061,22 @@ public class FireBlocks{
                     damage = 5;
                     lightningColor = col;
                     lightningLength = 10;
+                    collidesGround = false;
+
+                    fragBullets = 1;
+                    fragBullet = new LightningPointBulletType(165f){{
+                        homingRange = 120f;
+                        lightningChance = 0.6f;
+                        lightningColor = col;
+                        collidesGround = false;
+                    }};
                 }};
 
                 fragRandomSpread = 0f;
                 fragSpread = 60f;
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(10f, 225f){{
-                    lifetime = 40f;
+                fragBullet = new BasicBulletType(12f, 225f){{
+                    lifetime = 45f;
                     width = 3.2f;
                     height = 4f;
                     collidesGround = false;
