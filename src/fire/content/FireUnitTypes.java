@@ -267,7 +267,7 @@ public class FireUnitTypes{
 
             weapons.add(
                 new Weapon("flamethrower"){{
-                    float spd = 6f, lifetimee = 20f;
+                    float spd = 6f, time = 20f;
 
                     reload = 10f;
                     recoil = 3f;
@@ -275,7 +275,7 @@ public class FireUnitTypes{
                     top = false;
                     shootSound = Sounds.flame;
                     bullet = new BulletType(spd, 60f){{
-                        lifetime = lifetimee;
+                        lifetime = time;
                         hitSize = 8f;
                         pierceCap = 5;
                         statusDuration = 240f;
@@ -293,6 +293,7 @@ public class FireUnitTypes{
                             Angles.randLenVectors(e.id, amount, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) ->
                                 Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * size));
                         });
+
                         hitEffect = despawnEffect = new Effect(14f, e -> {
                             Draw.color(Pal.neoplasm2, Pal.neoplasmMid, e.fin());
                             Lines.stroke(0.5f + e.fout());
@@ -559,12 +560,14 @@ public class FireUnitTypes{
                         trailColor = Pal.heal;
                         shootEffect = Fx.hitEmpSpark;
                         smokeEffect = Fx.shootBigSmoke2;
+
                         trailEffect = new Effect(16f, e -> {
                             Draw.color(Pal.heal);
                             for(int s : Mathf.signs){
                                 Drawf.tri(e.x, e.y, 4f, 30f * e.fslope(), e.rotation + s * 90f);
                             }
                         });
+
                         hitEffect = new Effect(50f, 100f, e -> {
                             byte points = 8;
                             float offset = Mathf.randomSeed(e.id, 360f);

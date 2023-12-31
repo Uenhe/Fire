@@ -27,7 +27,8 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
     public void setBars(){
         super.setBars();
         removeBar("items");
-        removeBar("liquid");
+        removeBar("liquids");
+        removeBar("connections");
     }
 
     @Override
@@ -40,6 +41,8 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
         @Override
         public void updateTile(){
+            if(proximity.size == 0) return;
+
             counter += edelta();
             float limit = 60f / itemPerSec;
             while(counter >= limit){

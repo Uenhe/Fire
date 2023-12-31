@@ -1,22 +1,31 @@
 package fire.world.blocks.storage;
 
-import arc.graphics.*;
-import arc.graphics.g2d.*;
+import arc.Core;
+import arc.graphics.Blending;
+import arc.graphics.Color;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.util.Time;
-import arc.util.io.*;
+import arc.util.io.Reads;
+import arc.util.io.Writes;
 import mindustry.content.Fx;
+import mindustry.game.Team;
 import mindustry.gen.Groups;
-import mindustry.graphics.*;
+import mindustry.graphics.Layer;
+import mindustry.graphics.Pal;
 import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
-import mindustry.world.meta.*;
+import mindustry.world.Tile;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
-import static fire.FireLib.*;
 import static mindustry.Vars.*;
 
-public class ForceCoreBlock extends BuildableCoreBlock{
+public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
+
     /** {@link mindustry.world.blocks.defense.ForceProjector} */
     public float
         radius = 101.7f,
@@ -24,6 +33,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
         cooldownNormal = 1.2f,
         cooldownBroken = 1.5f,
         rotation = 0f;
+
     /** {@link mindustry.world.blocks.defense.ForceProjector} */
     public int sides = 6;
 
@@ -38,6 +48,16 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     }
 
     @Override
+    public boolean canBreak(Tile tile){
+        return tile.team() == Team.derelict || state.teams.cores(tile.team()).size > 1 || state.isEditor();
+    }
+
+    @Override
+    public boolean canPlaceOn(Tile tile, Team team, int rotation){
+        return true;
+    }
+
+    @Override
     public void setStats(){
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth);
@@ -49,7 +69,7 @@ public class ForceCoreBlock extends BuildableCoreBlock{
     public void setBars(){
         super.setBars();
         addBar("shield", (ForceCoreBuild e) -> new Bar(
-                () -> format("bar.detailedshield", (int)(shieldHealth - e.buildup), shieldHealth),
+                () -> Core.bundle.format("bar.detailedshield", (int)(shieldHealth - e.buildup), shieldHealth),
                 () -> Pal.accent,
                 () -> e.broken ? 0f : 1f - e.buildup / shieldHealth
         ));

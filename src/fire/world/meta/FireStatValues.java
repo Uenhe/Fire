@@ -1,7 +1,6 @@
 package fire.world.meta;
 
 import arc.Core;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Collapser;
 import arc.scene.ui.layout.Table;
@@ -11,7 +10,6 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import mindustry.content.StatusEffects;
-import mindustry.ctype.UnlockableContent;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.pattern.ShootAlternate;
 import mindustry.entities.pattern.ShootMulti;
@@ -38,7 +36,7 @@ public class FireStatValues{
 
                     bt.left().top().defaults().padRight(3f).left();
                     bt.table(title -> {
-                        title.image(icon(t.item)).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
+                        title.image(t.item.uiIcon).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
                         title.add(t.item.localizedName).padRight(10).left().top();
                     });
                     bt.row();
@@ -175,9 +173,5 @@ public class FireStatValues{
 
     private static String ammoStat(float val){
         return (val > 0f ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
-    }
-
-    private static TextureRegion icon(UnlockableContent t){
-        return t.uiIcon;
     }
 }

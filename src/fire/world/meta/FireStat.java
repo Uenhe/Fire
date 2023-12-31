@@ -9,8 +9,9 @@ public class FireStat{
         armorPierce = new Stat("armorPierce"),
         baseHealChance = new Stat("baseHealChance"),
         maxArmorIncrease = new Stat("maxArmorIncrease"),
-        allyStatusEffect = new Stat("allyStatusEffect", StatCat.function),
-        enemyStatusEffect = new Stat("enemyStatusEffect", StatCat.function),
+        allyStatusEffect = new Stat("allyStatusEffect"),
+        enemyStatusEffect = new Stat("enemyStatusEffect"),
+        statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
         lightningLength = new Stat("lightningLength", StatCat.function),
         lightningAmount = new Stat("lightningAmount", StatCat.function),
         invincibleTime = new Stat("invincibleTime", StatCat.function);

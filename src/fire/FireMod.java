@@ -17,7 +17,6 @@ import mindustry.ui.dialogs.SettingsMenuDialog;
 
 import java.util.Objects;
 
-import static fire.FireLib.format;
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
 
@@ -85,13 +84,13 @@ public class FireMod extends mindustry.mod.Mod{
         String version = mod.meta.version;
         mod.meta.displayName = name;
 
-        var historyDialog = new BaseDialog(format("historyTitle", name));
+        var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", name));
         setupDialog(historyDialog);
         historyDialog.cont.pane(t ->
             t.add("@history").left().width(1024f).maxWidth(1280f).pad(4f)
         ).maxWidth(1024f);
 
-        var mainDialog = new BaseDialog(format("mainTitle", name, version));
+        var mainDialog = new BaseDialog(Core.bundle.format("mainTitle", name, version));
         setupDialog(mainDialog);
         mainDialog.buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210f, 64f);
 
@@ -153,11 +152,9 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void setupDialog(BaseDialog dialog){
-        dialog.addCloseListener();
+        dialog.closeOnBack();
         dialog.buttons.button("@close", dialog::hide).size(210f, 64f);
     }
-
-
 
     private static void addContent(Table table, UnlockableContent content){
         table.table(Styles.grayPanel, t -> {
@@ -165,8 +162,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.left().button(new TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(Scaling.fit);
             t.left().table(info -> {
 
-                var end = Objects.equals(Core.settings.getString("locale"), "zh_CN") ? Core.bundle.get("stringEnd") : ".";
-                var detail = content.description.substring(0, content.description.indexOf(end));
+                var detail = content.description.substring(0, content.description.indexOf(Core.bundle.get("stringEnd")));
                 info.left().add("[accent]" + content.localizedName).left();
                 info.row();
                 info.left().add(detail).left();

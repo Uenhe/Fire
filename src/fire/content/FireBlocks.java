@@ -10,7 +10,7 @@ import fire.world.blocks.power.*;
 import fire.world.blocks.production.*;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.*;
-import fire.world.blocks.units.MechPad;
+import fire.world.blocks.units.*;
 import fire.world.meta.FireAttribute;
 import mindustry.content.*;
 import mindustry.entities.*;
@@ -88,7 +88,7 @@ public class FireBlocks{
                 lifetime = time;
                 sizeFrom = 0f;
                 sizeTo = radius;
-                strokeFrom = 4f;
+                strokeFrom = 10f;
                 strokeTo = 0f;
                 colorFrom = colorTo = Color.white;
             }};
@@ -125,7 +125,13 @@ public class FireBlocks{
             autolink = drawRange = false;
         }};
 
-        fireCompany = new LightBlock("hzgs"){{
+        fireCompany = new LightBlock("hzgs"){
+
+            @Override
+            public void setStats(){
+
+            }
+        {
             requirements(Category.effect, BuildVisibility.hidden, with());
             alwaysUnlocked = true;
             hasShadow = false;
@@ -274,7 +280,7 @@ public class FireBlocks{
             inaccuracy = 2f;
             rotateSpeed = 10f;
             shootSound = Sounds.shootBig;
-            coolantMultiplier = 0.975f;
+            coolantMultiplier = 0.99f;
 
             consumeCoolant(0.2f);
 
@@ -543,7 +549,7 @@ public class FireBlocks{
             Effect chargeFx = FireFx.jackpotChargeEffect(chargeTime, 0.17f, 40f, 4, colors);
 
             requirements(Category.turret, with(
-                Items.thorium, 235,
+                Items.thorium, 450,
                 Items.plastanium, 145,
                 Items.surgeAlloy, 85,
                 FireItems.logicAlloy, 60
@@ -669,9 +675,9 @@ public class FireBlocks{
             requirements(Category.turret, with(
                 Items.lead, 420,
                 Items.metaglass, 175,
-                Items.thorium, 150,
+                Items.thorium, 225,
                 Items.plastanium, 135,
-                Items.surgeAlloy, 65
+                Items.surgeAlloy, 60
             ));
             health = 1980;
             size = 3;
@@ -756,9 +762,9 @@ public class FireBlocks{
 
         distance = new ItemTurret("ql"){{
             requirements(Category.turret, with(
-                Items.copper, 650,
-                Items.thorium, 375,
-                Items.silicon, 425,
+                Items.copper, 800,
+                Items.thorium, 450,
+                Items.silicon, 525,
                 Items.plastanium, 250,
                 FireItems.hardenedAlloy, 225
             ));
@@ -772,7 +778,7 @@ public class FireBlocks{
             rotateSpeed = 1f;
             recoil = 2f;
             shake = 4f;
-            ammoPerShot = 6;
+            ammoPerShot = 4;
             shootSound = Sounds.missileLaunch;
 
             consumeCoolant(0.5f);
@@ -785,7 +791,7 @@ public class FireBlocks{
                     height = 28f;
                     splashDamageRadius = 56f;
                     splashDamage = 305f;
-                    homingPower = 0.16f;
+                    homingPower = 0.18f;
                     despawnShake = 3f;
                     ammoMultiplier = 1;
                     buildingDamageMultiplier = 0.2f;
@@ -811,6 +817,14 @@ public class FireBlocks{
                     smokeEffect = Fx.shootSmokeMissile;
                     hitEffect = Fx.massiveExplosion;
                     hitSound = Sounds.mediumCannon;
+
+                    trailColor = Pal.lightishOrange;
+                    trailInterval = 20f;
+                    trailEffect = new Effect(30f, e -> {
+                        Draw.color(e.color);
+                        Fill.circle(e.x, e.y, 1.8f * e.rotation * e.fout() + 1.4f);
+                    });
+
                     fragBullets = 3;
                     fragBullet = new MissileBulletType(2f, 220f){{
                         lifetime = 144f;
@@ -818,12 +832,19 @@ public class FireBlocks{
                         height = 24f;
                         splashDamage = 780f;
                         splashDamageRadius = 120f;
-                        homingPower = 0.04f;
+                        homingPower = 0.2f;
                         despawnShake = 2f;
                         shrinkY = 1f;
                         buildingDamageMultiplier = 0.2f;
                         status = StatusEffects.blasted;
                         hitEffect = Fx.blastExplosion;
+
+                        trailColor = Pal.lightishOrange;
+                        trailInterval = 25f;
+                        trailEffect = new Effect(30f, e -> {
+                            Draw.color(e.color);
+                            Fill.circle(e.x, e.y, 1.2f * e.rotation * e.fout() + 0.8f);
+                        });
                     }};
                 }}
             );
@@ -831,10 +852,10 @@ public class FireBlocks{
 
         grudge = new ItemTurret("grudge"){{
             requirements(Category.turret, with(
-                Items.copper, 1350,
-                Items.graphite, 475,
-                Items.phaseFabric, 325,
-                Items.surgeAlloy, 275,
+                Items.copper, 1750,
+                Items.graphite, 525,
+                Items.phaseFabric, 300,
+                Items.surgeAlloy, 325,
                 FireItems.hardenedAlloy, 550
             ));
             health = 4320;
@@ -973,9 +994,9 @@ public class FireBlocks{
             var col = Color.valueOf("92f3fd"); //color of Razorblade Typhoon's projectile in Terraria, ovo
 
             requirements(Category.turret, with(
-                Items.silicon, 375,
-                Items.plastanium, 300,
-                Items.surgeAlloy, 225,
+                Items.plastanium, 425,
+                Items.surgeAlloy, 250,
+                FireItems.logicAlloy, 400,
                 FireItems.magneticAlloy, 125
             ));
             health = 6000;
@@ -1362,10 +1383,11 @@ public class FireBlocks{
                     fragRandomSpread = 30f;
                     fragSpread = 60f;
                     fragBullets = 6;
-                    fragBullet = new BasicBulletType(10f, 800f){{
-                        lifetime = 45f;
+                    fragBullet = new BasicBulletType(12f, 800f){{
+                        lifetime = 54f;
                         width = 24f;
                         height = 30f;
+                        drag = 0.04f;
                         trailLength = 8;
                         trailWidth = 6;
                         splashDamageRadius = 220f;
@@ -1439,10 +1461,11 @@ public class FireBlocks{
                         fragRandomSpread = 30f;
                         fragSpread = 72f;
                         fragBullets = 5;
-                        fragBullet = new BasicBulletType(20f, 300f){{
-                            lifetime = 30f;
+                        fragBullet = new BasicBulletType(6f, 300f){{
+                            lifetime = 16f;
                             width = 24f;
                             height = 30f;
+                            drag = -0.06f;
                             trailLength = 6;
                             trailWidth = 6;
                             splashDamageRadius = 120f;
@@ -1653,7 +1676,7 @@ public class FireBlocks{
                 Fx.drillSteam
             );
             baseExplosiveness = 5f;
-            destroyBullet = destroyBullet(800f, 28f);
+            destroyBullet = destroyBullet(800f, 32f);
             tier = 8;
             drillTime = 45f;
             shake = 4f;
@@ -1749,7 +1772,7 @@ public class FireBlocks{
             itemCapacity = 20;
             liquidCapacity = 30f;
             baseExplosiveness = 5f;
-            destroyBullet = destroyBullet(640f, 20f);
+            destroyBullet = destroyBullet(640f, 24f);
             generateEffect = new MultiEffect(
                 Fx.explosion,
                 Fx.fuelburn,
@@ -2075,17 +2098,18 @@ public class FireBlocks{
             size = 2;
             hasPower = true;
             hasLiquids = false;
+            itemCapacity = 20;
             craftEffect = Fx.smeltsmoke;
             updateEffect = Fx.explosion;
 
-            craftTime = 120f;
-            outputItem = new ItemStack(FireItems.detonationCompound, 2);
+            craftTime = 300f;
+            outputItem = new ItemStack(FireItems.detonationCompound, 6);
 
             consumePower(1.5f);
             consumeItems(with(
-                Items.blastCompound, 2,
-                Items.pyratite, 2,
-                FireItems.logicAlloy, 1
+                Items.blastCompound, 4,
+                Items.pyratite, 4,
+                FireItems.logicAlloy, 3
             ));
         }};
 
@@ -2251,7 +2275,7 @@ public class FireBlocks{
 
             consumePower(400f / 60f);
             consumeItems(with(
-                Items.blastCompound, 5,
+                Items.blastCompound, 4,
                 FireItems.kindlingAlloy, 2
             ));
             consumeLiquid(Liquids.cryofluid, 1f);
@@ -2573,7 +2597,7 @@ public class FireBlocks{
             cooldownBroken = 1.5f;
         }};
 
-        javelinPad = new MechPad("javelinPad"){{
+        javelinPad = new MechPad("javelin-pad", FireUnitTypes.javelin){{
             requirements(Category.effect, with(
                 Items.lead, 350,
                 Items.titanium, 500,
@@ -2584,7 +2608,7 @@ public class FireBlocks{
             health = 1200;
             size = 2;
 
-            unitType = FireUnitTypes.javelin;
+            consumesPower = 240f;
         }};
 
         compositeUnloader = new AdaptDirectionalUnloader("composite-unloader"){{
