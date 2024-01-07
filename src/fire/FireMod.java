@@ -107,10 +107,7 @@ public class FireMod extends mindustry.mod.Mod{
             addContent(t, FireBlocks.blossom);
             addContent(t, FireBlocks.gambler);
             addContent(t, FireBlocks.magneticSphere);
-            addContent(t, FireBlocks.magneticAlloyFormer);
-            addContent(t, FireBlocks.electromagnetismDiffuser);
-            addContent(t, FireBlocks.fleshReconstructor);
-            addContent(t, FireUnitTypes.hatchet);
+            addContent(t, FireBlocks.hardenedAlloyConveyor);
             addContent(t, FireUnitTypes.pioneer);
             addContent(t, FireStatusEffects.overgrown);
             addContent(t, FireStatusEffects.disintegrated);

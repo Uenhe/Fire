@@ -55,7 +55,7 @@ public class FireBlocks{
         chopper, treeFarm, vapourCondenser, biomassCultivator, fissionDrill,
 
         //distribution
-        compositeConveyor, compositeBridgeConveyor,
+        compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
 
         //liquid
         compositeLiquidRouter, compositeBridgeConduit,
@@ -545,7 +545,7 @@ public class FireBlocks{
 
         gambler = new JackpotTurret("gambler"){{
             float chargeTime = 120f;
-            Color[] colors = new Color[] {Color.valueOf("d99d73"), Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
+            Color[] colors = new Color[] {Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
             Effect chargeFx = FireFx.jackpotChargeEffect(chargeTime, 0.17f, 40f, 4, colors);
 
             requirements(Category.turret, with(
@@ -577,11 +577,12 @@ public class FireBlocks{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
                     }}
-                , new VariableBulletType(19f, 2.1f, 30f, 1f, 100f){{
+                , new VariableBulletType(19f, 2.1f, 30f, 1f, 150f){{
                     lifetime = 30f;
                     width = 6f;
                     height = 12f;
-                    pierceArmor = true;
+                    status = FireStatusEffects.disintegrated;
+                    statusDuration = 240f;
 
                     chargeEffect = chargeFx;
                     shootEffect = FireFx.gamblerShootEffect(60f, 4);
@@ -599,16 +600,16 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 2f)
                     ),
-                    new BasicBulletType(10.5f, 90f){{
+                    new BasicBulletType(10.5f, 120f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        pierceArmor = true;
-                        status = StatusEffects.corroded;
-                        statusDuration = 240f;
+                        status = FireStatusEffects.disintegrated;
+                        statusDuration = 360f;
 
                         chargeEffect = chargeFx;
                         shootEffect = FireFx.gamblerShootEffect(60f, 2);
+                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[1]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[1];
                     }}
@@ -625,11 +626,12 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 3f)
                     ),
-                    new BasicBulletType(10.5f, 65f){{
+                    new BasicBulletType(10.5f, 80f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        pierceArmor = true;
+                        status = FireStatusEffects.disintegrated;
+                        statusDuration = 480f;
                         lightning = 2;
                         lightningDamage = 5f;
                         lightningLength = 4;
@@ -637,6 +639,7 @@ public class FireBlocks{
 
                         chargeEffect = chargeFx;
                         shootEffect = FireFx.gamblerShootEffect(25f, 1);
+                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[2]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[2];
                     }}
@@ -653,17 +656,19 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 3f)
                     ),
-                    new BasicBulletType(10.5f, 45f){{
+                    new BasicBulletType(10.5f, 60f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        pierceArmor = true;
+                        status = FireStatusEffects.disintegrated;
+                        statusDuration = 600f;
                         pierce = true;
                         pierceBuilding = true;
                         pierceCap = 4;
 
                         chargeEffect = chargeFx;
                         shootEffect = FireFx.gamblerShootEffect(15f, 1);
+                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[3]);
                         frontColor = Pal.sapBullet;
                         backColor = hitColor = colors[3];
                     }}
@@ -1690,14 +1695,26 @@ public class FireBlocks{
 
         compositeConveyor = new Conveyor("fhcsd"){{
             requirements(Category.distribution, with(
-                Items.metaglass, 1,
-                Items.titanium, 1,
-                Items.thorium, 1
+                Items.thorium, 1,
+                Items.plastanium, 1
             ));
             health = 85;
-            speed = 0.21f;
-            displayedSpeed = 25f;
+            speed = 0.22f;
+            displayedSpeed = 26f;
             junctionReplacement = Blocks.invertedSorter;
+        }};
+
+        hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
+            requirements(Category.distribution, with(
+                Items.graphite, 1,
+                Items.silicon, 1,
+                FireItems.hardenedAlloy, 1
+            ));
+            health = 210;
+            armor = 5;
+            speed = 7f / 60f;
+            itemCapacity = 20;
+            placeableLiquid = true;
         }};
 
         compositeBridgeConveyor = new ItemBridge("composite-bridge-conveyor"){{
@@ -1705,7 +1722,8 @@ public class FireBlocks{
                 Items.metaglass, 4,
                 Items.titanium, 6,
                 Items.thorium, 4,
-                Items.plastanium, 4));
+                Items.plastanium, 4
+            ));
             health = 85;
             hasPower = false;
             itemCapacity = 12;
@@ -1890,7 +1908,7 @@ public class FireBlocks{
             frames = 20;
             frameTime = 6f;
 
-            consumeLiquid(Liquids.water, 0.075f).boost();
+            consumeLiquid(Liquids.water, 0.0076f).boost();
         }};
 
         //endregion
@@ -2311,6 +2329,8 @@ public class FireBlocks{
 
         magneticAlloyFormer = new GenericCrafter("magnetic-alloy-former"){{
             requirements(Category.crafting, with(
+                Items.plastanium, 135,
+                FireItems.logicAlloy, 180,
                 FireItems.hardenedAlloy, 75
             ));
             size = 3;
@@ -2339,7 +2359,10 @@ public class FireBlocks{
             float time = 80f;
 
             requirements(Category.crafting, with(
-                Items.surgeAlloy, 100
+                Items.surgeAlloy, 325,
+                FireItems.logicAlloy, 500,
+                FireItems.hardenedAlloy, 375,
+                FireItems.magneticAlloy, 250
             ));
             armor = 6;
             size = 5;
@@ -2389,8 +2412,10 @@ public class FireBlocks{
 
         hardenedAlloyCrucible = new EnergyCrafter("hardened-alloy-crucible"){{
             requirements(Category.crafting, with(
-                Items.surgeAlloy, 1200,
-                FireItems.hardenedAlloy, 450
+                Items.metaglass, 550,
+                Items.titanium, 425,
+                Items.silicon, 275,
+                FireItems.hardenedAlloy, 500
             ));
             armor = 7;
             size = 6;

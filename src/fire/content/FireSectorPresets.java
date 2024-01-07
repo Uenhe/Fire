@@ -8,8 +8,8 @@ public class FireSectorPresets{
     public static SectorPreset
 
         landingBase, darksandPlain, cornerOfZero, beachLanding,
-        darkWorkshop, sporeFiord, scorchingVolcano, eternityRiverStronghold,
-        chillyMountains, urgentSupport;
+        darkWorkshop, sporeFiord, scorchingVolcano, lavaStronghold,
+        eternityRiverStronghold, chillyMountains, urgentSupport;
 
     public static void load(){
 
@@ -48,6 +48,11 @@ public class FireSectorPresets{
         scorchingVolcano = new SectorPreset("zrhs", risetar, 180){{
             difficulty = 8;
             captureWave = 50;
+            addStartingItems = true;
+        }};
+
+        lavaStronghold = new SectorPreset("lava-stronghold", risetar, 62){{
+            difficulty = 9;
             addStartingItems = true;
         }};
 

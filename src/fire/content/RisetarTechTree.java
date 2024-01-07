@@ -35,13 +35,20 @@ public class RisetarTechTree{
             node(compositeConveyor, with(new OnSector(cornerOfZero)), () -> {
                 node(compositeUnloader, with(new SectorComplete(darkWorkshop)), () -> {});
                 node(compositeBridgeConveyor, with(new SectorComplete(darkWorkshop)), () -> {});
+                node(hardenedAlloyConveyor, with(new SectorComplete(urgentSupport)), () -> {});
                 node(compositeLiquidRouter, with(new SectorComplete(darkWorkshop)), () ->
                     node(compositeBridgeConduit, with(new SectorComplete(darkWorkshop)), () -> {})
                 );
             });
 
-            node(coreArmored, with(new OnSector(darkWorkshop)), () ->node(omicron, () -> {})
-            );
+            node(coreArmored, with(new OnSector(darkWorkshop)), () -> {
+                node(omicron, () ->
+                    node(pioneer, with(new OnSector(urgentSupport)), () -> {})
+                );
+                node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
+                    node(javelin, () -> {})
+                );
+            });
 
             node(thermalKiln, with(new OnSector(landingBase)), () -> {
                 node(chopper, with(new OnSector(beachLanding)), () -> {
@@ -77,14 +84,15 @@ public class RisetarTechTree{
                 });
             });
 
-            node(conductorPowerNode, with(new SectorComplete(cornerOfZero)), () ->
-                node(campfire, with(new SectorComplete(beachLanding)), () -> {
+            node(conductorPowerNode, with(new SectorComplete(cornerOfZero)), () -> {
+                node(flameGenerator, with(new SectorComplete(chillyMountains)), () -> {});
+                node(campfire, with(new SectorComplete(beachLanding)), () ->
                     node(buildingHealer, with(new OnSector(darkWorkshop)), () ->
                         node(buildIndicator, with(new SectorComplete(darkWorkshop)), () -> {})
-                    );
-                    node(flameGenerator, with(new SectorComplete(chillyMountains)), () -> {});
-                })
-            );
+                    )
+                );
+                node(skyDome, with(new SectorComplete(urgentSupport)), () -> {});
+            });
 
             node(smasher, with(new OnSector(landingBase)), () -> {
                 node(damWall, with(new OnSector(beachLanding)), () -> {
@@ -93,13 +101,15 @@ public class RisetarTechTree{
                         node(hardenedWallLarge, with(new OnSector(urgentSupport)), () -> {})
                     );
                 });
-                node(nightmare, () ->
+                node(nightmare, () -> {
+                    node(blossom, with(new SectorComplete(beachLanding)), () -> {});
                     node(distance, with(new SectorComplete(eternityRiverStronghold)), () ->
                         node(grudge, with(new SectorComplete(urgentSupport)), () -> {})
-                    )
-                );
+                    );
+                });
                 node(seaquake, with(new SectorComplete(scorchingVolcano)), () -> {});
                 node(ignite, with(new OnSector(scorchingVolcano)), () -> {});
+                node(gambler, with(new SectorComplete(darkWorkshop)), () -> {});
             });
 
             node(guarding, with(new SectorComplete(darksandPlain)), () -> {
@@ -123,7 +133,9 @@ public class RisetarTechTree{
                         )
                     );
                     node(sporeFiord, with(new SectorComplete(darksandPlain)), () ->
-                        node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () -> {})
+                        node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () ->
+                            node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(urgentSupport), new Research(skyDome)), () -> {})
+                        )
                     );
                     node(eternityRiverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
                         node(chillyMountains, with(new SectorComplete(eternityRiverStronghold), new Produce(conductor)), () -> {})

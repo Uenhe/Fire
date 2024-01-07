@@ -9,6 +9,7 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Tmp;
 import mindustry.entities.Effect;
+import mindustry.graphics.Drawf;
 
 import static mindustry.Vars.tilesize;
 
@@ -62,6 +63,25 @@ public class FireFx{
             Draw.color(e.color, Color.lightGray, e.fin());
             Angles.randLenVectors(e.id, amount, 5f + e.finpow() * 22f, (x, y) ->
                 Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45f));
+        });
+    }
+
+    public static Effect hitBulletSmall(Color color){
+        return new Effect(14f, e -> {
+            Draw.color(Color.white, color, e.fin());
+
+            e.scaled(7f, s -> {
+                Lines.stroke(0.5f + s.fout());
+                Lines.circle(e.x, e.y, s.fin() * 5f);
+            });
+
+            Lines.stroke(0.5f + e.fout());
+
+            Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) ->
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
+            );
+
+            Drawf.light(e.x, e.y, 20f, color, 0.6f * e.fout());
         });
     }
 }
