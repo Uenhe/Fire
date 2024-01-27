@@ -36,6 +36,13 @@ public class FireMod extends mindustry.mod.Mod{
     @Override
     public void init(){
         loadSettings();
+
+          Blocks.sand.playerUnmineable
+        = Blocks.darksand.playerUnmineable
+        = Blocks.sandWater.playerUnmineable
+        = Blocks.darksandWater.playerUnmineable
+        = Blocks.darksandTaintedWater.playerUnmineable
+        = Core.settings.getBool("allowSandMining");
     }
 
     @Override
