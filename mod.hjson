@@ -1,13 +1,13 @@
 name: "fire"
 displayName: "Fire"
 author: "飞雨a_ssylfyzgmz && -Uenhe饨咂-"
-version: "1.2.0dev"
+version: "1.2.0"
 minGameVersion: "146"
 java: true
 main: "fire.FireMod"
 repo: "Uenhe/Fire"
 
-subtitle: "v1.2.0dev adapts v146"
+subtitle: "v1.2.0 adapts v146"
 description:
 "
 [royal[]]A Mindustry Mod that adds a lots of WEIRD things.

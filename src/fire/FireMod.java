@@ -5,36 +5,51 @@ import arc.Events;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
+import arc.util.Strings;
+import arc.util.Time;
 import fire.content.*;
 import fire.input.FireBinding;
 import fire.world.meta.FireAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
+import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog;
-
-import java.util.Objects;
 
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
 
 public class FireMod extends mindustry.mod.Mod{
     public static final String
+
         linkRaindance = "https://space.bilibili.com/516898377",
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
 
+    public static LoadedMod fire;
+    public static String name;
+    public static String close;
+
     public FireMod(){
+
         Events.on(EventType.ClientLoadEvent.class, e -> {
+
             FireBinding.load();
             showDialog();
+            showNoMultipleMods();
         });
     }
 
     @Override
     public void init(){
+
+        fire = mods.locateMod("fire");
+        name = Core.bundle.get("modname");
+        close = Core.bundle.get("close");
+        fire.meta.displayName = name;
+
         loadSettings();
 
           Blocks.sand.playerUnmineable
@@ -47,6 +62,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void loadContent(){
+
         FireAttribute.load();
         FireStatusEffects.load();
         FireItems.load();
@@ -59,7 +75,8 @@ public class FireMod extends mindustry.mod.Mod{
         FireOverride.load();
     }
 
-    public void loadSettings(){
+    public static void loadSettings(){
+
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
             t.checkPref("allowSandMining", false, a -> {
@@ -74,22 +91,22 @@ public class FireMod extends mindustry.mod.Mod{
 
             t.checkPref("showLogs", true);
 
+            t.checkPref("noMultipleMods", true);
+
             t.pref(new SettingsMenuDialog.SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
 
                 @Override
                 public void add(SettingsMenuDialog.SettingsTable table){
-                    table.button(name, () -> showDialog()).size(210f, 64f);
+                    table.button(name, FireMod::showDialog).size(210f, 64f);
                     table.row();
                 }
             });
         });
     }
 
-    public void showDialog(){
-        var mod = mods.locateMod("fire");
-        String name = Core.bundle.get("modname");
-        String version = mod.meta.version;
-        mod.meta.displayName = name;
+    public static void showDialog(){
+
+        String version = fire.meta.version;
 
         var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", name));
         setupDialog(historyDialog);
@@ -123,7 +140,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.add("@contentSecondary").left().width(800f).maxWidth(1024f).pad(4f);
             t.row();
 
-            if(Objects.equals(Core.settings.getString("locale"), "zh_CN")){
+            if("zh_CN".equals(Core.settings.getString("locale"))){
 
                 t.button(("@linkRaindance"), () -> {
                     if(!Core.app.openURI(linkRaindance)){
@@ -155,12 +172,47 @@ public class FireMod extends mindustry.mod.Mod{
         mainDialog.show();
     }
 
-    private static void setupDialog(BaseDialog dialog){
-        dialog.closeOnBack();
-        dialog.buttons.button("@close", dialog::hide).size(210f, 64f);
+    public static void showNoMultipleMods(){
+
+        boolean announces = false;
+
+        for(var mod : mods.orderedMods()){
+            if(!"fire".equals(mod.meta.name) && !mod.meta.hidden){
+                announces = true;
+                break;
+            }
+        }
+
+        if(announces && Core.settings.getBool("noMultipleMods")){
+
+            var dialog = new BaseDialog("o_o?"){
+
+                float time = 300f;
+                boolean canClose;
+
+                {
+                    update(() -> canClose = (time -= Time.delta) <= 0f);
+                    cont.add("@noMultipleMods");
+
+                    buttons.button("", this::hide).update(b -> {
+                        b.setDisabled(!canClose);
+                        b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60f, 1)));
+                    }).size(210f, 64f);
+                }
+            };
+
+            dialog.show();
+        }
     }
 
-    private static void addContent(Table table, UnlockableContent content){
+    public static void setupDialog(BaseDialog dialog){
+
+        dialog.closeOnBack();
+        dialog.buttons.button(close, dialog::hide).size(210f, 64f);
+    }
+
+    public static void addContent(Table table, UnlockableContent content){
+
         table.table(Styles.grayPanel, t -> {
 
             t.left().button(new TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(Scaling.fit);
