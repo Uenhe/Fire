@@ -1,8 +1,0 @@
-//type: LiquidRouter
-category: liquid
-
-health: 85
-size: 1
-liquidCapacity: 120
-solid: false
-underBullets: true
