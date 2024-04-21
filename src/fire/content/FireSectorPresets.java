@@ -51,7 +51,7 @@ public class FireSectorPresets{
             addStartingItems = true;
         }};
 
-        lavaStronghold = new SectorPreset("lava-stronghold", risetar, 62){{
+        lavaStronghold = new SectorPreset("lava-stronghold", risetar, 232){{
             difficulty = 9;
             addStartingItems = true;
         }};

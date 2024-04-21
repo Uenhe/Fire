@@ -12,12 +12,11 @@ Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that h
 - Sand & Dark Sand now are "playermineable", you can directly mine it without drills (Can be configured in setting)
 - Sand Water, Dark Sand Water, Dark Sand Tainted Water now are mineable
 - Slightly decreases the influence of ore hardness on drill speed of Laser & Blast Drill
-- Laser Drill: Slightly increases Base drill speed (1.93/s -> 2/s)
-- Blast Drill: Slightly increases Base drill speed (3.43/s -> 3.76/s)
-- Mechanical Pump: Slightly increases Pump speed (7/s -> 7.2/s)
-- Impulse Pump: Slightly increases Pump speed (118.8/s -> 120/s)
-- Phase Conveyor: Increases speed (30/s -> 60/s)
-- Illuminator: Slightly increases illumination strength and range
+- Laser Drill: Slightly increases Base drill speed ( 1.93/s -> 2/s )
+- Blast Drill: Slightly increases Base drill speed ( 3.43/s -> 3.76/s )
+- Mechanical Pump: Slightly increases Pump speed ( 7/s -> 7.2/s )
+- Impulse Pump: Slightly increases Pump speed ( 118.8/s -> 120/s )
+- Phase Conveyor: Increases speed ( 30/s -> 60/s )
 - Alpha & Beta now can be produced by Air Factory or Upgrading Alpha
 - Alpha, Beta, Gamma now "dock" to other units like Erekir core units
 

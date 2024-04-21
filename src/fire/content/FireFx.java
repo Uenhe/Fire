@@ -19,12 +19,12 @@ public class FireFx{
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){
         return new Effect(lifetime, range * 2f, e -> {
 
-            float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
+            final float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
 
             Draw.color(color);
             for(int i = 0; i <= range / spacing; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
-                float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
+                final float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144f * Draw.scl * f, 144f * Draw.scl * f, e.rotation - 90f);
             }
 
@@ -39,15 +39,15 @@ public class FireFx{
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
 
-            float orbSize = 2f * e.fout() + 1f;
-            float r = radius * e.fout();
-            float w = e.time * speed * e.fout(Interp.swingOut);
-            float x = Mathf.cos(w) + e.x;
-            float y = Mathf.sin(w) + e.y;
+            final float orbSize = 2f * e.fout() + 1f;
+            final float r = radius * e.fout();
+            final float w = e.time * speed * e.fout(Interp.swingOut);
+            final float x = Mathf.cos(w) + e.x;
+            final float y = Mathf.sin(w) + e.y;
 
             for(int i = 0; i < amount; i++) {
-                float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
-                float
+                final float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
+                final float
                     cx = e.x + r * Mathf.sinDeg(angle),
                     cy = e.y + r * Mathf.cosDeg(angle);
 

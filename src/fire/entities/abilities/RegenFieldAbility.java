@@ -18,18 +18,20 @@ import mindustry.world.meta.StatUnit;
 import static mindustry.Vars.tilesize;
 
 public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
-    public float healAmount, healRadius, lineSpeed, lineStroke;
-    public Color lineColor;
 
-    protected float warmup, totalProgress;
-    protected Seq<Unit> targets = new Seq<>();
+    public final float amount;
+    public final float radius;
+    public final float lineSpeed = 120f;
+    public final float lineStroke = 3f;
+    public final Color lineColor;
 
-    public RegenFieldAbility(float amount, float radius, Color color, float speed, float stroke){
-        healAmount = amount;
-        healRadius = radius;
-        lineColor = color;
-        lineSpeed = speed;
-        lineStroke = stroke;
+    private float warmup, totalProgress;
+    private final Seq<Unit> targets = new Seq<>();
+
+    public RegenFieldAbility(float amount, float radius, Color color){
+        this.amount = amount;
+        this.radius = radius;
+        this.lineColor = color;
     }
 
     @Override
@@ -39,26 +41,26 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(healAmount * 60f, 2) + StatUnit.perSecond.localized());
+        t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized());
         t.row();
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(healRadius / tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
         t.row();
     }
 
     @Override
-    public void update(Unit unit){
+    public final void update(Unit unit){
         targets.clear();
-        Units.nearby(unit.team, unit.x, unit.y, healRadius, u -> {
+        Units.nearby(unit.team, unit.x, unit.y, radius, u -> {
             if(u.damaged()) targets.add(u);
         });
-        boolean draws = false;
-        for(var target : targets){
+        boolean any = false;
+        for(final var target : targets){
             if(target.damaged()){
-                target.heal(healAmount * Time.delta);
-                draws = true;
+                target.heal(amount * Time.delta);
+                any = true;
             }
         }
-        warmup = Mathf.lerpDelta(warmup, Mathf.num(draws), 0.08f);
+        warmup = Mathf.lerpDelta(warmup, Mathf.num(any), 0.08f);
         totalProgress += Time.delta / lineSpeed;
     }
 
@@ -66,10 +68,10 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public void draw(Unit unit){
         if(warmup > 0.001f){
             Draw.z(Layer.effect);
-            float mod = totalProgress % 1f;
+            final float mod = totalProgress % 1f;
             Draw.color(lineColor);
             Lines.stroke(lineStroke * (1f - mod) * warmup);
-            Lines.circle(unit.x, unit.y, healRadius * mod);
+            Lines.circle(unit.x, unit.y, radius * mod);
             Draw.reset();
         }
     }

@@ -25,6 +25,7 @@ public class FireStatValues{
 
     /** see {@link mindustry.world.meta.StatValues#ammo(ObjectMap, int, boolean)} */
     public static StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, int indent){
+
         return table -> {
 
             table.row();
@@ -50,7 +51,7 @@ public class FireStatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1f){
-                        int val = (int)(type.buildingDamageMultiplier * 100 - 100);
+                        final int val = (int)(type.buildingDamageMultiplier * 100 - 100);
                         sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
                     }
 
@@ -128,9 +129,9 @@ public class FireStatValues{
                     if(type.intervalBullet != null){
                         bt.row();
 
-                        Table ic = new Table();
+                        final var ic = new Table();
                         StatValues.ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
-                        Collapser coll = new Collapser(ic, true);
+                        final var coll = new Collapser(ic, true);
                         coll.setDuration(0.1f);
 
                         bt.table(it -> {
@@ -146,9 +147,9 @@ public class FireStatValues{
                     if(type.fragBullet != null){
                         bt.row();
 
-                        Table fc = new Table();
+                        final var fc = new Table();
                         StatValues.ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
-                        Collapser coll = new Collapser(fc, true);
+                        final var coll = new Collapser(fc, true);
                         coll.setDuration(0.1f);
 
                         bt.table(ft -> {

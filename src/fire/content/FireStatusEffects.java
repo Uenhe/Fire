@@ -4,16 +4,23 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Angles;
-import fire.type.ArmorPierceStatusEffect;
-import fire.type.NeoplasmStatusEffect;
+import arc.math.Mathf;
+import arc.util.Time;
+import arc.util.Tmp;
+import fire.type.FleshUnitType;
+import fire.world.meta.FireStat;
+import fire.world.meta.FireStatUnit;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
+import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
+import mindustry.world.meta.Stat;
 
 public class FireStatusEffects{
+
     public static StatusEffect
         frostbite, inspired, mu, overgrown, disintegrated;
 
@@ -54,27 +61,92 @@ public class FireStatusEffects{
             speedMultiplier = 3f;
         }};
 
-        overgrown = new NeoplasmStatusEffect("overgrown"){{
+        overgrown = new StatusEffect("overgrown"){
+
+            /** Health Multiplier for non-neoplasm-about unit. For neoplasm-about unit, use {@code healthMultiplier}. */
+            private final float unfHealthMultiplier = 0.9f;
+            /** Health and Shield unit regen per frame. */
+            private final float regenPercent = 0.0004f;
+
+            @Override
+            public void setStats(){
+                stats.addPercent(Stat.healthMultiplier, unfHealthMultiplier);
+                stats.add(Stat.healing, regenPercent * 100f * 60f, FireStatUnit.percentPerSec);
+                super.setStats();
+            }
+
+            @Override
+            public void update(Unit unit, float time){
+
+                // check whether unit is neoplasm-about
+                if(unit.type instanceof FleshUnitType){
+
+                    unit.healthMultiplier *= healthMultiplier;
+                    unit.heal(regenPercent * Time.delta * unit.maxHealth);
+
+                    /* The shield unit can regen at most. */
+                    final float maxShield = 1200f;
+
+                    if(unit.shield < maxShield){
+                        unit.shield = Math.min(unit.shield + regenPercent * Time.delta * maxShield, maxShield);
+                    }
+
+                }else{
+                    // nerf otherwise
+                    unit.damageContinuousPierce(damage);
+                    unit.healthMultiplier *= unfHealthMultiplier;
+                }
+
+                if(Mathf.chanceDelta(effectChance)){
+                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2f));
+                    effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0f, color, parentizeEffect ? unit : null);
+                }
+            }
+            {
             color = Liquids.neoplasm.color;
             damage = 0.6f;
             speedMultiplier = 0.9f;
             effectChance = 0.1f;
             healthMultiplier = 1.1f;
-            unfHealthMultiplier = 0.9f;
-            regenPercent = 0.0004f;
-            maxShield = 1200f;
+
             effect = new Effect(40f, e -> {
                 Draw.color(overgrown.color);
+                final float scl = e.data instanceof Unit u ? 1f + u.type.hitSize / 4f : 1f;
+
                 Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) ->
-                    Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f)
+                    Fill.circle(e.x + x, e.y + y, e.fout() * scl * 1.2f)
                 );
             });
         }};
 
-        disintegrated = new ArmorPierceStatusEffect("disintegrated"){{
-            damage = 5f;
+        disintegrated = new StatusEffect("disintegrated"){
+
+            /** The armor unit can reduce at most. */
+            private final float maxArmorReduction = 10f;
+
+            @Override
+            public void setStats(){
+                super.setStats();
+                stats.add(FireStat.armorPierce, maxArmorReduction);
+            }
+
+            @Override
+            public void update(Unit unit, float time){
+                super.update(unit, time);
+                final float min = unit.type.armor - maxArmorReduction;
+
+                if(time >= 60f){
+                    // linearly reduces armor in 1s
+                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60f, min);
+
+                }else{
+                    // linearly puts armor back in 1s
+                    unit.armor += maxArmorReduction / 60f * Time.delta;
+                }
+            }
+            {
+            damage = 4.2f;
             speedMultiplier = 0.6f;
-            maxArmorReduction = 10f;
             effectChance = 0.2f;
             parentizeEffect = true;
             effect = Fx.unitShieldBreak;

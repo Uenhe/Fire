@@ -3,22 +3,20 @@ package fire.world.blocks.units;
 import arc.math.Mathf;
 import fire.annotations.FireAnnotations;
 import mindustry.content.Fx;
-import mindustry.gen.Building;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
-import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.*;
 
 public class MechPad extends mindustry.world.Block{
 
-    public UnitType unitType;
+    private final UnitType unitType;
     /** Power consumed per use. */
-    public float consumesPower = -1f;
+    protected float consumesPower = -1f;
 
-    public MechPad(String name, UnitType type){
+    protected MechPad(String name, UnitType type){
         super(name);
         solid = true;
         destructible = true;
@@ -31,25 +29,26 @@ public class MechPad extends mindustry.world.Block{
     public void setStats(){
         super.setStats();
 
-        if(consValid()) stats.add(Stat.powerUse, consumesPower);
+        if(consValid()) stats.add(mindustry.world.meta.Stat.powerUse, consumesPower);
     }
 
-    public boolean consValid(){
+    private boolean consValid(){
         return consumesPower > 0f;
     }
 
     @FireAnnotations.Remote(called = FireAnnotations.Loc.server)
-    public static void playerSpawn(Tile tile, Player play){
-        if(play == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
+    public static void playerSpawn(Tile tile, Player playerr){
+        if(playerr == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 
-        UnitType spawnType = ((MechPad)pad.block).unitType;
-        if(pad.wasVisible){
+        final var spawnType = ((MechPad)pad.block).unitType;
+        if(pad.wasVisible)
             Fx.spawn.at(pad);
-        }
 
-        //consumes power
-        if(((MechPad)pad.block).consValid()) pad.power.graph.useBatteries(((MechPad)pad.block).consumesPower);
-        play.set(pad);
+        // consumes power
+        if(((MechPad)pad.block).consValid())
+            pad.power.graph.useBatteries(((MechPad)pad.block).consumesPower);
+
+        playerr.set(pad);
 
         if(!net.client()){
             Unit unit = spawnType.create(tile.team());
@@ -57,20 +56,21 @@ public class MechPad extends mindustry.world.Block{
             unit.rotation(90f);
             unit.impulse(0f, 3f);
             unit.spawnedByCore(true);
-            unit.controller(play);
+            unit.controller(playerr);
             unit.add();
         }
 
-        if(state.isCampaign() && play == player){
+        if(state.isCampaign() && playerr == player){
             spawnType.unlock();
         }
     }
 
-    public class MechPadBuild extends Building{
+    public class MechPadBuild extends mindustry.gen.Building{
 
         @Override
         public boolean canControlSelect(Unit player){
-            /* active only when:
+            /*
+             * active only when:
              *
              * 1) player is enough close to pad
              * 2) power is enough
@@ -82,23 +82,18 @@ public class MechPad extends mindustry.world.Block{
         @Override
         public void onControlSelect(Unit unit){
             if(!unit.isPlayer()) return;
-            Player play = unit.getPlayer();
+            final var playerr = unit.getPlayer();
 
-            Fx.spawn.at(play);
-            if(net.client() && play == player){
+            Fx.spawn.at(playerr);
+            if(net.client() && playerr == player)
                 control.input.controlledType = null;
-            }
 
-            play.clearUnit();
-            play.deathTimer = Player.deathDelay + 1f;
-            requestSpawn(play);
-        }
+            playerr.clearUnit();
+            playerr.deathTimer = Player.deathDelay + 1f;
 
-        public void requestSpawn(Player player){
-            //do not try to respawn in unsupported environments at all
+            // do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
-
-            fire.gen.FireCall.playerSpawn(tile, player);
+            fire.gen.FireCall.playerSpawn(tile, playerr);
         }
     }
 }

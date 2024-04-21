@@ -1,7 +1,6 @@
 package fire.gen;
 
 import mindustry.gen.Player;
-import mindustry.gen.PlayerSpawnCallPacket;
 import mindustry.world.Tile;
 
 import static mindustry.Vars.net;
@@ -14,7 +13,7 @@ public class FireCall{
             fire.world.blocks.units.MechPad.playerSpawn(tile, player);
         }
         if(net.server()) {
-            var packet = new PlayerSpawnCallPacket();
+            var packet = new mindustry.gen.PlayerSpawnCallPacket();
             packet.tile = tile;
             packet.player = player;
             net.send(packet, true);
