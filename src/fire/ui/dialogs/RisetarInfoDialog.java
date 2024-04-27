@@ -495,7 +495,7 @@ public class RisetarInfoDialog extends BaseDialog{
 
     public static class InfoNode{
 
-        private final int depth;
+        private final short depth;
         private final UnlockableContent content;
         private final Seq<InfoNode> children = new Seq<>();
 
@@ -503,7 +503,7 @@ public class RisetarInfoDialog extends BaseDialog{
             if(parent != null) parent.children.add(this);
 
             this.content = content;
-            this.depth = parent == null ? 0 : parent.depth + 1;
+            this.depth = (short)(parent == null ? 0 : parent.depth + 1);
 
             InfoTree.all.add(this);
         }

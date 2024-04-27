@@ -1,12 +1,17 @@
 package fire.entities.abilities;
 
+import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
+import arc.util.Strings;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.renderer;
 
@@ -22,20 +27,30 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
         this.fieldColor = color;
     }
 
+    @Override
+    public String localized(){
+        return Core.bundle.get("ability.fire-extinguishfield");
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+    }
+
     /** see {@link mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)} */
     @Override
     public void update(Unit unit){
         boolean any = false;
 
-        for(final var fire : mindustry.gen.Groups.fire){
-
+        for(final var fire : mindustry.gen.Groups.fire)
             if(arc.math.geom.Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0f, fire.x, fire.y)){
+
                 any = true;
 
                 fire.time(fire.time + 100f * arc.util.Time.delta);
                 mindustry.content.Fx.steam.at(fire);
             }
-        }
 
         warmup = Math.min(Mathf.lerpDelta(warmup, Mathf.num(any), 0.04f), 0.8f);
     }

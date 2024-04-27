@@ -30,7 +30,7 @@ public class FireStatValues{
 
             table.row();
 
-            for(var t : map){
+            for(final var t : map){
                 BulletType type = t.type;
 
                 table.table(Styles.grayPanel, bt -> {
@@ -51,7 +51,7 @@ public class FireStatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1f){
-                        final int val = (int)(type.buildingDamageMultiplier * 100 - 100);
+                        final int val = (short)(type.buildingDamageMultiplier * 100 - 100);
                         sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
                     }
 
@@ -64,11 +64,11 @@ public class FireStatValues{
                     }
 
                     if(!Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (int)type.ammoMultiplier));
+                        sep(bt, Core.bundle.format("bullet.multiplier", (byte)type.ammoMultiplier));
                     }
 
                     if(!Mathf.equal(type.reloadMultiplier, 1f)){
-                        int val = (int)(type.reloadMultiplier * 100 - 100);
+                        final short val = (short)(type.reloadMultiplier * 100 - 100);
                         sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
@@ -109,20 +109,20 @@ public class FireStatValues{
                     }
 
                     if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((int)(type.statusDuration / 60f)) + "[lightgray] " + StatUnit.seconds.localized()));
+                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((byte)(type.statusDuration / 60f)) + "[lightgray] " + StatUnit.seconds.localized()));
                     }
 
                     if(t.chance != 0f){
-                        sep(bt, Core.bundle.format("bullet.chance", (int)(t.chance * 100) + StatUnit.percent.localized()));
+                        sep(bt, Core.bundle.format("bullet.chance", (byte)(t.chance * 100) + StatUnit.percent.localized()));
                     }
 
-                    int a = 1, n = 1;
+                    byte a = 1, n = 1;
                     if(t.shoot instanceof ShootAlternate s){
-                        a = s.shots;
+                        a = (byte)s.shots;
                     }
                     if(t.shoot instanceof ShootMulti s){
-                        a = s.dest[0].shots;
-                        n = s.source.shots;
+                        a = (byte)s.dest[0].shots;
+                        n = (byte)s.source.shots;
                     }
                     sep(bt, Core.bundle.format("bullet.pattern", a, n));
 

@@ -15,8 +15,6 @@ import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.*;
-import mindustry.graphics.Pal;
-import mindustry.ui.Bar;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -24,13 +22,14 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     /** see {@link mindustry.entities.bullet.LightningBulletType#calculateRange()} */
     private final short lightningLength;
-    private final short lightningAmount;
+    private final byte lightningAmount;
     private final float lightningDamage;
     private final float chanceDeflect;
-    protected float rotateSpeed = -1f;
-    protected Color lightningColor = Pal.surge;
+    protected float rotateSpeed;
+    protected Color lightningColor;
     protected boolean unlocks;
 
+    private static final String name = "ability.fire-energyforcefield";
     private float timer;
     private boolean broken, canRegen;
     private final Seq<Bullet> bullets = new Seq<>();
@@ -40,16 +39,26 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         chanceDeflect = chance;
         lightningDamage = damage;
         lightningLength = (short)length;
-        lightningAmount = (short)amount;
+        lightningAmount = (byte)amount;
     }
 
     @Override
     public String localized(){
-        return Core.bundle.get("ability.fire-energyforcefield");
+        return Core.bundle.get(name);
     }
 
+    /** TODO Change this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a>; Clashes with BE-builds? */
     @Override
     public void addStats(Table t){
+        final float wid = 432f;
+
+        t.add(Core.bundle.get(name + ".description")).wrap().width(wid);
+        t.row();
+        if(unlocks){
+            t.add(Core.bundle.get(name + ".unlocks")).wrap().width(wid);
+            t.row();
+        }
+
         super.addStats(t);
         t.add("[lightgray]" + Stat.baseDeflectChance.localized() + ": [white]" + Strings.autoFixed(chanceDeflect, 2));
         t.row();
@@ -63,9 +72,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar(
+        bars.add(new mindustry.ui.Bar(
             "stat.shieldhealth",
-            broken ? Color.gray : Pal.accent,
+            broken ? Color.gray : mindustry.graphics.Pal.accent,
             () -> broken ? -unit.shield / (regen * cooldown) : unit.shield / max)
         ).row();
     }
@@ -79,26 +88,23 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             rotation += rotateSpeed * Time.delta;
             rotation %= 360f;
         }
-        if(unit.shield < max && timer == 0f){
+        if(unit.shield < max && timer == 0f)
             unit.shield += regen * Time.delta;
-        }
 
         if(!broken){
             radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
             Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
                 if(bullet.team != unit.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, unit.x, unit.y, realRad(), rotation, bullet.x, bullet.y)){
-                    boolean collision = true;
                     Fx.absorb.at(bullet);
 
+                    boolean collision = true;
                     if(bullet.vel.len() > 0.1f && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)){
-
                         bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
-                        if(Math.abs(unit.x - bullet.x) > Math.abs(unit.y - bullet.y)){
+                        if(Math.abs(unit.x - bullet.x) > Math.abs(unit.y - bullet.y))
                             bullet.vel.x *= -1f;
-                        }else{
+                        else
                             bullet.vel.y *= -1f;
-                        }
 
                         bullet.owner = unit;
                         bullet.team = unit.team;
@@ -106,16 +112,11 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         collision = false;
                     }
 
-                    float dmg = bullet.damage;
-                    if(!collision){
-                        dmg *= 2f;
-                    }
                     bullet.absorb();
-                    unit.shield -= dmg;
+                    unit.shield -= collision ? bullet.damage : bullet.damage * 2f;
                     alpha = 1f;
 
                     if(unit.shield <= 0f){
-
                         broken = true;
                         canRegen = false;
                         radiusScale = 0f;
@@ -123,7 +124,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
 
                         Sounds.spark.at(unit, Mathf.random(0.45f, 0.55f));
-                        for(short i = 0; i < lightningAmount; i++){
+                        for(byte i = 0; i < lightningAmount; i++){
                             Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, (i - 1) * (360f / lightningAmount), lightningLength);
                         }
                     }
@@ -132,7 +133,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
         }else{
             if(unlocks && !canRegen){
-                timer += Time.delta;
+
+                final boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.5f;
 
                 final float scl = Math.min(1f - ((timer - 240f) / 60f), 1f);
                 final float speed = 0.2f;
@@ -140,11 +142,12 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                     x = Mathf.cos(timer * speed) * radius * scl + unit.x,
                     y = Mathf.sin(timer * speed) * radius * scl + unit.y;
 
+                timer += Time.delta * (isOverloaded ? 1.2f : 1f);
                 if(timer <= 180f){
 
                     Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2f, radius * 2f, bullet -> {
                         if(
-                            bullets.sumf(b -> b.damage) < unit.maxHealth * 0.5f
+                            !isOverloaded
                             && bullet.team != unit.team && bullet.type.absorbable && bullet.type.hittable
                             && Intersector.isInRegularPolygon(sides, unit.x, unit.y, radius, rotation, bullet.x, bullet.y)
                         ){
@@ -158,9 +161,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             // make artillery collides building
                             type.collidesTiles = type.collides = true;
 
-                            // add a default trail to bullets without a trail
+                            // add a default trail to bullets that without a trail
                             if(type.trailLength <= 0){
-                                if(type instanceof final BasicBulletType bt){
+                                if(type instanceof BasicBulletType bt){
                                     type.trailWidth = bt.width * 0.22f;
                                     type.trailLength = (int)(bt.height * 0.5f);
                                     type.trailColor = bt.backColor;
@@ -186,7 +189,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                         final float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
                         final float range = b.type.speed * b.type.lifetime;
-                        final float v = 12f;
+                        final float vel = 12f;
 
                         if(timer <= 240f){
                             b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80f * Time.delta));
@@ -198,7 +201,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                         }else{
                             b.time = 0f;
-                            b.lifetime = range / v;
+                            b.lifetime = range / vel;
 
                             Teamc target;
 
@@ -214,20 +217,20 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             b.set(unit.x, unit.y);
                             if(target != null && Mathf.chance(0.6)){
                                 final float mag = 5f;
-                                final float vt = v * 1.15f;
+                                final float velT = vel * 1.15f;
 
-                                b.vel.setLength(vt);
+                                b.vel.setLength(velT);
                                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000f));
-                                b.mover = bullet -> bullet.moveRelative(0f, (float)(Math.cos(b.time * vt * Math.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0)));
+                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velT * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
 
                             }else{
                                 float angle = Mathf.random(360f);
-                                if(target != null){
-                                    while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30f)){
+
+                                if(target != null)
+                                    while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30f))
                                         angle = Mathf.random(360f);
-                                    }
-                                }
-                                b.initVel(angle, v);
+
+                                b.initVel(angle, vel);
                             }
 
                             bullets.remove(b);

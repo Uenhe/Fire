@@ -40,7 +40,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     protected float maxInstability = 360f;
     protected float stabilizeInterval = 60f;
     protected float lightningDamage = 80f;
-    protected short lightningAmount = 8;
+    protected byte lightningAmount = 8;
     protected Sound craftSound = Sounds.none;
     protected Color baseColor = Color.valueOf("ffffff");
     protected Color[] circleColor = {Pal.plastanium, Pal.lightishOrange};
@@ -67,7 +67,8 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     public class EnergyCrafterBuild extends GenericCrafterBuild{
 
         private float instability, fraction, flash;
-        private short angle, colorCounter, realLightningAmount;
+        private short angle, colorCounter;
+        private byte realLightningAmount;
         private Color color = circleColor[0];
 
         @Override
@@ -103,7 +104,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             colorCounter = (short)(colorCounter >= circleColor.length - 1 ? 0 : colorCounter + 1);
             color = circleColor[colorCounter];
             angle = (short)Mathf.random(360);
-            realLightningAmount = (short)(lightningAmount * (1 + instability / maxInstability));
+            realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
             createLightning();
         }
 
@@ -130,7 +131,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         private void createLightning(){
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
-            for(short i = 0; i < realLightningAmount; i++){
+            for(byte i = 0; i < realLightningAmount; i++){
                 Lightning.create(team, color, lightningDamage, x, y, (i - 1) * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
             }
         }

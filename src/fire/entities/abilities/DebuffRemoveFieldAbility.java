@@ -1,7 +1,11 @@
 package fire.entities.abilities;
 
+import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Strings;
 import mindustry.entities.Effect;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 import static fire.content.FireStatusEffects.*;
 import static mindustry.content.StatusEffects.*;
@@ -34,6 +38,19 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
     }
 
     @Override
+    public String localized(){
+        return arc.Core.bundle.get("ability.fire-debuffremovefield");
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(reload / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.row();
+    }
+
+    @Override
     public void update(mindustry.gen.Unit unit){
         if((timer += arc.util.Time.delta) >= reload){
             timer %= reload;
@@ -42,7 +59,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
             mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, range, u -> {
 
                 for(final var e : DE_BUFFS){
-                    if(!u.hasEffect(e)) continue; //why not { if(u.hasEffect(e)) } ????
+                    if(!u.hasEffect(e)) continue; //why not { if(u.hasEffect(e)) continue; } ???
 
                     if(!(u.type instanceof fire.type.FleshUnitType && e == overgrown)){
                         u.unapply(e);

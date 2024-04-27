@@ -496,7 +496,7 @@ public class FireBlocks{
 
                         Draw.alpha(1f);
                         Draw.blend(Blending.additive);
-                        Draw.rect(Core.atlas.find("fire-flesh" + (int)((b.time / item.frameTime % item.frames) + 1)), b.x, b.y, 10f, 10f);
+                        Draw.rect(Core.atlas.find("fire-flesh" + (byte)((b.time / item.frameTime % item.frames) + 1)), b.x, b.y, 10f, 10f);
                         Draw.blend();
                     }
                     {
@@ -532,7 +532,7 @@ public class FireBlocks{
 
             drawer = new DrawTurret(){{
 
-                var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
+                final var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
 
                 parts.add(
 
@@ -598,7 +598,7 @@ public class FireBlocks{
             consumeCoolant(0.3f);
 
             shootType = new FlakBulletType(4f, 40f){{
-                var col = StatusEffects.blasted.color;
+                final var col = StatusEffects.blasted.color;
 
                 sprite = "missile-large";
                 lifetime = 62f;
@@ -1158,7 +1158,7 @@ public class FireBlocks{
                         b.remove();
 
                     }else{
-                        var type = b.type.copy();
+                        final var type = b.type.copy();
                         type.speed = b.vel.setLength(8f).len();
                         type.drag = 0f;
                         b.type(type);
@@ -2708,7 +2708,7 @@ public class FireBlocks{
                             e -> e != null && !b.hasCollided(e.id)) != null)
                             return;
 
-                        final int sign = Mathf.sign(bullets.get(0).id % 2 == 0);
+                        final byte sign = (byte)Mathf.sign(bullets.get(0).id % 2 == 0);
                         final float
                             spd = 3f,
                             scl = b.time / b.lifetime,

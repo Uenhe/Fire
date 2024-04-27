@@ -4,7 +4,6 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
-import fire.world.meta.FireStatValues;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.type.Item;
@@ -32,7 +31,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
     public void setStats(){
         super.setStats();
         stats.remove(Stat.ammo);
-        stats.add(Stat.ammo, FireStatValues.ammo(jackpotAmmo, 0));
+        stats.add(Stat.ammo, fire.world.meta.FireStatValues.ammo(jackpotAmmo, 0));
     }
 
     public class JackpotTurretBuild extends ItemTurretBuild{

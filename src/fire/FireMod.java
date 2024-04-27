@@ -3,20 +3,18 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
-import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
-import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
 import fire.input.FireBinding;
 import mindustry.content.Blocks;
-import mindustry.ctype.UnlockableContent;
-import mindustry.game.EventType;
 import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog;
+
+import java.time.LocalDate;
 
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
@@ -29,8 +27,7 @@ public class FireMod extends mindustry.mod.Mod{
         linkGitHub = "https://github.com/Uenhe/Fire";
 
     private static LoadedMod FIRE;
-    private static String name;
-    private static String close;
+    private static String name, close;
 
     @Override
     public void init(){
@@ -41,6 +38,7 @@ public class FireMod extends mindustry.mod.Mod{
 
         setRandTitle();
         loadSettings();
+        FireBinding.load();
 
           Blocks.sand.playerUnmineable
         = Blocks.darksand.playerUnmineable
@@ -49,8 +47,7 @@ public class FireMod extends mindustry.mod.Mod{
         = Blocks.darksandTaintedWater.playerUnmineable
         = Core.settings.getBool("allowSandMining");
 
-        Events.on(EventType.ClientLoadEvent.class, e -> {
-            FireBinding.load();
+        Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
             showNoMultipleMods();
             showDialog();
         });
@@ -170,7 +167,7 @@ public class FireMod extends mindustry.mod.Mod{
     private static void showNoMultipleMods(){
         boolean announces = false;
 
-        for(var mod : mods.orderedMods())
+        for(final var mod : mods.orderedMods())
             if(!"fire".equals(mod.meta.name) && !mod.meta.hidden){
                 announces = true;
                 break;
@@ -200,10 +197,19 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also. */
     private static void setRandTitle(){
-        if(!Core.app.isDesktop()) return;
+        if (!Core.app.isDesktop()) return;
 
-        final var title = Core.bundle.get("fire.randTitle").split("\\|");
-        Core.graphics.setTitle("Mindustry: " + title[Mathf.random(title.length - 1)]);
+        final var titles = Core.bundle.get("fire.randTitle").split("\\|");
+        final byte index = (byte)Mathf.random(titles.length - 1);
+        String title = titles[index];
+
+        if(index == 0) // "Today is the {0}th Day of God's Creation of the Risetar" picked
+            title = Core.bundle.format(
+                title,
+                java.time.temporal.ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
+            );
+
+        Core.graphics.setTitle("Mindustry: " + title);
     }
 
     private static void setupDialog(BaseDialog dialog){
@@ -211,10 +217,10 @@ public class FireMod extends mindustry.mod.Mod{
         dialog.buttons.button(close, dialog::hide).size(210f, 64f);
     }
 
-    private static void addContent(Table table, UnlockableContent content){
+    private static void addContent(Table table, mindustry.ctype.UnlockableContent content){
         table.table(Styles.grayPanel, t -> {
 
-            t.left().button(new TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(Scaling.fit);
+            t.left().button(new arc.scene.style.TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(arc.util.Scaling.fit);
             t.left().table(info -> {
 
                 final var detail = content.description.substring(0, content.description.indexOf(Core.bundle.get("stringEnd")));

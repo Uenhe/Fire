@@ -5,7 +5,7 @@ import arc.struct.Seq;
 
 public class SurgeCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    protected short fragBullets = 6;
+    protected byte fragBullets = 6;
     /** Remember to set {@code lifetime} to be less than {@code craftTime}. */
     protected mindustry.entities.bullet.BulletType fragBullet;
     protected arc.audio.Sound craftSound = mindustry.gen.Sounds.none;
@@ -27,7 +27,7 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
 
             //create bullet
             final float rand = Mathf.random(360f);
-            for(short i = 0; i < fragBullets; i++){
+            for(byte i = 0; i < fragBullets; i++){
                 bullets.add(fragBullet.create(this, x, y, 360f / fragBullets * i + rand));
             }
         }

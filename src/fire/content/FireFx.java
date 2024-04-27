@@ -22,7 +22,7 @@ public class FireFx{
             final float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
 
             Draw.color(color);
-            for(int i = 0; i <= range / spacing; i++){
+            for(short i = 0; i <= range / spacing; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
                 final float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144f * Draw.scl * f, 144f * Draw.scl * f, e.rotation - 90f);
@@ -45,7 +45,7 @@ public class FireFx{
             final float x = Mathf.cos(w) + e.x;
             final float y = Mathf.sin(w) + e.y;
 
-            for(int i = 0; i < amount; i++) {
+            for(byte i = 0; i < amount; i++) {
                 final float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
                 final float
                     cx = e.x + r * Mathf.sinDeg(angle),
@@ -69,18 +69,15 @@ public class FireFx{
     public static Effect hitBulletSmall(Color color){
         return new Effect(14f, e -> {
             Draw.color(Color.white, color, e.fin());
-
             e.scaled(7f, s -> {
                 Lines.stroke(0.5f + s.fout());
                 Lines.circle(e.x, e.y, s.fin() * 5f);
             });
 
             Lines.stroke(0.5f + e.fout());
-
             Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) ->
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
             );
-
             Drawf.light(e.x, e.y, 20f, color, 0.6f * e.fout());
         });
     }

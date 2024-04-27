@@ -248,9 +248,9 @@ public class FireUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-
                 new EnergyForceFieldAbility(144f, 4f, 7200f, 600f, 30f, 15f, 28, 24){{
                     sides = 24;
+                    lightningColor = Pal.surge;
                     unlocks = true;
                 }},
 

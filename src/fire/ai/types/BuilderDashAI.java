@@ -145,7 +145,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
     }
 
     private void dash(arc.math.geom.Position pos){
-        for(var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
+        for(final var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
             da.dash(unit, pos);
             break;
         }

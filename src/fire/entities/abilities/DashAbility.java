@@ -47,8 +47,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(Unit unit){
-        timer += Time.delta;
-        timer = Math.min(timer, cooldown);
+        timer = Math.min(timer + Time.delta, cooldown);
 
         if(unit.controller() instanceof Player || unit.controller() instanceof CommandAI)
             dash(unit, null);
@@ -60,6 +59,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
         Draw.color(arc.graphics.Color.white);
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
+
         for(byte i = 0; i < afterimage; i++){
             final float offset = unit.type.engineOffset * 0.5f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * 8f);
             final float
@@ -68,6 +68,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
             Draw.alpha(0.6f * (1f - (timer / invincibleTime)) * (1f - (float)i / afterimage));
             Draw.rect(unit.type.name, cx, cy, unit.rotation - 90f);
         }
+
         Draw.reset();
     }
 
