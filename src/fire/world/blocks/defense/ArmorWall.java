@@ -7,9 +7,9 @@ import static mindustry.Vars.*;
 public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 
     /** Armor increases in total. */
-    protected float armorIncrease = 10f;
-    /** The armor will no longer increase if {@code current health percentage} < {@code 1 - this} */
-    protected float maxHealthLose = 0.5f;
+    protected byte armorIncrease;
+    /** The armor will no longer increase if {@code current health percentage} < {@code 100 - this}; 50 => 50%. */
+    protected byte maxHealthLossPercentage = 50;
     protected Interp increasePattern = Interp.linear;
 
     protected ArmorWall(String name){
@@ -40,14 +40,13 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 
         @Override
         public float handleDamage(float damage){
-
             final float healthMul = state.rules.blockHealth(team);
-            if(arc.math.Mathf.zero(healthMul)){
+            if(arc.math.Mathf.zero(healthMul))
                 return health + 1f;
-            }
 
             final float dmg = (damage - extraArmor) / healthMul;
-            if(dmg < 1f) return damage * minArmorDamage;
+            if(dmg < 1f)
+                return damage * minArmorDamage;
             return dmg;
         }
 
@@ -55,7 +54,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public void draw(){
             super.draw();
-            extraArmor = armorIncrease * increasePattern.apply(Math.min((1f - health / maxHealth) / maxHealthLose, 1f));
+            extraArmor = armorIncrease * increasePattern.apply(Math.min((1f - health / maxHealth) / maxHealthLossPercentage, 1f));
         }
     }
 }

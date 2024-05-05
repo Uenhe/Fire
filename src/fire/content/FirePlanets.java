@@ -1,11 +1,8 @@
 package fire.content;
 
-import arc.Events;
 import arc.graphics.Color;
-import arc.math.Mathf;
 import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
-import mindustry.game.EventType;
 import mindustry.graphics.g3d.HexMesh;
 import mindustry.graphics.g3d.HexSkyMesh;
 import mindustry.graphics.g3d.MultiMesh;
@@ -192,7 +189,7 @@ public class FirePlanets{
             addResearch(UnitTypes.alpha, "air-factory");
             addResearch(UnitTypes.beta, "alpha");
 
-            //InfoNodes below
+            // InfoNodes below
 
             dnode(fireCompany, true, () -> {
 
@@ -206,22 +203,45 @@ public class FirePlanets{
                             dnode(kindlingAlloy);
                             dnode(compositeConveyor);
                             dnode(electrothermalSiliconFurnace);
+
+                            dnode(beachLanding, () -> {
+                                dnode(blossom);
+
+                                dnode(darkWorkshop, () -> {
+                                    dnode(gambler);
+
+                                    dnode(urgentSupport, () ->
+                                        dnode(grudge)
+                                    );
+                                });
+                            });
                         });
 
                         dnode(sporeFiord, () -> {
                             dnode(biomassCultivator);
                             dnode(logicAlloy);
+
+                            dnode(scorchingVolcano, () -> {
+                                dnode(seaquake);
+
+                                dnode(lavaStronghold, () -> {
+
+                                });
+                            });
                         });
 
                         dnode(eternityRiverStronghold, () -> {
                             dnode(hardenedAlloy);
                             dnode(distance);
 
+                            dnode(chillyMountains, () ->
+                                dnode(flameGenerator)
+                            );
                         });
                     });
                 });
 
-                dnode(magneticSphere); // to test unlocked content
+                dnode(magneticSphere); //to test unlocked content
             });
         });
     }

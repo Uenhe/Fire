@@ -4,6 +4,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
 import mindustry.entities.Effect;
+import mindustry.gen.Unit;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -19,7 +20,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
     );
      */
 
-    private static final Seq<mindustry.type.StatusEffect> DE_BUFFS = Seq.with(
+    public static final Seq<mindustry.type.StatusEffect> DE_BUFFS = Seq.with(
         burning, freezing, unmoving, slow, wet, muddy, melting, sapped,
         electrified, sporeSlowed, tarred, shocked, blasted, corroded, disarmed,
         frostbite, overgrown, disintegrated
@@ -70,5 +71,10 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
 
             if(any[0]) removeEffect.at(unit);
         }
+    }
+
+    @Override
+    public void death(Unit unit){
+        timer = 0f;
     }
 }

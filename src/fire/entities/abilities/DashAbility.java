@@ -23,6 +23,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     /** Number of afterimages to be displayed while dashing. */
     private final byte afterimage;
 
+    private static final String name = "ability.fire-dash";
     private float timer;
 
     public DashAbility(float speedMul, float invTime, float cooldown, int afterimage){
@@ -34,11 +35,14 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public String localized(){
-        return Core.bundle.get("ability.fire-dash");
+        return Core.bundle.get(name);
     }
 
+    /** TODO Change this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a> */
     @Override
     public void addStats(arc.scene.ui.layout.Table t){
+        t.add(Core.bundle.get(name + ".description"));
+        t.row();
         t.add("[lightgray]" + fire.world.meta.FireStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
         t.row();
         t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
@@ -70,6 +74,11 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         }
 
         Draw.reset();
+    }
+
+    @Override
+    public void death(Unit unit){
+        timer = 0f;
     }
 
     public void dash(Unit unit, Position pos){

@@ -12,6 +12,8 @@ public class FireStat{
         maxArmorIncrease = new Stat("maxArmorIncrease"),
         allyStatusEffect = new Stat("allyStatusEffect"),
         enemyStatusEffect = new Stat("enemyStatusEffect"),
+        clearDeBuffUponApplied = new Stat("clearDeBuffUponApplied"),
+
         statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
         lightningLength = new Stat("lightningLength", StatCat.function),
         lightningAmount = new Stat("lightningAmount", StatCat.function),

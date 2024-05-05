@@ -6,7 +6,7 @@ import mindustry.gen.*;
 public class LightningPointBulletType extends mindustry.entities.bullet.BulletType{
 
     /** Chance to let the lightning take effect. Using this to control lightning releasing for some reason... */
-    public float lightningChance = 0.5f;
+    protected float lightningChance = 0.5f;
 
     public LightningPointBulletType(float damage){
         super(0f, damage);
@@ -20,15 +20,14 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
         super.init(b);
         Teamc target;
 
-        if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id)){
+        if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id))
             target = b.aimTile.build;
-        }else{
+        else
             target = mindustry.entities.Units.closestTarget(
                 b.team, b.x ,b.y, homingRange,
                 e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
                 t -> t != null && collidesGround && !b.hasCollided(t.id)
             );
-        }
 
         if(target != null && arc.math.Mathf.chance(lightningChance)){
             Fx.chainLightning.at(b.x, b.y, 0f, lightningColor, target);

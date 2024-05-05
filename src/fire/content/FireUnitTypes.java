@@ -248,7 +248,7 @@ public class FireUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(144f, 4f, 7200f, 600f, 30f, 15f, 28, 24){{
+                new EnergyForceFieldAbility(160f, 4f, 7200f, 600f, 30f, 15f, 28, 24){{
                     sides = 24;
                     lightningColor = Pal.surge;
                     unlocks = true;
@@ -308,32 +308,28 @@ public class FireUnitTypes{
 
             weapons.add(
                 new Weapon("flamethrower"){{
-                    final float spd = 6f, time = 20f;
-
                     reload = 10f;
                     recoil = 3f;
                     shootY = 2f;
                     top = false;
                     shootSound = Sounds.flame;
-                    bullet = new BulletType(spd, 60f){{
-                        lifetime = time;
+                    bullet = new BulletType(6f, 60f){{
+                        lifetime = 20f;
                         hitSize = 8f;
                         pierceCap = 5;
-                        statusDuration = 240f;
                         pierce = true;
                         pierceBuilding = true;
-                        hittable = false;
+
+                        hittable = reflectable = absorbable = false;
                         keepVelocity = false;
                         status = FireStatusEffects.overgrown;
+                        statusDuration = 240f;
 
                         hitEffect = despawnEffect = Fx.none;
                         shootEffect = new Effect(32f, 80f, e -> {
-                            final byte amount = 24;
-                            final float size = 4f;
-
                             Draw.color(Pal.neoplasm2, Pal.neoplasmMid, Pal.neoplasm1, e.fin());
-                            Angles.randLenVectors(e.id, amount, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) ->
-                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * size));
+                            Angles.randLenVectors(e.id, 24, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) ->
+                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * 4f));
                         });
                     }};
                 }}
@@ -542,7 +538,8 @@ public class FireUnitTypes{
             lowAltitude = true;
 
             abilities.add(
-                new DashAbility(8f, 12f, 120f, 6)
+                new DashAbility(8f, 12f, 120f, 6),
+                new FirstAidAbility(2400, 70, 2000, 10, FireStatusEffects.sanctuaryGuard, 600, 120)
             );
 
             weapons.add(
@@ -864,7 +861,7 @@ public class FireUnitTypes{
                             fragBullet = new LaserBulletType(160f){{
                                 lifetime = 16f;
                                 length = 260f;
-                                colors = new Color[] {Color.valueOf("a9d8ff66"), Color.valueOf("a9d8ff66"), Color.white};
+                                colors = new Color[]{Color.valueOf("a9d8ff66"), Color.valueOf("a9d8ff66"), Color.white};
                                 fragBullets = 2;
                                 fragBullet = new LightningBulletType(){{
                                     damage = 8f;
@@ -888,7 +885,7 @@ public class FireUnitTypes{
                         lifetime = 16f;
                         length = 288f;
                         width = 22f;
-                        colors = new Color[] {Color.valueOf("f6efa1"), Color.valueOf("f6efa1"), Color.white};
+                        colors = new Color[]{Color.valueOf("f6efa1"), Color.valueOf("f6efa1"), Color.white};
                         lightningSpacing = 15f;
                         lightningLength = 1;
                         lightningDelay = 1.2f;

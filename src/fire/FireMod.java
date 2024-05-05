@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
+import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
@@ -12,7 +13,7 @@ import mindustry.content.Blocks;
 import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.ui.dialogs.SettingsMenuDialog;
+import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 
 import java.time.LocalDate;
 
@@ -27,34 +28,36 @@ public class FireMod extends mindustry.mod.Mod{
         linkGitHub = "https://github.com/Uenhe/Fire";
 
     private static LoadedMod FIRE;
-    private static String name, close;
+    private static String displayName, close;
 
     @Override
     public void init(){
+        Log.info("init");
         FIRE = mods.locateMod("fire");
-        name = Core.bundle.get("modname");
+        displayName = Core.bundle.get("modname");
         close = Core.bundle.get("close");
-        FIRE.meta.displayName = name;
+        FIRE.meta.displayName = displayName;
 
         setRandTitle();
         loadSettings();
         FireBinding.load();
 
-          Blocks.sand.playerUnmineable
-        = Blocks.darksand.playerUnmineable
-        = Blocks.sandWater.playerUnmineable
-        = Blocks.darksandWater.playerUnmineable
-        = Blocks.darksandTaintedWater.playerUnmineable
-        = Core.settings.getBool("allowSandMining");
-
         Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
             showNoMultipleMods();
             showDialog();
+
+              Blocks.sand.playerUnmineable
+            = Blocks.darksand.playerUnmineable
+            = Blocks.sandWater.playerUnmineable
+            = Blocks.darksandWater.playerUnmineable
+            = Blocks.darksandTaintedWater.playerUnmineable
+            = Core.settings.getBool("allowSandMining");
         });
     }
 
     @Override
     public void loadContent(){
+        Log.info("content");
         fire.world.meta.FireAttribute.load();
         FireStatusEffects.load();
         FireItems.load();
@@ -84,9 +87,9 @@ public class FireMod extends mindustry.mod.Mod{
 
             t.checkPref("noMultipleMods", true);
 
-            t.pref(new SettingsMenuDialog.SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
+            t.pref(new SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
                 @Override
-                public void add(SettingsMenuDialog.SettingsTable table){
+                public void add(SettingsTable table){
                     table.button(name, FireMod::showDialog).size(210f, 64f);
                     table.row();
                 }
@@ -98,14 +101,14 @@ public class FireMod extends mindustry.mod.Mod{
         if(!Core.settings.getBool("showLogs")) return;
 
         final var version = FIRE.meta.version;
-        final var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", name)){{
+        final var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{
             setupDialog(this);
             cont.pane(t ->
                 t.add("@history").left().width(1024f).maxWidth(1280f).pad(4f)
             ).maxWidth(1024f);
         }};
 
-        new BaseDialog(Core.bundle.format("mainTitle", name, version)){{
+        new BaseDialog(Core.bundle.format("mainTitle", displayName, version)){{
 
             setupDialog(this);
             buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210f, 64f);
@@ -200,7 +203,7 @@ public class FireMod extends mindustry.mod.Mod{
         if (!Core.app.isDesktop()) return;
 
         final var titles = Core.bundle.get("fire.randTitle").split("\\|");
-        final byte index = (byte)Mathf.random(titles.length - 1);
+        final int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
         if(index == 0) // "Today is the {0}th Day of God's Creation of the Risetar" picked
@@ -223,10 +226,11 @@ public class FireMod extends mindustry.mod.Mod{
             t.left().button(new arc.scene.style.TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(arc.util.Scaling.fit);
             t.left().table(info -> {
 
-                final var detail = content.description.substring(0, content.description.indexOf(Core.bundle.get("stringEnd")));
                 info.left().add("[accent]" + content.localizedName).left();
                 info.row();
-                info.left().add(detail).left();
+                info.left().add(
+                    content.description.substring(0, content.description.indexOf(Core.bundle.get("stringEnd")))
+                ).left();
             });
 
         }).growX().pad(5f);

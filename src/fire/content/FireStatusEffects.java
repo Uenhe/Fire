@@ -7,6 +7,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.Tmp;
+import fire.entities.abilities.DebuffRemoveFieldAbility;
 import fire.type.FleshUnitType;
 import fire.world.meta.FireStat;
 import fire.world.meta.FireStatUnit;
@@ -22,7 +23,7 @@ import mindustry.world.meta.Stat;
 public class FireStatusEffects{
 
     public static StatusEffect
-        frostbite, inspired, mu, overgrown, disintegrated;
+        frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated;
 
     public static void load(){
 
@@ -56,6 +57,40 @@ public class FireStatusEffects{
             effect = Fx.overdriven;
         }};
 
+        /* TODO Reconstruct this if v147 is released: https://github.com/Anuken/Mindustry/pull/9801"
+         * heal an amount when status ends
+         */
+        sanctuaryGuard = new StatusEffect("sanctuary-guard"){
+            /** This is buggy... If the world reloads, it triggers again. */
+            private boolean added = true;
+
+            @Override
+            public void setStats(){
+                super.setStats();
+                stats.add(FireStat.clearDeBuffUponApplied, true);
+            }
+
+            @Override
+            public void update(Unit unit, float time){
+                super.update(unit, time);
+
+                if(added){
+                    Fx.healWave.at(unit);
+
+                    DebuffRemoveFieldAbility.DE_BUFFS.each(e -> {
+                        if(!(unit.type instanceof FleshUnitType && e == overgrown))
+                            unit.unapply(e);
+                    });
+
+                    added = false;
+                }
+            }
+            {
+            color = Pal.accent;
+            damage = -2.4f;
+            healthMultiplier = 2.25f;
+        }};
+
         mu = new StatusEffect("mu"){{
             damageMultiplier = 0.4f;
             speedMultiplier = 3f;
@@ -84,12 +119,11 @@ public class FireStatusEffects{
                     unit.healthMultiplier *= healthMultiplier;
                     unit.heal(regenPercent * Time.delta * unit.maxHealth);
 
-                    /* The shield unit can regen at most. */
+                    /* The shield that unit can regen at most. */
                     final float maxShield = 1200f;
 
-                    if(unit.shield < maxShield){
+                    if(unit.shield < maxShield)
                         unit.shield = Math.min(unit.shield + regenPercent * Time.delta * maxShield, maxShield);
-                    }
 
                 }else{
                     // nerf otherwise
@@ -121,7 +155,7 @@ public class FireStatusEffects{
 
         disintegrated = new StatusEffect("disintegrated"){
 
-            /** The armor unit can reduce at most. */
+            /** The armor that unit reduces at most. */
             private final float maxArmorReduction = 10f;
 
             @Override
@@ -130,22 +164,21 @@ public class FireStatusEffects{
                 stats.add(FireStat.armorPierce, maxArmorReduction);
             }
 
+            /** TODO Reconstruct this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9801">DETAIL</a> */
             @Override
             public void update(Unit unit, float time){
                 super.update(unit, time);
-                final float min = unit.type.armor - maxArmorReduction;
 
-                if(time >= 60f){
+                if(time >= 60f)
                     // linearly reduces armor in 1s
-                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60f, min);
+                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60f, unit.type.armor - maxArmorReduction);
 
-                }else{
+                else
                     // linearly puts armor back in 1s
                     unit.armor += maxArmorReduction / 60f * Time.delta;
-                }
             }
             {
-            damage = 4.2f;
+            damage = 4f;
             speedMultiplier = 0.6f;
             effectChance = 0.2f;
             parentizeEffect = true;

@@ -6,6 +6,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
@@ -14,6 +15,7 @@ import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.gen.*;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
@@ -26,13 +28,15 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     private final float lightningDamage;
     private final float chanceDeflect;
     protected float rotateSpeed;
-    protected Color lightningColor;
+    protected Color lightningColor = Color.clear;
     protected boolean unlocks;
 
     private static final String name = "ability.fire-energyforcefield";
     private float timer;
     private boolean broken, canRegen;
     private final Seq<Bullet> bullets = new Seq<>();
+    /** Prevent endless and awful creating instances. */
+    private static final ObjectMap<BulletType, BulletType> bulletMap = new ObjectMap<>();
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, float chance, float damage, int length, int amount){
         super(radius, regen, max, cooldown);
@@ -47,7 +51,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         return Core.bundle.get(name);
     }
 
-    /** TODO Change this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a>; Clashes with BE-builds? */
+    /** TODO Reconstruct this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a>; May clash with BE? */
     @Override
     public void addStats(Table t){
         final float wid = 432f;
@@ -125,7 +129,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                         Sounds.spark.at(unit, Mathf.random(0.45f, 0.55f));
                         for(byte i = 0; i < lightningAmount; i++){
-                            Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, (i - 1) * (360f / lightningAmount), lightningLength);
+                            Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, i * (360f / lightningAmount), lightningLength);
                         }
                     }
                 }
@@ -142,13 +146,14 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                     x = Mathf.cos(timer * speed) * radius * scl + unit.x,
                     y = Mathf.sin(timer * speed) * radius * scl + unit.y;
 
-                timer += Time.delta * (isOverloaded ? 1.2f : 1f);
-                if(timer <= 180f){
+                timer += Time.delta * (isOverloaded ? 1.33f : 1f);
 
+                if(timer <= 180f)
                     Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2f, radius * 2f, bullet -> {
                         if(
                             !isOverloaded
                             && bullet.team != unit.team && bullet.type.absorbable && bullet.type.hittable
+                            && !(bullet.type instanceof mindustry.entities.bullet.LiquidBulletType)
                             && Intersector.isInRegularPolygon(sides, unit.x, unit.y, radius, rotation, bullet.x, bullet.y)
                         ){
                             bullet.owner = unit;
@@ -156,19 +161,24 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             bullet.time = 0f;
                             bullet.lifetime = 310f;
 
-                            final var type = bullet.type.copy();
+                            // reuse instances as possible
+                            final var type = bulletMap.get(bullet.type) == null
+                                ? bullet.type.copy()
+                                : bulletMap.get(bullet.type);
 
-                            // make artillery collides building
-                            type.collidesTiles = type.collides = true;
+                            if(!bulletMap.containsKey(bullet.type)){
 
-                            // add a default trail to bullets that without a trail
-                            if(type.trailLength <= 0){
-                                if(type instanceof BasicBulletType bt){
-                                    type.trailWidth = bt.width * 0.22f;
-                                    type.trailLength = (int)(bt.height * 0.5f);
-                                    type.trailColor = bt.backColor;
-                                }else{
-                                    type.trailLength = 12;
+                                // make artillery collides building
+                                type.collidesTiles = type.collides = true;
+
+                                // add a default trail to bullets that without a trail
+                                if(type.trailLength <= 0){
+                                    if(type instanceof BasicBulletType bt){
+                                        type.trailWidth = bt.width * 0.22f;
+                                        type.trailLength = (int)bt.height / 2;
+                                        type.trailColor = bt.backColor;
+                                    }else
+                                        type.trailLength = 12;
                                 }
                             }
 
@@ -177,7 +187,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         }
                     });
 
-                }else if(timer > 310f){
+                else if(timer > 310f){
                     canRegen = true;
                     timer = 0f;
                     bullets.clear();
@@ -203,25 +213,21 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             b.time = 0f;
                             b.lifetime = range / vel;
 
-                            Teamc target;
-
-                            if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)){
-                                target = b.aimTile.build;
-                            }else{
-                                target = Units.closestTarget(
-                                    b.team, b.x, b.y, range,
-                                    u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
-                                    t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
-                            }
+                            final var target =
+                                b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
+                                    ? b.aimTile.build
+                                    : Units.closestTarget(b.team, b.x, b.y, range,
+                                        u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
+                                        t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
                             b.set(unit.x, unit.y);
                             if(target != null && Mathf.chance(0.6)){
                                 final float mag = 5f;
-                                final float velT = vel * 1.15f;
+                                final float velt = vel * 1.15f;
 
-                                b.vel.setLength(velT);
+                                b.vel.setLength(velt);
                                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000f));
-                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velT * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
+                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velt * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
 
                             }else{
                                 float angle = Mathf.random(360f);
@@ -239,6 +245,13 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 });
             }
         }
+    }
+
+    @Override
+    public void death(Unit unit){
+        timer = 0f;
+        broken = canRegen = false;
+        bullets.clear();
     }
 
     private float realRad(){

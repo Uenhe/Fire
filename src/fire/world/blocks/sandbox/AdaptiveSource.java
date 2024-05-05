@@ -6,7 +6,7 @@ import static mindustry.Vars.content;
 
 public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
-    protected short itemPerSec = 100;
+    protected short itemPerSec;
 
     protected AdaptiveSource(String name){
         super(name);
@@ -37,7 +37,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         return true;
     }
 
-    public class AdaptiveSourceBuild extends PowerSourceBuild{
+    public class AdaptiveSourceBuild extends PowerSourceBuild implements mindustry.world.blocks.heat.HeatBlock{
 
         private float counter;
 
@@ -62,6 +62,16 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }
+        }
+
+        @Override
+        public float heat(){
+            return Float.POSITIVE_INFINITY;
+        }
+
+        @Override
+        public float heatFrac(){
+            return Float.POSITIVE_INFINITY;
         }
     }
 }

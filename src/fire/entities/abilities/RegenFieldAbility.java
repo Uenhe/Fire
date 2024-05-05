@@ -19,11 +19,9 @@ import static mindustry.Vars.tilesize;
 
 public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
 
-    public final float amount;
-    public final float radius;
-    public final float lineSpeed = 120f;
-    public final float lineStroke = 3f;
-    public final Color lineColor;
+    private final float amount;
+    private final float radius;
+    private final Color lineColor;
 
     private float warmup, totalProgress;
     private final Seq<Unit> targets = new Seq<>();
@@ -48,31 +46,43 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     }
 
     @Override
-    public final void update(Unit unit){
+    public void update(Unit unit){
+        final float lineSpeed = 120f;
+
         targets.clear();
         Units.nearby(unit.team, unit.x, unit.y, radius, u -> {
             if(u.damaged()) targets.add(u);
         });
+
         boolean any = false;
-        for(final var target : targets){
+        for(final var target : targets)
             if(target.damaged()){
                 target.heal(amount * Time.delta);
                 any = true;
             }
-        }
+
         warmup = Mathf.lerpDelta(warmup, Mathf.num(any), 0.08f);
         totalProgress += Time.delta / lineSpeed;
     }
 
     @Override
     public void draw(Unit unit){
-        if(warmup > 0.001f){
-            Draw.z(Layer.effect);
-            final float mod = totalProgress % 1f;
-            Draw.color(lineColor);
-            Lines.stroke(lineStroke * (1f - mod) * warmup);
-            Lines.circle(unit.x, unit.y, radius * mod);
-            Draw.reset();
-        }
+        if(warmup < 0.001f) return;
+
+        final float lineStroke = 3f;
+        final float mod = totalProgress % 1f;
+
+        Draw.z(Layer.effect);
+        Draw.color(lineColor);
+        Lines.stroke(lineStroke * (1f - mod) * warmup);
+        Lines.circle(unit.x, unit.y, radius * mod);
+
+        Draw.reset();
+    }
+
+    @Override
+    public void death(Unit unit){
+        warmup = totalProgress = 0f;
+        targets.clear();
     }
 }

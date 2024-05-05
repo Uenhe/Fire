@@ -1,5 +1,6 @@
 package fire.world.blocks.environment;
 
+/** TODO reconstruct this if v147 is released, since it will be able to change weather in world processor... */
 public class EnvBlock extends mindustry.world.Block{
 
     public EnvBlock(String name){
@@ -33,7 +34,7 @@ public class EnvBlock extends mindustry.world.Block{
 
         protected void updateStop(){}
 
-        /** Use position to decide to start or to stop, to prevent registering two blocks. */
+        /** Use position to decide to start or to stop, preventing registering two blocks. */
         protected boolean isStarter(){
             return tileX() % 2 == 0;
         }

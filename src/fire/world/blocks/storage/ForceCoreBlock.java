@@ -32,7 +32,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         shieldHealth = 750f,
         cooldownNormal = 1.2f,
         cooldownBroken = 1.5f,
-        rot = 0f;
+        rot;
 
     /** {@link mindustry.world.blocks.defense.ForceProjector} */
     protected byte sides = 6;
@@ -110,22 +110,26 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         public void updateTile(){
             super.updateTile();
             scl = Mathf.lerpDelta(scl, broken ? 0f : warmup, 0.06f);
-            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f)){
-                Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
-            }
             warmup = Mathf.lerpDelta(warmup, 1f, 0.1f);
-            if(buildup > 0f){
-                final float scale = !broken ? cooldownNormal : cooldownBroken;
-                buildup -= delta() * scale;
-            }
+
+            if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f))
+                Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
+
+            if(buildup > 0f)
+                buildup -= delta() * (!broken ? cooldownNormal : cooldownBroken);
+
             if(broken && buildup <= 0f) broken = false;
+
             if(buildup >= shieldHealth && !broken){
                 broken = true;
                 buildup = shieldHealth;
                 Fx.shieldBreak.at(x, y, range(), team.color);
             }
-            if(hit > 0f) hit -= 0.2f * Time.delta;
-            if(range() > 0 && !broken){
+
+            if(hit > 0f)
+                hit -= 0.2f * Time.delta;
+
+            if(range() > 0 && !broken)
                 Groups.bullet.intersect(x - range(), y - range(), range() * 2f, range() * 2f, bullet -> {
                     if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, range(), rotation, bullet.x, bullet.y)){
                         bullet.absorb();
@@ -134,7 +138,6 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
                         buildup += bullet.damage;
                     }
                 });
-            }
         }
 
         @Override
@@ -163,6 +166,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
                     Lines.poly(x, y, sides, range(), rot);
                 }
             }
+
             Draw.reset();
         }
 

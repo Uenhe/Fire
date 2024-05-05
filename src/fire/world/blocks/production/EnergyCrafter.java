@@ -11,10 +11,13 @@ import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import mindustry.content.Bullets;
 import mindustry.content.Fx;
 import mindustry.entities.Damage;
 import mindustry.entities.Effect;
 import mindustry.entities.Lightning;
+import mindustry.entities.bullet.BulletType;
+import mindustry.game.Team;
 import mindustry.gen.Sounds;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -27,23 +30,34 @@ import static fire.FireLib.*;
 
 public class EnergyCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    /** {@link mindustry.world.blocks.power.PowerGenerator} */
+    /** see {@link mindustry.world.blocks.power.PowerGenerator} */
     protected float
-        explosionRadius = 40f,
-        explosionDamage = 100f,
-        explosionShake = 0f,
-        explosionShakeDuration = 6f;
-    /** {@link mindustry.world.blocks.power.PowerGenerator} */
+        explosionRadius,
+        explosionDamage,
+        explosionShake,
+        explosionShakeDuration;
+    protected float
+        maxInstability,
+        stabilizeInterval,
+        lightningDamage;
+    protected byte
+        lightningAmount,
+        fragBullets,
+        fragRound,
+        fragDelay;
+    protected boolean
+        fragBulletsRand,
+        fragRoundRand,
+        fragDelayRand;
+    /** see {@link mindustry.world.blocks.power.PowerGenerator} */
     protected Effect explodeEffect = Fx.none;
-    /** {@link mindustry.world.blocks.power.PowerGenerator} */
-    protected Sound explodeSound = Sounds.none;
-    protected float maxInstability = 360f;
-    protected float stabilizeInterval = 60f;
-    protected float lightningDamage = 80f;
-    protected byte lightningAmount = 8;
-    protected Sound craftSound = Sounds.none;
-    protected Color baseColor = Color.valueOf("ffffff");
-    protected Color[] circleColor = {Pal.plastanium, Pal.lightishOrange};
+    /** see {@link mindustry.world.blocks.power.PowerGenerator} */
+    protected Sound
+        craftSound = Sounds.none,
+        explodeSound = Sounds.none;
+    protected Color baseColor = Color.clear;
+    protected Color[] circleColor = {Color.clear};
+    protected BulletType fragBullet = Bullets.placeholder;
 
     private final short timerStabilize = (short)timers++;
 
@@ -64,76 +78,78 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         addBar("instability", (EnergyCrafterBuild e) -> new Bar("bar.instability", Pal.sap, () -> e.instability / maxInstability));
     }
 
-    public class EnergyCrafterBuild extends GenericCrafterBuild{
+    public class EnergyCrafterBuild extends GenericCrafterBuild implements mindustry.logic.Ranged{
 
-        private float instability, fraction, flash;
-        private short angle, colorCounter;
-        private byte realLightningAmount;
-        private Color color = circleColor[0];
+        private float instability, fraction, angle, flash;
+        private byte index; //of color
 
         @Override
-        public final void updateTile(){
+        public void updateTile(){
             super.updateTile();
-            if(instability > maxInstability) kill();
-
-            final boolean wasUnstable = instability > 0f;
-            instability = Math.max(instability, 0f);
             fraction = Interp.smoother.apply(1f - progress);
 
-            if(consValid(this)){
+            if(consValid(this))
                 indexer.eachBlock(this, explosionRadius, b -> true, build -> {
-                    if(build != null && build.block == this.block && consValid(build) && build != this){
+                    if(build != null && build.block == block && consValid(build) && build != this){
+
                         instability += delta();
+                        if(instability > maxInstability) kill();
                     }
                 });
-            }
 
-            if(wasUnstable && efficiency > 0f && Mathf.chanceDelta((instability / maxInstability) * 0.05f)){
-                createLightning();
-            }
+            if(instability > 0f){
 
-            if(wasUnstable && timer(timerStabilize, stabilizeInterval)){
-                Fx.healBlockFull.at(x, y, size, color, block);
-                instability -= maxInstability * 0.1f;
+                if(consValid(this) && Mathf.chanceDelta((instability / maxInstability) * 0.05f))
+                    createLightning();
+
+                if(timer(timerStabilize, stabilizeInterval)){
+                    Fx.healBlockFull.at(x, y, size, circleColor[index], block);
+                    instability = Math.max(instability - maxInstability * 0.1f, 0f);
+                }
             }
         }
 
         @Override
         public void craft(){
             super.craft();
-            colorCounter = (short)(colorCounter >= circleColor.length - 1 ? 0 : colorCounter + 1);
-            color = circleColor[colorCounter];
-            angle = (short)Mathf.random(360);
-            realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
+            index = (byte)((index + 1) % circleColor.length);
+            angle = Mathf.random(360f);
+
             createLightning();
         }
 
         @Override
         public void onDestroyed(){
             super.onDestroyed();
-            if(state.rules.reactorExplosions && consValid(this)){
-                Damage.damage(x, y, explosionRadius * time(), explosionDamage * time());
-                explodeEffect.at(this);
-                explodeSound.at(this);
-                Effect.shake(explosionShake * time(), explosionShakeDuration * time(), this);
-            }
+            if(!(state.rules.reactorExplosions && consValid(this))) return;
+
+            Damage.damage(x, y, range(), explosionDamage * scale());
+            Effect.shake(explosionShake * scale(), explosionShakeDuration * scale(), this);
+            explodeSound.at(this);
+            explodeEffect.at(this);
+
+            // ewe, this is truly horrible, no ref
+            final float min = scale() * 0.7f, max = scale() * 1.3f;
+            for(byte i = 0; i < (fragRoundRand
+                ? Mathf.random(Mathf.ceil(fragRound * min), Mathf.floor(fragRound * max))
+                : fragRound
+            ); i++)
+                Time.run(fragDelayRand
+                    ? i * fragDelay * Mathf.random(0.7f, 1.3f) / scale()
+                    : i * fragDelay,
+                () -> {
+                    for(byte j = 0; j < (fragBulletsRand
+                        ? Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max))
+                        : fragBullets
+                    ); j++)
+                        fragBullet.create(this, Team.derelict, x, y, Mathf.random(360f));
+                });
         }
 
         @Override
         public void drawSelect(){
             super.drawSelect();
-            Drawf.dashCircle(x, y, explosionRadius, team.color);
-        }
-
-        private float time(){
-            return (timeScale - 1f) * 0.5f + 1f;
-        }
-
-        private void createLightning(){
-            craftSound.at(this, Mathf.random(0.45f, 0.55f));
-            for(byte i = 0; i < realLightningAmount; i++){
-                Lightning.create(team, color, lightningDamage, x, y, (i - 1) * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
-            }
+            Drawf.dashCircle(x, y, range(), team.color);
         }
 
         @Override
@@ -143,20 +159,21 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             if(consValid(this)){
                 flash += (1f + instability / maxInstability * 6f) * Time.delta;
                 Draw.z(Layer.effect);
-                Lines.stroke(2.5f, color);
+                Lines.stroke(2.5f, circleColor[index]);
                 Lines.arc(x, y, size * 5f, fraction, angle);
             }
 
-            if(instability > maxInstability / 3f && Core.settings.getBool("showBlockRange")){
+            if(instability > maxInstability * 0.3f && Core.settings.getBool("showBlockRange")){
                 final float alpha = Mathf.absin(2.4f, 0.6f);
+
                 Draw.color(Pal.health, alpha);
                 Lines.stroke(1f);
-                Lines.circle(x, y, explosionRadius * time());
+                Lines.circle(x, y, range());
                 Draw.alpha(alpha / 3f);
-                Fill.circle(x, y, explosionRadius * time());
+                Fill.circle(x, y, range());
             }
 
-            Draw.color(color, baseColor, Mathf.absin(flash, 9f, 1f));
+            Draw.color(circleColor[index], baseColor, Mathf.absin(flash, 9f, 1f));
             Draw.alpha(0.5f);
             Draw.z(Layer.blockOver);
             Draw.rect(name + "-lights", x, y);
@@ -177,9 +194,26 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         }
 
         @Override
-        public void read(Reads read, byte revision) {
+        public void read(Reads read, byte revision){
             super.read(read, revision);
             instability = read.f();
+        }
+
+        @Override
+        public float range(){
+            return explosionRadius * scale();
+        }
+
+        private void createLightning(){
+            craftSound.at(this, Mathf.random(0.45f, 0.55f));
+
+            final byte realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
+            for(byte i = 0; i < realLightningAmount; i++)
+                Lightning.create(team, circleColor[index], lightningDamage, x, y, i * (360f / realLightningAmount), (int)(size * 2f + instability * 0.03f));
+        }
+
+        private float scale(){
+            return (timeScale - 1f) * 0.25f + 1f;
         }
     }
 }

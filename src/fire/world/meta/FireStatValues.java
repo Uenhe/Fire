@@ -116,13 +116,13 @@ public class FireStatValues{
                         sep(bt, Core.bundle.format("bullet.chance", (byte)(t.chance * 100) + StatUnit.percent.localized()));
                     }
 
-                    byte a = 1, n = 1;
+                    int a = 1, n = 1;
                     if(t.shoot instanceof ShootAlternate s){
-                        a = (byte)s.shots;
+                        a = s.shots;
                     }
                     if(t.shoot instanceof ShootMulti s){
-                        a = (byte)s.dest[0].shots;
-                        n = (byte)s.source.shots;
+                        a = s.dest[0].shots;
+                        n = s.source.shots;
                     }
                     sep(bt, Core.bundle.format("bullet.pattern", a, n));
 

@@ -12,7 +12,6 @@ import mindustry.world.meta.Stat;
 public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTurret{
 
     protected final Seq<JackpotAmmo> jackpotAmmo = new Seq<>();
-    protected boolean centerChargeEffect;
 
     protected JackpotTurret(String name){
         super(name);
@@ -58,8 +57,8 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
 
         private void shoot(JackpotAmmo ammo){
             final float
-                bx = centerChargeEffect ? x : x + Angles.trnsx(rotation - 90f, shootX, shootY),
-                by = centerChargeEffect ? y : y + Angles.trnsy(rotation - 90f, shootX, shootY);
+                bx = x + Angles.trnsx(rotation - 90f, shootX, shootY),
+                by = y + Angles.trnsy(rotation - 90f, shootX, shootY);
 
             if(shoot.firstShotDelay > 0f){
                 chargeSound.at(bx, by, Mathf.random(soundPitchMin, soundPitchMax));
@@ -68,16 +67,16 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
 
             ammo.shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
-                if(delay > 0f){
+
+                if(delay > 0f)
                     Time.run(delay, () -> bullet(ammo.type, xOffset, yOffset, angle, mover));
-                }else{
+                else
                     bullet(ammo.type, xOffset, yOffset, angle, mover);
-                }
+
             }, () -> barrelCounter++);
 
-            if(consumeAmmoOnce){
+            if(consumeAmmoOnce)
                 useAmmo();
-            }
         }
     }
 

@@ -678,11 +678,11 @@ public class FireBlocks{
             reload = 120f;
             range = 320f;
             shootCone = 30f;
-            recoil = 3f;
+            shootY = 0f;
+            recoil = 13f;
             rotateSpeed = 4f;
             ammoPerShot = 5;
             maxAmmo = 20;
-            centerChargeEffect = true;
             shootSound = Sounds.shotgun;
             shoot.firstShotDelay = chargeTime;
 
@@ -693,7 +693,7 @@ public class FireBlocks{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
                     }},
-                    new BasicBulletType(18f, 150f){{
+                    new BasicBulletType(18f, 180f){{
                     lifetime = 30f;
                     width = 6f;
                     height = 12f;
@@ -716,7 +716,7 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 2f)
                     ),
-                    new BasicBulletType(10.5f, 120f){{
+                    new BasicBulletType(10.5f, 145f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
@@ -741,7 +741,7 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 3f)
                     ),
-                    new BasicBulletType(10.5f, 80f){{
+                    new BasicBulletType(10.5f, 100f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
@@ -770,7 +770,7 @@ public class FireBlocks{
                         }},
                         new ShootSpread(7, 3f)
                     ),
-                    new BasicBulletType(10.5f, 60f){{
+                    new BasicBulletType(10.5f, 75f){{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
@@ -982,7 +982,7 @@ public class FireBlocks{
             armor = 10;
             liquidCapacity = 75f;
             canOverdrive = false;
-            reload = 15f;
+            reload = 14f;
             range = 360f;
             shootCone = 24f;
             inaccuracy = 2f;
@@ -994,7 +994,7 @@ public class FireBlocks{
             unitSort = FireUnitSorts.a;
             shootSound = Sounds.shootBig;
             ammoUseEffect = Fx.casing3;
-            coolantMultiplier = 0.825f;
+            coolantMultiplier = 0.75f;
             shoot = new ShootAlternate(6.3f){{
                 shots = 2;
                 barrels = 3;
@@ -1015,19 +1015,20 @@ public class FireBlocks{
                     pierceArmor = true;
                     ammoMultiplier = 4;
                     status = FireStatusEffects.disintegrated;
-                    statusDuration = 360f;
+                    statusDuration = 120f;
                     shootEffect = Fx.shootBig;
                     fragBullets = 4;
                     fragBullet = new BasicBulletType(4f, 25f){{
                         lifetime = 8f;
                         width = 8f;
                         height = 11f;
+                        drag = 0.02f;
                         status = StatusEffects.corroded;
                         statusDuration = 240f;
                     }};
                 }},
 
-                FireItems.detonationCompound, new BasicBulletType(8f, 105f){{
+                FireItems.detonationCompound, new BasicBulletType(8f, 55f){{
                     lifetime = 46f;
                     knockback = 0.7f;
                     width = 18f;
@@ -1037,71 +1038,70 @@ public class FireBlocks{
                     pierceBuilding = true;
                     makeFire = true;
                     ammoMultiplier = 8;
+                    reloadMultiplier = 0.6f;
+                    buildingDamageMultiplier = 0.1f;
                     status = FireStatusEffects.disintegrated;
-                    statusDuration = 360f;
+                    statusDuration = 100f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.lightishOrange;
                     backColor = Pal.lightOrange;
                     fragBullets = 2;
                     fragBullet = new BulletType(4f, 0f){{
                         lifetime = 1f;
-                        splashDamageRadius = 65f;
-                        splashDamage = 115f;
-                        collides = false;
-                        collidesTiles = false;
-                        hittable = false;
-                        status = StatusEffects.burning;
+                        splashDamageRadius = 62f;
+                        splashDamage = 90f;
+                        hittable = reflectable = absorbable = false;
+                        status = StatusEffects.melting;
                         statusDuration = 480f;
                         hitSoundVolume = 0.5f;
                         hitSound = Sounds.mediumCannon;
                         hitEffect = Fx.pulverize;
                         despawnEffect = new WaveEffect(){{
-                            lifetime = 24f;
+                            lifetime = 16f;
                             sizeFrom = 0f;
-                            sizeTo = 65f;
-                            strokeFrom = 4f;
+                            sizeTo = 56f;
+                            strokeFrom = 3f;
                             strokeTo = 0f;
+                            interp = Interp.pow2Out;
                             colorFrom = Pal.lightishOrange;
                             colorTo = Color.white;
                         }};
                     }};
                 }},
 
-                FireItems.hardenedAlloy, new BasicBulletType(6f, 275f){{
-                    lifetime = 82f;
+                FireItems.hardenedAlloy, new BasicBulletType(9f, 200f){{
+                    lifetime = 72f;
                     knockback = 2f;
-                    width = 22f;
-                    height = 36f;
-                    hitSize = 7.2f;
+                    width = 28f;
+                    height = 32f;
+                    drag = 0.01f;
+                    hitSize = 7f;
                     rangeChange = 120f;
                     pierceCap = 4;
                     pierceBuilding = true;
-                    reloadMultiplier = 0.4f;
+                    reloadMultiplier = 0.2f;
                     buildingDamageMultiplier = 0.1f;
                     status = FireStatusEffects.disintegrated;
-                    statusDuration = 360f;
+                    statusDuration = 120f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.sapBullet;
                     backColor = Pal.sapBulletBack;
-                    fragBullets = 3;
+                    fragBullets = 2;
                     fragBullet = new BulletType(48f, 0f){{
                         lifetime = 1f;
-                        splashDamageRadius = 57f;
-                        splashDamage = 100f;
-                        collides = false;
-                        collidesTiles = false;
-                        hittable = false;
-                        status = StatusEffects.melting;
-                        statusDuration = 480f;
+                        splashDamageRadius = 52f;
+                        splashDamage = 80f;
+                        hittable = reflectable = absorbable = false;
                         hitSoundVolume = 0.5f;
                         hitSound = Sounds.mediumCannon;
                         hitEffect = Fx.pulverizeMedium;
                         despawnEffect = new WaveEffect(){{
-                            lifetime = 15f;
+                            lifetime = 12f;
                             sizeFrom = 0f;
-                            sizeTo = 57f;
-                            strokeFrom = 4f;
+                            sizeTo = 54f;
+                            strokeFrom = 3f;
                             strokeTo = 0f;
+                            interp = Interp.pow3Out;
                             colorFrom = Pal.sapBullet;
                             colorTo = Color.white;
                         }};
@@ -1143,6 +1143,9 @@ public class FireBlocks{
 
             shootType = new BulletType(15.5f, 1800f){
 
+                /** Prevent endless creating instances, since its terminal state is always the same. */
+                private BulletType type;
+
                 @Override
                 public void update(Bullet b){
                     super.update(b);
@@ -1158,10 +1161,12 @@ public class FireBlocks{
                         b.remove();
 
                     }else{
-                        final var type = b.type.copy();
-                        type.speed = b.vel.setLength(8f).len();
-                        type.drag = 0f;
-                        b.type(type);
+                        if(type == null){
+                            type = b.type.copy();
+                            type.speed = b.vel.setLength(8f).len();
+                            type.drag = 0f;
+                        }
+                        b.type = type;
                     }
                 }
 
@@ -2166,7 +2171,7 @@ public class FireBlocks{
             insulated = true;
             absorbLasers = true;
             armorIncrease = 20;
-            maxHealthLose = 0.7f;
+            maxHealthLossPercentage = 70;
             increasePattern = Interp.pow2Out;
         }};
 
@@ -2179,7 +2184,7 @@ public class FireBlocks{
             insulated = true;
             absorbLasers = true;
             armorIncrease = 20;
-            maxHealthLose = 0.7f;
+            maxHealthLossPercentage = 70;
             increasePattern = Interp.pow2Out;
         }};
 
@@ -2699,16 +2704,14 @@ public class FireBlocks{
 
                 @Override
                 public void updateBullet(){
-
                     bullets.each(b -> {
 
                         // check whether there's any target first
-
                         if(Units.closestTarget(b.team, b.x, b.y, radius,
                             e -> e != null && !b.hasCollided(e.id)) != null)
                             return;
 
-                        final byte sign = (byte)Mathf.sign(bullets.get(0).id % 2 == 0);
+                        final int sign = Mathf.sign(bullets.get(0).id % 2 == 0);
                         final float
                             spd = 3f,
                             scl = b.time / b.lifetime,
@@ -2757,19 +2760,84 @@ public class FireBlocks{
 
             craftTime = 120f;
             outputItem = new ItemStack(FireItems.hardenedAlloy, 20);
+
             explosionRadius = 240f;
             explosionDamage = 2880f;
             explosionShake = 6f;
             explosionShakeDuration = 30f;
-            explodeEffect = Fx.reactorExplosion;
             explodeSound = Sounds.explosionbig;
+            explodeEffect = Fx.reactorExplosion;
+
             maxInstability = 360f;
             stabilizeInterval = 900f;
+
             lightningDamage = 80f;
             lightningAmount = 8;
+
+            fragBullets = 3;
+            fragBulletsRand = true;
+            fragRound = 12;
+            fragRoundRand = true;
+            fragDelay = 10;
+            fragDelayRand = true;
+            fragBullet = new BasicBulletType(30f, 80f, "fire-frag-front"){{
+                backSprite = "fire-frag-back";
+                lifetime = 24f;
+                width = 20f;
+                height = 20f;
+                drag = 0.12f;
+                hitSize = 5f;
+                frontColor = Color.white;
+                backColor = Pal.reactorPurple;
+
+                trailLength = 4;
+                trailWidth = 4;
+                trailColor = Pal.reactorPurple;
+
+                status = FireStatusEffects.disintegrated;
+                statusDuration = 180f;
+
+                hitSound = Sounds.shotgun;
+                hitEffect = despawnEffect = new MultiEffect(
+
+                    new ParticleEffect(){{
+                        lifetime = 20f;
+                        particles = 4;
+                        length = 8f;
+                        baseLength = 4f;
+                        line = true;
+                        strokeFrom = 2f;
+                        strokeTo = 0f;
+                        lenFrom = 8f;
+                        lenTo = 0f;
+                        colorFrom = Pal.reactorPurple;
+                        colorTo = Color.white;
+                    }},
+
+                    new WaveEffect(){{
+                        lifetime = 20f;
+                        sizeFrom = 48f;
+                        sizeTo = 0f;
+                        strokeFrom = 1.6f;
+                        strokeTo = 0f;
+                        interp = Interp.pow3In;
+                        colorFrom = Pal.reactorPurple;
+                        colorTo = Color.white;
+                    }}
+                );
+
+                fragBullets = 4;
+                fragBullet = new LightningBulletType(){{
+                    damage = 40;
+                    lightningLength = 10;
+                    lightningLengthRand = 1;
+                    lightningColor = Pal.reactorPurple;
+                }};
+            }};
+
             craftSound = Sounds.release;
             baseColor = Color.valueOf("67474b");
-            circleColor = new Color[] {Pal.reactorPurple, Pal.thoriumPink, Pal.lightishOrange, Pal.surge, Pal.plastanium};
+            circleColor = new Color[]{Pal.reactorPurple, Pal.thoriumPink, Pal.lightishOrange, Pal.surge, Pal.plastanium};
 
             consumePower(300f);
             consumeItems(with(
@@ -2975,15 +3043,15 @@ public class FireBlocks{
 
         envStormyCoast = new EnvBlock("env-stormy-coast"){{
             buildType = () -> new EnvBlockBuild(){
-
-                private float alpha;
+                private final Color
+                    defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f),
+                    specificColor = new Color(0.1f, 0.1f, 0.1f);
 
                 @Override
                 protected void updateStart(){
                     state.rules.lighting = true;
-                    state.rules.ambientLight = new Color(0.1f, 0.1f, 0.1f);
-                    alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
-                    state.rules.ambientLight.a = alpha;
+                    state.rules.ambientLight = specificColor;
+                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.8f, 0.004f);
 
                     Groups.weather.each(w -> {
                         if(w.weather != Weathers.rain) w.remove();
@@ -2997,11 +3065,11 @@ public class FireBlocks{
                     state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0f, 0.004f);
 
                     if(state.rules.ambientLight.a <= 0.001f){
-                        if(state.isCampaign()){
-                            state.rules.ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                        }else{
+                        if(state.isCampaign())
+                            state.rules.ambientLight = defaultColor;
+                        else
                             state.rules.ambientLight = Color.clear;
-                        }
+
                         kill();
                     }
                 }
@@ -3010,11 +3078,10 @@ public class FireBlocks{
                 public void onRemoved(){
                     if(!isStarter()) return;
 
-                    if(state.isCampaign()){
-                        state.rules.ambientLight = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                    }else{
+                    if(state.isCampaign())
+                        state.rules.ambientLight = defaultColor;
+                    else
                         state.rules.ambientLight = Color.clear;
-                    }
                 }
             };
         }};
