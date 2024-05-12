@@ -10,11 +10,12 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Time;
-import fire.entities.FireUnitSorts;
+import fire.entities.FUnitSorts;
 import fire.entities.bullets.LightningPointBulletType;
-import fire.ui.dialogs.RisetarInfoDialog;
+import fire.ui.dialogs.InfoDialog;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
 import fire.world.blocks.defense.UnitOverdriveProjector;
@@ -30,8 +31,9 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.units.MechPad;
-import fire.world.meta.FireAttribute;
+import fire.world.meta.FAttribute;
 import mindustry.content.*;
+import mindustry.ctype.UnlockableContent;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
@@ -91,8 +93,10 @@ import static mindustry.Vars.state;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.type.ItemStack.with;
 
-public class FireBlocks{
+public class FBlocks{
 
+    /** Key is component itself, value is its inferior. */
+    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(5);
     public static Block
 
         //environment
@@ -159,13 +163,13 @@ public class FireBlocks{
             drownTime = 230f;
             speedMultiplier = 0.5f;
             statusDuration = 240f;
-            status = FireStatusEffects.overgrown;
+            status = FStatusEffects.overgrown;
             isLiquid = true;
             liquidDrop = Liquids.neoplasm;
         }};
 
         bloodyDirt = new Floor("bloody-dirt", 8){{
-            attributes.set(FireAttribute.flesh, 1f / 9f);
+            attributes.set(FAttribute.flesh, 1f / 9f);
         }};
 
         //endregion
@@ -186,7 +190,7 @@ public class FireBlocks{
             @Override
             public void setStats(){
                 stats.add(Stat.maxUnits, table ->
-                    table.button(new TextureRegionDrawable(uiIcon), Styles.emptyi, 40f, RisetarInfoDialog.dialog::show)
+                    table.button(new TextureRegionDrawable(uiIcon), Styles.emptyi, 40f, InfoDialog.dialog::show)
                 );
             }
         {
@@ -278,7 +282,7 @@ public class FireBlocks{
                     pierceArmor = true;
                 }},
 
-                FireItems.impurityKindlingAlloy, new ArtilleryBulletType(6f, 105f){{
+                FItems.impurityKindlingAlloy, new ArtilleryBulletType(6f, 105f){{
                     lifetime = 130f;
                     knockback = 1.6f;
                     width = 12f;
@@ -301,7 +305,7 @@ public class FireBlocks{
                     }};
                 }},
 
-                FireItems.detonationCompound, new ArtilleryBulletType(4f, 65f){{
+                FItems.detonationCompound, new ArtilleryBulletType(4f, 65f){{
                     lifetime = 196f;
                     knockback = 2f;
                     width = 15f;
@@ -321,13 +325,13 @@ public class FireBlocks{
                 Items.titanium, 75,
                 Items.thorium, 60,
                 Items.silicon, 35,
-                FireItems.mirrorglass, 25
+                FItems.mirrorglass, 25
             ));
             researchCost = with(
                 Items.titanium, 400,
                 Items.thorium, 250,
                 Items.silicon, 275,
-                FireItems.mirrorglass, 165
+                FItems.mirrorglass, 165
             );
             health = 1080;
             size = 2;
@@ -450,7 +454,7 @@ public class FireBlocks{
                     hitSound = Sounds.spark;
                 }},
 
-                FireItems.glass, new LaserBulletType(25f){{
+                FItems.glass, new LaserBulletType(25f){{
                     length = 315f;
                     width = 10f;
                     hitSize = 3f;
@@ -461,7 +465,7 @@ public class FireBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                FireItems.mirrorglass, new LaserBulletType(75f){{
+                FItems.mirrorglass, new LaserBulletType(75f){{
                     length = 390f;
                     width = 10f;
                     hitSize = 3f;
@@ -476,7 +480,7 @@ public class FireBlocks{
 
         scab = new ItemTurret("scab"){{
             requirements(Category.turret, with(
-                FireItems.flesh, 50
+                FItems.flesh, 50
             ));
             health = 1600;
             size = 2;
@@ -487,12 +491,12 @@ public class FireBlocks{
             rotateSpeed = 4f;
 
             ammo(
-                FireItems.flesh, new BulletType(2f, 75f){
+                FItems.flesh, new BulletType(2f, 75f){
 
                     @Override
                     public void draw(Bullet b){
                         super.draw(b);
-                        final var item = FireItems.flesh;
+                        final var item = FItems.flesh;
 
                         Draw.alpha(1f);
                         Draw.blend(Blending.additive);
@@ -501,7 +505,7 @@ public class FireBlocks{
                     }
                     {
                     lifetime = 131f;
-                    status = FireStatusEffects.overgrown;
+                    status = FStatusEffects.overgrown;
                     statusDuration = 360f;
                 }}
             );
@@ -663,13 +667,13 @@ public class FireBlocks{
         gambler = new JackpotTurret("gambler"){{
             final var chargeTime = 120f;
             final var colors = new Color[]{Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
-            final var chargeFx = FireFx.jackpotChargeEffect(chargeTime, 0.17f, 40f, 4, colors);
+            final var chargeFx = FFx.jackpotChargeEffect(chargeTime, 0.17f, 40f, 4, colors);
 
             requirements(Category.turret, with(
                 Items.thorium, 450,
                 Items.plastanium, 145,
                 Items.surgeAlloy, 85,
-                FireItems.logicAlloy, 60
+                FItems.logicAlloy, 60
             ));
             health = 1920;
             size = 3;
@@ -698,11 +702,11 @@ public class FireBlocks{
                     width = 6f;
                     height = 12f;
                     drag = 0.04f;
-                    status = FireStatusEffects.disintegrated;
+                    status = FStatusEffects.disintegrated;
                     statusDuration = 240f;
 
                     chargeEffect = chargeFx;
-                    shootEffect = FireFx.gamblerShootEffect(60f, 4);
+                    shootEffect = FFx.gamblerShootEffect(60f, 4);
                     frontColor = Color.white;
                     backColor = hitColor = colors[0];
                 }}),
@@ -720,12 +724,12 @@ public class FireBlocks{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        status = FireStatusEffects.disintegrated;
+                        status = FStatusEffects.disintegrated;
                         statusDuration = 360f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(60f, 2);
-                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[1]);
+                        shootEffect = FFx.gamblerShootEffect(60f, 2);
+                        hitEffect = despawnEffect = FFx.hitBulletSmall(colors[1]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[1];
                     }}
@@ -745,7 +749,7 @@ public class FireBlocks{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        status = FireStatusEffects.disintegrated;
+                        status = FStatusEffects.disintegrated;
                         statusDuration = 480f;
                         lightning = 2;
                         lightningDamage = 5f;
@@ -753,14 +757,14 @@ public class FireBlocks{
                         lightningLengthRand = 1;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(25f, 1);
-                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[2]);
+                        shootEffect = FFx.gamblerShootEffect(25f, 1);
+                        hitEffect = despawnEffect = FFx.hitBulletSmall(colors[2]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[2];
                     }}
                 ),
 
-                new JackpotAmmo(FireItems.hardenedAlloy, 0f,
+                new JackpotAmmo(FItems.hardenedAlloy, 0f,
                     new ShootMulti(
                         new ShootAlternate(0f){{
                             shots = 7;
@@ -774,15 +778,15 @@ public class FireBlocks{
                         lifetime = 30f;
                         width = 8f;
                         height = 10f;
-                        status = FireStatusEffects.disintegrated;
+                        status = FStatusEffects.disintegrated;
                         statusDuration = 600f;
                         pierce = true;
                         pierceBuilding = true;
                         pierceCap = 4;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FireFx.gamblerShootEffect(15f, 1);
-                        hitEffect = despawnEffect = FireFx.hitBulletSmall(colors[3]);
+                        shootEffect = FFx.gamblerShootEffect(15f, 1);
+                        hitEffect = despawnEffect = FFx.hitBulletSmall(colors[3]);
                         frontColor = Pal.sapBullet;
                         backColor = hitColor = colors[3];
                     }}
@@ -864,7 +868,7 @@ public class FireBlocks{
                     statusDuration = 270f;
                 }},
 
-                FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
+                FLiquids.liquidNitrogen, new LiquidBulletType(FLiquids.liquidNitrogen){{
                     speed = 6f;
                     damage = 5.5f;
                     lifetime = 54f;
@@ -885,7 +889,7 @@ public class FireBlocks{
                 Items.thorium, 450,
                 Items.silicon, 525,
                 Items.plastanium, 250,
-                FireItems.hardenedAlloy, 225
+                FItems.hardenedAlloy, 225
             ));
             health = 2160;
             armor = 5;
@@ -904,7 +908,7 @@ public class FireBlocks{
 
             ammo(
 
-                FireItems.logicAlloy, new MissileBulletType(3f, 285f){{
+                FItems.logicAlloy, new MissileBulletType(3f, 285f){{
                     lifetime = 167f;
                     width = 25f;
                     height = 28f;
@@ -920,7 +924,7 @@ public class FireBlocks{
                     hitSound = Sounds.mediumCannon;
                 }},
 
-                FireItems.detonationCompound, new MissileBulletType(4f, 320f){{
+                FItems.detonationCompound, new MissileBulletType(4f, 320f){{
                     lifetime = 193f;
                     width = 25f;
                     height = 28f;
@@ -971,11 +975,11 @@ public class FireBlocks{
 
         grudge = new ItemTurret("grudge"){{
             requirements(Category.turret, with(
-                Items.copper, 1750,
-                Items.graphite, 525,
-                Items.phaseFabric, 250,
+                Items.copper, 1350,
+                Items.graphite, 475,
+                Items.phaseFabric, 175,
                 Items.surgeAlloy, 400,
-                FireItems.hardenedAlloy, 550
+                FItems.hardenedAlloy, 400
             ));
             health = 4320;
             size = 4;
@@ -991,7 +995,7 @@ public class FireBlocks{
             recoilTime = 10f;
             shake = 2.2f;
             rotateSpeed = 6.5f;
-            unitSort = FireUnitSorts.a;
+            unitSort = FUnitSorts.a;
             shootSound = Sounds.shootBig;
             ammoUseEffect = Fx.casing3;
             coolantMultiplier = 0.75f;
@@ -1014,7 +1018,7 @@ public class FireBlocks{
                     pierceBuilding = true;
                     pierceArmor = true;
                     ammoMultiplier = 4;
-                    status = FireStatusEffects.disintegrated;
+                    status = FStatusEffects.disintegrated;
                     statusDuration = 120f;
                     shootEffect = Fx.shootBig;
                     fragBullets = 4;
@@ -1028,7 +1032,7 @@ public class FireBlocks{
                     }};
                 }},
 
-                FireItems.detonationCompound, new BasicBulletType(8f, 55f){{
+                FItems.detonationCompound, new BasicBulletType(8f, 55f){{
                     lifetime = 46f;
                     knockback = 0.7f;
                     width = 18f;
@@ -1040,7 +1044,7 @@ public class FireBlocks{
                     ammoMultiplier = 8;
                     reloadMultiplier = 0.6f;
                     buildingDamageMultiplier = 0.1f;
-                    status = FireStatusEffects.disintegrated;
+                    status = FStatusEffects.disintegrated;
                     statusDuration = 100f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.lightishOrange;
@@ -1069,7 +1073,7 @@ public class FireBlocks{
                     }};
                 }},
 
-                FireItems.hardenedAlloy, new BasicBulletType(9f, 200f){{
+                FItems.hardenedAlloy, new BasicBulletType(9f, 200f){{
                     lifetime = 72f;
                     knockback = 2f;
                     width = 28f;
@@ -1081,7 +1085,7 @@ public class FireBlocks{
                     pierceBuilding = true;
                     reloadMultiplier = 0.2f;
                     buildingDamageMultiplier = 0.1f;
-                    status = FireStatusEffects.disintegrated;
+                    status = FStatusEffects.disintegrated;
                     statusDuration = 120f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.sapBullet;
@@ -1096,7 +1100,7 @@ public class FireBlocks{
                         hitSound = Sounds.mediumCannon;
                         hitEffect = Fx.pulverizeMedium;
                         despawnEffect = new WaveEffect(){{
-                            lifetime = 12f;
+                            lifetime = 15f;
                             sizeFrom = 0f;
                             sizeTo = 54f;
                             strokeFrom = 3f;
@@ -1119,8 +1123,8 @@ public class FireBlocks{
             requirements(Category.turret, with(
                 Items.plastanium, 425,
                 Items.surgeAlloy, 250,
-                FireItems.logicAlloy, 400,
-                FireItems.magneticAlloy, 125
+                FItems.logicAlloy, 400,
+                FItems.magneticAlloy, 125
             ));
             health = 6000;
             size = 4;
@@ -1156,8 +1160,8 @@ public class FireBlocks{
                         e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
                         t -> t != null && collidesGround && !b.hasCollided(t.id)) == null
                     ){
-                        b.hit = true;    // if there's no target nearby, remove and don't create frag bullets
-                        hitEffect.at(b); // but keep effect
+                        b.hit = true;    //if there's no target nearby, remove and don't create frag bullets
+                        hitEffect.at(b); //but keep effect
                         b.remove();
 
                     }else{
@@ -1283,8 +1287,8 @@ public class FireBlocks{
             final var col = Color.valueOf("ec7458");
             final var coll = Color.valueOf("ec7458bb");
 
-            final var item_1 = FireItems.hardenedAlloy;
-            final var item_2 = FireItems.magneticAlloy;
+            final var item_1 = FItems.hardenedAlloy;
+            final var item_2 = FItems.magneticAlloy;
 
             final BulletType bullet_1_1;
             final BulletType bullet_2_1;
@@ -1307,7 +1311,7 @@ public class FireBlocks{
                 frontColor = Color.white;
                 trailColor = col;
                 chargeEffect = new MultiEffect(
-                    FireFx.railChargeEffect(chargeTime, col, 3f, baseRange + extraRange, 80f)
+                    FFx.railChargeEffect(chargeTime, col, 3f, baseRange + extraRange, 80f)
                 );
                 parts.addAll(
                     new HaloPart(){{
@@ -1372,7 +1376,7 @@ public class FireBlocks{
                 frontColor = Color.white;
                 trailColor = col;
                 chargeEffect = new MultiEffect(
-                    FireFx.railChargeEffect(chargeTime, col, 3f, baseRange, 80f)
+                    FFx.railChargeEffect(chargeTime, col, 3f, baseRange, 80f)
                 );
                 despawnEffect = new MultiEffect(
 
@@ -1656,8 +1660,8 @@ public class FireBlocks{
             requirements(Category.turret, with(
                 Items.thorium, 3200,
                 Items.plastanium, 4000,
-                FireItems.conductor, 14400,
-                FireItems.hardenedAlloy, 3600
+                FItems.conductor, 14400,
+                FItems.hardenedAlloy, 3600
             ));
             scaledHealth = 1000;
             size = 12;
@@ -1860,9 +1864,9 @@ public class FireBlocks{
             size = 1;
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.01f;
-            attribute = FireAttribute.tree;
+            attribute = FAttribute.tree;
             drillTime = 120;
-            output = FireItems.timber;
+            output = FItems.timber;
 
             consumePower(0.4f);
         }};
@@ -1892,10 +1896,10 @@ public class FireBlocks{
                 new DrawLiquidTile(Liquids.water),
                 new DrawDefault()
             );
-            attribute = FireAttribute.grass;
+            attribute = FAttribute.grass;
             maxBoost = 1f;
             craftTime = 240f;
-            outputItem = new ItemStack(FireItems.timber, 4);
+            outputItem = new ItemStack(FItems.timber, 4);
 
             consumePower(2.5f);
             consumeLiquid(Liquids.water, 0.2f);
@@ -1999,13 +2003,15 @@ public class FireBlocks{
             speed = 0.22f;
             displayedSpeed = 26f;
             junctionReplacement = Blocks.invertedSorter;
+
+            compositeMap.put(this, Blocks.titaniumConveyor);
         }};
 
         hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
             requirements(Category.distribution, with(
                 Items.graphite, 1,
                 Items.silicon, 1,
-                FireItems.hardenedAlloy, 1
+                FItems.hardenedAlloy, 1
             ));
             health = 240;
             armor = 5;
@@ -2027,6 +2033,8 @@ public class FireBlocks{
             range = 8;
             pulse = true;
             ((Conveyor)compositeConveyor).bridgeReplacement = this;
+
+            compositeMap.put(this, Blocks.itemBridge);
         }};
 
         //endregion
@@ -2043,6 +2051,8 @@ public class FireBlocks{
             liquidCapacity = 120f;
             solid = false;
             underBullets = true;
+
+            compositeMap.put(this, Blocks.liquidRouter);
         }};
 
         compositeBridgeConduit = new LiquidBridge("composite-bridge-conduit"){{
@@ -2056,6 +2066,8 @@ public class FireBlocks{
             liquidCapacity = 16f;
             range = 8;
             pulse = true;
+
+            compositeMap.put(this, Blocks.bridgeConduit);
         }};
 
         //endregion
@@ -2064,7 +2076,7 @@ public class FireBlocks{
         conductorPowerNode = new BatteryNode("zjjd"){{
             requirements(Category.power, with(
                 Items.lead, 10,
-                FireItems.conductor, 5
+                FItems.conductor, 5
             ));
             health = 225;
             size = 2;
@@ -2080,7 +2092,7 @@ public class FireBlocks{
                 Items.thorium, 100,
                 Items.silicon, 160,
                 Items.plastanium, 75,
-                FireItems.conductor, 75
+                FItems.conductor, 75
             ));
             health = 840;
             size = 3;
@@ -2113,7 +2125,7 @@ public class FireBlocks{
         //TODO complete.
         burstReactor = new ImpactReactor("burst-reactor"){{
             requirements(Category.power, with(
-                FireItems.magneticAlloy, 500
+                FItems.magneticAlloy, 500
             ));
             health = 9600;
             size = 6;
@@ -2135,8 +2147,8 @@ public class FireBlocks{
             );
 
             consumePower(96f);
-            consumeItem(FireItems.detonationCompound, 8);
-            consumeLiquid(FireLiquids.liquidNitrogen, 50f / 60f);
+            consumeItem(FItems.detonationCompound, 8);
+            consumeLiquid(FLiquids.liquidNitrogen, 50f / 60f);
         }};
 
         //endregion
@@ -2162,7 +2174,7 @@ public class FireBlocks{
         hardenedWall = new ArmorWall("hardened-wall"){{
             requirements(Category.defense, with(
                 Items.surgeAlloy, 3,
-                FireItems.hardenedAlloy, 6
+                FItems.hardenedAlloy, 6
             ));
             health = 1440;
             armor = 12;
@@ -2190,8 +2202,8 @@ public class FireBlocks{
 
         fleshWall = new RegenWall("xrq"){{
             requirements(Category.defense, with(
-                FireItems.flesh, 24,
-                FireItems.logicAlloy, 12
+                FItems.flesh, 24,
+                FItems.logicAlloy, 12
             ));
             health = 8000;
             size = 2;
@@ -2234,7 +2246,7 @@ public class FireBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FireItems.glass, 6);
+            outputItem = new ItemStack(FItems.glass, 6);
             attribute = Attribute.heat;
             boostScale = 1f / 3f;
 
@@ -2272,7 +2284,7 @@ public class FireBlocks{
             consumePower(2f);
             consumeItems(with(
                 Items.lead, 1,
-                FireItems.glass, 2
+                FItems.glass, 2
             ));
         }};
 
@@ -2297,7 +2309,7 @@ public class FireBlocks{
             );
 
             craftTime = 90f;
-            outputItem = new ItemStack(FireItems.mirrorglass, 1);
+            outputItem = new ItemStack(FItems.mirrorglass, 1);
 
             consumePower(2f);
             consumeItem(Items.metaglass, 2);
@@ -2319,7 +2331,7 @@ public class FireBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FireItems.impurityKindlingAlloy, 2);
+            outputItem = new ItemStack(FItems.impurityKindlingAlloy, 2);
 
             consumePower(1.5f);
             consumeItems(with(
@@ -2342,12 +2354,12 @@ public class FireBlocks{
             updateEffect = Fx.explosion;
 
             craftTime = 60f;
-            outputItem = new ItemStack(FireItems.kindlingAlloy, 1);
+            outputItem = new ItemStack(FItems.kindlingAlloy, 1);
 
             consumePower(2f);
             consumeItems(with(
                 Items.coal, 1,
-                FireItems.impurityKindlingAlloy, 1
+                FItems.impurityKindlingAlloy, 1
             ));
         }};
 
@@ -2355,7 +2367,7 @@ public class FireBlocks{
             requirements(Category.crafting, with(
                 Items.lead, 75,
                 Items.surgeAlloy, 20,
-                FireItems.mirrorglass, 25
+                FItems.mirrorglass, 25
             ));
             size = 2;
             hasPower = true;
@@ -2371,7 +2383,7 @@ public class FireBlocks{
             );
 
             craftTime = 120;
-            outputItem = new ItemStack(FireItems.conductor, 2);
+            outputItem = new ItemStack(FItems.conductor, 2);
 
             consumePower(200f / 60f);
             consumeItems(with(
@@ -2395,7 +2407,7 @@ public class FireBlocks{
             );
 
             craftTime = 120f;
-            outputItem = new ItemStack(FireItems.logicAlloy, 2);
+            outputItem = new ItemStack(FItems.logicAlloy, 2);
 
             consumePower(2f);
             consumeItems(with(
@@ -2409,7 +2421,7 @@ public class FireBlocks{
             requirements(Category.crafting, with(
                 Items.thorium, 45,
                 Items.plastanium, 30,
-                FireItems.logicAlloy, 55
+                FItems.logicAlloy, 55
             ));
             size = 2;
             hasPower = true;
@@ -2419,13 +2431,13 @@ public class FireBlocks{
             updateEffect = Fx.explosion;
 
             craftTime = 300f;
-            outputItem = new ItemStack(FireItems.detonationCompound, 6);
+            outputItem = new ItemStack(FItems.detonationCompound, 6);
 
             consumePower(1.5f);
             consumeItems(with(
                 Items.blastCompound, 4,
                 Items.pyratite, 4,
-                FireItems.logicAlloy, 3
+                FItems.logicAlloy, 3
             ));
         }};
 
@@ -2449,7 +2461,7 @@ public class FireBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FireItems.flamefluidCrystal, 2);
+            outputItem = new ItemStack(FItems.flamefluidCrystal, 2);
 
             consumePower(1.5f);
             consumeLiquids(LiquidStack.with(
@@ -2506,7 +2518,7 @@ public class FireBlocks{
             powerProduction = 3.5f;
             outputItem = Items.coal;
 
-            consumeItem(FireItems.timber);
+            consumeItem(FItems.timber);
         }};
 
         electrothermalSiliconFurnace = new GenericCrafter("drgl"){{
@@ -2553,9 +2565,9 @@ public class FireBlocks{
                 new DrawDefault()
             );
 
-            attribute = FireAttribute.flesh;
+            attribute = FAttribute.flesh;
             craftTime = 45f;
-            outputItem = new ItemStack(FireItems.flesh, 1);
+            outputItem = new ItemStack(FItems.flesh, 1);
 
             consumePower(100f / 60f);
             consumeItems(with(
@@ -2582,17 +2594,17 @@ public class FireBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.cryofluid),
-                new DrawLiquidTile(FireLiquids.liquidNitrogen),
+                new DrawLiquidTile(FLiquids.liquidNitrogen),
                 new DrawDefault()
             );
 
             craftTime = 120f;
-            outputLiquid = new LiquidStack(FireLiquids.liquidNitrogen, 50f / 60f);
+            outputLiquid = new LiquidStack(FLiquids.liquidNitrogen, 50f / 60f);
 
             consumePower(400f / 60f);
             consumeItems(with(
                 Items.blastCompound, 4,
-                FireItems.kindlingAlloy, 2
+                FItems.kindlingAlloy, 2
             ));
             consumeLiquid(Liquids.cryofluid, 1f);
         }};
@@ -2615,21 +2627,21 @@ public class FireBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FireItems.hardenedAlloy, 3);
+            outputItem = new ItemStack(FItems.hardenedAlloy, 3);
 
             consumePower(10f);
             consumeItems(with(
                 Items.thorium, 3,
                 Items.plastanium, 6,
-                FireItems.kindlingAlloy, 2
+                FItems.kindlingAlloy, 2
             ));
         }};
 
         magneticAlloyFormer = new GenericCrafter("magnetic-alloy-former"){{
             requirements(Category.crafting, with(
                 Items.plastanium, 135,
-                FireItems.logicAlloy, 180,
-                FireItems.hardenedAlloy, 75
+                FItems.logicAlloy, 180,
+                FItems.hardenedAlloy, 75
             ));
             size = 3;
             hasPower = true;
@@ -2643,13 +2655,13 @@ public class FireBlocks{
             );
 
             craftTime = 90f;
-            outputItem = new ItemStack(FireItems.magneticAlloy, 2);
+            outputItem = new ItemStack(FItems.magneticAlloy, 2);
 
             consumePower(24f);
             consumeItems(with(
                 Items.surgeAlloy, 1,
-                FireItems.conductor, 3,
-                FireItems.hardenedAlloy, 2
+                FItems.conductor, 3,
+                FItems.hardenedAlloy, 2
             ));
         }};
 
@@ -2659,9 +2671,9 @@ public class FireBlocks{
 
             requirements(Category.crafting, with(
                 Items.surgeAlloy, 325,
-                FireItems.logicAlloy, 500,
-                FireItems.hardenedAlloy, 375,
-                FireItems.magneticAlloy, 250
+                FItems.logicAlloy, 500,
+                FItems.hardenedAlloy, 375,
+                FItems.magneticAlloy, 250
             ));
             armor = 6;
             size = 5;
@@ -2682,7 +2694,7 @@ public class FireBlocks{
             craftTime = 120f;
             outputItems = ItemStack.with(
                 Items.surgeAlloy, 16,
-                FireItems.hardenedAlloy, 1
+                FItems.hardenedAlloy, 1
             );
 
             fragBullets = amount;
@@ -2727,8 +2739,8 @@ public class FireBlocks{
 
             consumePower(120f);
             consumeItems(with(
-                FireItems.flamefluidCrystal, 16,
-                FireItems.magneticAlloy, 1
+                FItems.flamefluidCrystal, 16,
+                FItems.magneticAlloy, 1
             ));
             consumeLiquid(Liquids.cryofluid, 0.5f);
         }};
@@ -2738,7 +2750,7 @@ public class FireBlocks{
                 Items.metaglass, 550,
                 Items.titanium, 425,
                 Items.silicon, 275,
-                FireItems.hardenedAlloy, 500
+                FItems.hardenedAlloy, 500
             ));
             armor = 7;
             size = 6;
@@ -2759,7 +2771,7 @@ public class FireBlocks{
             );
 
             craftTime = 120f;
-            outputItem = new ItemStack(FireItems.hardenedAlloy, 20);
+            outputItem = new ItemStack(FItems.hardenedAlloy, 20);
 
             explosionRadius = 240f;
             explosionDamage = 2880f;
@@ -2794,7 +2806,7 @@ public class FireBlocks{
                 trailWidth = 4;
                 trailColor = Pal.reactorPurple;
 
-                status = FireStatusEffects.disintegrated;
+                status = FStatusEffects.disintegrated;
                 statusDuration = 180f;
 
                 hitSound = Sounds.shotgun;
@@ -2854,20 +2866,20 @@ public class FireBlocks{
 
             @Override
             public boolean canPlaceOn(Tile tile, Team team, int rotation){
-                return state.rules.infiniteResources || tile.getLinkedTilesAs(this, tempTiles).sumf(o -> o.floor().attributes.get(FireAttribute.flesh)) >= 1f;
+                return state.rules.infiniteResources || tile.getLinkedTilesAs(this, tempTiles).sumf(o -> o.floor().attributes.get(FAttribute.flesh)) >= 1f;
             }
         {
             requirements(Category.units, with(
-                FireItems.flesh, 100
+                FItems.flesh, 100
             ));
             size = 3;
             hasLiquids = true;
             liquidCapacity = 30f;
 
             plans.add(
-                new UnitFactory.UnitPlan(FireUnitTypes.blade, 2700f, with(
-                    FireItems.flesh, 55,
-                    FireItems.logicAlloy, 65
+                new UnitFactory.UnitPlan(FUnitTypes.blade, 2700f, with(
+                    FItems.flesh, 55,
+                    FItems.logicAlloy, 65
                 ))
             );
 
@@ -2882,7 +2894,7 @@ public class FireBlocks{
             requirements(Category.effect, with(
                 Items.titanium, 30,
                 Items.silicon, 25,
-                FireItems.logicAlloy, 10
+                FItems.logicAlloy, 10
             ));
             health = 320;
             size = 2;
@@ -2915,7 +2927,7 @@ public class FireBlocks{
                 Items.copper, 300,
                 Items.metaglass, 220,
                 Items.plastanium, 175,
-                FireItems.timber, 200
+                FItems.timber, 200
             ));
             size = 5;
             hasPower = false;
@@ -2934,15 +2946,15 @@ public class FireBlocks{
             range = 320f;
             useTime = 240f;
             speedBoost = 3.2f;
-            allyStatus = FireStatusEffects.inspired;
+            allyStatus = FStatusEffects.inspired;
             enemyStatus = StatusEffects.sapped;
             statusDuration = 60f;
 
             consumeItems(with(
                 Items.pyratite, 4,
-                FireItems.timber, 8,
-                FireItems.kindlingAlloy, 4,
-                FireItems.flamefluidCrystal, 4
+                FItems.timber, 8,
+                FItems.kindlingAlloy, 4,
+                FItems.flamefluidCrystal, 4
             ));
             consumeLiquid(Liquids.slag, 0.4f);
         }};
@@ -2951,8 +2963,8 @@ public class FireBlocks{
             requirements(Category.effect, with(
                 Items.lead, 300,
                 Items.phaseFabric, 120,
-                FireItems.logicAlloy, 225,
-                FireItems.hardenedAlloy, 180
+                FItems.logicAlloy, 225,
+                FItems.hardenedAlloy, 180
             ));
             armor = 4;
             size = 5;
@@ -2975,7 +2987,7 @@ public class FireBlocks{
             requirements(Category.effect, with(
                 Items.lead, 120,
                 Items.thorium, 50,
-                FireItems.logicAlloy, 30
+                FItems.logicAlloy, 30
             ));
             health = 720;
             size = 2;
@@ -3002,7 +3014,7 @@ public class FireBlocks{
             size = 5;
             itemCapacity = 10500;
 
-            unitType = FireUnitTypes.omicron;
+            unitType = FUnitTypes.omicron;
             unitCapModifier = 12;
             radius = 96f;
             shieldHealth = 650f;
@@ -3010,7 +3022,7 @@ public class FireBlocks{
             cooldownBroken = 1.5f;
         }};
 
-        javelinPad = new MechPad("javelin-pad", FireUnitTypes.javelin){{
+        javelinPad = new MechPad("javelin-pad", FUnitTypes.javelin){{
             requirements(Category.effect, with(
                 Items.lead, 350,
                 Items.titanium, 500,
@@ -3036,6 +3048,8 @@ public class FireBlocks{
 
             allowCoreUnload = true;
             speed = 25f;
+
+            compositeMap.put(this, Blocks.unloader);
         }};
 
         //endregion
@@ -3043,6 +3057,8 @@ public class FireBlocks{
 
         envStormyCoast = new EnvBlock("env-stormy-coast"){{
             buildType = () -> new EnvBlockBuild(){
+
+                private float alpha;
                 private final Color
                     defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f),
                     specificColor = new Color(0.1f, 0.1f, 0.1f);
@@ -3051,7 +3067,8 @@ public class FireBlocks{
                 protected void updateStart(){
                     state.rules.lighting = true;
                     state.rules.ambientLight = specificColor;
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.8f, 0.004f);
+                    alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
+                    state.rules.ambientLight.a = alpha;
 
                     Groups.weather.each(w -> {
                         if(w.weather != Weathers.rain) w.remove();
@@ -3076,7 +3093,7 @@ public class FireBlocks{
 
                 @Override
                 public void onRemoved(){
-                    if(!isStarter()) return;
+                    if(isStarter()) return;
 
                     if(state.isCampaign())
                         state.rules.ambientLight = defaultColor;

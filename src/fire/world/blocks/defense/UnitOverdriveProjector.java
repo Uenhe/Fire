@@ -6,7 +6,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
-import fire.world.meta.FireStat;
+import fire.world.meta.FStat;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
@@ -15,7 +15,7 @@ import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Styles;
 
-import static fire.FireLib.consValid;
+import static fire.FLib.consValid;
 import static mindustry.Vars.ui;
 
 public class UnitOverdriveProjector extends mindustry.world.blocks.defense.OverdriveProjector{
@@ -34,7 +34,7 @@ public class UnitOverdriveProjector extends mindustry.world.blocks.defense.Overd
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(FireStat.statusEffectApplied, table -> {
+        stats.add(FStat.statusEffectApplied, table -> {
 
             table.row();
             for(final var s : new StatusEffect[]{allyStatus, enemyStatus}){
@@ -46,8 +46,8 @@ public class UnitOverdriveProjector extends mindustry.world.blocks.defense.Overd
 
                         final var detail =
                             s == allyStatus
-                            ? FireStat.allyStatusEffect.localized()
-                            : FireStat.enemyStatusEffect.localized();
+                            ? FStat.allyStatusEffect.localized()
+                            : FStat.enemyStatusEffect.localized();
 
                         info.left().add("[accent]" + detail).left();
                         info.row();

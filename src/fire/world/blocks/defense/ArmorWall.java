@@ -1,6 +1,7 @@
 package fire.world.blocks.defense;
 
 import arc.math.Interp;
+import fire.world.meta.FStat;
 
 import static mindustry.Vars.*;
 
@@ -19,7 +20,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(fire.world.meta.FireStat.maxArmorIncrease, armorIncrease);
+        stats.add(FStat.maxArmorIncrease, armorIncrease);
     }
 
     @Override

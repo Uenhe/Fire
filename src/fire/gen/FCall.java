@@ -5,7 +5,7 @@ import mindustry.world.Tile;
 
 import static mindustry.Vars.net;
 
-public class FireCall{
+public class FCall{
 
     /** see {@link mindustry.gen.Call#playerSpawn(Tile, Player)} */
     public static void playerSpawn(Tile tile, Player player){

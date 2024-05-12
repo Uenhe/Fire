@@ -9,8 +9,8 @@ import arc.util.Time;
 import arc.util.Tmp;
 import fire.entities.abilities.DebuffRemoveFieldAbility;
 import fire.type.FleshUnitType;
-import fire.world.meta.FireStat;
-import fire.world.meta.FireStatUnit;
+import fire.world.meta.FStat;
+import fire.world.meta.FStatUnit;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -20,7 +20,7 @@ import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.world.meta.Stat;
 
-public class FireStatusEffects{
+public class FStatusEffects{
 
     public static StatusEffect
         frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated;
@@ -67,7 +67,7 @@ public class FireStatusEffects{
             @Override
             public void setStats(){
                 super.setStats();
-                stats.add(FireStat.clearDeBuffUponApplied, true);
+                stats.add(FStat.clearDeBuffUponApplied, true);
             }
 
             @Override
@@ -106,7 +106,7 @@ public class FireStatusEffects{
             @Override
             public void setStats(){
                 stats.addPercent(Stat.healthMultiplier, unfHealthMultiplier);
-                stats.add(Stat.healing, regenPercent * 100f * 60f, FireStatUnit.percentPerSec);
+                stats.add(Stat.healing, regenPercent * 100f * 60f, FStatUnit.percentPerSec);
                 super.setStats();
             }
 
@@ -161,7 +161,7 @@ public class FireStatusEffects{
             @Override
             public void setStats(){
                 super.setStats();
-                stats.add(FireStat.armorPierce, maxArmorReduction);
+                stats.add(FStat.armorPierce, maxArmorReduction);
             }
 
             /** TODO Reconstruct this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9801">DETAIL</a> */

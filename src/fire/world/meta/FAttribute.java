@@ -2,7 +2,7 @@ package fire.world.meta;
 
 import mindustry.world.meta.Attribute;
 
-public class FireAttribute{
+public class FAttribute{
 
     public static Attribute
         tree, grass, flesh;

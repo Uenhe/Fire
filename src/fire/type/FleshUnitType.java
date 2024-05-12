@@ -1,5 +1,7 @@
 package fire.type;
 
+import fire.content.FStatusEffects;
+
 public class FleshUnitType extends mindustry.type.UnitType{
 
     public FleshUnitType(String name){
@@ -11,6 +13,6 @@ public class FleshUnitType extends mindustry.type.UnitType{
     public void update(mindustry.gen.Unit unit){
         super.update(unit);
         if(arc.math.Mathf.chanceDelta(0.04))
-            fire.content.FireStatusEffects.overgrown.effect.at(unit.x, unit.y, 0f, unit);
+            FStatusEffects.overgrown.effect.at(unit.x, unit.y, 0f, unit);
     }
 }

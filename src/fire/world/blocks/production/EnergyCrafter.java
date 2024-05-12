@@ -26,7 +26,7 @@ import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
 
 import static mindustry.Vars.*;
-import static fire.FireLib.*;
+import static fire.FLib.*;
 
 public class EnergyCrafter extends mindustry.world.blocks.production.GenericCrafter{
 

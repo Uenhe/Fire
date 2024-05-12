@@ -6,14 +6,14 @@ import arc.util.Reflect;
 
 import static arc.KeyBinds.*;
 
-public enum FireBinding implements KeyBind{
+public enum FBinding implements KeyBind{
 
     unit_ability(KeyCode.g, "fire");
 
     private final KeybindValue defaultValue;
     private final String category;
 
-    FireBinding(KeybindValue defaultValue, String cat){
+    FBinding(KeybindValue defaultValue, String cat){
         this.defaultValue = defaultValue;
         this.category = cat;
     }

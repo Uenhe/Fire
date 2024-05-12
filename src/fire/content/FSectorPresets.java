@@ -2,9 +2,9 @@ package fire.content;
 
 import mindustry.type.SectorPreset;
 
-import static fire.content.FirePlanets.risetar;
+import static fire.content.FPlanets.risetar;
 
-public class FireSectorPresets{
+public class FSectorPresets{
     public static SectorPreset
 
         landingBase, darksandPlain, cornerOfZero, beachLanding,

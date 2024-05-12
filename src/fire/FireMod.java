@@ -8,7 +8,8 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
-import fire.input.FireBinding;
+import fire.input.FBinding;
+import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
@@ -40,7 +41,7 @@ public class FireMod extends mindustry.mod.Mod{
 
         setRandTitle();
         loadSettings();
-        FireBinding.load();
+        FBinding.load();
 
         Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
             showNoMultipleMods();
@@ -58,16 +59,16 @@ public class FireMod extends mindustry.mod.Mod{
     @Override
     public void loadContent(){
         Log.info("content");
-        fire.world.meta.FireAttribute.load();
-        FireStatusEffects.load();
-        FireItems.load();
-        FireLiquids.load();
-        FireUnitTypes.load();
-        FireBlocks.load();
-        FirePlanets.load();
-        FireSectorPresets.load();
-        FirePlanets.loadTree();
-        FireOverride.load();
+        FAttribute.load();
+        FStatusEffects.load();
+        FItems.load();
+        FLiquids.load();
+        FUnitTypes.load();
+        FBlocks.load();
+        FPlanets.load();
+        FSectorPresets.load();
+        FPlanets.loadTree();
+        FOverride.load();
     }
 
     private static void loadSettings(){
@@ -120,14 +121,14 @@ public class FireMod extends mindustry.mod.Mod{
                 t.add(Core.bundle.format("contentMain", version)).left().width(800f).maxWidth(1024f).pad(4f);
                 t.row();
 
-                addContent(t, FireBlocks.adaptiveSource);
-                addContent(t, FireBlocks.blossom);
-                addContent(t, FireBlocks.gambler);
-                addContent(t, FireBlocks.magneticSphere);
-                addContent(t, FireBlocks.hardenedAlloyConveyor);
-                addContent(t, FireUnitTypes.pioneer);
-                addContent(t, FireStatusEffects.overgrown);
-                addContent(t, FireStatusEffects.disintegrated);
+                addContent(t, FBlocks.adaptiveSource);
+                addContent(t, FBlocks.blossom);
+                addContent(t, FBlocks.gambler);
+                addContent(t, FBlocks.magneticSphere);
+                addContent(t, FBlocks.hardenedAlloyConveyor);
+                addContent(t, FUnitTypes.pioneer);
+                addContent(t, FStatusEffects.overgrown);
+                addContent(t, FStatusEffects.disintegrated);
                 t.row();
 
                 t.add("@contentSecondary").left().width(800f).maxWidth(1024f).pad(4f);

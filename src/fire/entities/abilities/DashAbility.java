@@ -7,6 +7,8 @@ import arc.math.geom.Position;
 import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
+import fire.input.FBinding;
+import fire.world.meta.FStat;
 import mindustry.ai.types.CommandAI;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -43,7 +45,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     public void addStats(arc.scene.ui.layout.Table t){
         t.add(Core.bundle.get(name + ".description"));
         t.row();
-        t.add("[lightgray]" + fire.world.meta.FireStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + FStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
         t.row();
         t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
         t.row();
@@ -90,7 +92,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     private boolean canDash(Unit unit, @Nullable Position pos){
-        return (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(fire.input.FireBinding.unit_ability)) || (Core.app.isMobile() && arc.math.Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
+        return (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(FBinding.unit_ability)) || (Core.app.isMobile() && arc.math.Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
             || (unit.controller() instanceof CommandAI c && c.hasCommand() && correctPos(unit, c.targetPos))
             || (pos != null && correctPos(unit, pos));
     }

@@ -3,7 +3,7 @@ package fire.ai;
 import fire.ai.types.BuilderDashAI;
 import mindustry.ai.UnitCommand;
 
-public class FireUnitCommand{
+public class FUnitCommand{
 
     public static final UnitCommand
         repairDashCommand = new UnitCommand("repair", "modeSurvival", u -> new fire.ai.types.RepairDashAI()),

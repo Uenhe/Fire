@@ -6,7 +6,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.util.Time;
-import fire.world.meta.FireStat;
+import fire.world.meta.FStat;
 import mindustry.content.Fx;
 import mindustry.entities.TargetPriority;
 import mindustry.gen.Bullet;
@@ -53,7 +53,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         super.setStats();
 
         stats.remove(Stat.range);
-        stats.addPercent(FireStat.baseHealChance, chanceHeal);
+        stats.addPercent(FStat.baseHealChance, chanceHeal);
         if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect);
     }
 

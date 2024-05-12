@@ -21,7 +21,7 @@ import mindustry.world.meta.StatValues;
 
 import static mindustry.Vars.tilesize;
 
-public class FireStatValues{
+public class FStatValues{
 
     /** see {@link mindustry.world.meta.StatValues#ammo(ObjectMap, int, boolean)} */
     public static StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, int indent){

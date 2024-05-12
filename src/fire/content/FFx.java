@@ -13,7 +13,7 @@ import mindustry.graphics.Drawf;
 
 import static mindustry.Vars.tilesize;
 
-public class FireFx{
+public class FFx{
 
     /** Special thanks to Extra Utilities mod. */
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){

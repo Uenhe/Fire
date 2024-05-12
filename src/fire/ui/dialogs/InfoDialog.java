@@ -23,11 +23,11 @@ import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Nullable;
 import arc.util.Scaling;
+import fire.content.FBlocks;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
-import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
@@ -38,10 +38,10 @@ import java.util.Arrays;
 import static mindustry.Vars.*;
 
 /**
- * To show more details about Planet Risetar.
+ * To show more details about contents.
  * See {@link mindustry.ui.dialogs.ResearchDialog}
  */
-public class RisetarInfoDialog extends BaseDialog{
+public class InfoDialog extends BaseDialog{
 
     private final View view;
     private Rect bounds = new Rect();
@@ -51,21 +51,21 @@ public class RisetarInfoDialog extends BaseDialog{
 
     private static final float nodeSize = Scl.scl(70f);
     private static final float nodeSpacing = 40f;
-    public static final RisetarInfoDialog dialog = new RisetarInfoDialog();
+    public static final InfoDialog dialog = new InfoDialog();
 
-    private RisetarInfoDialog(){
+    private InfoDialog(){
         super("");
 
         titleTable.remove();
         titleTable.clear();
         titleTable.top();
         titleTable.button(b -> {
-
             b.imageDraw(() -> new TextureRegionDrawable(root.node.content.uiIcon)).padRight(8).size(iconMed);
             b.add().growX();
             b.label(() -> root.node.content.localizedName).color(Pal.accent);
             b.add().growX();
             b.add().size(iconMed);
+
         }, () -> new BaseDialog("@techtree.select"){{
 
             cont.pane(t -> t.table(Tex.button, in -> {
@@ -76,9 +76,8 @@ public class RisetarInfoDialog extends BaseDialog{
                     if(locked(node)) continue;
 
                     in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
-                        if(node == lastNode){
+                        if(node == lastNode)
                             return;
-                        }
 
                         rebuildTree(node);
                         hide();
@@ -130,9 +129,8 @@ public class RisetarInfoDialog extends BaseDialog{
 
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
-                if(view.lastZoom < 0){
+                if(view.lastZoom < 0)
                     view.lastZoom = view.scaleX;
-                }
 
                 view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
                 view.setOrigin(Align.center);
@@ -164,7 +162,6 @@ public class RisetarInfoDialog extends BaseDialog{
     }
 
     public void rebuildTree(InfoNode node){
-
         switchTree(node);
         view.panX = 0f;
         view.panY = -200f;
@@ -178,7 +175,7 @@ public class RisetarInfoDialog extends BaseDialog{
         treeLayout();
     }
 
-    void checkNodes(InfoTreeNode node){
+    private void checkNodes(InfoTreeNode node){
         final boolean locked = locked(node.node);
         if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
 
@@ -190,11 +187,11 @@ public class RisetarInfoDialog extends BaseDialog{
         }
     }
 
-    boolean locked(InfoNode node){
+    private boolean locked(InfoNode node){
         return node.content.locked();
     }
 
-    void treeLayout(){
+    private void treeLayout(){
         final var node = new LayoutNode(root, null);
         final var children = node.children;
         final var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
@@ -236,24 +233,25 @@ public class RisetarInfoDialog extends BaseDialog{
         bounds.y += nodeSize * 1.5f;
     }
 
-    void shift(LayoutNode[] children, float amount){
+    private void shift(LayoutNode[] children, float amount){
         for(final var node : children){
             node.y += amount;
-            if(node.children != null && node.children.length > 0) shift(node.children, amount);
+
+            if(node.children != null && node.children.length > 0)
+                shift(node.children, amount);
         }
     }
 
-    void copyInfo(LayoutNode node){
+    private void copyInfo(LayoutNode node){
         node.node.x = node.x;
         node.node.y = node.y;
-        if(node.children != null){
-            for(final var child : node.children){
+
+        if(node.children != null)
+            for(final var child : node.children)
                 copyInfo(child);
-            }
-        }
     }
 
-    public class View extends Group{
+    private class View extends Group{
 
         private float panX = 0f, panY = -200f, lastZoom = -1f;
         private boolean moved = false;
@@ -265,7 +263,6 @@ public class RisetarInfoDialog extends BaseDialog{
         }
 
         private void rebuildAll(){
-
             clear();
             hoverNode = null;
             infoTable.clear();
@@ -281,7 +278,6 @@ public class RisetarInfoDialog extends BaseDialog{
                     if(moved) return;
 
                     if(mobile){
-
                         hoverNode = button;
                         rebuild();
 
@@ -293,10 +289,8 @@ public class RisetarInfoDialog extends BaseDialog{
                                 @Override
                                 protected void updateRelative(float percentDelta){
                                     panX -= moveBy * percentDelta;
-                                    {
-                                        setDuration(0.1f);
-                                        setInterpolation(Interp.fade);
-                                    }
+                                    setDuration(0.1f);
+                                    setInterpolation(Interp.fade);
                                 }
                             });
                         }
@@ -320,9 +314,9 @@ public class RisetarInfoDialog extends BaseDialog{
                 button.touchable(() -> !node.visible ? Touchable.disabled : Touchable.enabled);
                 button.userObject = node.node;
                 button.setSize(nodeSize);
-                button.update(() -> {
 
-                    final float offset = (Core.graphics.getHeight() % 2) / 2f;
+                button.update(() -> {
+                    final float offset = (Core.graphics.getHeight() % 2f) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : locked(node.node) || !locked(node.node) ? Tex.buttonRed : Tex.button;
 
@@ -333,14 +327,13 @@ public class RisetarInfoDialog extends BaseDialog{
                 addChild(button);
             }
 
-            if(mobile){
+            if(mobile)
                 tapped(() -> {
                     if(Core.scene.hit(Core.input.mouseX(), Core.input.mouseY(), true) == this){
                         hoverNode = null;
                         rebuild();
                     }
                 });
-            }
 
             setOrigin(Align.center);
             setTransform(true);
@@ -358,6 +351,14 @@ public class RisetarInfoDialog extends BaseDialog{
             ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
+        }
+
+        private String getKey(InfoNode node){
+            return node.content.getContentType() + "." + node.content.name + ".info";
+        }
+
+        private boolean hasInfo(InfoNode node){
+            return !Core.bundle.get(getKey(node)).startsWith("?");
         }
 
         private void rebuild(){
@@ -399,19 +400,24 @@ public class RisetarInfoDialog extends BaseDialog{
                     desc.add(locked(node) ? "@content.unlocked" : node.content.localizedName);
                     desc.row();
 
-                    if(locked(node)){
+                    if(locked(node))
                         desc.table(Table::left);
-                    }else{
+                    else
                         desc.add("@completed");
-                    }
+
                 }).pad(9f);
-                if(!(node.content instanceof SectorPreset)) t.minWidth(480f);
+
+                if(hasInfo(node)) t.minWidth(480f);
             });
+
             infoTable.row();
 
-            if(node.content.description != null && node.content.inlineDescription && !locked(node)){
-                infoTable.table(t -> t.margin(3f).left().labelWrap(Core.bundle.get(node.content.getContentType() + "." + node.content.name + ".info")).color(Color.lightGray).growX()).fillX();
-            }
+            if(!locked(node) && hasInfo(node))
+                infoTable.table(t -> t.margin(3f).left().labelWrap(
+                    FBlocks.compositeMap.containsKey(node.content)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FBlocks.compositeMap.get(node.content).localizedName)
+                    : Core.bundle.get(getKey(node))
+                ).color(Color.lightGray).growX()).fillX();
 
             addChild(infoTable);
 
@@ -438,10 +444,10 @@ public class RisetarInfoDialog extends BaseDialog{
                     Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
 
-                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3f){
+                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3f)
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
 
-                    }else{
+                    else{
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, node.y + offsetY);
                         Lines.line(child.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                     }
@@ -462,9 +468,9 @@ public class RisetarInfoDialog extends BaseDialog{
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
-            if(node.children != null){
+
+            if(node.children != null)
                 children = Seq.with(node.children).map(t -> new LayoutNode(t, this)).toArray(LayoutNode.class);
-            }
         }
     }
 
@@ -480,9 +486,8 @@ public class RisetarInfoDialog extends BaseDialog{
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
-            for(int i = 0; i < children.length; i++){
+            for(int i = 0; i < children.length; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
-            }
         }
     }
 
@@ -517,7 +522,6 @@ public class RisetarInfoDialog extends BaseDialog{
         }
 
         public static InfoNode dnode(UnlockableContent content, boolean isRoot, Runnable children){
-
             if(isRoot) InfoTree.roots.add(dnode(content, children));
 
             final var node = new InfoNode(InfoTree.context, content);

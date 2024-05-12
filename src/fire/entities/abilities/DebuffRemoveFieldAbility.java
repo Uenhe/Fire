@@ -8,7 +8,7 @@ import mindustry.gen.Unit;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static fire.content.FireStatusEffects.*;
+import static fire.content.FStatusEffects.*;
 import static mindustry.content.StatusEffects.*;
 
 public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Ability{

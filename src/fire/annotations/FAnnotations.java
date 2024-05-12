@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /** A copy of vanilla annotations, never mind. */
-public class FireAnnotations{
+public class FAnnotations{
 
     public enum Loc{
 

@@ -9,7 +9,7 @@ import mindustry.type.Item;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
 
-import static fire.FireLib.consValid;
+import static fire.FLib.consValid;
 
 public class CrafterGenerator extends mindustry.world.blocks.power.ConsumeGenerator{
 

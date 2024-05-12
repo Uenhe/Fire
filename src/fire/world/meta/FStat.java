@@ -3,7 +3,7 @@ package fire.world.meta;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatCat;
 
-public class FireStat{
+public class FStat{
 
     public static final Stat
 

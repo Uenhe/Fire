@@ -1,7 +1,8 @@
 package fire.world.blocks.units;
 
 import arc.math.Mathf;
-import fire.annotations.FireAnnotations;
+import fire.annotations.FAnnotations;
+import fire.gen.FCall;
 import mindustry.content.Fx;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -36,7 +37,7 @@ public class MechPad extends mindustry.world.Block{
         return consumesPower > 0f;
     }
 
-    @FireAnnotations.Remote(called = FireAnnotations.Loc.server)
+    @FAnnotations.Remote(called = FAnnotations.Loc.server)
     public static void playerSpawn(Tile tile, Player playerr){
         if(playerr == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 
@@ -93,7 +94,7 @@ public class MechPad extends mindustry.world.Block{
 
             // do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
-            fire.gen.FireCall.playerSpawn(tile, playerr);
+            FCall.playerSpawn(tile, playerr);
         }
     }
 }

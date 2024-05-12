@@ -6,7 +6,7 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Mathf;
-import fire.ai.FireUnitCommand;
+import fire.ai.FUnitCommand;
 import fire.entities.abilities.*;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
@@ -27,7 +27,7 @@ import mindustry.type.weapons.PointDefenseWeapon;
 
 import static mindustry.Vars.tilePayload;
 
-public class FireUnitTypes{
+public class FUnitTypes{
 
     public static UnitType
 
@@ -322,7 +322,7 @@ public class FireUnitTypes{
 
                         hittable = reflectable = absorbable = false;
                         keepVelocity = false;
-                        status = FireStatusEffects.overgrown;
+                        status = FStatusEffects.overgrown;
                         statusDuration = 240f;
 
                         hitEffect = despawnEffect = Fx.none;
@@ -520,8 +520,8 @@ public class FireUnitTypes{
 
         pioneer = new UnitType("pioneer"){{
             constructor = PayloadUnit::create;
-            defaultCommand = FireUnitCommand.repairDashCommand;
-            commands = new UnitCommand[]{UnitCommand.moveCommand, FireUnitCommand.repairDashCommand, FireUnitCommand.rebuildDashCommand, FireUnitCommand.assistDashCommand};
+            defaultCommand = FUnitCommand.repairDashCommand;
+            commands = new UnitCommand[]{UnitCommand.moveCommand, FUnitCommand.repairDashCommand, FUnitCommand.rebuildDashCommand, FUnitCommand.assistDashCommand};
             flying = true;
             health = 5600;
             armor = 7;
@@ -539,7 +539,7 @@ public class FireUnitTypes{
 
             abilities.add(
                 new DashAbility(8f, 12f, 120f, 6),
-                new FirstAidAbility(2400, 70, 2000, 10, FireStatusEffects.sanctuaryGuard, 600, 120)
+                new FirstAidAbility(2400, 70, 2000, 10, FStatusEffects.sanctuaryGuard, 600, 120)
             );
 
             weapons.add(

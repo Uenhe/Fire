@@ -3,7 +3,7 @@ package fire.content;
 import arc.graphics.Color;
 import mindustry.type.Liquid;
 
-public class FireLiquids{
+public class FLiquids{
     public static Liquid
         liquidNitrogen;
     
@@ -14,7 +14,7 @@ public class FireLiquids{
             temperature = -2.1f;
             viscosity = 0.4f;
             boilPoint = -1.7f;
-            effect = FireStatusEffects.frostbite;
+            effect = FStatusEffects.frostbite;
             barColor = Color.valueOf("f0ffff");
             gasColor = Color.valueOf("c1e8f5");
             lightColor = Color.valueOf("0097f532");

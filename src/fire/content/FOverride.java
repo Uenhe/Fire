@@ -1,7 +1,7 @@
 package fire.content;
 
 import fire.gen.MutableMechUnit;
-import fire.world.meta.FireAttribute;
+import fire.world.meta.FAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.*;
 
-public class FireOverride{
+public class FOverride{
 
     private static UnitType[] unitUpgrade(UnitType from, UnitType to){
         final var a = Arrays.copyOf(((Reconstructor)tetrativeReconstructor).upgrades.get(0), 2);
@@ -39,24 +39,24 @@ public class FireOverride{
         sandWater.itemDrop = Items.sand;
         darksandWater.itemDrop = Items.sand;
         darksandTaintedWater.itemDrop = Items.sand;
-        sporePine.attributes.set(FireAttribute.tree, 1.5f);
-        snowPine.attributes.set(FireAttribute.tree, 1.5f);
-        pine.attributes.set(FireAttribute.tree, 1.5f);
-        whiteTreeDead.attributes.set(FireAttribute.tree, 1f);
-        whiteTree.attributes.set(FireAttribute.tree, 1f);
-        grass.attributes.set(FireAttribute.grass, 0.25f);
+        sporePine.attributes.set(FAttribute.tree, 1.5f);
+        snowPine.attributes.set(FAttribute.tree, 1.5f);
+        pine.attributes.set(FAttribute.tree, 1.5f);
+        whiteTreeDead.attributes.set(FAttribute.tree, 1f);
+        whiteTree.attributes.set(FAttribute.tree, 1f);
+        grass.attributes.set(FAttribute.grass, 0.25f);
 
         //endregion
         //region block turret
 
         wave.liquidCapacity += 10f;
-        ((LiquidTurret)wave).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
+        ((LiquidTurret)wave).ammoTypes.put(FLiquids.liquidNitrogen, new LiquidBulletType(FLiquids.liquidNitrogen){{
             damage = 4.55f;
             knockback = 0.7f;
             drag = 0.001f;
         }});
         tsunami.liquidCapacity += 20f;
-        ((LiquidTurret)tsunami).ammoTypes.put(FireLiquids.liquidNitrogen, new LiquidBulletType(FireLiquids.liquidNitrogen){{
+        ((LiquidTurret)tsunami).ammoTypes.put(FLiquids.liquidNitrogen, new LiquidBulletType(FLiquids.liquidNitrogen){{
             speed = 4f;
             damage = 6.25f;
             lifetime = 49f;
@@ -95,7 +95,7 @@ public class FireOverride{
         //region units
 
         ((UnitFactory)groundFactory).plans.add(
-            new UnitFactory.UnitPlan(FireUnitTypes.guarding, 1500f, ItemStack.with(
+            new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500f, ItemStack.with(
                 Items.lead, 20,
                 Items.titanium, 25,
                 Items.silicon, 30
@@ -107,7 +107,7 @@ public class FireOverride{
                 Items.lead, 40,
                 Items.silicon, 30
             )),
-            new UnitFactory.UnitPlan(FireUnitTypes.firefly, 2400f, ItemStack.with(
+            new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400f, ItemStack.with(
                 Items.lead, 20,
                 Items.metaglass, 10,
                 Items.coal, 10,
@@ -116,18 +116,18 @@ public class FireOverride{
         );
         ((Reconstructor)additiveReconstructor).upgrades.add(
             unitUpgrade(alpha, beta),
-            unitUpgrade(FireUnitTypes.guarding, FireUnitTypes.resisting),
-            unitUpgrade(FireUnitTypes.blade, FireUnitTypes.hatchet),
-            unitUpgrade(FireUnitTypes.firefly, FireUnitTypes.candlelight)
+            unitUpgrade(FUnitTypes.guarding, FUnitTypes.resisting),
+            unitUpgrade(FUnitTypes.blade, FUnitTypes.hatchet),
+            unitUpgrade(FUnitTypes.firefly, FUnitTypes.candlelight)
         );
         ((Reconstructor)multiplicativeReconstructor).upgrades.add(
-            unitUpgrade(beta, FireUnitTypes.omicron),
-            unitUpgrade(FireUnitTypes.resisting, FireUnitTypes.garrison),
-            unitUpgrade(FireUnitTypes.hatchet, FireUnitTypes.castle)
+            unitUpgrade(beta, FUnitTypes.omicron),
+            unitUpgrade(FUnitTypes.resisting, FUnitTypes.garrison),
+            unitUpgrade(FUnitTypes.hatchet, FUnitTypes.castle)
         );
         ((Reconstructor)exponentialReconstructor).upgrades.add(
-            unitUpgrade(FireUnitTypes.omicron, FireUnitTypes.pioneer),
-            unitUpgrade(FireUnitTypes.garrison, FireUnitTypes.shelter)
+            unitUpgrade(FUnitTypes.omicron, FUnitTypes.pioneer),
+            unitUpgrade(FUnitTypes.garrison, FUnitTypes.shelter)
         );
 
         //endregion
@@ -140,9 +140,9 @@ public class FireOverride{
         //endregion
         //region unit
 
-        dagger.constructor = () -> new MutableMechUnit(FireUnitTypes.blade);
-        mace.constructor = () -> new MutableMechUnit(FireUnitTypes.hatchet);
-        fortress.constructor = () -> new MutableMechUnit(FireUnitTypes.castle);
+        dagger.constructor = () -> new MutableMechUnit(FUnitTypes.blade);
+        mace.constructor = () -> new MutableMechUnit(FUnitTypes.hatchet);
+        fortress.constructor = () -> new MutableMechUnit(FUnitTypes.castle);
 
         alpha.coreUnitDock = true;
         beta.coreUnitDock = true;
@@ -156,6 +156,6 @@ public class FireOverride{
         //endregion
         //region liquid
 
-        Liquids.neoplasm.effect = FireStatusEffects.overgrown;
+        Liquids.neoplasm.effect = FStatusEffects.overgrown;
     }
 }

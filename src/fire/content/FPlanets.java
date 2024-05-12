@@ -10,17 +10,17 @@ import mindustry.maps.planet.SerpuloPlanetGenerator;
 import mindustry.type.Planet;
 
 import static arc.struct.Seq.with;
-import static fire.content.FireBlocks.*;
-import static fire.content.FireItems.*;
-import static fire.content.FireLiquids.*;
-import static fire.content.FireSectorPresets.*;
-import static fire.content.FireUnitTypes.*;
-import static fire.ui.dialogs.RisetarInfoDialog.InfoNode.dnode;
+import static fire.content.FBlocks.*;
+import static fire.content.FItems.*;
+import static fire.content.FLiquids.*;
+import static fire.content.FSectorPresets.*;
+import static fire.content.FUnitTypes.*;
+import static fire.ui.dialogs.InfoDialog.InfoNode.dnode;
 import static mindustry.content.TechTree.node;
 import static mindustry.content.TechTree.nodeRoot;
 import static mindustry.game.Objectives.*;
 
-public class FirePlanets{
+public class FPlanets{
 
     public static Planet
         risetar;
@@ -241,7 +241,7 @@ public class FirePlanets{
                     });
                 });
 
-                dnode(magneticSphere); //to test unlocked content
+                //dnode(magneticSphere); //to test unlocked content
             });
         });
     }
