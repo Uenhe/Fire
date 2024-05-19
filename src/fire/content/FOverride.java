@@ -1,8 +1,10 @@
 package fire.content;
 
+import arc.Core;
 import fire.gen.MutableMechUnit;
 import fire.world.meta.FAttribute;
 import mindustry.ai.UnitCommand;
+import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.entities.bullet.LiquidBulletType;
@@ -45,6 +47,12 @@ public class FOverride{
         whiteTreeDead.attributes.set(FAttribute.tree, 1f);
         whiteTree.attributes.set(FAttribute.tree, 1f);
         grass.attributes.set(FAttribute.grass, 0.25f);
+
+        Blocks.sand.playerUnmineable =
+        Blocks.darksand.playerUnmineable =
+        Blocks.sandWater.playerUnmineable =
+        Blocks.darksandWater.playerUnmineable =
+        Blocks.darksandTaintedWater.playerUnmineable = !Core.settings.getBool("allowSandMining");
 
         //endregion
         //region block turret

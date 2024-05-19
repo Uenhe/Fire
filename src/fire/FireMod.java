@@ -4,7 +4,6 @@ import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
-import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
@@ -33,32 +32,19 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        Log.info("init");
+        FBinding.load();
+        loadSettings();
+    }
+
+    @Override
+    public void loadContent(){
         FIRE = mods.locateMod("fire");
         displayName = Core.bundle.get("modname");
         close = Core.bundle.get("close");
         FIRE.meta.displayName = displayName;
 
         setRandTitle();
-        loadSettings();
-        FBinding.load();
 
-        Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
-            showNoMultipleMods();
-            showDialog();
-
-              Blocks.sand.playerUnmineable
-            = Blocks.darksand.playerUnmineable
-            = Blocks.sandWater.playerUnmineable
-            = Blocks.darksandWater.playerUnmineable
-            = Blocks.darksandTaintedWater.playerUnmineable
-            = Core.settings.getBool("allowSandMining");
-        });
-    }
-
-    @Override
-    public void loadContent(){
-        Log.info("content");
         FAttribute.load();
         FStatusEffects.load();
         FItems.load();
@@ -68,19 +54,24 @@ public class FireMod extends mindustry.mod.Mod{
         FPlanets.load();
         FSectorPresets.load();
         FPlanets.loadTree();
-        FOverride.load();
+
+        Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
+            showDialog();
+            showNoMultipleMods();
+            FOverride.load();
+        });
     }
 
     private static void loadSettings(){
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
-            t.checkPref("allowSandMining", false, a -> {
-                Blocks.sand.playerUnmineable = !a;
-                Blocks.darksand.playerUnmineable = !a;
-                Blocks.sandWater.playerUnmineable = !a;
-                Blocks.darksandWater.playerUnmineable = !a;
-                Blocks.darksandTaintedWater.playerUnmineable = !a;
-            });
+            t.checkPref("allowSandMining", false, a ->
+                Blocks.sand.playerUnmineable =
+                Blocks.darksand.playerUnmineable =
+                Blocks.sandWater.playerUnmineable =
+                Blocks.darksandWater.playerUnmineable =
+                Blocks.darksandTaintedWater.playerUnmineable = !a
+            );
 
             t.checkPref("showBlockRange", true);
 

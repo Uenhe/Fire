@@ -42,7 +42,7 @@ public class FStatusEffects{
             init(() -> {
                 opposite(StatusEffects.melting, StatusEffects.burning);
                 affinity(StatusEffects.blasted, (unit, result, time) ->
-                    unit.damagePierce(frostbite.transitionDamage)
+                    unit.damagePierce(transitionDamage)
                 );
             });
         }};
@@ -58,7 +58,7 @@ public class FStatusEffects{
         }};
 
         /* TODO Reconstruct this if v147 is released: https://github.com/Anuken/Mindustry/pull/9801"
-         * heal an amount when status ends
+         * TODO heal an amount when status ends
          */
         sanctuaryGuard = new StatusEffect("sanctuary-guard"){
             /** This is buggy... If the world reloads, it triggers again. */
@@ -144,9 +144,9 @@ public class FStatusEffects{
             healthMultiplier = 1.1f;
 
             effect = new Effect(40f, e -> {
-                Draw.color(overgrown.color);
                 final float scl = e.data instanceof Unit u ? 1f + u.type.hitSize / 4f : 1f;
 
+                Draw.color(overgrown.color);
                 Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) ->
                     Fill.circle(e.x + x, e.y + y, e.fout() * scl * 1.2f)
                 );

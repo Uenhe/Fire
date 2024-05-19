@@ -535,7 +535,6 @@ public class FBlocks{
             loopSound = Sounds.flux;
 
             drawer = new DrawTurret(){{
-
                 final var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
 
                 parts.add(
@@ -1282,8 +1281,8 @@ public class FBlocks{
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
-            final float chargeTime = 150f;
-            final float baseRange = 1200f, extraRange = 400f;
+            final float chargeTime = 150.0f;
+            final float baseRange = 1200.0f, extraRange = 400.0f;
             final var col = Color.valueOf("ec7458");
             final var coll = Color.valueOf("ec7458bb");
 
