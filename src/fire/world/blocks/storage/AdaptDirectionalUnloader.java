@@ -7,6 +7,7 @@ public class AdaptDirectionalUnloader extends mindustry.world.blocks.distributio
 
     protected AdaptDirectionalUnloader(String name){
         super(name);
+        buildType = AdaptDirectionalUnloaderBuild::new;
     }
 
     @Override

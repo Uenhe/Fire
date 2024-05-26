@@ -33,7 +33,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     private static final String name = "ability.fire-energyforcefield";
     private float timer;
-    private boolean broken, canRegen;
+    private boolean broken, regenable;
     private final Seq<Bullet> bullets = new Seq<>();
     /** Prevent endless and awful creating instances. */
     private static final ObjectMap<BulletType, BulletType> bulletMap = new ObjectMap<>();
@@ -122,7 +122,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                     if(unit.shield <= 0f){
                         broken = true;
-                        canRegen = false;
+                        regenable = false;
                         radiusScale = 0f;
                         unit.shield -= cooldown * regen;
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
@@ -136,7 +136,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             });
 
         }else{
-            if(unlocks && !canRegen){
+            if(unlocks && !regenable){
 
                 final boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.5f;
 
@@ -162,9 +162,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             bullet.lifetime = 310f;
 
                             // reuse instances as possible
-                            final var type = bulletMap.get(bullet.type) == null
-                                ? bullet.type.copy()
-                                : bulletMap.get(bullet.type);
+                            final var type = bulletMap.get(bullet.type) == null ?
+                                bullet.type.copy() : bulletMap.get(bullet.type);
 
                             if(!bulletMap.containsKey(bullet.type)){
 
@@ -177,8 +176,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                         type.trailWidth = bt.width * 0.22f;
                                         type.trailLength = (int)bt.height / 2;
                                         type.trailColor = bt.backColor;
-                                    }else
+                                    }else{
                                         type.trailLength = 12;
+                                    }
                                 }
                             }
 
@@ -188,7 +188,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                     });
 
                 else if(timer > 310f){
-                    canRegen = true;
+                    regenable = true;
                     timer = 0f;
                     bullets.clear();
                 }
@@ -214,20 +214,19 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             b.lifetime = range / vel;
 
                             final var target =
-                                b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
-                                    ? b.aimTile.build
-                                    : Units.closestTarget(b.team, b.x, b.y, range,
+                                b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id) ?
+                                    b.aimTile.build : Units.closestTarget(b.team, b.x, b.y, range,
                                         u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
                                         t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
                             b.set(unit.x, unit.y);
                             if(target != null && Mathf.chance(0.6)){
-                                final float mag = 5f;
-                                final float velt = vel * 1.15f;
+                                final float mag = 5.0f;
+                                final float velTer = vel * 1.15f;
 
-                                b.vel.setLength(velt);
+                                b.vel.setLength(velTer);
                                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000f));
-                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velt * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
+                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velTer * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
 
                             }else{
                                 float angle = Mathf.random(360f);
@@ -250,7 +249,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     @Override
     public void death(Unit unit){
         timer = 0f;
-        broken = canRegen = false;
+        broken = regenable = false;
         bullets.clear();
     }
 

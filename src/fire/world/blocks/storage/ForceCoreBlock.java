@@ -11,6 +11,7 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
+import mindustry.game.FogControl;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.graphics.Layer;
@@ -39,6 +40,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
     protected ForceCoreBlock(String name){
         super(name);
+        buildType = ForceCoreBuild::new;
     }
 
     @Override
@@ -96,7 +98,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         private boolean broken;
 
         @Override
-        public float range(){
+        public final float range(){
             return radius * scl;
         }
 

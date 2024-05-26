@@ -11,6 +11,7 @@ public class EnvBlock extends mindustry.world.Block{
         forceDark = true;
         hasShadow = false;
         size = 1;
+        buildType = EnvBlockBuild::new;
     }
 
     @Override

@@ -9,6 +9,7 @@ public class BatteryNode extends mindustry.world.blocks.power.PowerNode{
         super(name);
         consumesPower = true;
         outputsPower = true;
+        buildType = BatteryNodeBuild::new;
     }
 
     public class BatteryNodeBuild extends PowerNodeBuild{

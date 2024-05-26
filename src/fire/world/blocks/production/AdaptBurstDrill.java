@@ -4,6 +4,7 @@ public class AdaptBurstDrill extends mindustry.world.blocks.production.BurstDril
 
     protected AdaptBurstDrill(String name){
         super(name);
+        buildType = AdaptBurstDrillBuild::new;
     }
 
     public class AdaptBurstDrillBuild extends BurstDrillBuild{

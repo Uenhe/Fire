@@ -3,24 +3,30 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
+import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
+import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
 import fire.input.FBinding;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
+import mindustry.ctype.UnlockableContent;
+import mindustry.game.EventType;
+import mindustry.mod.Mod;
 import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
 
-public class FireMod extends mindustry.mod.Mod{
+public class FireMod extends Mod{
 
     private static final String
         linkRaindance = "https://space.bilibili.com/516898377",
@@ -54,11 +60,11 @@ public class FireMod extends mindustry.mod.Mod{
         FPlanets.load();
         FSectorPresets.load();
         FPlanets.loadTree();
+        FOverride.load();
 
-        Events.on(mindustry.game.EventType.ClientLoadEvent.class, e -> {
-            showDialog();
+        Events.on(EventType.ClientLoadEvent.class, e -> {
+            showDialog(false);
             showNoMultipleMods();
-            FOverride.load();
         });
     }
 
@@ -82,47 +88,43 @@ public class FireMod extends mindustry.mod.Mod{
             t.pref(new SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
                 @Override
                 public void add(SettingsTable table){
-                    table.button(name, FireMod::showDialog).size(210f, 64f);
-                    table.row();
+                    table.button(name, () -> showDialog(true)).size(240.0f, 64.0f);
                 }
             });
         });
     }
 
-    private static void showDialog(){
-        if(!Core.settings.getBool("showLogs")) return;
+    private static void showDialog(boolean forces){
+        if(!(Core.settings.getBool("showLogs") || forces)) return;
 
         final var version = FIRE.meta.version;
         final var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{
             setupDialog(this);
             cont.pane(t ->
-                t.add("@history").left().width(1024f).maxWidth(1280f).pad(4f)
-            ).maxWidth(1024f);
+                t.add("@history").left().width(1024.0f).maxWidth(1280.0f).pad(4.0f)
+            ).maxWidth(1024.0f);
         }};
 
         new BaseDialog(Core.bundle.format("mainTitle", displayName, version)){{
 
             setupDialog(this);
-            buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210f, 64f);
+            buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210.0f, 64.0f);
             cont.pane(t -> {
 
-                t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107f).width(359f).pad(3f);
+                t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107.0f).width(359.0f).pad(3.0f);
                 t.row();
 
-                t.add(Core.bundle.format("contentMain", version)).left().width(800f).maxWidth(1024f).pad(4f);
+                t.add(Core.bundle.format("contentMain", version)).left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
                 t.row();
 
-                addContent(t, FBlocks.adaptiveSource);
-                addContent(t, FBlocks.blossom);
-                addContent(t, FBlocks.gambler);
-                addContent(t, FBlocks.magneticSphere);
-                addContent(t, FBlocks.hardenedAlloyConveyor);
-                addContent(t, FUnitTypes.pioneer);
-                addContent(t, FStatusEffects.overgrown);
-                addContent(t, FStatusEffects.disintegrated);
+                addContent(t,
+                    FBlocks.adaptiveSource, FBlocks.blossom, FBlocks.gambler, FBlocks.magneticSphere,
+                    FBlocks.hardenedAlloyConveyor, FUnitTypes.pioneer,
+                    FStatusEffects.overgrown, FStatusEffects.disintegrated
+                );
                 t.row();
 
-                t.add("@contentSecondary").left().width(800f).maxWidth(1024f).pad(4f);
+                t.add("@contentSecondary").left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
                 t.row();
 
                 if("zh_CN".equals(Core.settings.getString("locale"))){
@@ -132,7 +134,7 @@ public class FireMod extends mindustry.mod.Mod{
                             ui.showErrorMessage("@linkfail");
                             Core.app.setClipboardText(linkRaindance);
                         }
-                    }).size(256f, 64f);
+                    }).size(256.0f, 64.0f);
                     t.row();
 
                     t.button(("@linkUenhe"), () -> {
@@ -140,7 +142,7 @@ public class FireMod extends mindustry.mod.Mod{
                             ui.showErrorMessage("@linkfail");
                             Core.app.setClipboardText(linkUeneh);
                         }
-                    }).size(256f, 64f);
+                    }).size(256.0f, 64.0f);
                     t.row();
 
                 }else{
@@ -150,10 +152,10 @@ public class FireMod extends mindustry.mod.Mod{
                             ui.showErrorMessage("@linkfail");
                             Core.app.setClipboardText(linkGitHub);
                         }
-                    }).size(256f, 64f);
+                    }).size(256.0f, 64.0f);
                     t.row();
                 }
-            }).maxWidth(1024f);
+            }).maxWidth(1024.0f);
 
             show();
         }};
@@ -172,16 +174,16 @@ public class FireMod extends mindustry.mod.Mod{
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
             new BaseDialog("o_o?"){
-                private float time = 300f;
+                private float time = 300.0f;
                 private boolean canClose;
 
                 {
-                    update(() -> canClose = (time -= Time.delta) <= 0f);
+                    update(() -> canClose = (time -= Time.delta) <= 0.0f);
                     cont.add("@noMultipleMods");
                     buttons.button("", this::hide).update(b -> {
                         b.setDisabled(!canClose);
-                        b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60f, 1)));
-                    }).size(210f, 64f);
+                        b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60.0f, 1)));
+                    }).size(210.0f, 64.0f);
                 }
                 {
                     show();
@@ -192,16 +194,17 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also. */
     private static void setRandTitle(){
-        if (!Core.app.isDesktop()) return;
+        if(!Core.app.isDesktop()) return;
 
         final var titles = Core.bundle.get("fire.randTitle").split("\\|");
         final int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
-        if(index == 0) // "Today is the {0}th Day of God's Creation of the Risetar" picked
+        // "Today is the {0}th Day of God's Creation of the Risetar" picked
+        if(index == 0)
             title = Core.bundle.format(
                 title,
-                java.time.temporal.ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
+                ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
             );
 
         Core.graphics.setTitle("Mindustry: " + title);
@@ -209,23 +212,26 @@ public class FireMod extends mindustry.mod.Mod{
 
     private static void setupDialog(BaseDialog dialog){
         dialog.closeOnBack();
-        dialog.buttons.button(close, dialog::hide).size(210f, 64f);
+        dialog.buttons.button(close, dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, mindustry.ctype.UnlockableContent content){
-        table.table(Styles.grayPanel, t -> {
+    private static void addContent(Table table, UnlockableContent... content){
+        for(final var c : content){
 
-            t.left().button(new arc.scene.style.TextureRegionDrawable(content.uiIcon), Styles.emptyi, 40f, () -> ui.content.show(content)).size(40f).pad(10f).scaling(arc.util.Scaling.fit);
-            t.left().table(info -> {
+            table.table(Styles.grayPanel, t -> {
 
-                info.left().add("[accent]" + content.localizedName).left();
-                info.row();
-                info.left().add(
-                    content.description.substring(0, content.description.indexOf(Core.bundle.get("stringEnd")))
-                ).left();
-            });
+                t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
+                t.left().table(info -> {
 
-        }).growX().pad(5f);
-        table.row();
+                    info.left().add("[accent]" + c.localizedName).left();
+                    info.row();
+                    info.left().add(
+                        c.description.substring(0, c.description.indexOf(Core.bundle.get("stringEnd")))
+                    ).left();
+                });
+
+            }).growX().pad(5.0f);
+            table.row();
+        }
     }
 }

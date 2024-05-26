@@ -15,6 +15,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 
     protected ArmorWall(String name){
         super(name);
+        buildType = ArmorWallBuild::new;
     }
 
     @Override

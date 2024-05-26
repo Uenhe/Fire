@@ -15,6 +15,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         update = true;
         displayFlow = false;
         canOverdrive = true;
+        buildType = AdaptiveSourceBuild::new;
     }
 
     @Override

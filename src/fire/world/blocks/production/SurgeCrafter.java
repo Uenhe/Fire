@@ -2,62 +2,56 @@ package fire.world.blocks.production;
 
 import arc.math.Mathf;
 import arc.struct.Seq;
+import mindustry.gen.Bullet;
 
 public class SurgeCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    protected byte fragBullets = 6;
-    /** Remember to set {@code lifetime} to be less than {@code craftTime}. */
-    protected mindustry.entities.bullet.BulletType fragBullet;
+    protected byte fragBullets;
+    protected mindustry.entities.bullet.BulletType fragBullet = mindustry.content.Bullets.placeholder;
+    /** Used for custom bullets behavior. */
+    protected Pattern pattern = (bullet, index, sign) -> {};
     protected arc.audio.Sound craftSound = mindustry.gen.Sounds.none;
 
     public SurgeCrafter(String name){
         super(name);
-        baseExplosiveness = 5f;
+        baseExplosiveness = 5.0f;
+        buildType = SurgeCrafterBuild::new;
     }
 
     public class SurgeCrafterBuild extends GenericCrafterBuild{
 
-        /** Used for custom bullets behavior. */
-        protected final Seq<mindustry.gen.Bullet> bullets = new Seq<>();
+        protected final Seq<mindustry.gen.Bullet> bullets = new Seq<>(fragBullets);
+        private byte sign;
 
         @Override
         public void craft(){
             super.craft();
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
+            bullets.clear();
 
             //create bullet
-            final float rand = Mathf.random(360f);
+            final float rand = Mathf.random(360.0f);
             for(byte i = 0; i < fragBullets; i++){
-                bullets.add(fragBullet.create(this, x, y, 360f / fragBullets * i + rand));
+                bullets.add(fragBullet.create(this, x, y, 360.0f / fragBullets * i + rand));
             }
-        }
-
-        /** Used for custom bullets behavior. */
-        protected void updateBullet(){
-            bullets.each(b -> {
-
-                // some custom part
-                b.update();
-
-                // necessary
-                if(b.time >= b.lifetime)
-                    bullets.clear();
-            });
+            sign = (byte)Mathf.sign(bullets.get(0).id % 2 == 0);
         }
 
         @Override
-        public void update(){
-            super.update();
+        public void updateTile(){
+            super.updateTile();
+            if(bullets.isEmpty()) return;
 
-            // write this in update() instead of updateTile()
-            // since if the factory is not working, bullets will stop updating
+            bullets.each(b -> {
+                // use replace() so that the origin pattern won't be messed up
+                if(!b.isAdded()) bullets.replace(b, Bullet.create());
 
-            // clear corrupted bullets
-            if(bullets.size > fragBullets)
-                bullets.clear();
-
-            else if(bullets.size == fragBullets)
-                updateBullet();
+                pattern.get(b, bullets.indexOf(b), sign);
+            });
         }
+    }
+
+    public interface Pattern{
+        void get(Bullet bullet, int index, byte sign);
     }
 }

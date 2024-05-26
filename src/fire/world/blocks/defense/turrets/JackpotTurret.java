@@ -16,6 +16,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
 
     protected JackpotTurret(String name){
         super(name);
+        buildType = JackpotTurretBuild::new;
     }
 
     @Override

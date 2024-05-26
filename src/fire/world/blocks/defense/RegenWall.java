@@ -46,6 +46,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         range = 1;
         effect = Fx.none;
         envEnabled = Env.any;
+        buildType = RegenWallBuild::new;
     }
 
     @Override

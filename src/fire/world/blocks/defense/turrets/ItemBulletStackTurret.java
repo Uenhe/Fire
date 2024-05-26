@@ -12,6 +12,7 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
     protected ItemBulletStackTurret(String name){
         super(name);
         consumeAmmoOnce = true;
+        buildType = ItemBulletStackTurretBuild::new;
     }
 
     protected void stack(Object... objects){
