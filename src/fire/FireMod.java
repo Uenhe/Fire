@@ -1,7 +1,6 @@
 package fire;
 
 import arc.Core;
-import arc.Events;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
@@ -13,9 +12,6 @@ import fire.input.FBinding;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
-import mindustry.game.EventType;
-import mindustry.mod.Mod;
-import mindustry.mod.Mods.LoadedMod;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
@@ -26,15 +22,16 @@ import java.time.temporal.ChronoUnit;
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
 
-public class FireMod extends Mod{
+public class FireMod extends mindustry.mod.Mod{
 
     private static final String
         linkRaindance = "https://space.bilibili.com/516898377",
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
 
-    private static LoadedMod FIRE;
+    private static mindustry.mod.Mods.LoadedMod FIRE;
     private static String displayName, close;
+    private static boolean launched;
 
     @Override
     public void init(){
@@ -62,9 +59,10 @@ public class FireMod extends Mod{
         FPlanets.loadTree();
         FOverride.load();
 
-        Events.on(EventType.ClientLoadEvent.class, e -> {
-            showDialog(false);
+        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
+            showDialog();
             showNoMultipleMods();
+            launched = true;
         });
     }
 
@@ -88,14 +86,15 @@ public class FireMod extends Mod{
             t.pref(new SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
                 @Override
                 public void add(SettingsTable table){
-                    table.button(name, () -> showDialog(true)).size(240.0f, 64.0f);
+                    table.button(name, FireMod::showDialog).size(240.0f, 64.0f);
+                    table.row();
                 }
             });
         });
     }
 
-    private static void showDialog(boolean forces){
-        if(!(Core.settings.getBool("showLogs") || forces)) return;
+    private static void showDialog(){
+        if(!(Core.settings.getBool("showLogs") || launched)) return;
 
         final var version = FIRE.meta.version;
         final var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{

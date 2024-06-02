@@ -54,7 +54,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     /** TODO Reconstruct this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a>; May clash with BE? */
     @Override
     public void addStats(Table t){
-        final float wid = 432f;
+        final float wid = 432.0f;
 
         t.add(Core.bundle.get(name + ".description")).wrap().width(wid);
         t.row();
@@ -88,7 +88,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         alpha = Math.max(alpha - Time.delta / 10f, 0f);
         broken = unit.shield <= 0f;
 
-        if(rotateSpeed > 0f){
+        if(rotateSpeed > 0.0f){
             rotation += rotateSpeed * Time.delta;
             rotation %= 360f;
         }

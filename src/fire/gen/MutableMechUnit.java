@@ -1,6 +1,5 @@
 package fire.gen;
 
-import fire.content.FStatusEffects;
 import mindustry.type.UnitType;
 
 public class MutableMechUnit extends mindustry.gen.MechUnit{
@@ -15,9 +14,10 @@ public class MutableMechUnit extends mindustry.gen.MechUnit{
     public void destroy(){
         super.destroy();
 
-        if(hasEffect(FStatusEffects.overgrown)){
+        if(hasEffect(fire.content.FStatusEffects.overgrown)){
             final var unit = toRespawn.spawn(mindustry.game.Team.crux, x, y);
-            statuses.each(e -> unit.apply(e.effect, e.time));
+            for(final var e : statuses)
+                unit.apply(e.effect, e.time);
         }
     }
 }

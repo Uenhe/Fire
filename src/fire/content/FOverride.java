@@ -13,6 +13,7 @@ import mindustry.type.UnitType;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.MassDriver;
+import mindustry.world.blocks.logic.MessageBlock;
 import mindustry.world.blocks.power.LightBlock;
 import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.production.Pump;
@@ -26,13 +27,6 @@ import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.*;
 
 public class FOverride{
-
-    private static UnitType[] unitUpgrade(UnitType from, UnitType to){
-        final var a = Arrays.copyOf(((Reconstructor)tetrativeReconstructor).upgrades.get(0), 2);
-        a[0] = from;
-        a[1] = to;
-        return a;
-    }
 
     public static void load(){
 
@@ -146,6 +140,11 @@ public class FOverride{
         ((LightBlock)illuminator).radius += 60f;
 
         //endregion
+        //region block logic
+
+        ((MessageBlock)worldMessage).maxTextLength = 999;
+
+        //endregion
         //region unit
 
         dagger.constructor = () -> new MutableMechUnit(FUnitTypes.blade);
@@ -165,5 +164,14 @@ public class FOverride{
         //region liquid
 
         Liquids.neoplasm.effect = FStatusEffects.overgrown;
+
+        //endregion
+    }
+
+    private static UnitType[] unitUpgrade(UnitType from, UnitType to){
+        final var a = Arrays.copyOf(((Reconstructor)tetrativeReconstructor).upgrades.get(0), 2);
+        a[0] = from;
+        a[1] = to;
+        return a;
     }
 }

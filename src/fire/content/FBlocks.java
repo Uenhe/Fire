@@ -898,6 +898,7 @@ public class FBlocks{
             rotateSpeed = 1.0f;
             recoil = 2.0f;
             shake = 4.0f;
+            coolantMultiplier = 3.0f;
             ammoPerShot = 4;
             shootSound = Sounds.missileLaunch;
 
@@ -905,15 +906,15 @@ public class FBlocks{
 
             ammo(
 
-                FItems.logicAlloy, new MissileBulletType(3f, 285f){{
-                    lifetime = 167f;
-                    width = 25f;
-                    height = 28f;
-                    splashDamageRadius = 56f;
-                    splashDamage = 305f;
-                    homingPower = 0.18f;
+                FItems.logicAlloy, new MissileBulletType(3.0f, 300.0f){{
+                    lifetime = 167.0f;
+                    width = 25.0f;
+                    height = 28.0f;
+                    splashDamageRadius = 30.0f;
+                    splashDamage = 75.0f;
+                    homingPower = 0.16f;
                     despawnShake = 3.0f;
-                    ammoMultiplier = 1;
+                    ammoMultiplier = 1.0f;
                     buildingDamageMultiplier = 0.2f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootSmokeMissile;
@@ -921,17 +922,17 @@ public class FBlocks{
                     hitSound = Sounds.mediumCannon;
                 }},
 
-                FItems.detonationCompound, new MissileBulletType(4f, 320f){{
-                    lifetime = 193f;
-                    width = 25f;
-                    height = 28f;
-                    splashDamageRadius = 72f;
-                    splashDamage = 320f;
-                    rangeChange = 270f;
+                FItems.detonationCompound, new MissileBulletType(4.0f, 120.0f){{
+                    lifetime = 193.0f;
+                    width = 25.0f;
+                    height = 28.0f;
+                    splashDamage = 275.0f;
+                    splashDamageRadius = 64.0f;
+                    rangeChange = 270.0f;
                     homingPower = 0.16f;
                     despawnShake = 5.0f;
                     makeFire = true;
-                    ammoMultiplier = 1;
+                    ammoMultiplier = 1.0f;
                     buildingDamageMultiplier = 0.2f;
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootSmokeMissile;
@@ -939,19 +940,19 @@ public class FBlocks{
                     hitSound = Sounds.mediumCannon;
 
                     trailColor = Pal.lightishOrange;
-                    trailInterval = 20f;
-                    trailEffect = new Effect(30f, e -> {
+                    trailInterval = 20.0f;
+                    trailEffect = new Effect(30.0f, e -> {
                         Draw.color(e.color);
                         Fill.circle(e.x, e.y, 1.8f * e.rotation * e.fout() + 1.4f);
                     });
 
                     fragBullets = 3;
-                    fragBullet = new MissileBulletType(2f, 220f){{
-                        lifetime = 144f;
-                        width = 20f;
-                        height = 24f;
-                        splashDamage = 780f;
-                        splashDamageRadius = 120f;
+                    fragBullet = new MissileBulletType(2.0f, 30.0f){{
+                        lifetime = 144.0f;
+                        width = 20.0f;
+                        height = 24.0f;
+                        splashDamage = 120.0f;
+                        splashDamageRadius = 48.0f;
                         homingPower = 0.2f;
                         despawnShake = 2.0f;
                         shrinkY = 1.0f;
@@ -960,8 +961,8 @@ public class FBlocks{
                         hitEffect = Fx.blastExplosion;
 
                         trailColor = Pal.lightishOrange;
-                        trailInterval = 25f;
-                        trailEffect = new Effect(30f, e -> {
+                        trailInterval = 25.0f;
+                        trailEffect = new Effect(30.0f, e -> {
                             Draw.color(e.color);
                             Fill.circle(e.x, e.y, 1.2f * e.rotation * e.fout() + 0.8f);
                         });
@@ -2324,6 +2325,7 @@ public class FBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.slag),
+                new DrawRegion("-top"),
                 new DrawDefault()
             );
 
