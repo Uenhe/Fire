@@ -47,7 +47,7 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(Unit unit){
-        final float lineSpeed = 120f;
+        final float lineSpeed = 120.0f;
 
         targets.clear();
         Units.nearby(unit.team, unit.x, unit.y, radius, u -> {
@@ -69,20 +69,14 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public void draw(Unit unit){
         if(warmup < 0.001f) return;
 
-        final float lineStroke = 3f;
-        final float mod = totalProgress % 1f;
+        final float lineStroke = 3.0f;
+        final float mod = totalProgress % 1.0f;
 
         Draw.z(Layer.effect);
         Draw.color(lineColor);
-        Lines.stroke(lineStroke * (1f - mod) * warmup);
+        Lines.stroke(lineStroke * (1.0f - mod) * warmup);
         Lines.circle(unit.x, unit.y, radius * mod);
 
         Draw.reset();
-    }
-
-    @Override
-    public void death(Unit unit){
-        warmup = totalProgress = 0f;
-        targets.clear();
     }
 }

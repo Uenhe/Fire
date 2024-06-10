@@ -2,14 +2,13 @@ package fire.entities.abilities;
 
 import arc.struct.FloatSeq;
 import arc.util.Time;
-import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 
 public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
-    /** TICKs between two triggers. */
+    /** Frames between two triggers. */
     private final short cooldown;
-    /** Trigger if unit loses such health in detectDuration; 50 => 50%. */
+    /** Triggers if the unit loses such health in detectDuration; 50 => 50%. */
     private final byte healthLossPercentage;
     /** Amount to heal at trigger. */
     private final int healAmount;
@@ -20,7 +19,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     /** Status effect duration. */
     private final short effectDuration;
 
-    /** TICKs between two detections. */
+    /** Frames between two detections. */
     private static final byte detectInterval = 10;
     /** Used to record health. */
     private final FloatSeq healths;
@@ -46,7 +45,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             for(byte i = 0; i < healths.items.length; i++)
                 healths.add(unit.health);
 
-        if(cooldownTimer == 0f){
+        if(cooldownTimer == 0.0f){
             timer += Time.delta;
 
             if(timer >= detectInterval){
@@ -55,27 +54,20 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
                 healths.removeIndex(0);
                 healths.add(unit.health);
 
-                if((healths.get(0) - unit.health) >= unit.maxHealth * healthLossPercentage / 100f){
+                if((healths.get(0) - unit.health) >= unit.maxHealth * healthLossPercentage / 100.0f){
 
-                    unit.heal(healAmount + healPercentage / 100f);
+                    unit.heal(healAmount + healPercentage / 100.0f);
                     unit.apply(effect, effectDuration);
 
-                    // enter cooldown
+                    //enter cooldown
                     cooldownTimer = 0.001f;
                 }
             }
-        }
+        }else if(cooldownTimer >= cooldown){
+            cooldownTimer = 0.0f;
 
-        else if(cooldownTimer >= cooldown)
-            cooldownTimer = 0f;
-
-        else
+        }else{
             cooldownTimer += Time.delta;
-    }
-
-    @Override
-    public void death(Unit unit){
-        healths.clear();
-        timer = cooldownTimer = 0f;
+        }
     }
 }

@@ -74,9 +74,4 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
 
         Draw.reset();
     }
-
-    @Override
-    public void death(Unit unit){
-        warmup = 0f;
-    }
 }

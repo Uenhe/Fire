@@ -8,8 +8,8 @@ public class FSectorPresets{
     public static SectorPreset
 
         landingBase, darksandPlain, cornerOfZero, beachLanding,
-        darkWorkshop, sporeFiord, scorchingVolcano, lavaStronghold,
-        eternityRiverStronghold, chillyMountains, urgentSupport;
+        darkWorkshop, urgentSupport, glaciatedPeaks, sporeFiord,
+        scorchingVolcano, lavaStronghold, eteriverStronghold, chillyMountains;
 
     public static void load(){
 
@@ -39,6 +39,11 @@ public class FSectorPresets{
             addStartingItems = true;
         }};
 
+        glaciatedPeaks = new SectorPreset("glaciated-peaks", risetar, 206){{
+            difficulty = 10;
+            addStartingItems = true;
+        }};
+
         sporeFiord = new SectorPreset("bzxw", risetar, 199){{
             difficulty = 8;
             captureWave = 40;
@@ -56,7 +61,7 @@ public class FSectorPresets{
             addStartingItems = true;
         }};
 
-        eternityRiverStronghold = new SectorPreset("hhys", risetar, 34){{
+        eteriverStronghold = new SectorPreset("hhys", risetar, 34){{
             difficulty = 8;
             addStartingItems = true;
         }};

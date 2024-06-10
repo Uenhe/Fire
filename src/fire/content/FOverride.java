@@ -1,13 +1,16 @@
 package fire.content;
 
 import arc.Core;
-import fire.gen.MutableMechUnit;
+import arc.util.Reflect;
 import fire.world.meta.FAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
+import mindustry.entities.abilities.Ability;
 import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.game.Team;
+import mindustry.gen.Unit;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -147,9 +150,9 @@ public class FOverride{
         //endregion
         //region unit
 
-        dagger.constructor = () -> new MutableMechUnit(FUnitTypes.blade);
-        mace.constructor = () -> new MutableMechUnit(FUnitTypes.hatchet);
-        fortress.constructor = () -> new MutableMechUnit(FUnitTypes.castle);
+        dagger.abilities.add(new MutableAbility(FUnitTypes.blade));
+        mace.abilities.add(new MutableAbility(FUnitTypes.hatchet));
+        fortress.abilities.add(new MutableAbility(FUnitTypes.castle));
 
         alpha.coreUnitDock = true;
         beta.coreUnitDock = true;
@@ -173,5 +176,22 @@ public class FOverride{
         a[0] = from;
         a[1] = to;
         return a;
+    }
+
+    private static class MutableAbility extends Ability{
+
+        private final UnitType toRespawn;
+
+        public MutableAbility(UnitType type){
+            toRespawn = type;
+            display = false;
+
+        }
+
+        @Override
+        public void death(Unit unit){
+            if(!unit.hasEffect(FStatusEffects.overgrown)) return;
+            Reflect.set(toRespawn.spawn(Team.crux, unit.x, unit.y), "statuses", Reflect.get(unit, "statuses"));
+        }
     }
 }

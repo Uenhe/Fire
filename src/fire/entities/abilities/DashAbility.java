@@ -78,11 +78,6 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         Draw.reset();
     }
 
-    @Override
-    public void death(Unit unit){
-        timer = 0f;
-    }
-
     public void dash(Unit unit, Position pos){
         if(timer < cooldown || !unit.moving() || !(canDash(unit, pos))) return;
 

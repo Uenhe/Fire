@@ -1,6 +1,7 @@
 package fire.content;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -13,6 +14,7 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Time;
 import fire.entities.FUnitSorts;
 import fire.entities.bullets.LightningPointBulletType;
@@ -50,6 +52,7 @@ import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootAlternate;
 import mindustry.entities.pattern.ShootMulti;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
@@ -136,7 +139,7 @@ public class FBlocks{
         buildingHealer, campfire, skyDome, buildIndicator, coreArmored, javelinPad, compositeUnloader,
 
         //env
-        envStormyCoast;
+        envEteriverStronghold, envStormyCoast, envGlaciatedPeaks;
 
     private static BulletType destroyBullet(float dmg, float radius){
         return new BulletType(1f, 0f){{
@@ -482,29 +485,29 @@ public class FBlocks{
             ));
             health = 1600;
             size = 2;
-            reload = 45f;
-            range = 260f;
-            shootCone = 15f;
+            reload = 45.0f;
+            range = 260.0f;
+            shootCone = 15.0f;
             inaccuracy = 1.0f;
             rotateSpeed = 4.0f;
 
             ammo(
-                FItems.flesh, new BulletType(2f, 75f){
+                FItems.flesh, new BulletType(2.0f, 75.0f){
 
                     @Override
                     public void draw(Bullet b){
                         super.draw(b);
                         final var item = FItems.flesh;
 
-                        Draw.alpha(1f);
+                        Draw.alpha(1.0f);
                         Draw.blend(Blending.additive);
-                        Draw.rect(Core.atlas.find("fire-flesh" + (byte)((b.time / item.frameTime % item.frames) + 1)), b.x, b.y, 10.0f, 10.0f);
+                        Draw.rect(Core.atlas.find("fire-flesh" + (b.time / item.frameTime % item.frames) + 1), b.x, b.y, 10.0f, 10.0f);
                         Draw.blend();
                     }
                     {
-                    lifetime = 131f;
+                    lifetime = 131.0f;
                     status = FStatusEffects.overgrown;
-                    statusDuration = 360f;
+                    statusDuration = 360.0f;
                 }}
             );
         }};
@@ -533,7 +536,7 @@ public class FBlocks{
             loopSound = Sounds.flux;
 
             drawer = new DrawTurret(){{
-                final var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2f, 1.0f) * p.warmup, 0.2f);
+                final var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2.0f, 1.0f) * p.warmup, 0.2f);
 
                 parts.add(
 
@@ -922,11 +925,11 @@ public class FBlocks{
                     hitSound = Sounds.mediumCannon;
                 }},
 
-                FItems.detonationCompound, new MissileBulletType(4.0f, 120.0f){{
+                FItems.detonationCompound, new MissileBulletType(4.0f, 210.0f){{
                     lifetime = 193.0f;
                     width = 25.0f;
                     height = 28.0f;
-                    splashDamage = 275.0f;
+                    splashDamage = 330.0f;
                     splashDamageRadius = 64.0f;
                     rangeChange = 270.0f;
                     homingPower = 0.16f;
@@ -947,11 +950,11 @@ public class FBlocks{
                     });
 
                     fragBullets = 3;
-                    fragBullet = new MissileBulletType(2.0f, 30.0f){{
+                    fragBullet = new MissileBulletType(2.0f, 105.0f){{
                         lifetime = 144.0f;
                         width = 20.0f;
                         height = 24.0f;
-                        splashDamage = 120.0f;
+                        splashDamage = 225.0f;
                         splashDamageRadius = 48.0f;
                         homingPower = 0.2f;
                         despawnShake = 2.0f;
@@ -2778,7 +2781,7 @@ public class FBlocks{
             fragRoundRand = true;
             fragDelay = 10;
             fragDelayRand = true;
-            fragBulletViRand = true;
+            fragBulletVelRand = true;
             fragBullet = new BasicBulletType(30f, 80f, "fire-frag-front"){{
                 backSprite = "fire-frag-back";
                 lifetime = 24f;
@@ -3042,6 +3045,32 @@ public class FBlocks{
         //endregion
         //region env
 
+        envEteriverStronghold = new EnvBlock("env-eteriver-stronghold"){{
+            buildType = () -> new EnvBlockBuild(){
+
+                /** Apollo spawn; placed() is not used since it's buggy. */
+                @Override
+                public void update(){
+                    if(state.isEditor()) return;
+
+                    for(final var w : Groups.weather)
+                        if(w.weather != Weathers.rain) w.remove();
+
+                    if(Groups.weather.isEmpty())
+                        Weathers.rain.create();
+
+                    kill();
+                }
+
+                /** Apollo death. */
+                @Override
+                public void onRemoved(){
+                    super.onRemoved();
+                    Groups.weather.clear();
+                }
+            };
+        }};
+
         envStormyCoast = new EnvBlock("env-stormy-coast"){{
             buildType = () -> new EnvBlockBuild(){
 
@@ -3050,6 +3079,7 @@ public class FBlocks{
                     defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f),
                     specificColor = new Color(0.1f, 0.1f, 0.1f);
 
+                /** Wave 59/60. */
                 @Override
                 protected void updateStart(){
                     state.rules.lighting = true;
@@ -3057,13 +3087,14 @@ public class FBlocks{
                     alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
                     state.rules.ambientLight.a = alpha;
 
-                    Groups.weather.each(w -> {
+                    for(final var w : Groups.weather)
                         if(w.weather != Weathers.rain) w.remove();
-                    });
+
                     if(Groups.weather.isEmpty())
                         Weathers.rain.create();
                 }
 
+                /** After all the apollos are destructed. */
                 @Override
                 protected void updateStop(){
                     state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0f, 0.004f);
@@ -3086,6 +3117,28 @@ public class FBlocks{
                         state.rules.ambientLight = defaultColor;
                     else
                         state.rules.ambientLight = Color.clear;
+                }
+            };
+        }};
+
+        envGlaciatedPeaks = new EnvBlock("env-glaciated-peaks"){{
+            buildType = () -> new EnvBlockBuild(){
+
+                /** Limits invasion times. */
+                private byte times;
+
+                /** Landing; placed() is not used since it's buggy. */
+                @Override
+                public void update(){
+                    if(state.isEditor() || !state.isCampaign()) return;
+
+                    for(final var s : state.getPlanet().sectors){
+                        if(times < 5 && !s.isAttacked() && Mathf.chance(0.8)) continue;
+                        Events.fire(new EventType.SectorInvasionEvent(s));
+                        times++;
+                    }
+
+                    kill();
                 }
             };
         }};

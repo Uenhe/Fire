@@ -246,13 +246,6 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         }
     }
 
-    @Override
-    public void death(Unit unit){
-        timer = 0f;
-        broken = regenable = false;
-        bullets.clear();
-    }
-
     private float realRad(){
         return radius * radiusScale;
     }

@@ -48,7 +48,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         fragBulletsRand,
         fragRoundRand,
         fragDelayRand,
-        fragBulletViRand;
+        fragBulletVelRand;
     /** see {@link mindustry.world.blocks.power.PowerGenerator} */
     protected Effect explodeEffect = Fx.none;
     /** see {@link mindustry.world.blocks.power.PowerGenerator} */
@@ -141,7 +141,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                     for(byte j = 0; j < (fragBulletsRand ?
                         Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max)) : fragBullets
                     ); j++)
-                        fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f), fragBulletViRand ?
+                        fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f), fragBulletVelRand ?
                             Mathf.random(0.9f, 1.1f) : 1.0f
                         );
                 });
@@ -158,7 +158,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             super.draw();
 
             if(efficiency > 0.0f){
-                flash += (1.0f + instability / maxInstability * 6.0f) * Time.delta;
+                flash += (1.0f + instability / maxInstability * 6.0f) * delta();
                 Draw.z(Layer.effect);
                 Lines.stroke(2.5f, circleColor[index]);
                 Lines.arc(x, y, size * 5.0f, fraction, angle);

@@ -8,7 +8,6 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
-import fire.input.FBinding;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
@@ -17,7 +16,6 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
@@ -35,8 +33,14 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        FBinding.load();
+        fire.input.FBinding.load();
         loadSettings();
+
+        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
+            showDialog();
+            showNoMultipleMods();
+            launched = true;
+        });
     }
 
     @Override
@@ -58,12 +62,6 @@ public class FireMod extends mindustry.mod.Mod{
         FSectorPresets.load();
         FPlanets.loadTree();
         FOverride.load();
-
-        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
-            showDialog();
-            showNoMultipleMods();
-            launched = true;
-        });
     }
 
     private static void loadSettings(){
@@ -78,9 +76,7 @@ public class FireMod extends mindustry.mod.Mod{
             );
 
             t.checkPref("showBlockRange", true);
-
             t.checkPref("showLogs", true);
-
             t.checkPref("noMultipleMods", true);
 
             t.pref(new SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
@@ -104,60 +100,59 @@ public class FireMod extends mindustry.mod.Mod{
             ).maxWidth(1024.0f);
         }};
 
-        new BaseDialog(Core.bundle.format("mainTitle", displayName, version)){{
+        final var mainDialog = new BaseDialog(Core.bundle.format("mainTitle", displayName, version));
 
-            setupDialog(this);
-            buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210.0f, 64.0f);
-            cont.pane(t -> {
+        setupDialog(mainDialog);
+        mainDialog.buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210.0f, 64.0f);
+        mainDialog.cont.pane(t -> {
 
-                t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107.0f).width(359.0f).pad(3.0f);
+            t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107.0f).width(359.0f).pad(3.0f);
+            t.row();
+
+            t.add(Core.bundle.format("contentMain", version)).left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
+            t.row();
+
+            addContent(t,
+                FBlocks.adaptiveSource, FBlocks.blossom, FBlocks.gambler, FBlocks.magneticSphere,
+                FBlocks.hardenedAlloyConveyor, FUnitTypes.pioneer,
+                FStatusEffects.overgrown, FStatusEffects.disintegrated
+            );
+            t.row();
+
+            t.add("@contentSecondary").left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
+            t.row();
+
+            if("zh_CN".equals(Core.settings.getString("locale"))){
+
+                t.button(("@linkRaindance"), () -> {
+                    if(!Core.app.openURI(linkRaindance)){
+                        ui.showErrorMessage("@linkfail");
+                        Core.app.setClipboardText(linkRaindance);
+                    }
+                }).size(256.0f, 64.0f);
                 t.row();
 
-                t.add(Core.bundle.format("contentMain", version)).left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
+                t.button(("@linkUenhe"), () -> {
+                    if(!Core.app.openURI(linkUeneh)){
+                        ui.showErrorMessage("@linkfail");
+                        Core.app.setClipboardText(linkUeneh);
+                    }
+                }).size(256.0f, 64.0f);
                 t.row();
 
-                addContent(t,
-                    FBlocks.adaptiveSource, FBlocks.blossom, FBlocks.gambler, FBlocks.magneticSphere,
-                    FBlocks.hardenedAlloyConveyor, FUnitTypes.pioneer,
-                    FStatusEffects.overgrown, FStatusEffects.disintegrated
-                );
+            }else{
+
+                t.button(("@linkGithub"), () -> {
+                    if(!Core.app.openURI(linkGitHub)){
+                        ui.showErrorMessage("@linkfail");
+                        Core.app.setClipboardText(linkGitHub);
+                    }
+                }).size(256.0f, 64.0f);
                 t.row();
+            }
+        }).maxWidth(1024.0f);
 
-                t.add("@contentSecondary").left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
-                t.row();
-
-                if("zh_CN".equals(Core.settings.getString("locale"))){
-
-                    t.button(("@linkRaindance"), () -> {
-                        if(!Core.app.openURI(linkRaindance)){
-                            ui.showErrorMessage("@linkfail");
-                            Core.app.setClipboardText(linkRaindance);
-                        }
-                    }).size(256.0f, 64.0f);
-                    t.row();
-
-                    t.button(("@linkUenhe"), () -> {
-                        if(!Core.app.openURI(linkUeneh)){
-                            ui.showErrorMessage("@linkfail");
-                            Core.app.setClipboardText(linkUeneh);
-                        }
-                    }).size(256.0f, 64.0f);
-                    t.row();
-
-                }else{
-
-                    t.button(("@linkGithub"), () -> {
-                        if(!Core.app.openURI(linkGitHub)){
-                            ui.showErrorMessage("@linkfail");
-                            Core.app.setClipboardText(linkGitHub);
-                        }
-                    }).size(256.0f, 64.0f);
-                    t.row();
-                }
-            }).maxWidth(1024.0f);
-
-            show();
-        }};
+        mainDialog.show();
     }
 
     private static void showNoMultipleMods(){
@@ -169,10 +164,10 @@ public class FireMod extends mindustry.mod.Mod{
                 break;
             }
 
-        if(announces && Core.settings.getBool("noMultipleMods"))
+        if(announces && Core.settings.getBool("noMultipleMods")){
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
-            new BaseDialog("o_o?"){
+            final var dialog = new BaseDialog("o_o?"){
                 private float time = 300.0f;
                 private boolean canClose;
 
@@ -184,11 +179,10 @@ public class FireMod extends mindustry.mod.Mod{
                         b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60.0f, 1)));
                     }).size(210.0f, 64.0f);
                 }
-                {
-                    show();
-                }
             };
 
+            dialog.show();
+        }
     }
 
     /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also. */
@@ -203,7 +197,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(index == 0)
             title = Core.bundle.format(
                 title,
-                ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
+                java.time.temporal.ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
             );
 
         Core.graphics.setTitle("Mindustry: " + title);

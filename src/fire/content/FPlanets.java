@@ -103,7 +103,7 @@ public class FPlanets{
                     );
                     node(kindlingExtractor, () -> {
                         node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () -> {});
-                        node(hardenedAlloySmelter, with(new SectorComplete(eternityRiverStronghold)), () ->
+                        node(hardenedAlloySmelter, with(new SectorComplete(eteriverStronghold)), () ->
                             node(hardenedAlloyCrucible, with(new SectorComplete(urgentSupport)), () -> {})
                         );
                     });
@@ -129,7 +129,7 @@ public class FPlanets{
                 });
                 node(nightmare, with(new OnSector(landingBase)), () -> {
                     node(blossom, with(new SectorComplete(beachLanding)), () -> {});
-                    node(distance, with(new SectorComplete(eternityRiverStronghold)), () ->
+                    node(distance, with(new SectorComplete(eteriverStronghold)), () ->
                         node(grudge, with(new SectorComplete(urgentSupport)), () -> {})
                     );
                 });
@@ -154,7 +154,9 @@ public class FPlanets{
                     node(cornerOfZero, with(new SectorComplete(darksandPlain)), () ->
                         node(beachLanding, with(new SectorComplete(cornerOfZero)), () ->
                             node(darkWorkshop, with(new SectorComplete(beachLanding), new Research(garrison)), () ->
-                                node(urgentSupport, with(new SectorComplete(darkWorkshop), new Research(distance)), () -> {})
+                                node(urgentSupport, with(new SectorComplete(darkWorkshop), new Research(distance)), () -> {
+                                    //node(glaciatedPeaks, () -> {});
+                                })
                             )
                         )
                     );
@@ -163,8 +165,8 @@ public class FPlanets{
                             node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(urgentSupport), new Research(skyDome)), () -> {})
                         )
                     );
-                    node(eternityRiverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
-                        node(chillyMountains, with(new SectorComplete(eternityRiverStronghold), new Produce(conductor)), () -> {})
+                    node(eteriverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
+                        node(chillyMountains, with(new SectorComplete(eteriverStronghold), new Produce(conductor)), () -> {})
                     );
                 })
             );
@@ -230,7 +232,7 @@ public class FPlanets{
                             });
                         });
 
-                        dnode(eternityRiverStronghold, () -> {
+                        dnode(eteriverStronghold, () -> {
                             dnode(hardenedAlloy);
                             dnode(distance);
 

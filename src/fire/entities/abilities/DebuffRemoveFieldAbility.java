@@ -72,9 +72,4 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
             if(any[0]) removeEffect.at(unit);
         }
     }
-
-    @Override
-    public void death(Unit unit){
-        timer = 0f;
-    }
 }

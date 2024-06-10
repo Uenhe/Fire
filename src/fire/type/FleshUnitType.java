@@ -13,6 +13,6 @@ public class FleshUnitType extends mindustry.type.UnitType{
     public void update(mindustry.gen.Unit unit){
         super.update(unit);
         if(arc.math.Mathf.chanceDelta(0.04))
-            FStatusEffects.overgrown.effect.at(unit.x, unit.y, 0f, unit);
+            FStatusEffects.overgrown.effect.at(unit.x, unit.y, 0.0f, unit);
     }
 }
