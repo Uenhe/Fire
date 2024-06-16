@@ -14,7 +14,6 @@ import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import fire.entities.FUnitSorts;
 import fire.entities.bullets.LightningPointBulletType;
@@ -2328,8 +2327,10 @@ public class FBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.slag),
-                new DrawRegion("-top"),
-                new DrawDefault()
+                new DrawDefault(),
+                new DrawFlame(Color.valueOf("ffcf99")){{
+                    flameRadius = 2.0f;
+                }}
             );
 
             craftTime = 60f;
@@ -3127,15 +3128,16 @@ public class FBlocks{
                 /** Limits invasion times. */
                 private byte times;
 
-                /** Landing; placed() is not used since it's buggy. */
+                /** Landing; placed() is not used since it won't be called if placed by world processor... */
                 @Override
                 public void update(){
                     if(state.isEditor() || !state.isCampaign()) return;
 
                     for(final var s : state.getPlanet().sectors){
-                        if(times < 5 && !s.isAttacked() && Mathf.chance(0.8)) continue;
-                        Events.fire(new EventType.SectorInvasionEvent(s));
-                        times++;
+                        if(times < 5 && s.hasBase() && Mathf.chance(0.6)){
+                            Events.fire(new EventType.SectorInvasionEvent(s));
+                            times++;
+                        }
                     }
 
                     kill();
