@@ -538,8 +538,8 @@ public class FUnitTypes{
             lowAltitude = true;
 
             abilities.add(
-                new DashAbility(8f, 12f, 120f, 6),
-                new FirstAidAbility(2400, 70, 2000, 10, FStatusEffects.sanctuaryGuard, 600, 120)
+                new DashAbility(6f, 15f, 120f, 6),
+                new FirstAidAbility(2400, 80, 1200, 0, FStatusEffects.sanctuaryGuard, 360, 120)
             );
 
             weapons.add(

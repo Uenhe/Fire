@@ -182,7 +182,6 @@ public class FBlocks{
             liquidCapacity = 100.0f;
             laserRange = 200.0f;
             maxNodes = 500;
-            powerProduction = Float.MAX_VALUE;
             itemPerSec = 2000;
             autolink = drawRange = false;
         }};

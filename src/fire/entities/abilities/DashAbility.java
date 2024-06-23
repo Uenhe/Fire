@@ -97,6 +97,6 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     private float dst(Unit unit){
-        return unit.speed() * speedMultiplier * mindustry.Vars.tilesize * 1.3f;
+        return unit.speed() * speedMultiplier * mindustry.Vars.tilesize * 2.0f;
     }
 }
