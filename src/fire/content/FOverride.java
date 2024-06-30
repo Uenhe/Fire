@@ -24,8 +24,6 @@ import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BuildVisibility;
 
-import java.util.Arrays;
-
 import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.*;
 
@@ -41,8 +39,8 @@ public class FOverride{
         sporePine.attributes.set(FAttribute.tree, 1.5f);
         snowPine.attributes.set(FAttribute.tree, 1.5f);
         pine.attributes.set(FAttribute.tree, 1.5f);
-        whiteTreeDead.attributes.set(FAttribute.tree, 1f);
-        whiteTree.attributes.set(FAttribute.tree, 1f);
+        whiteTreeDead.attributes.set(FAttribute.tree, 1.0f);
+        whiteTree.attributes.set(FAttribute.tree, 1.0f);
         grass.attributes.set(FAttribute.grass, 0.25f);
 
         Blocks.sand.playerUnmineable =
@@ -54,85 +52,88 @@ public class FOverride{
         //endregion
         //region block turret
 
-        wave.liquidCapacity += 10f;
+        wave.liquidCapacity += 10.0f;
         ((LiquidTurret)wave).ammoTypes.put(FLiquids.liquidNitrogen, new LiquidBulletType(FLiquids.liquidNitrogen){{
             damage = 4.55f;
             knockback = 0.7f;
             drag = 0.001f;
         }});
-        tsunami.liquidCapacity += 20f;
+        tsunami.liquidCapacity += 20.0f;
         ((LiquidTurret)tsunami).ammoTypes.put(FLiquids.liquidNitrogen, new LiquidBulletType(FLiquids.liquidNitrogen){{
-            speed = 4f;
+            speed = 4.0f;
             damage = 6.25f;
-            lifetime = 49f;
+            lifetime = 49.0f;
             knockback = 1.3f;
             ammoMultiplier = 0.4f;
-            statusDuration = 240f;
-            puddleSize = 8f;
-            orbSize = 4f;
+            statusDuration = 240.0f;
+            puddleSize = 8.0f;
+            orbSize = 4.0f;
             drag = 0.001f;
         }});
 
         //endregion
         //region block production
 
-        ((Drill)laserDrill).drillTime -= 10f;
-        ((Drill)laserDrill).hardnessDrillMultiplier -= 5f;
-        ((Drill)blastDrill).drillTime -= 25f;
-        ((Drill)blastDrill).hardnessDrillMultiplier -= 5f;
+        ((Drill)laserDrill).drillTime -= 10.0f;
+        ((Drill)laserDrill).hardnessDrillMultiplier -= 5.0f;
+        ((Drill)blastDrill).drillTime -= 25.0f;
+        ((Drill)blastDrill).hardnessDrillMultiplier -= 5.0f;
 
         //endregion
         //region block distribution
 
         phaseConveyor.itemCapacity += 5;
-        ((ItemBridge)phaseConveyor).transportTime -= 1f;
-        ((MassDriver)massDriver).rotateSpeed += 5f;
+        ((ItemBridge)phaseConveyor).transportTime -= 1.5f;
+        ((MassDriver)massDriver).rotateSpeed += 5.0f;
         ((MassDriver)massDriver).bulletSpeed += 9.5f;
 
         //endregion
         //region block liquid
 
-        ((Pump)mechanicalPump).pumpAmount += 0.2f / 60f;
-        ((Pump)impulsePump).pumpAmount += 1.2f / 9f / 60f;
-        phaseConduit.liquidCapacity += 14f;
+        ((Pump)mechanicalPump).pumpAmount += 0.2f / 60.0f;
+        ((Pump)impulsePump).pumpAmount += 1.2f / 9.0f / 60.0f;
+        phaseConduit.liquidCapacity += 14.0f;
 
         //endregion
         //region units
 
         ((UnitFactory)groundFactory).plans.add(
-            new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500f, ItemStack.with(
+            new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500.0f, ItemStack.with(
                 Items.lead, 20,
                 Items.titanium, 25,
                 Items.silicon, 30
             ))
         );
         ((UnitFactory)airFactory).plans.add(
-            new UnitFactory.UnitPlan(alpha, 2400f, ItemStack.with(
+            new UnitFactory.UnitPlan(alpha, 2400.0f, ItemStack.with(
                 Items.copper, 30,
                 Items.lead, 40,
                 Items.silicon, 30
             )),
-            new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400f, ItemStack.with(
+            new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400.0f, ItemStack.with(
                 Items.lead, 20,
                 Items.metaglass, 10,
                 Items.coal, 10,
                 Items.silicon, 15
             ))
         );
-        ((Reconstructor)additiveReconstructor).upgrades.add(
-            unitUpgrade(alpha, beta),
-            unitUpgrade(FUnitTypes.guarding, FUnitTypes.resisting),
-            unitUpgrade(FUnitTypes.blade, FUnitTypes.hatchet),
-            unitUpgrade(FUnitTypes.firefly, FUnitTypes.candlelight)
+        ((Reconstructor)additiveReconstructor).upgrades.addAll(
+            new UnitType[]{alpha, beta},
+            new UnitType[]{FUnitTypes.guarding, FUnitTypes.resisting},
+            new UnitType[]{FUnitTypes.blade, FUnitTypes.hatchet},
+            new UnitType[]{FUnitTypes.firefly, FUnitTypes.candlelight}
         );
-        ((Reconstructor)multiplicativeReconstructor).upgrades.add(
-            unitUpgrade(beta, FUnitTypes.omicron),
-            unitUpgrade(FUnitTypes.resisting, FUnitTypes.garrison),
-            unitUpgrade(FUnitTypes.hatchet, FUnitTypes.castle)
+        ((Reconstructor)multiplicativeReconstructor).upgrades.addAll(
+            new UnitType[]{beta, FUnitTypes.omicron},
+            new UnitType[]{FUnitTypes.resisting, FUnitTypes.garrison},
+            new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle}
         );
-        ((Reconstructor)exponentialReconstructor).upgrades.add(
-            unitUpgrade(FUnitTypes.omicron, FUnitTypes.pioneer),
-            unitUpgrade(FUnitTypes.garrison, FUnitTypes.shelter)
+        ((Reconstructor)exponentialReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.omicron, FUnitTypes.pioneer},
+            new UnitType[]{FUnitTypes.garrison, FUnitTypes.shelter}
+        );
+        ((Reconstructor)tetrativeReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.shelter, FUnitTypes.blessing}
         );
 
         //endregion
@@ -140,7 +141,7 @@ public class FOverride{
 
         illuminator.buildVisibility = BuildVisibility.shown;
         ((LightBlock)illuminator).brightness += 0.25f;
-        ((LightBlock)illuminator).radius += 60f;
+        ((LightBlock)illuminator).radius += 60.0f;
 
         //endregion
         //region block logic
@@ -169,13 +170,7 @@ public class FOverride{
         Liquids.neoplasm.effect = FStatusEffects.overgrown;
 
         //endregion
-    }
 
-    private static UnitType[] unitUpgrade(UnitType from, UnitType to){
-        final var a = Arrays.copyOf(((Reconstructor)tetrativeReconstructor).upgrades.get(0), 2);
-        a[0] = from;
-        a[1] = to;
-        return a;
     }
 
     private static class MutableAbility extends Ability{

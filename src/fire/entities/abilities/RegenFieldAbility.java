@@ -42,7 +42,6 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
         t.add("[lightgray]" + Stat.repairSpeed.localized() + ": [white]" + Strings.autoFixed(amount * 60f, 2) + StatUnit.perSecond.localized());
         t.row();
         t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" + Strings.autoFixed(radius / tilesize, 2) + " " + StatUnit.blocks.localized());
-        t.row();
     }
 
     @Override
@@ -55,7 +54,7 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
         });
 
         boolean any = false;
-        for(final var target : targets)
+        for(var target : targets)
             if(target.damaged()){
                 target.heal(amount * Time.delta);
                 any = true;

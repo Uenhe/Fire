@@ -1,8 +1,14 @@
 package fire.entities.abilities;
 
+import arc.Core;
+import arc.scene.ui.layout.Table;
 import arc.struct.FloatSeq;
+import arc.util.Strings;
 import arc.util.Time;
+import fire.world.meta.FStat;
 import mindustry.type.StatusEffect;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
 
 public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
@@ -35,6 +41,25 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
         this.effectDuration = (short)effectDuration;
 
         healths = new FloatSeq(detectDuration / detectInterval);
+    }
+
+    @Override
+    public String localized(){
+        return Core.bundle.get("ability.fire-firstaid");
+    }
+
+    @Override
+    public void addStats(Table t){
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60.0f, 2) + StatUnit.seconds.localized());
+        t.row();
+        t.add("[lightgray]" + Stat.healing.localized() + ": [white]" + healAmount);
+        t.row();
+        if(healPercentage > 0){
+            t.add("[lightgray]" + Stat.healing.localized() + ": [white]" + healPercentage + StatUnit.percent.localized());
+            t.row();
+        }
+        t.row();
+        t.add(effect.emoji() + " [accent]" + effect.localizedName + "[white], " + Strings.autoFixed(effectDuration / 60.0f, 2) + StatUnit.seconds.localized());
     }
 
     @Override

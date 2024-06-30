@@ -35,7 +35,6 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     @Override
     public void addStats(Table t){
         t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
-        t.row();
     }
 
     /** see {@link mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)} */
@@ -43,7 +42,7 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     public void update(Unit unit){
         boolean any = false;
 
-        for(final var fire : mindustry.gen.Groups.fire)
+        for(var fire : mindustry.gen.Groups.fire)
             if(arc.math.geom.Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0f, fire.x, fire.y)){
                 any = true;
 

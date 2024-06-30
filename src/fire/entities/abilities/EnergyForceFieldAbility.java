@@ -71,7 +71,6 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         t.add("[lightgray]" + FStat.lightningLength.localized() + ": [white]" + Strings.autoFixed(lightningLength * 0.75f, 2) + " " + StatUnit.blocks.localized());
         t.row();
         t.add("[lightgray]" + FStat.lightningAmount.localized() + ": [white]" + Strings.autoFixed(lightningAmount, 2));
-        t.row();
     }
 
     @Override

@@ -48,7 +48,6 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
         t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
         t.row();
         t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(reload / 60f, 2) + " " + StatUnit.seconds.localized());
-        t.row();
     }
 
     @Override
@@ -59,7 +58,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
             final var any = new boolean[]{false};
             mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, range, u -> {
 
-                for(final var e : DE_BUFFS){
+                for(var e : DE_BUFFS){
                     if(!u.hasEffect(e)) continue; //why not { if(u.hasEffect(e)) continue; } ???
 
                     if(!(u.type instanceof fire.type.FleshUnitType && e == overgrown)){

@@ -334,13 +334,13 @@ public class FBlocks{
             );
             health = 1080;
             size = 2;
-            reload = 60f / 2.5f;
-            range = 220f;
-            shootCone = 30f;
+            reload = 21.6f;
+            range = 220.0f;
+            shootCone = 30.0f;
             inaccuracy = 2.0f;
             rotateSpeed = 10.0f;
             shootSound = Sounds.shootBig;
-            coolantMultiplier = 0.99f;
+            coolantMultiplier = 1.2f;
 
             consumeCoolant(0.2f);
 
@@ -348,14 +348,14 @@ public class FBlocks{
 
                 Items.copper, new LaserBulletType(50f){{
                     length = 230f;
-                    colors = new Color[] {Color.valueOf("ff9900").a(0.4f), Color.valueOf("ff9900"), Color.white};
+                    colors = new Color[]{Color.valueOf("ff9900").a(0.4f), Color.valueOf("ff9900"), Color.white};
                     reloadMultiplier = 0.8f;
                     buildingDamageMultiplier = 0.5f;
                 }},
 
                 Items.lead, new LaserBulletType(45f){{
                     length = 230f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     reloadMultiplier = 1.1f;
                     buildingDamageMultiplier = 0.5f;
                 }},
@@ -364,7 +364,7 @@ public class FBlocks{
                     length = 275f;
                     width = 12.5f;
                     hitSize = 3.5f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     rangeChange = 45f;
                     ammoMultiplier = 3;
                     reloadMultiplier = 0.8f;
@@ -373,7 +373,7 @@ public class FBlocks{
 
                 Items.graphite, new LaserBulletType(40f){{
                     length = 230f;
-                    colors = new Color[] {Color.valueOf("33ccff").a(0.4f), Color.valueOf("33ccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("33ccff").a(0.4f), Color.valueOf("33ccff"), Color.white};
                     status = StatusEffects.freezing;
                     statusDuration = 150f;
                     ammoMultiplier = 3;
@@ -385,27 +385,27 @@ public class FBlocks{
                     length = 380f;
                     width = 10.0f;
                     hitSize = 3.0f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     rangeChange = 150f;
                     ammoMultiplier = 1;
                     reloadMultiplier = 0.5f;
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.titanium, new LaserBulletType(75f){{
+                Items.titanium, new LaserBulletType(60f){{
                     length = 230f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     status = StatusEffects.corroded;
                     statusDuration = 150f;
                     reloadMultiplier = 1.2f;
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.thorium, new LaserBulletType(90f){{
+                Items.thorium, new LaserBulletType(75f){{
                     length = 230f;
                     width = 20f;
                     hitSize = 5.0f;
-                    colors = new Color[] {Pal.thoriumPink.cpy().a(0.4f), Pal.thoriumPink, Color.white};
+                    colors = new Color[]{Pal.thoriumPink.cpy().a(0.4f), Pal.thoriumPink, Color.white};
                     pierceArmor = true;
                     status = StatusEffects.melting;
                     statusDuration = 150f;
@@ -417,7 +417,7 @@ public class FBlocks{
                     length = 400f;
                     width = 10.0f;
                     hitSize = 3.0f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     rangeChange = 170f;
                     ammoMultiplier = 1;
                     reloadMultiplier = 1.0f / 3.0f;
@@ -428,25 +428,25 @@ public class FBlocks{
                     length = 230f;
                     width = 16f;
                     hitSize = 4.5f;
-                    colors = new Color[] {Color.valueOf("404040").a(0.4f), Color.valueOf("404040"), Color.white};
+                    colors = new Color[]{Color.valueOf("404040").a(0.4f), Color.valueOf("404040"), Color.white};
                     ammoMultiplier = 3;
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.surgeAlloy, new LaserBulletType(105f){{
-                    length = 265f;
-                    width = 16f;
+                Items.surgeAlloy, new LaserBulletType(90f){{
+                    length = 265.0f;
+                    width = 16.0f;
                     hitSize = 4.5f;
-                    colors = new Color[] {Pal.surge.cpy().a(0.4f), Pal.surge, Color.white};
-                    rangeChange = 35f;
+                    colors = new Color[]{Pal.surge.cpy().a(0.4f), Pal.surge, Color.white};
+                    rangeChange = 35.0f;
                     pierceArmor = true;
                     status = StatusEffects.shocked;
-                    lightningSpacing = 30;
+                    lightningSpacing = 27.0f;
                     lightningLength = 1;
                     lightningDelay = 1.2f;
                     lightningLengthRand = 10;
-                    lightningDamage = 24f;
-                    lightningAngleRand = 30f;
+                    lightningDamage = 20.0f;
+                    lightningAngleRand = 30.0f;
                     ammoMultiplier = 4;
                     reloadMultiplier = 0.85f;
                     buildingDamageMultiplier = 0.5f;
@@ -457,7 +457,7 @@ public class FBlocks{
                     length = 315f;
                     width = 10.0f;
                     hitSize = 3.0f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     rangeChange = 85f;
                     ammoMultiplier = 3;
                     reloadMultiplier = 0.8f;
@@ -468,7 +468,7 @@ public class FBlocks{
                     length = 390f;
                     width = 10.0f;
                     hitSize = 3.0f;
-                    colors = new Color[] {Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
+                    colors = new Color[]{Color.valueOf("ccccff").a(0.4f), Color.valueOf("ccccff"), Color.white};
                     rangeChange = 160f;
                     ammoMultiplier = 4;
                     reloadMultiplier = 0.6f;
@@ -2123,7 +2123,7 @@ public class FBlocks{
 
         //TODO complete.
         burstReactor = new ImpactReactor("burst-reactor"){{
-            requirements(Category.power, with(
+            requirements(Category.power, BuildVisibility.hidden, with(
                 FItems.magneticAlloy, 500
             ));
             health = 9600;
@@ -2999,15 +2999,15 @@ public class FBlocks{
             ));
             researchCostMultiplier = 0.4f;
             buildCostMultiplier = 0.4f;
-            health = 11200;
+            health = 12000;
             armor = 8;
             size = 5;
-            itemCapacity = 10500;
+            itemCapacity = 11000;
 
             unitType = FUnitTypes.omicron;
-            unitCapModifier = 12;
-            radius = 96f;
-            shieldHealth = 650f;
+            unitCapModifier = 18;
+            radius = 96.0f;
+            shieldHealth = 800.0f;
             cooldownNormal = 1.2f;
             cooldownBroken = 1.5f;
         }};
@@ -3023,7 +3023,7 @@ public class FBlocks{
             health = 1200;
             size = 2;
 
-            consumesPower = 240f;
+            consumesPower = 240.0f;
         }};
 
         compositeUnloader = new AdaptDirectionalUnloader("composite-unloader"){{
@@ -3037,7 +3037,7 @@ public class FBlocks{
             underBullets = true;
 
             allowCoreUnload = true;
-            speed = 25f;
+            speed = 25.0f;
 
             compositeMap.put(this, Blocks.unloader);
         }};
@@ -3053,7 +3053,7 @@ public class FBlocks{
                 public void update(){
                     if(state.isEditor()) return;
 
-                    for(final var w : Groups.weather)
+                    for(var w : Groups.weather)
                         if(w.weather != Weathers.rain) w.remove();
 
                     if(Groups.weather.isEmpty())
@@ -3087,7 +3087,7 @@ public class FBlocks{
                     alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
                     state.rules.ambientLight.a = alpha;
 
-                    for(final var w : Groups.weather)
+                    for(var w : Groups.weather)
                         if(w.weather != Weathers.rain) w.remove();
 
                     if(Groups.weather.isEmpty())
@@ -3132,7 +3132,7 @@ public class FBlocks{
                 public void update(){
                     if(state.isEditor() || !state.isCampaign()) return;
 
-                    for(final var s : state.getPlanet().sectors){
+                    for(var s : state.getPlanet().sectors){
                         if(times < 5 && s.hasBase() && Mathf.chance(0.6)){
                             Events.fire(new EventType.SectorInvasionEvent(s));
                             times++;

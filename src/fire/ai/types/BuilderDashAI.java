@@ -59,7 +59,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
             final var req = unit.buildPlan();
             // clear break plan if another player breaking something
             if(!req.breaking && timer.get(timerTarget2, 40f)){
-                for(final var player : Groups.player){
+                for(var player : Groups.player){
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                         unit.plans.removeFirst();
                         // remove from the list of plans
@@ -111,7 +111,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
                 if(onlyAssist){
                     float minDst = Float.MAX_VALUE;
                     mindustry.gen.Player closest = null;
-                    for(final var player : Groups.player){
+                    for(var player : Groups.player){
                         if(player.unit().canBuild() && !player.dead() && player.team() == unit.team){
                             final float dst = player.dst2(unit);
                             if(dst < minDst){
@@ -145,7 +145,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
     }
 
     private void dash(arc.math.geom.Position pos){
-        for(final var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
+        for(var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
             da.dash(unit, pos);
             break;
         }

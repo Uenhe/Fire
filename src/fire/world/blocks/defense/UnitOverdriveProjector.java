@@ -37,7 +37,7 @@ public class UnitOverdriveProjector extends mindustry.world.blocks.defense.Overd
         stats.add(FStat.statusEffectApplied, table -> {
 
             table.row();
-            for(final var s : new StatusEffect[]{allyStatus, enemyStatus}){
+            for(var s : new StatusEffect[]{allyStatus, enemyStatus}){
 
                 table.table(Styles.grayPanel, t -> {
 

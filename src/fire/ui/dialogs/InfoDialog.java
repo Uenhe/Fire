@@ -72,7 +72,7 @@ public class InfoDialog extends BaseDialog{
 
                 in.defaults().width(300f).height(60f);
 
-                for(final var node : InfoTree.roots){
+                for(var node : InfoTree.roots){
                     if(locked(node)) continue;
 
                     in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
@@ -181,7 +181,7 @@ public class InfoDialog extends BaseDialog{
 
         node.selectable = !locked(node.node);
 
-        for(final var n : node.children){
+        for(var n : node.children){
             n.visible = !locked && n.parent.visible;
             checkNodes(n);
         }
@@ -221,7 +221,7 @@ public class InfoDialog extends BaseDialog{
         float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
         copyInfo(node);
 
-        for(final var n : nodes){
+        for(var n : nodes){
             if(!n.visible) continue;
 
             minx = Math.min(n.x - n.width / 2f, minx);
@@ -234,7 +234,7 @@ public class InfoDialog extends BaseDialog{
     }
 
     private void shift(LayoutNode[] children, float amount){
-        for(final var node : children){
+        for(var node : children){
             node.y += amount;
 
             if(node.children != null && node.children.length > 0)
@@ -247,7 +247,7 @@ public class InfoDialog extends BaseDialog{
         node.node.y = node.y;
 
         if(node.children != null)
-            for(final var child : node.children)
+            for(var child : node.children)
                 copyInfo(child);
     }
 
@@ -268,7 +268,7 @@ public class InfoDialog extends BaseDialog{
             infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
-            for(final var node : nodes){
+            for(var node : nodes){
                 final var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
 
                 button.resizeImage(32f);
@@ -432,10 +432,10 @@ public class InfoDialog extends BaseDialog{
             final float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
             Draw.sort(true);
 
-            for(final var node : nodes){
+            for(var node : nodes){
                 if(!node.visible) continue;
 
-                for(final var child : node.children){
+                for(var child : node.children){
                     if(!child.visible) continue;
 
                     final boolean lock = locked(node.node) || locked(child.node);

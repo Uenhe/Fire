@@ -67,7 +67,7 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
     }
 
     private void dash(arc.math.geom.Position pos){
-        for(final var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
+        for(var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
             da.dash(unit, pos);
             break;
         }

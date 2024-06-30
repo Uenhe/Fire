@@ -48,7 +48,6 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         t.add("[lightgray]" + FStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
         t.row();
         t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
-        t.row();
     }
 
     @Override

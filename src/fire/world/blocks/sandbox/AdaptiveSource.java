@@ -51,7 +51,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
             final float limit = 60f / itemPerSec;
 
             while(counter >= limit){
-                for(final var item : content.items()){
+                for(var item : content.items()){
                     items.set(item, 1);
                     dump(item);
                     items.set(item, 0);
@@ -60,7 +60,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
             }
 
             liquids.clear();
-            for(final var liquid: content.liquids()){
+            for(var liquid: content.liquids()){
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }

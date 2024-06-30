@@ -158,7 +158,7 @@ public class FireMod extends mindustry.mod.Mod{
     private static void showNoMultipleMods(){
         boolean announces = false;
 
-        for(final var mod : mods.orderedMods())
+        for(var mod : mods.orderedMods())
             if(!"fire".equals(mod.meta.name) && !mod.meta.hidden){
                 announces = true;
                 break;
@@ -209,7 +209,7 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void addContent(Table table, UnlockableContent... content){
-        for(final var c : content){
+        for(var c : content){
 
             table.table(Styles.grayPanel, t -> {
 

@@ -2,80 +2,46 @@ package fire.content;
 
 import mindustry.type.SectorPreset;
 
-import static fire.content.FPlanets.risetar;
-
 public class FSectorPresets{
+
     public static SectorPreset
 
         landingBase, darksandPlain, cornerOfZero, beachLanding,
-        darkWorkshop, urgentSupport, glaciatedPeaks, sporeFiord,
+        darkWorkshop, desolateFortification, glaciatedPeaks, sporeFiord,
         scorchingVolcano, lavaStronghold, eteriverStronghold, chillyMountains;
 
     public static void load(){
 
-        landingBase = new SectorPreset("jljd", risetar, 0){{
-            difficulty = 6;
-        }};
+        landingBase = create("jljd", 0, 6, 0, false);
+        darksandPlain = create("hspy", 94, 7, 15);
 
-        darksandPlain = new SectorPreset("hspy", risetar, 94){{
-            difficulty = 7;
-            captureWave = 15;
-            addStartingItems = true;
-        }};
+        cornerOfZero = create("lhyj", 15, 6, 30);
+        beachLanding = create("htdl", 183, 6);
+        darkWorkshop = create("hacj", 186, 8);
+        glaciatedPeaks = create("glaciated-peaks", 118, 10);
 
-        cornerOfZero = new SectorPreset("lhyj", risetar, 15){{
-            difficulty = 6;
-            captureWave = 30;
-            addStartingItems = true;
-        }};
+        sporeFiord = create("bzxw", 199, 8, 40);
+        scorchingVolcano = create("zrhs", 180, 8, 50);
+        lavaStronghold = create("lava-stronghold", 232, 9);
 
-        beachLanding = new SectorPreset("htdl", risetar, 183){{
-            difficulty = 6;
-            addStartingItems = true;
-        }};
+        eteriverStronghold = create("hhys", 34, 8);
+        chillyMountains = create("lfsm", 168, 9, 17);
+        desolateFortification = create("urgent-support", 119, 9, 60);
+    }
 
-        darkWorkshop = new SectorPreset("hacj", risetar, 186){{
-            difficulty = 8;
-            addStartingItems = true;
-        }};
+    private static SectorPreset create(String name, int sector, float difficulty){
+        return create(name, sector, difficulty, 0, true);
+    }
 
-        glaciatedPeaks = new SectorPreset("glaciated-peaks", risetar, 206){{
-            difficulty = 10;
-            addStartingItems = true;
-        }};
+    private static SectorPreset create(String name, int sector, float difficulty, int captureWave){
+        return create(name, sector, difficulty, captureWave, true);
+    }
 
-        sporeFiord = new SectorPreset("bzxw", risetar, 199){{
-            difficulty = 8;
-            captureWave = 40;
-            addStartingItems = true;
-        }};
-
-        scorchingVolcano = new SectorPreset("zrhs", risetar, 180){{
-            difficulty = 8;
-            captureWave = 50;
-            addStartingItems = true;
-        }};
-
-        lavaStronghold = new SectorPreset("lava-stronghold", risetar, 232){{
-            difficulty = 9;
-            addStartingItems = true;
-        }};
-
-        eteriverStronghold = new SectorPreset("hhys", risetar, 34){{
-            difficulty = 8;
-            addStartingItems = true;
-        }};
-
-        chillyMountains = new SectorPreset("lfsm", risetar, 168){{
-            difficulty = 9;
-            captureWave = 17;
-            addStartingItems = true;
-        }};
-
-        urgentSupport = new SectorPreset("urgent-support", risetar, 119){{
-            difficulty = 9;
-            captureWave = 60;
-            addStartingItems = true;
-        }};
+    private static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
+        SectorPreset s = new SectorPreset(name, FPlanets.risetar, sector);
+        s.difficulty = difficulty;
+        s.captureWave = captureWave;
+        s.addStartingItems = addStartingItems;
+        return s;
     }
 }

@@ -278,21 +278,24 @@ public class FUnitTypes{
             drownTimeMultiplier = 3f;
 
             weapons.add(
-                new Weapon("large-weapon"){{
-                    reload = 30f;
-                    x = 4f;
-                    y = 2f;
-                    recoil = 1f;
+                new Weapon("fire-byjd-weapon"){{
+                    reload = 30.0f;
+                    x = 5.0f;
+                    y = 3.0f;
+                    recoil = 2.0f;
                     top = false;
                     ejectEffect = Fx.casing1;
                     shoot = new ShootPattern(){{
                         shots = 3;
-                        shotDelay = 4f;
+                        shotDelay = 4.0f;
                     }};
-                    bullet = new BasicBulletType(5f, 30f){{
-                        lifetime = 40f;
-                        width = 6f;
-                        height = 10f;
+                    bullet = new BasicBulletType(5.0f, 30.0f){{
+                        lifetime = 40.0f;
+                        width = 5.4f;
+                        height = 10.8f;
+
+                        backColor.g -= 0.1f;
+                        frontColor.g -= 0.1f;
                     }};
                 }}
             );

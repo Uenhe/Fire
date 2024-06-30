@@ -22,7 +22,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
     @Override
     public void init(){
         super.init();
-        for(final var ammo : jackpotAmmo){
+        for(var ammo : jackpotAmmo){
             ammo.type.ammoMultiplier = 1;
             ammoTypes.put(ammo.item, ammo.type);
         }
@@ -45,7 +45,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
                 if(peekAmmo() == jackpotAmmo.peek().type)
                     type = jackpotAmmo.peek();
                 else{
-                    for(final var a : jackpotAmmo)
+                    for(var a : jackpotAmmo)
                         if(a.type == peekAmmo()){
                             final byte i = (byte)(Mathf.chance(a.chance) ? 1 : 0);
                             type = jackpotAmmo.get(jackpotAmmo.indexOf(a) + i);

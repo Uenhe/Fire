@@ -61,7 +61,7 @@ public class FPlanets{
             node(compositeConveyor, with(new OnSector(cornerOfZero)), () -> {
                 node(compositeUnloader, with(new SectorComplete(darkWorkshop)), () -> {});
                 node(compositeBridgeConveyor, with(new SectorComplete(darkWorkshop)), () -> {});
-                node(hardenedAlloyConveyor, with(new SectorComplete(urgentSupport)), () -> {});
+                node(hardenedAlloyConveyor, with(new SectorComplete(desolateFortification)), () -> {});
                 node(compositeLiquidRouter, with(new SectorComplete(darkWorkshop)), () ->
                     node(compositeBridgeConduit, with(new SectorComplete(darkWorkshop)), () -> {})
                 );
@@ -69,7 +69,7 @@ public class FPlanets{
 
             node(coreArmored, with(new OnSector(darkWorkshop)), () -> {
                 node(omicron, () ->
-                    node(pioneer, with(new OnSector(urgentSupport)), () -> {})
+                    node(pioneer, with(new OnSector(desolateFortification)), () -> {})
                 );
                 node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
                     node(javelin, () -> {})
@@ -103,9 +103,12 @@ public class FPlanets{
                     );
                     node(kindlingExtractor, () -> {
                         node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () -> {});
-                        node(hardenedAlloySmelter, with(new SectorComplete(eteriverStronghold)), () ->
-                            node(hardenedAlloyCrucible, with(new SectorComplete(urgentSupport)), () -> {})
-                        );
+                        node(hardenedAlloySmelter, with(new SectorComplete(eteriverStronghold)), () -> {
+                            node(hardenedAlloyCrucible, with(new SectorComplete(desolateFortification)), () -> {});
+                            node(magneticAlloyFormer, with(new SectorComplete(glaciatedPeaks)), () ->
+                                node(electromagnetismDiffuser, () -> {})
+                            );
+                        });
                     });
                 });
             });
@@ -117,25 +120,31 @@ public class FPlanets{
                         node(buildIndicator, with(new SectorComplete(darkWorkshop)), () -> {})
                     )
                 );
-                node(skyDome, with(new SectorComplete(urgentSupport)), () -> {});
+                node(skyDome, with(new SectorComplete(desolateFortification)), () -> {});
             });
 
             node(smasher, with(new OnSector(landingBase)), () -> {
                 node(damWall, with(new OnSector(beachLanding)), () -> {
                     node(damWallLarge, () -> {});
                     node(hardenedWall, with(new SectorComplete(darkWorkshop)), () ->
-                        node(hardenedWallLarge, with(new OnSector(urgentSupport)), () -> {})
+                        node(hardenedWallLarge, with(new OnSector(desolateFortification)), () -> {})
                     );
                 });
+
                 node(nightmare, with(new OnSector(landingBase)), () -> {
-                    node(blossom, with(new SectorComplete(beachLanding)), () -> {});
+                    node(blossom, with(new SectorComplete(beachLanding)), () ->
+                        node(gambler, with(new SectorComplete(darkWorkshop)), () -> {})
+                    );
                     node(distance, with(new SectorComplete(eteriverStronghold)), () ->
-                        node(grudge, with(new SectorComplete(urgentSupport)), () -> {})
+                        node(grudge, with(new SectorComplete(desolateFortification)), () -> {})
                     );
                 });
-                node(seaquake, with(new SectorComplete(scorchingVolcano)), () -> {});
-                node(ignite, with(new OnSector(scorchingVolcano)), () -> {});
-                node(gambler, with(new SectorComplete(darkWorkshop)), () -> {});
+
+                node(ignite, with(new OnSector(scorchingVolcano)), () ->
+                    node(seaquake, with(new SectorComplete(scorchingVolcano)), () -> {})
+                );
+
+                node(magneticSphere, with(new SectorComplete(glaciatedPeaks)), () -> {});
             });
 
             node(guarding, with(new SectorComplete(darksandPlain)), () -> {
@@ -144,6 +153,7 @@ public class FPlanets{
                         node(shelter, with(new OnSector(darkWorkshop)), () -> {})
                     )
                 );
+
                 node(firefly, () ->
                     node(candlelight, with(new SectorComplete(cornerOfZero)), () -> {})
                 );
@@ -154,17 +164,19 @@ public class FPlanets{
                     node(cornerOfZero, with(new SectorComplete(darksandPlain)), () ->
                         node(beachLanding, with(new SectorComplete(cornerOfZero)), () ->
                             node(darkWorkshop, with(new SectorComplete(beachLanding), new Research(garrison)), () ->
-                                node(urgentSupport, with(new SectorComplete(darkWorkshop), new Research(distance)), () -> {
-                                    //node(glaciatedPeaks, () -> {});
-                                })
+                                node(desolateFortification, with(new SectorComplete(darkWorkshop), new Research(distance)), () ->
+                                    node(glaciatedPeaks, () -> {})
+                                )
                             )
                         )
                     );
+
                     node(sporeFiord, with(new SectorComplete(darksandPlain)), () ->
                         node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () ->
-                            node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(urgentSupport), new Research(skyDome)), () -> {})
+                            node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(desolateFortification), new Research(skyDome)), () -> {})
                         )
                     );
+
                     node(eteriverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
                         node(chillyMountains, with(new SectorComplete(eteriverStronghold), new Produce(conductor)), () -> {})
                     );
@@ -191,7 +203,7 @@ public class FPlanets{
             addResearch(UnitTypes.alpha, "air-factory");
             addResearch(UnitTypes.beta, "alpha");
 
-            // InfoNodes below
+            /* ======== InfoNodes below ======== */
 
             dnode(fireCompany, true, () -> {
 
@@ -212,7 +224,7 @@ public class FPlanets{
                                 dnode(darkWorkshop, () -> {
                                     dnode(gambler);
 
-                                    dnode(urgentSupport, () ->
+                                    dnode(desolateFortification, () ->
                                         dnode(grudge)
                                     );
                                 });
@@ -242,21 +254,19 @@ public class FPlanets{
                         });
                     });
                 });
-
-                //dnode(magneticSphere); //to test unlocked content
             });
         });
     }
 
     private static void addResearch(UnlockableContent content, String parent){
 
-        final var lastNode = TechTree.all.find(t -> t.content == content);
+        var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();
 
-        final var node = new TechTree.TechNode(null, content, content.researchRequirements());
+        var node = new TechTree.TechNode(null, content, content.researchRequirements());
         if(node.parent != null) node.parent.children.remove(node);
 
-        final var p = TechTree.all.find(t -> t.content.name.equals(parent) || t.content.name.equals("fire-" + parent));
+        var p = TechTree.all.find(t -> t.content.name.equals(parent) || t.content.name.equals("fire-" + parent));
         if(!p.children.contains(node)) p.children.add(node);
 
         node.parent = p;

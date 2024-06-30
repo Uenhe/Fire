@@ -30,7 +30,7 @@ public class FStatValues{
 
             table.row();
 
-            for(final var t : map){
+            for(var t : map){
                 BulletType type = t.type;
 
                 table.table(Styles.grayPanel, bt -> {
