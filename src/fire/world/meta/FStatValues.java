@@ -51,7 +51,7 @@ public class FStatValues{
                     }
 
                     if(type.buildingDamageMultiplier != 1f){
-                        final int val = (short)(type.buildingDamageMultiplier * 100 - 100);
+                        int val = (short)(type.buildingDamageMultiplier * 100 - 100);
                         sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
                     }
 
@@ -68,7 +68,7 @@ public class FStatValues{
                     }
 
                     if(!Mathf.equal(type.reloadMultiplier, 1f)){
-                        final short val = (short)(type.reloadMultiplier * 100 - 100);
+                        short val = (short)(type.reloadMultiplier * 100 - 100);
                         sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
                     }
 
@@ -129,9 +129,9 @@ public class FStatValues{
                     if(type.intervalBullet != null){
                         bt.row();
 
-                        final var ic = new Table();
+                        Table ic = new Table();
                         StatValues.ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
-                        final var coll = new Collapser(ic, true);
+                        Collapser coll = new Collapser(ic, true);
                         coll.setDuration(0.1f);
 
                         bt.table(it -> {
@@ -147,9 +147,9 @@ public class FStatValues{
                     if(type.fragBullet != null){
                         bt.row();
 
-                        final var fc = new Table();
+                        Table fc = new Table();
                         StatValues.ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
-                        final var coll = new Collapser(fc, true);
+                        Collapser coll = new Collapser(fc, true);
                         coll.setDuration(0.1f);
 
                         bt.table(ft -> {

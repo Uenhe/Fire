@@ -28,7 +28,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
     public void setBars(){
         super.setBars();
 
-        final float max = armor + armorIncrease;
+        float max = armor + armorIncrease;
         addBar("currentarmor", (ArmorWallBuild build) -> new mindustry.ui.Bar(
             () -> arc.Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
             () -> mindustry.graphics.Pal.accent,
@@ -42,12 +42,12 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 
         @Override
         public float handleDamage(float damage){
-            final float healthMul = state.rules.blockHealth(team);
+            float healthMul = state.rules.blockHealth(team);
             if(arc.math.Mathf.zero(healthMul))
-                return health + 1f;
+                return health + 1.0f;
 
-            final float dmg = (damage - extraArmor) / healthMul;
-            if(dmg < 1f)
+            float dmg = (damage - extraArmor) / healthMul;
+            if(dmg < 1.0f)
                 return damage * minArmorDamage;
             return dmg;
         }

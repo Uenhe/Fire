@@ -19,12 +19,12 @@ public class FFx{
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){
         return new Effect(lifetime, range * 2f, e -> {
 
-            final float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
+            float track = Mathf.curve(e.fin(Interp.pow2Out), 0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0f, 0.3f) * e.fin();
 
             Draw.color(color);
             for(short i = 0; i <= range / spacing; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
-                final float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
+                float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144f * Draw.scl * f, 144f * Draw.scl * f, e.rotation - 90f);
             }
 

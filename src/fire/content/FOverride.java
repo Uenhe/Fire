@@ -83,7 +83,7 @@ public class FOverride{
         //region block distribution
 
         phaseConveyor.itemCapacity += 5;
-        ((ItemBridge)phaseConveyor).transportTime -= 1.5f;
+        ((ItemBridge)phaseConveyor).transportTime -= 1.0f;
         ((MassDriver)massDriver).rotateSpeed += 5.0f;
         ((MassDriver)massDriver).bulletSpeed += 9.5f;
 

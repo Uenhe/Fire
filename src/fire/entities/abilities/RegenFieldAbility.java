@@ -69,7 +69,7 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
         if(warmup < 0.001f) return;
 
         final float lineStroke = 3.0f;
-        final float mod = totalProgress % 1.0f;
+        float mod = totalProgress % 1.0f;
 
         Draw.z(Layer.effect);
         Draw.color(lineColor);

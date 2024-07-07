@@ -41,7 +41,7 @@ public class MechPad extends mindustry.world.Block{
     public static void playerSpawn(Tile tile, Player playee){
         if(playee == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 
-        final var spawnType = ((MechPad)pad.block).unitType;
+        var spawnType = ((MechPad)pad.block).unitType;
         if(pad.wasVisible)
             Fx.spawn.at(pad);
 

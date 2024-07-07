@@ -44,7 +44,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
             if((retreatTimer += arc.util.Time.delta) >= retreatDelay || alwaysFlee){
                 if(enemy != null){
                     unit.clearBuilding();
-                    final var core = unit.closestCore();
+                    var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
                         dash(core);
@@ -56,7 +56,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
         if(unit.buildPlan() != null){
             if(!alwaysFlee) retreatTimer = 0f;
             // approach plan if building
-            final var req = unit.buildPlan();
+            var req = unit.buildPlan();
             // clear break plan if another player breaking something
             if(!req.breaking && timer.get(timerTarget2, 40f)){
                 for(var player : Groups.player){

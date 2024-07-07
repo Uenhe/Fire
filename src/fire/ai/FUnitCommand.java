@@ -9,7 +9,7 @@ public class FUnitCommand{
         repairDashCommand = new UnitCommand("repair", "modeSurvival", u -> new fire.ai.types.RepairDashAI()),
         rebuildDashCommand = new UnitCommand("rebuild", "hammer", u -> new BuilderDashAI()),
         assistDashCommand = new UnitCommand("assist", "players", u -> {
-            final var ai = new BuilderDashAI();
+            var ai = new BuilderDashAI();
             ai.onlyAssist = true;
             return ai;
         }),

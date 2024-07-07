@@ -141,17 +141,18 @@ public class FBlocks{
         envEteriverStronghold, envStormyCoast, envGlaciatedPeaks;
 
     private static BulletType destroyBullet(float dmg, float radius){
-        return new BulletType(1f, 0f){{
-            final float time = 15f;
+        return new BulletType(1.0f, 0.0f){{
+            final float time = 15.0f;
+            
             lifetime = time;
             splashDamage = dmg;
             splashDamageRadius = radius;
             despawnEffect = hitEffect = new WaveEffect(){{
                 lifetime = time;
-                sizeFrom = 0f;
+                sizeFrom = 0.0f;
                 sizeTo = radius;
                 strokeFrom = 10.0f;
-                strokeTo = 0f;
+                strokeTo = 0.0f;
                 colorFrom = colorTo = Color.white;
             }};
         }};
@@ -477,8 +478,9 @@ public class FBlocks{
             );
         }};
 
+        //TODO...
         scab = new ItemTurret("scab"){{
-            requirements(Category.turret, with(
+            requirements(Category.turret, BuildVisibility.hidden, with(
                 FItems.flesh, 50
             ));
             health = 1600;
@@ -680,7 +682,7 @@ public class FBlocks{
             reload = 120f;
             range = 320f;
             shootCone = 30f;
-            shootY = 0f;
+            shootY = 0.0f;
             recoil = 13f;
             rotateSpeed = 4.0f;
             ammoPerShot = 5;
@@ -711,7 +713,7 @@ public class FBlocks{
 
                 new JackpotAmmo(Items.thorium, 0.3f,
                     new ShootMulti(
-                        new ShootAlternate(0f){{
+                        new ShootAlternate(0.0f){{
                             shots = 1;
                             barrels = 7;
                             firstShotDelay = chargeTime;
@@ -735,7 +737,7 @@ public class FBlocks{
 
                 new JackpotAmmo(Items.surgeAlloy, 0.15f,
                     new ShootMulti(
-                        new ShootAlternate(0f){{
+                        new ShootAlternate(0.0f){{
                             shots = 2;
                             barrels = 7;
                             shotDelay = 6.0f;
@@ -764,7 +766,7 @@ public class FBlocks{
 
                 new JackpotAmmo(FItems.hardenedAlloy, 0f,
                     new ShootMulti(
-                        new ShootAlternate(0f){{
+                        new ShootAlternate(0.0f){{
                             shots = 7;
                             barrels = 7;
                             shotDelay = 4.0f;
@@ -1061,10 +1063,10 @@ public class FBlocks{
                         hitEffect = Fx.pulverize;
                         despawnEffect = new WaveEffect(){{
                             lifetime = 16f;
-                            sizeFrom = 0f;
+                            sizeFrom = 0.0f;
                             sizeTo = 56f;
                             strokeFrom = 3.0f;
-                            strokeTo = 0f;
+                            strokeTo = 0.0f;
                             interp = Interp.pow2Out;
                             colorFrom = Pal.lightishOrange;
                             colorTo = Color.white;
@@ -1100,10 +1102,10 @@ public class FBlocks{
                         hitEffect = Fx.pulverizeMedium;
                         despawnEffect = new WaveEffect(){{
                             lifetime = 15f;
-                            sizeFrom = 0f;
+                            sizeFrom = 0.0f;
                             sizeTo = 54f;
                             strokeFrom = 3.0f;
-                            strokeTo = 0f;
+                            strokeTo = 0.0f;
                             interp = Interp.pow3Out;
                             colorFrom = Pal.sapBullet;
                             colorTo = Color.white;
@@ -1167,7 +1169,7 @@ public class FBlocks{
                         if(type == null){
                             type = b.type.copy();
                             type.speed = b.vel.setLength(8f).len();
-                            type.drag = 0f;
+                            type.drag = 0.0f;
                         }
                         b.type = type;
                     }
@@ -1259,7 +1261,7 @@ public class FBlocks{
                     }};
                 }};
 
-                fragRandomSpread = 0f;
+                fragRandomSpread = 0.0f;
                 fragSpread = 60f;
                 fragBullets = 6;
                 fragBullet = new BasicBulletType(12f, 225f){{
@@ -1296,7 +1298,7 @@ public class FBlocks{
 
             bullet_1_1 = new BasicBulletType(60f, 15000f){{
                 lifetime = 35f;
-                width = height = 0f;
+                width = height = 0.0f;
                 hitSize = 12;
                 rangeChange = extraRange;
                 splashDamageRadius = 180f;
@@ -1317,7 +1319,7 @@ public class FBlocks{
                         tri = true;
                         layer = Layer.effect;
                         shapes = 2;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = 9.0f;
                         radius = 40f;
                         triLength = 60f;
@@ -1386,7 +1388,7 @@ public class FBlocks{
                         sizeFrom = 120f;
                         sizeTo = 4.0f;
                         strokeFrom = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         colorFrom = col;
                         colorTo = coll;
                     }},
@@ -1397,7 +1399,7 @@ public class FBlocks{
                         particles = 6;
                         baseLength = 24f;
                         sizeFrom = 12f;
-                        sizeTo = 0f;
+                        sizeTo = 0.0f;
                         colorFrom = col;
                         colorTo = coll;
                     }},
@@ -1410,9 +1412,9 @@ public class FBlocks{
                         baseLength = 16f;
                         line = true;
                         strokeFrom = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         lenFrom = 20f;
-                        lenTo = 0f;
+                        lenTo = 0.0f;
                         colorFrom = col;
                         colorTo = coll;
                     }}
@@ -1427,7 +1429,7 @@ public class FBlocks{
 
                 // create lightning while flying
                 bulletInterval = 1.5f;
-                intervalRandomSpread = 0f;
+                intervalRandomSpread = 0.0f;
                 intervalSpread = 359f;
                 intervalBullets = 1;
                 intervalBullet = new LightningBulletType(){{
@@ -1451,7 +1453,7 @@ public class FBlocks{
                     interp = Interp.pow5In;
                     length = 180f;
                     baseLength = -180f;
-                    sizeFrom = 0f;
+                    sizeFrom = 0.0f;
                     sizeTo = 10.0f;
                     colorFrom = coll;
                     colorTo = col;
@@ -1461,8 +1463,8 @@ public class FBlocks{
                     lifetime = 67f;
                     particles = 3;
                     sizeInterp = Interp.pow3In;
-                    length = 0f;
-                    sizeFrom = 0f;
+                    length = 0.0f;
+                    sizeFrom = 0.0f;
                     sizeTo = 40f;
                     colorFrom = coll;
                     colorTo = col;
@@ -1471,7 +1473,7 @@ public class FBlocks{
                 new ParticleEffect(){{
                     lifetime = 20f;
                     particles = 3;
-                    length = 0f;
+                    length = 0.0f;
                     sizeFrom = 40f;
                     sizeTo = 15f;
                     colorFrom = col;
@@ -1508,7 +1510,7 @@ public class FBlocks{
                         sizeFrom = 192f;
                         sizeTo = 8.0f;
                         strokeFrom = 8.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         colorFrom = colorTo = col;
                     }},
 
@@ -1518,7 +1520,7 @@ public class FBlocks{
                         particles = 12;
                         baseLength = 72f;
                         sizeFrom = 32f;
-                        sizeTo = 0f;
+                        sizeTo = 0.0f;
                         colorFrom = colorTo = col;
                     }},
 
@@ -1530,9 +1532,9 @@ public class FBlocks{
                         baseLength = 48f;
                         line = true;
                         strokeFrom = 8.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         lenFrom = 60f;
-                        lenTo = 0f;
+                        lenTo = 0.0f;
                         colorFrom = colorTo = col;
                     }}
                 );
@@ -1546,7 +1548,7 @@ public class FBlocks{
 
                 // create lightning while flying
                 bulletInterval = 0.5f;
-                intervalRandomSpread = 0f;
+                intervalRandomSpread = 0.0f;
                 intervalSpread = 359f;
                 intervalBullets = 2;
                 intervalBullet = new LightningBulletType(){{
@@ -1586,7 +1588,7 @@ public class FBlocks{
                             sizeFrom = 108f;
                             sizeTo = 4.0f;
                             strokeFrom = 4.0f;
-                            strokeTo = 0f;
+                            strokeTo = 0.0f;
                             colorFrom = colorTo = col;
                         }},
 
@@ -1596,7 +1598,7 @@ public class FBlocks{
                             particles = 6;
                             baseLength = 40f;
                             sizeFrom = 20f;
-                            sizeTo = 0f;
+                            sizeTo = 0.0f;
                             colorFrom = colorTo = col;
                         }},
 
@@ -1608,9 +1610,9 @@ public class FBlocks{
                             baseLength = 24f;
                             line = true;
                             strokeFrom = 4.0f;
-                            strokeTo = 0f;
+                            strokeTo = 0.0f;
                             lenFrom = 40f;
-                            lenTo = 0f;
+                            lenTo = 0.0f;
                             colorFrom = colorTo = col;
                         }}
                     );
@@ -1624,7 +1626,7 @@ public class FBlocks{
 
                     // create lightning while flying
                     bulletInterval = 0.5f;
-                    intervalRandomSpread = 0f;
+                    intervalRandomSpread = 0.0f;
                     intervalSpread = 359f;
                     intervalBullets = 1;
                     intervalBullet = new LightningBulletType(){{
@@ -1690,11 +1692,11 @@ public class FBlocks{
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 57f;
                         radiusTo = 120f;
                         stroke = 8.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
                         color = col;
@@ -1702,11 +1704,11 @@ public class FBlocks{
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 58f;
                         radiusTo = 32f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
                         color = col;
@@ -1714,11 +1716,11 @@ public class FBlocks{
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 32f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 3.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
                         color = col;
@@ -1726,11 +1728,11 @@ public class FBlocks{
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 4.0f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 2.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         circle = true;
                         hollow = false;
                         color = col;
@@ -1738,15 +1740,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 4.0f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 8.0f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = 0.6f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 5;
                         hollow = false;
                         tri = false;
@@ -1755,15 +1757,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 8.0f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 24f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = -1.8f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 5;
                         hollow = false;
                         tri = false;
@@ -1772,15 +1774,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 12f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 43f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = 2.2f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 5;
                         hollow = false;
                         tri = false;
@@ -1789,15 +1791,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 12f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 43f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = 2.2f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 8;
                         hollow = false;
                         tri = false;
@@ -1806,15 +1808,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 18f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 63f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = -1.2f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 3;
                         shapes = 8;
                         hollow = false;
@@ -1824,15 +1826,15 @@ public class FBlocks{
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
                         layer = Layer.effect;
-                        x = y = 0f;
+                        x = y = 0.0f;
                         radius = 10.0f;
-                        radiusTo = 0f;
+                        radiusTo = 0.0f;
                         stroke = 4.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         haloRadius = 63f;
-                        haloRotation = 0f;
+                        haloRotation = 0.0f;
                         haloRotateSpeed = 2.8f;
-                        rotateSpeed = 0f;
+                        rotateSpeed = 0.0f;
                         sides = 3;
                         shapes = 6;
                         hollow = false;
@@ -2121,7 +2123,7 @@ public class FBlocks{
             consumeLiquid(Liquids.cryofluid, 0.15f);
         }};
 
-        //TODO complete.
+        //TODO...
         burstReactor = new ImpactReactor("burst-reactor"){{
             requirements(Category.power, BuildVisibility.hidden, with(
                 FItems.magneticAlloy, 500
@@ -2809,9 +2811,9 @@ public class FBlocks{
                         baseLength = 4.0f;
                         line = true;
                         strokeFrom = 2.0f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         lenFrom = 8.0f;
-                        lenTo = 0f;
+                        lenTo = 0.0f;
                         colorFrom = Pal.reactorPurple;
                         colorTo = Color.white;
                     }},
@@ -2819,9 +2821,9 @@ public class FBlocks{
                     new WaveEffect(){{
                         lifetime = 20f;
                         sizeFrom = 48f;
-                        sizeTo = 0f;
+                        sizeTo = 0.0f;
                         strokeFrom = 1.6f;
-                        strokeTo = 0f;
+                        strokeTo = 0.0f;
                         interp = Interp.pow3In;
                         colorFrom = Pal.reactorPurple;
                         colorTo = Color.white;

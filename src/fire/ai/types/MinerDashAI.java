@@ -9,7 +9,7 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
 
     @Override
     public void updateMovement(){
-        final var core = unit.closestCore();
+        var core = unit.closestCore();
         if(!(unit.canMine()) || core == null) return;
         if(unit.mineTile != null && !unit.mineTile.within(unit, unit.type.mineRange)){
             unit.mineTile(null);

@@ -205,7 +205,7 @@ public class FPlanets{
 
             /* ======== InfoNodes below ======== */
 
-            dnode(fireCompany, true, () -> {
+            dnode(fireCompany, true, () ->
 
                 dnode(landingBase, () -> {
                     dnode(smasher);
@@ -214,7 +214,6 @@ public class FPlanets{
                     dnode(darksandPlain, () -> {
 
                         dnode(cornerOfZero, () -> {
-                            dnode(kindlingAlloy);
                             dnode(compositeConveyor);
                             dnode(electrothermalSiliconFurnace);
 
@@ -222,18 +221,26 @@ public class FPlanets{
                                 dnode(blossom);
 
                                 dnode(darkWorkshop, () -> {
+                                    dnode(compositeUnloader);
+                                    dnode(compositeBridgeConveyor);
+                                    dnode(compositeLiquidRouter);
+                                    dnode(compositeBridgeConduit);
                                     dnode(gambler);
 
-                                    dnode(desolateFortification, () ->
-                                        dnode(grudge)
-                                    );
+                                    dnode(desolateFortification, () -> {
+                                        dnode(grudge);
+                                        dnode(pioneer);
+
+                                        dnode(glaciatedPeaks, () -> {
+
+                                        });
+                                    });
                                 });
                             });
                         });
 
                         dnode(sporeFiord, () -> {
                             dnode(biomassCultivator);
-                            dnode(logicAlloy);
 
                             dnode(scorchingVolcano, () -> {
                                 dnode(seaquake);
@@ -245,7 +252,6 @@ public class FPlanets{
                         });
 
                         dnode(eteriverStronghold, () -> {
-                            dnode(hardenedAlloy);
                             dnode(distance);
 
                             dnode(chillyMountains, () ->
@@ -253,8 +259,8 @@ public class FPlanets{
                             );
                         });
                     });
-                });
-            });
+                })
+            );
         });
     }
 

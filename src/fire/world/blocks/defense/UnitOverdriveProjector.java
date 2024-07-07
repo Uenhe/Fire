@@ -44,7 +44,7 @@ public class UnitOverdriveProjector extends mindustry.world.blocks.defense.Overd
                     t.left().button(new arc.scene.style.TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(arc.util.Scaling.fit);
                     t.left().table(info -> {
 
-                        final var detail =
+                        var detail =
                             s == allyStatus
                             ? FStat.allyStatusEffect.localized()
                             : FStat.enemyStatusEffect.localized();

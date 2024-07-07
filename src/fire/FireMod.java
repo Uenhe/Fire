@@ -92,15 +92,15 @@ public class FireMod extends mindustry.mod.Mod{
     private static void showDialog(){
         if(!(Core.settings.getBool("showLogs") || launched)) return;
 
-        final var version = FIRE.meta.version;
-        final var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{
+        var version = FIRE.meta.version;
+        var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{
             setupDialog(this);
             cont.pane(t ->
                 t.add("@history").left().width(1024.0f).maxWidth(1280.0f).pad(4.0f)
             ).maxWidth(1024.0f);
         }};
 
-        final var mainDialog = new BaseDialog(Core.bundle.format("mainTitle", displayName, version));
+        var mainDialog = new BaseDialog(Core.bundle.format("mainTitle", displayName, version));
 
         setupDialog(mainDialog);
         mainDialog.buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210.0f, 64.0f);
@@ -167,7 +167,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(announces && Core.settings.getBool("noMultipleMods")){
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
-            final var dialog = new BaseDialog("o_o?"){
+            var dialog = new BaseDialog("o_o?"){
                 private float time = 300.0f;
                 private boolean canClose;
 
@@ -189,9 +189,9 @@ public class FireMod extends mindustry.mod.Mod{
     private static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
 
-        final var titles = Core.bundle.get("fire.randTitle").split("\\|");
-        final int index = Mathf.random(titles.length - 1);
-        String title = titles[index];
+        var titles = Core.bundle.get("fire.randTitle").split("\\|");
+        int index = Mathf.random(titles.length - 1);
+        var title = titles[index];
 
         // "Today is the {0}th Day of God's Creation of the Risetar" picked
         if(index == 0)

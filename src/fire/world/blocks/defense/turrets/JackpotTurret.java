@@ -47,7 +47,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
                 else{
                     for(var a : jackpotAmmo)
                         if(a.type == peekAmmo()){
-                            final byte i = (byte)(Mathf.chance(a.chance) ? 1 : 0);
+                            byte i = (byte)(Mathf.chance(a.chance) ? 1 : 0);
                             type = jackpotAmmo.get(jackpotAmmo.indexOf(a) + i);
                         }
                 }
@@ -58,7 +58,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
         }
 
         private void shoot(JackpotAmmo ammo){
-            final float
+            float
                 bx = x + Angles.trnsx(rotation - 90f, shootX, shootY),
                 by = y + Angles.trnsy(rotation - 90f, shootX, shootY);
 

@@ -4,6 +4,7 @@ import mindustry.gen.WeatherState;
 import mindustry.type.Weather;
 import mindustry.type.weather.RainWeather;
 
+/** TODO: stormy coast with real rainstorm. */
 public class FWeathers{
 
     public static Weather
@@ -13,11 +14,9 @@ public class FWeathers{
 
         rainstorm = new RainWeather("rainstorm"){
 
-            /** TODO... */
             @Override
             public void update(WeatherState state){
                 super.update(state);
-
             }
         };
     }

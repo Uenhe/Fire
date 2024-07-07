@@ -131,7 +131,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             explodeEffect.at(this);
 
             // ewe, this is truly horrible, no ref
-            final float min = scale() * 0.7f, max = scale() * 1.3f;
+            float min = scale() * 0.7f, max = scale() * 1.3f;
             for(byte i = 0; i < (fragRoundRand ?
                 Mathf.random(Mathf.ceil(fragRound * min), Mathf.floor(fragRound * max)) : fragRound
             ); i++)
@@ -165,7 +165,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             }
 
             if(instability > maxInstability * 0.3f && Core.settings.getBool("showBlockRange")){
-                final float alpha = Mathf.absin(2.4f, 0.6f);
+                float alpha = Mathf.absin(2.4f, 0.6f);
 
                 Draw.color(Pal.health, alpha);
                 Lines.stroke(1.0f);
@@ -201,13 +201,13 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         }
 
         @Override
-        public final float range(){
+        public float range(){
             return explosionRadius * scale();
         }
 
         private void createLightning(){
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
-            final byte realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
+            byte realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
 
             for(byte i = 0; i < realLightningAmount; i++)
                 Lightning.create(team, circleColor[index], lightningDamage, x, y, i * (360.0f / realLightningAmount), (int)(size * 2.0f + instability * 0.03f));

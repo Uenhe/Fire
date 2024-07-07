@@ -48,7 +48,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
             if(proximity.size == 0) return;
 
             counter += edelta();
-            final float limit = 60f / itemPerSec;
+            float limit = 60f / itemPerSec;
 
             while(counter >= limit){
                 for(var item : content.items()){

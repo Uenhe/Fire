@@ -30,8 +30,8 @@ public enum FBinding implements KeyBind{
 
     /** See <a href="https://github.com/RICCJ/MinerTools">MinerTools</a> also. */
     public static void load(){
-        final KeyBind[] bindings = Reflect.get(Core.keybinds, "definitions");
-        final var newBindings = new KeyBind[bindings.length + values().length];
+        KeyBind[] bindings = Reflect.get(Core.keybinds, "definitions");
+        KeyBind[] newBindings = new KeyBind[bindings.length + values().length];
         System.arraycopy(bindings, 0, newBindings, 0, bindings.length);
         System.arraycopy(values(), 0, newBindings, bindings.length, values().length);
         Core.keybinds.setDefaults(newBindings);

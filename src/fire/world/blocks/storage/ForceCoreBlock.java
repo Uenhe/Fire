@@ -98,7 +98,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         private boolean broken;
 
         @Override
-        public final float range(){
+        public float range(){
             return radius * scl;
         }
 

@@ -42,11 +42,11 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
         public void updateTile(){
             if(totalAmmo == 0) return;
 
-            if(unavailable() || !shooting)
+            if(unavailable() || !shooting){
                 super.updateTile();
 
-            else{
-                final var stack = bulletStack.get(item()).get(index);
+            }else{
+                var stack = bulletStack.get(item()).get(index);
 
                 if((reloadTimer += delta()) >= stack.delay){
                     reloadTimer %= stack.delay;

@@ -30,7 +30,7 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
             bullets.clear();
 
             //create bullet
-            final float rand = Mathf.random(360.0f);
+            float rand = Mathf.random(360.0f);
             for(byte i = 0; i < fragBullets; i++){
                 bullets.add(fragBullet.create(this, x, y, 360.0f / fragBullets * i + rand));
             }

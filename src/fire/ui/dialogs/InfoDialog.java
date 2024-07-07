@@ -176,7 +176,7 @@ public class InfoDialog extends BaseDialog{
     }
 
     private void checkNodes(InfoTreeNode node){
-        final boolean locked = locked(node.node);
+        boolean locked = locked(node.node);
         if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
 
         node.selectable = !locked(node.node);

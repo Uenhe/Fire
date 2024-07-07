@@ -24,7 +24,7 @@ public class AdaptDirectionalUnloader extends mindustry.world.blocks.distributio
         @Override
         public void updateTile(){
             counter += edelta();
-            final float limit = 60f / speed;
+            float limit = 60.0f / speed;
 
             while(counter >= limit){
                 unloadTimer = speed;

@@ -42,7 +42,7 @@ public class RepairDashAI extends mindustry.ai.types.RepairAI{
             if((retreatTimer += arc.util.Time.delta) >= retreatDelay){
                 //fly away from enemies when not doing anything
                 if(avoid != null){
-                    final var core = unit.closestCore();
+                    var core = unit.closestCore();
                     if(core != null && !unit.within(core, retreatDst)){
                         moveTo(core, retreatDst);
                         dash(core);

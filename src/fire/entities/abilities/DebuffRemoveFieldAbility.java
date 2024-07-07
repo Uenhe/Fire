@@ -55,7 +55,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
         if((timer += arc.util.Time.delta) >= reload){
             timer %= reload;
 
-            final var any = new boolean[]{false};
+            boolean[] any = new boolean[]{false};
             mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, range, u -> {
 
                 for(var e : DE_BUFFS){

@@ -137,17 +137,17 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         }else{
             if(unlocks && !regenable){
 
-                final boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.5f;
+                boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.5f;
 
-                final float scl = Math.min(1f - ((timer - 240f) / 60f), 1f);
                 final float speed = 0.2f;
-                final float
+                float scl = Math.min(1.0f - ((timer - 240.0f) / 60.0f), 1.0f);
+                float
                     x = Mathf.cos(timer * speed) * radius * scl + unit.x,
                     y = Mathf.sin(timer * speed) * radius * scl + unit.y;
 
-                timer += Time.delta * (isOverloaded ? 1.33f : 1f);
+                timer += Time.delta * (isOverloaded ? 1.333f : 1f);
 
-                if(timer <= 180f)
+                if(timer <= 180.0f)
                     Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2f, radius * 2f, bullet -> {
                         if(
                             !isOverloaded
@@ -161,11 +161,12 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             bullet.lifetime = 310f;
 
                             // reuse instances as possible
-                            final var type = bulletMap.get(bullet.type) == null ?
-                                bullet.type.copy() : bulletMap.get(bullet.type);
+                            var type = bulletMap.containsKey(bullet.type) ?
+                                bulletMap.get(bullet.type) :
+                                bullet.type.copy();
 
                             if(!bulletMap.containsKey(bullet.type)){
-
+                                
                                 // make artillery collides building
                                 type.collidesTiles = type.collides = true;
 
@@ -196,9 +197,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                     if(b.type != null){
 
-                        final float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
-                        final float range = b.type.speed * b.type.lifetime;
-                        final float vel = 12f;
+                        final float vel = 12.0f;
+                        float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
+                        float range = b.type.speed * b.type.lifetime;
 
                         if(timer <= 240f){
                             b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80f * Time.delta));
@@ -212,16 +213,16 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             b.time = 0f;
                             b.lifetime = range / vel;
 
-                            final var target =
+                            var target =
                                 b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id) ?
                                     b.aimTile.build : Units.closestTarget(b.team, b.x, b.y, range,
                                         u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
                                         t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
                             b.set(unit.x, unit.y);
-                            if(target != null && Mathf.chance(0.6)){
+                            if(target != null && Mathf.chance(0.48)){
                                 final float mag = 5.0f;
-                                final float velTer = vel * 1.15f;
+                                final float velTer = vel * 1.16f;
 
                                 b.vel.setLength(velTer);
                                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000f));

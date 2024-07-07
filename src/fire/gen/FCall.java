@@ -13,7 +13,7 @@ public class FCall{
             fire.world.blocks.units.MechPad.playerSpawn(tile, player);
 
         if(net.server()){
-            final var packet = new mindustry.gen.PlayerSpawnCallPacket();
+            var packet = new mindustry.gen.PlayerSpawnCallPacket();
             packet.tile = tile;
             packet.player = player;
             net.send(packet, true);

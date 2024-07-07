@@ -19,19 +19,19 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
     private final float speedMultiplier;
     /** Tick that unit becomes invincible while dashing. */
-    private final float invincibleTime;
+    private final short invincibleTime;
     /** Dash cooldown. */
-    private final float cooldown;
+    private final short cooldown;
     /** Number of afterimages to be displayed while dashing. */
     private final byte afterimage;
 
     private static final String name = "ability.fire-dash";
     private float timer;
 
-    public DashAbility(float speedMul, float invTime, float cooldown, int afterimage){
+    public DashAbility(float speedMul, int invTime, int cooldown, int afterimage){
         this.speedMultiplier = speedMul;
-        this.invincibleTime = invTime;
-        this.cooldown = cooldown;
+        this.invincibleTime = (short)invTime;
+        this.cooldown = (short)cooldown;
         this.afterimage = (byte)afterimage;
     }
 
@@ -45,9 +45,9 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     public void addStats(arc.scene.ui.layout.Table t){
         t.add(Core.bundle.get(name + ".description"));
         t.row();
-        t.add("[lightgray]" + FStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + FStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60.0f, 2) + " " + StatUnit.seconds.localized());
         t.row();
-        t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60f, 2) + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60.0f, 2) + " " + StatUnit.seconds.localized());
     }
 
     @Override
@@ -66,8 +66,8 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
 
         for(byte i = 0; i < afterimage; i++){
-            final float offset = unit.type.engineOffset * 0.5f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * 8f);
-            final float
+            float offset = unit.type.engineOffset * 0.5f * (1f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * 8f);
+            float
                 cx = unit.x + Angles.trnsx(unit.rotation + 180f, offset),
                 cy = unit.y + Angles.trnsy(unit.rotation + 180f, offset);
             Draw.alpha(0.6f * (1f - (timer / invincibleTime)) * (1f - (float)i / afterimage));

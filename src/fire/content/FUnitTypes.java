@@ -52,7 +52,7 @@ public class FUnitTypes{
     public static void load(){
 
         //region legs support
-        final var colLegSpt = Color.valueOf("8cfffb");
+        Color colLegSpt = Color.valueOf("8cfffb");
 
         guarding = new UnitType("sh"){{
             constructor = LegsUnit::create;
@@ -528,59 +528,59 @@ public class FUnitTypes{
             flying = true;
             health = 5600;
             armor = 7;
-            hitSize = 30f;
+            hitSize = 30.0f;
             speed = 2.7f;
             drag = 0.05f;
             accel = 0.1f;
-            rotateSpeed = 3f;
+            rotateSpeed = 3.0f;
             payloadCapacity = 3.5f * 3.5f * tilePayload;
-            engineOffset = 13f;
-            engineSize = 7f;
+            engineOffset = 13.0f;
+            engineSize = 7.0f;
             itemCapacity = 120;
             buildSpeed = 3.2f;
             lowAltitude = true;
 
             abilities.add(
-                new DashAbility(6f, 15f, 120f, 6),
+                new DashAbility(6.0f, 15, 120, 6),
                 new FirstAidAbility(2400, 80, 1200, 0, FStatusEffects.sanctuaryGuard, 360, 120)
             );
 
             weapons.add(
 
                 new Weapon("emp-cannon-mount"){{
-                    reload = 120f;
-                    x = 0f;
-                    y = 0f;
-                    shake = 1f;
-                    recoil = 3f;
+                    reload = 120.0f;
+                    x = 0.0f;
+                    y = 0.0f;
+                    shake = 1.0f;
+                    recoil = 3.0f;
                     rotateSpeed = 2.5f;
                     mirror = false;
                     rotate = true;
                     shootSound = Sounds.laser;
 
                     bullet = new EmpBulletType(){{
-                        final float rad = 60f;
+                        final float rad = 60.0f;
 
                         sprite = "circle-bullet";
-                        speed = 6f;
-                        damage = 80f;
-                        lifetime = 35f;
-                        width = 10f;
-                        height = 10f;
-                        splashDamage = 120f;
+                        speed = 6.0f;
+                        damage = 80.0f;
+                        lifetime = 35.0f;
+                        width = 10.0f;
+                        height = 10.0f;
+                        splashDamage = 120.0f;
                         splashDamageRadius = rad;
-                        powerDamageScl = 2f;
-                        healPercent = 10f;
-                        timeIncrease = 0f;
-                        hitShake = 3f;
+                        powerDamageScl = 2.0f;
+                        healPercent = 10.0f;
+                        timeIncrease = 0.0f;
+                        hitShake = 3.0f;
                         trailLength = 18;
                         trailWidth = 5;
-                        trailInterval = 3f;
+                        trailInterval = 3.0f;
                         lightRadius = 60f;
                         lightOpacity = 0.6f;
                         scaleLife = true;
                         trailRotation = true;
-                        statusDuration = 180f;
+                        statusDuration = 180.0f;
                         status = StatusEffects.electrified;
 
                         hitSound = Sounds.plasmaboom;
@@ -601,7 +601,7 @@ public class FUnitTypes{
 
                         hitEffect = new Effect(50f, 100f, e -> {
                             final byte points = 8;
-                            final float offset = Mathf.randomSeed(e.id, 360f);
+                            float offset = Mathf.randomSeed(e.id, 360f);
 
                             e.scaled(7f, b -> {
                                 Draw.color(Pal.heal, b.fout());
@@ -611,7 +611,7 @@ public class FUnitTypes{
                             Lines.stroke(e.fout() * 3f);
                             Lines.circle(e.x, e.y, rad);
                             for(byte i = 0; i < points; i++){
-                                final float angle = i * 360f / points + offset;
+                                float angle = i * 360f / points + offset;
                                 Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4f, 30f * e.fout(), angle);
                             }
                             Fill.circle(e.x, e.y, 12f * e.fout());
