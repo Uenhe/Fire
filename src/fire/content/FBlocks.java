@@ -63,6 +63,7 @@ import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.ui.Styles;
+import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.BuildTurret;
@@ -191,7 +192,22 @@ public class FBlocks{
 
             @Override
             public void displayExtra(Table table){
-                table.button(new TextureRegionDrawable(uiIcon), Styles.emptyi, 40.0f, InfoDialog.dialog::show);
+                table.button(new TextureRegionDrawable(uiIcon), Styles.emptyi, 40.0f, () -> {
+                    InfoDialog.dialog.show();
+
+                    if(!"zh_CN".equals(Core.settings.getString("locale"))){
+
+                        var dialog = new BaseDialog("Warning");
+                        dialog.closeOnBack();
+                        dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
+
+                        dialog.cont.pane(t ->
+                            t.add("@AITranslationWarning").left().maxWidth(1280.0f).pad(4.0f)
+                        ).center();
+
+                        dialog.show();
+                    }
+                });
             }
         {
             requirements(Category.effect, BuildVisibility.hidden, with());
@@ -497,7 +513,7 @@ public class FBlocks{
                     @Override
                     public void draw(Bullet b){
                         super.draw(b);
-                        final var item = FItems.flesh;
+                        var item = FItems.flesh;
 
                         Draw.alpha(1.0f);
                         Draw.blend(Blending.additive);
@@ -536,7 +552,7 @@ public class FBlocks{
             loopSound = Sounds.flux;
 
             drawer = new DrawTurret(){{
-                final var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2.0f, 1.0f) * p.warmup, 0.2f);
+                var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2.0f, 1.0f) * p.warmup, 0.2f);
 
                 parts.add(
 
@@ -602,72 +618,72 @@ public class FBlocks{
             consumeCoolant(0.3f);
 
             shootType = new FlakBulletType(4f, 40f){{
-                final var col = StatusEffects.blasted.color;
+                var color = StatusEffects.blasted.color;
 
                 sprite = "missile-large";
-                lifetime = 62f;
-                width = 12f;
-                height = 12f;
+                lifetime = 62.0f;
+                width = 12.0f;
+                height = 12.0f;
                 drag = -0.003f;
-                homingRange = 80f;
-                explodeRange = 40f;
-                splashDamageRadius = 36f;
-                splashDamage = 65f;
+                homingRange = 80.0f;
+                explodeRange = 40.0f;
+                splashDamageRadius = 36.0f;
+                splashDamage = 65.0f;
                 weaveScale = 10.0f;
                 weaveMag = 2.0f;
                 trailLength = 24;
-                trailWidth = 3;
-                lightRadius = 100f;
+                trailWidth = 3.0f;
+                lightRadius = 100.0f;
                 lightOpacity = 1.2f;
-                ammoMultiplier = 1;
+                ammoMultiplier = 1.0f;
                 buildingDamageMultiplier = 0.25f;
                 collidesGround = true;
                 makeFire = true;
-                statusDuration = 150f;
+                statusDuration = 480.0f;
                 status = StatusEffects.burning;
-                trailColor = lightColor = backColor = col;
+                trailColor = lightColor = backColor = color;
                 frontColor = Color.white;
                 hitSound = Sounds.explosion;
                 hitEffect = new ExplosionEffect(){{
-                    lifetime = 27f;
+                    lifetime = 27.0f;
                     waveStroke = 4.0f;
                     waveLife = 8.0f;
                     waveRadBase = 8.0f;
-                    waveRad = 24f;
+                    waveRad = 24.0f;
                     sparks = 4;
-                    sparkRad = 27f;
+                    sparkRad = 27.0f;
                     sparkStroke = 1.5f;
                     sparkLen = 3.0f;
                     smokes = 4;
-                    waveColor = sparkColor = col;
+                    waveColor = sparkColor = color;
                     smokeColor = Color.white;
                 }};
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(4f, 25f){{
-                    lifetime = 16f;
+                fragBullet = new BasicBulletType(4.0f, 25.0f){{
+                    lifetime = 16.0f;
                     width = 3.0f;
                     height = 5.0f;
-                    splashDamageRadius = 32f;
-                    splashDamage = 45f;
+                    splashDamageRadius = 32.0f;
+                    splashDamage = 45.0f;
                     homingPower = 0.15f;
-                    homingRange = 80f;
+                    homingRange = 80.0f;
                     homingDelay = 8.0f;
                     trailLength = 3;
                     trailWidth = 3;
                     buildingDamageMultiplier = 0.25f;
                     collidesGround = true;
                     status = StatusEffects.blasted;
-                    backColor = col;
+                    backColor = color;
                     frontColor = Color.white;
-                    trailColor = col;
+                    trailColor = color;
                 }};
             }};
         }};
 
         gambler = new JackpotTurret("gambler"){{
-            final var chargeTime = 120f;
-            final var colors = new Color[]{Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
-            final var chargeFx = FFx.jackpotChargeEffect(chargeTime, 0.17f, 40f, 4, colors);
+            final float chargeTime = 120.0f;
+            var colors = new Color[]{Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
+            var chargeFx = FFx.jackpotChargeEffect(chargeTime, 0.17f, 40.0f, 4, colors);
 
             requirements(Category.turret, with(
                 Items.thorium, 450,
@@ -679,11 +695,11 @@ public class FBlocks{
             size = 3;
             hasLiquids = false;
             canOverdrive = false;
-            reload = 120f;
-            range = 320f;
-            shootCone = 30f;
+            reload = 120.0f;
+            range = 320.0f;
+            shootCone = 30.0f;
             shootY = 0.0f;
-            recoil = 13f;
+            recoil = 13.0f;
             rotateSpeed = 4.0f;
             ammoPerShot = 5;
             maxAmmo = 20;
@@ -693,20 +709,20 @@ public class FBlocks{
             jackpotAmmo.add(
 
                 new JackpotAmmo(Items.copper, 0.45f,
-                    new ShootAlternate(4f){{
+                    new ShootAlternate(4.0f){{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
                     }},
-                    new BasicBulletType(18f, 180f){{
-                    lifetime = 30f;
+                    new BasicBulletType(18.0f, 180.0f){{
+                    lifetime = 30.0f;
                     width = 6.0f;
-                    height = 12f;
+                    height = 12.0f;
                     drag = 0.04f;
                     status = FStatusEffects.disintegrated;
-                    statusDuration = 240f;
+                    statusDuration = 240.0f;
 
                     chargeEffect = chargeFx;
-                    shootEffect = FFx.gamblerShootEffect(60f, 4);
+                    shootEffect = FFx.gamblerShootEffect(60.0f, 4);
                     frontColor = Color.white;
                     backColor = hitColor = colors[0];
                 }}),
@@ -720,15 +736,15 @@ public class FBlocks{
                         }},
                         new ShootSpread(7, 2.0f)
                     ),
-                    new BasicBulletType(10.5f, 145f){{
-                        lifetime = 30f;
+                    new BasicBulletType(10.5f, 145.0f){{
+                        lifetime = 30.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FStatusEffects.disintegrated;
-                        statusDuration = 360f;
+                        statusDuration = 360.0f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(60f, 2);
+                        shootEffect = FFx.gamblerShootEffect(60.0f, 2);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[1]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[1];
@@ -745,26 +761,26 @@ public class FBlocks{
                         }},
                         new ShootSpread(7, 3.0f)
                     ),
-                    new BasicBulletType(10.5f, 100f){{
-                        lifetime = 30f;
+                    new BasicBulletType(10.5f, 100.0f){{
+                        lifetime = 30.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FStatusEffects.disintegrated;
-                        statusDuration = 480f;
+                        statusDuration = 480.0f;
                         lightning = 2;
                         lightningDamage = 5.0f;
                         lightningLength = 4;
                         lightningLengthRand = 1;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(25f, 1);
+                        shootEffect = FFx.gamblerShootEffect(25.0f, 1);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[2]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[2];
                     }}
                 ),
 
-                new JackpotAmmo(FItems.hardenedAlloy, 0f,
+                new JackpotAmmo(FItems.hardenedAlloy, 0.0f,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 7;
@@ -774,18 +790,18 @@ public class FBlocks{
                         }},
                         new ShootSpread(7, 3.0f)
                     ),
-                    new BasicBulletType(10.5f, 75f){{
-                        lifetime = 30f;
+                    new BasicBulletType(10.5f, 75.0f){{
+                        lifetime = 30.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FStatusEffects.disintegrated;
-                        statusDuration = 600f;
+                        statusDuration = 600.0f;
                         pierce = true;
                         pierceBuilding = true;
                         pierceCap = 4;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(15f, 1);
+                        shootEffect = FFx.gamblerShootEffect(15.0f, 1);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[3]);
                         frontColor = Pal.sapBullet;
                         backColor = hitColor = colors[3];
@@ -1119,7 +1135,7 @@ public class FBlocks{
             final float chargeTime = 90f;
             final float accelTime = 120f;
             final float radius = 220f;
-            final var col = Color.valueOf("92f3fd");
+            var col = Color.valueOf("92f3fd");
 
             requirements(Category.turret, with(
                 Items.plastanium, 425,
@@ -2457,6 +2473,7 @@ public class FBlocks{
             liquidCapacity = 30f;
             craftEffect = Fx.blastsmoke;
             updateEffect = Fx.smeltsmoke;
+            updateEffectChance = 0.08f;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.slag),
@@ -2464,7 +2481,7 @@ public class FBlocks{
                 new DrawFade()
             );
 
-            craftTime = 60f;
+            craftTime = 60.0f;
             outputItem = new ItemStack(FItems.flamefluidCrystal, 2);
 
             consumePower(1.5f);

@@ -130,21 +130,19 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             explodeSound.at(this);
             explodeEffect.at(this);
 
-            // ewe, this is truly horrible, no ref
-            float min = scale() * 0.7f, max = scale() * 1.3f;
-            for(byte i = 0; i < (fragRoundRand ?
-                Mathf.random(Mathf.ceil(fragRound * min), Mathf.floor(fragRound * max)) : fragRound
-            ); i++)
-                Time.run(fragDelayRand ?
-                    i * fragDelay * Mathf.random(0.7f, 1.3f) / scale() : i * fragDelay,
-                () -> {
-                    for(byte j = 0; j < (fragBulletsRand ?
-                        Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max)) : fragBullets
-                    ); j++)
-                        fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f), fragBulletVelRand ?
-                            Mathf.random(0.9f, 1.1f) : 1.0f
+            float min = scale() * 0.6f, max = scale() * 1.2f;
+            int round = fragRoundRand ? Mathf.random(Mathf.ceil(fragRound * min), Mathf.floor(fragRound * max)) : fragRound;
+            int bullets = fragBulletsRand ? Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max)) : fragBullets;
+
+            for(int i = 0; i < round; i++){
+                float delay = fragDelayRand ? i * fragDelay * Mathf.random(0.7f, 1.3f) / scale() : i * fragDelay;
+                Time.run(delay, () -> {
+                    for(int j = 0; j < bullets; j++)
+                        fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f),
+                            fragBulletVelRand ? Mathf.random(0.9f, 1.1f) : 1.0f
                         );
                 });
+            }
         }
 
         @Override

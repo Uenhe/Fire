@@ -68,7 +68,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
                     }
                 }
             }
-            final boolean valid =
+            boolean valid =
                 !(lastPlan != null && lastPlan.removed) &&
                     ((req.tile() != null && req.tile().build instanceof ConstructBlock.ConstructBuild cons && cons.current == req.block) ||
                         (req.breaking ?
@@ -96,8 +96,8 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
                 mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, buildRadius, u -> {
                     if(found) return;
                     if(u.canBuild() && u != unit && u.activelyBuilding()){
-                        final var plan = u.buildPlan();
-                        final var build = world.build(plan.x, plan.y);
+                        var plan = u.buildPlan();
+                        var build = world.build(plan.x, plan.y);
                         if(build instanceof ConstructBlock.ConstructBuild cons){
                             float dist = Math.min(cons.dst(unit) - unit.type.buildRange, 0f);
                             // make sure it can reach the plan in time
@@ -113,7 +113,7 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
                     mindustry.gen.Player closest = null;
                     for(var player : Groups.player){
                         if(player.unit().canBuild() && !player.dead() && player.team() == unit.team){
-                            final float dst = player.dst2(unit);
+                            float dst = player.dst2(unit);
                             if(dst < minDst){
                                 closest = player;
                                 minDst = dst;
@@ -125,8 +125,8 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
             }
             // find a new plan
             if(!onlyAssist && !unit.team.data().plans.isEmpty() && following == null && timer.get(timerTarget3, rebuildPeriod)){
-                final var blocks = unit.team.data().plans;
-                final var block = blocks.first();
+                var blocks = unit.team.data().plans;
+                var block = blocks.first();
                 // check if it's already been placed
                 if(world.tile(block.x, block.y) != null && world.tile(block.x, block.y).block().id == block.block){
                     blocks.removeFirst();

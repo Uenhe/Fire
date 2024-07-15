@@ -18,3 +18,6 @@
     磁球 (Magnetic Sphere)
   重绘的:
     灼阳 (Apollo)
+    利刃 (Blade)
+    柄斧 (Hatchet)
+    坚城 (Castle)

@@ -15,7 +15,6 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
-import mindustry.entities.pattern.ShootPattern;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -52,7 +51,7 @@ public class FUnitTypes{
     public static void load(){
 
         //region legs support
-        Color colLegSpt = Color.valueOf("8cfffb");
+        var colLegSpt = Color.valueOf("8cfffb");
 
         guarding = new UnitType("sh"){{
             constructor = LegsUnit::create;
@@ -74,7 +73,7 @@ public class FUnitTypes{
             legCount = 4;
             legLength = 8f;
             legSpeed = 0.2f;
-            legExtension = 0f;
+            legExtension = 0.0f;
             legBaseOffset = 2f;
             legPairOffset = 3f;
             legLengthScl = 1.6f;
@@ -110,7 +109,7 @@ public class FUnitTypes{
             legCount = 4;
             legLength = 10f;
             legSpeed = 0.2f;
-            legExtension = 0f;
+            legExtension = 0.0f;
             legBaseOffset = 2f;
             legPairOffset = 3f;
             legLengthScl = 1.6f;
@@ -159,7 +158,7 @@ public class FUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new ForceFieldAbility(72f, 1f, 400f, 300f, 4, 45f),
+                new ForceFieldAbility(72f, 1.0f, 400f, 300f, 4, 45f),
                 new StatusFieldAbility(StatusEffects.overclock, 360f, 360f, 80f)
             );
 
@@ -211,7 +210,7 @@ public class FUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(80f, 2.5f, 1080f, 270f, 10f, 10f, 20, 16),
+                new EnergyForceFieldAbility(80f, 2.5f, 1080f, 270f, 20, 16, 10, 10.0f),
                 new RegenFieldAbility(2.5f, 120f, colLegSpt)
             );
         }};
@@ -248,7 +247,7 @@ public class FUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(160f, 4f, 7200f, 600f, 30f, 15f, 28, 24){{
+                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 28, 24, 15, 30.0f){{
                     sides = 24;
                     lightningColor = Pal.surge;
                     unlocks = true;
@@ -271,31 +270,34 @@ public class FUnitTypes{
 
         blade = new FleshUnitType("byjd"){{
             constructor = MechUnit::create;
-            health = 630;
-            armor = 5;
-            hitSize = 8f;
+            health = 630.0f;
+            armor = 5.0f;
+            hitSize = 10.0f;
             speed = 0.6f;
-            drownTimeMultiplier = 3f;
+            drownTimeMultiplier = 3.0f;
+
+            mechSideSway = 0.6f;
+            mechFrontSway = 0.2f;
 
             weapons.add(
                 new Weapon("fire-byjd-weapon"){{
                     reload = 30.0f;
-                    x = 5.0f;
-                    y = 3.0f;
-                    recoil = 2.0f;
+                    x = 0.0f;
+                    shootX = 6.6f;
+                    shootY = 4.2f;
+                    recoil = 1.0f;
                     top = false;
                     ejectEffect = Fx.casing1;
-                    shoot = new ShootPattern(){{
-                        shots = 3;
-                        shotDelay = 4.0f;
-                    }};
+
+                    shoot.shots = 3;
+                    shoot.shotDelay = 4.0f;
                     bullet = new BasicBulletType(5.0f, 30.0f){{
                         lifetime = 40.0f;
                         width = 5.4f;
                         height = 10.8f;
 
-                        backColor.g -= 0.1f;
-                        frontColor.g -= 0.1f;
+                        backColor = Color.valueOf("f9a27a");
+                        frontColor = Color.valueOf("ffd8e8");
                     }};
                 }}
             );
@@ -303,22 +305,28 @@ public class FUnitTypes{
 
         hatchet = new FleshUnitType("hatchet"){{
             constructor = MechUnit::create;
-            health = 960;
-            armor = 8;
-            hitSize = 10f;
+            health = 960.0f;
+            armor = 8.0f;
+            hitSize = 13.0f;
             speed = 0.6f;
-            drownTimeMultiplier = 3f;
+            drownTimeMultiplier = 4.0f;
+
+            mechSideSway = 0.6f;
+            mechFrontSway = 0.45f;
 
             weapons.add(
-                new Weapon("flamethrower"){{
-                    reload = 10f;
-                    recoil = 3f;
-                    shootY = 2f;
+                new Weapon("fire-hatchet-weapon"){{
+                    reload = 10.0f;
+                    recoil = 2.0f;
+                    x = 0.0f;
+                    shootX = 9.6f;
+                    shootY = 4.0f;
                     top = false;
                     shootSound = Sounds.flame;
-                    bullet = new BulletType(6f, 60f){{
-                        lifetime = 20f;
-                        hitSize = 8f;
+
+                    bullet = new BulletType(6.0f, 60.0f){{
+                        lifetime = 20.0f;
+                        hitSize = 8.0f;
                         pierceCap = 5;
                         pierce = true;
                         pierceBuilding = true;
@@ -326,13 +334,13 @@ public class FUnitTypes{
                         hittable = reflectable = absorbable = false;
                         keepVelocity = false;
                         status = FStatusEffects.overgrown;
-                        statusDuration = 240f;
+                        statusDuration = 240.0f;
 
                         hitEffect = despawnEffect = Fx.none;
-                        shootEffect = new Effect(32f, 80f, e -> {
+                        shootEffect = new Effect(27.0f, 80.0f, e -> {
                             Draw.color(Pal.neoplasm2, Pal.neoplasmMid, Pal.neoplasm1, e.fin());
-                            Angles.randLenVectors(e.id, 24, 8f + e.finpow() * speed * lifetime, e.rotation, 10f, (x, y) ->
-                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * 4f));
+                            Angles.randLenVectors(e.id, 32, 12.0f + e.finpow() * speed * lifetime, e.rotation, 10.0f, (x, y) ->
+                                Fill.circle(e.x + x, e.y + y, 0.75f + e.fout() * 4.0f));
                         });
                     }};
                 }}
@@ -341,46 +349,52 @@ public class FUnitTypes{
 
         castle = new FleshUnitType("bybl"){{
             constructor = MechUnit::create;
-            health = 8200;
-            armor = 9;
-            hitSize = 13f;
-            speed = 4f / 7.5f;
-            rotateSpeed = 6f;
-            drownTimeMultiplier = 3f;
+            health = 8200.0f;
+            armor = 9.0f;
+            hitSize = 18.0f;
+            speed = 0.53f;
+            rotateSpeed = 6.0f;
+            drownTimeMultiplier = 5.0f;
+
+            mechSideSway = 0.6f;
+            mechFrontSway = 0.7f;
 
             abilities.add(
-                new EnergyFieldAbility(15f, 30f, 128f){{
-                    status = StatusEffects.burning;
-                    statusDuration = 40f;
+                new EnergyFieldAbility(15.0f, 30.0f, 128.0f){{
                     maxTargets = 40;
                     healPercent = 0.1f;
+                    statusDuration = 40.0f;
+                    status = StatusEffects.burning;
                     color = Color.valueOf("ff3300");
                 }}
             );
 
             weapons.add(
-                new Weapon("artillery"){{
-                    reload = 40f;
-                    x = 9f;
-                    y = 1f;
+                new Weapon("fire-bybl-weapon"){{
+                    reload = 40.0f;
+                    x = 0.0f;
+                    shootX = 16.0f;
+                    shootY = 5.4f;
+                    recoil = 5.0f;
+                    shake = 3.0f;
                     top = false;
-                    recoil = 6f;
-                    shake = 3f;
                     ejectEffect = Fx.casing2;
                     shootSound = Sounds.artillery;
                     targetAir = false;
+
                     shoot.shots = 2;
-                    shoot.shotDelay = 8f;
-                    bullet = new ArtilleryBulletType(2f, 90f, "shell"){{
-                        lifetime = 150f;
-                        width = 16f;
-                        height = 16f;
+                    shoot.shotDelay = 8.0f;
+                    bullet = new ArtilleryBulletType(2.0f, 90.0f, "shell"){{
+                        lifetime = 150.0f;
+                        width = 16.0f;
+                        height = 16.0f;
                         knockback = 1.2f;
-                        splashDamage = 200f;
-                        splashDamageRadius = 40f;
+                        splashDamage = 200.0f;
+                        splashDamageRadius = 40.0f;
+
                         hitEffect = Fx.blastExplosion;
-                        backColor = Pal.bulletYellowBack;
-                        frontColor = Pal.bulletYellow;
+                        backColor = Color.valueOf("f9a27a");
+                        frontColor = Color.valueOf("ffd8e8");
                     }};
                 }}
             );
@@ -390,6 +404,8 @@ public class FUnitTypes{
         //region ground
 
         error = new FleshUnitType("error"){{
+            hidden = true;
+            
             constructor = LegsUnit::create;
             hovering = true;
             health = 128000;
@@ -421,17 +437,18 @@ public class FUnitTypes{
             weapons.add(
 
                 new Weapon("error-sapper"){{
-                    reload = 12;
-                    x = 8; y = -5;
-                    rotateSpeed = 6;
+                    reload = 12.0f;
+                    x = 8.0f;
+                    y = -5.0f;
+                    rotateSpeed = 6.0f;
                     rotate = true;
                     shootSound = Sounds.sap;
                     bullet = new SapBulletType(){{
-                        damage = 165f;
-                        length = 128f;
-                        width = 2f;
-                        lifetime = 30f;
-                        knockback = -1f;
+                        damage = 165.0f;
+                        length = 128.0f;
+                        width = 2.0f;
+                        lifetime = 30.0f;
+                        knockback = -1.0f;
                         sapStrength = 0.6f;
                         color = Color.valueOf("990003");
                         hitColor = Color.valueOf("990003");
@@ -595,7 +612,7 @@ public class FUnitTypes{
                         trailEffect = new Effect(16f, e -> {
                             Draw.color(Pal.heal);
                             for(int s : Mathf.signs){
-                                Drawf.tri(e.x, e.y, 4f, 30f * e.fslope(), e.rotation + s * 90f);
+                                Drawf.tri(e.x, e.y, 4.0f, 30f * e.fslope(), e.rotation + s * 90f);
                             }
                         });
 
@@ -612,7 +629,7 @@ public class FUnitTypes{
                             Lines.circle(e.x, e.y, rad);
                             for(byte i = 0; i < points; i++){
                                 float angle = i * 360f / points + offset;
-                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4f, 30f * e.fout(), angle);
+                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4.0f, 30f * e.fout(), angle);
                             }
                             Fill.circle(e.x, e.y, 12f * e.fout());
                             Draw.color();
@@ -648,7 +665,7 @@ public class FUnitTypes{
                         trailColor = Pal.heal;
                         trailEffect = Fx.colorSpark;
 
-                        fragSpread = 0f;
+                        fragSpread = 0.0f;
                         fragRandomSpread = 15f;
                         fragBullets = 2;
                         fragBullet = new LaserBulletType(20f){{
@@ -684,7 +701,7 @@ public class FUnitTypes{
             lowAltitude = false;
 
             abilities.add(
-                new MoveLightningAbility(2f, 8, 0.1f, 0f, 1.2f, 1.6f, Color.valueOf("a9d8ff"))
+                new MoveLightningAbility(2f, 8, 0.1f, 0.0f, 1.2f, 1.6f, Color.valueOf("a9d8ff"))
             );
 
             weapons.add(
@@ -730,7 +747,7 @@ public class FUnitTypes{
 
             weapons.add(
                 new Weapon("fire-candlelight-weapon"){{
-                    x = 0f;
+                    x = 0.0f;
                     y = 2f;
                     reload = 600f;
                     shootCone = 180f;
@@ -836,7 +853,7 @@ public class FUnitTypes{
 
                 new Weapon("omura-cannon"){{
                     reload = 495f;
-                    x = 0f;
+                    x = 0.0f;
                     y = -13f;
                     shootY = 14f;
                     rotateSpeed = 2f;
@@ -855,7 +872,7 @@ public class FUnitTypes{
                         pierceBuilding = true;
                         collidesGround = true;
                         fragBullets = 12;
-                        fragBullet = new BasicBulletType(10f, 0f){{
+                        fragBullet = new BasicBulletType(10f, 0.0f){{
                             lifetime = 35f;
                             splashDamageRadius = 70f;
                             splashDamage = 320f;

@@ -39,15 +39,15 @@ public class FFx{
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
 
-            final float orbSize = 2f * e.fout() + 1f;
-            final float r = radius * e.fout();
-            final float w = e.time * speed * e.fout(Interp.swingOut);
-            final float x = Mathf.cos(w) + e.x;
-            final float y = Mathf.sin(w) + e.y;
+            float orbSize = 2f * e.fout() + 1f;
+            float r = radius * e.fout();
+            float w = e.time * speed * e.fout(Interp.swingOut);
+            float x = Mathf.cos(w) + e.x;
+            float y = Mathf.sin(w) + e.y;
 
             for(byte i = 0; i < amount; i++) {
-                final float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
-                final float
+                float angle = Angles.angle(e.x, e.y, x, y) + 360f / amount * i;
+                float
                     cx = e.x + r * Mathf.sinDeg(angle),
                     cy = e.y + r * Mathf.cosDeg(angle);
 

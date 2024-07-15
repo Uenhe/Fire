@@ -6,9 +6,10 @@ public class FSectorPresets{
 
     public static SectorPreset
 
-        landingBase, darksandPlain, cornerOfZero, beachLanding,
-        darkWorkshop, desolateFortification, glaciatedPeaks, sporeFiord,
-        scorchingVolcano, lavaStronghold, eteriverStronghold, chillyMountains;
+        landingBase, darksandPlain,
+        cornerOfZero, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
+        sporeFiord, scorchingVolcano, lavaStronghold,
+        eteriverStronghold, chillyMountains, stormyCoast;
 
     public static void load(){
 
@@ -18,6 +19,7 @@ public class FSectorPresets{
         cornerOfZero = create("lhyj", 15, 6, 30);
         beachLanding = create("htdl", 183, 6);
         darkWorkshop = create("hacj", 186, 8);
+        desolateFortification = create("urgent-support", 119, 9, 60);
         glaciatedPeaks = create("glaciated-peaks", 118, 10);
 
         sporeFiord = create("bzxw", 199, 8, 40);
@@ -26,7 +28,7 @@ public class FSectorPresets{
 
         eteriverStronghold = create("hhys", 34, 8);
         chillyMountains = create("lfsm", 168, 9, 17);
-        desolateFortification = create("urgent-support", 119, 9, 60);
+        stormyCoast = create("stormy-coast", 81, 10, 60);
     }
 
     private static SectorPreset create(String name, int sector, float difficulty){
@@ -38,7 +40,7 @@ public class FSectorPresets{
     }
 
     private static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
-        SectorPreset s = new SectorPreset(name, FPlanets.risetar, sector);
+        var s = new SectorPreset(name, FPlanets.risetar, sector);
         s.difficulty = difficulty;
         s.captureWave = captureWave;
         s.addStartingItems = addStartingItems;

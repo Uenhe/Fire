@@ -16,6 +16,7 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
@@ -28,7 +29,7 @@ public class FireMod extends mindustry.mod.Mod{
         linkGitHub = "https://github.com/Uenhe/Fire";
 
     private static mindustry.mod.Mods.LoadedMod FIRE;
-    private static String displayName, close;
+    private static String displayName;
     private static boolean launched;
 
     @Override
@@ -47,7 +48,6 @@ public class FireMod extends mindustry.mod.Mod{
     public void loadContent(){
         FIRE = mods.locateMod("fire");
         displayName = Core.bundle.get("modname");
-        close = Core.bundle.get("close");
         FIRE.meta.displayName = displayName;
 
         setRandTitle();
@@ -93,15 +93,14 @@ public class FireMod extends mindustry.mod.Mod{
         if(!(Core.settings.getBool("showLogs") || launched)) return;
 
         var version = FIRE.meta.version;
-        var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName)){{
-            setupDialog(this);
-            cont.pane(t ->
-                t.add("@history").left().width(1024.0f).maxWidth(1280.0f).pad(4.0f)
-            ).maxWidth(1024.0f);
-        }};
+
+        var historyDialog = new BaseDialog(Core.bundle.format("historyTitle", displayName));
+        setupDialog(historyDialog);
+        historyDialog.cont.pane(t ->
+            t.add("@history").left().maxWidth(1280.0f).pad(4.0f)
+        );
 
         var mainDialog = new BaseDialog(Core.bundle.format("mainTitle", displayName, version));
-
         setupDialog(mainDialog);
         mainDialog.buttons.button(Core.bundle.format("historyTitle", ""), historyDialog::show).size(210.0f, 64.0f);
         mainDialog.cont.pane(t -> {
@@ -109,7 +108,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107.0f).width(359.0f).pad(3.0f);
             t.row();
 
-            t.add(Core.bundle.format("contentMain", version)).left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
+            t.add(Core.bundle.format("contentMain", version)).left().maxWidth(1024.0f).pad(4.0f);
             t.row();
 
             addContent(t,
@@ -119,7 +118,7 @@ public class FireMod extends mindustry.mod.Mod{
             );
             t.row();
 
-            t.add("@contentSecondary").left().width(800.0f).maxWidth(1024.0f).pad(4.0f);
+            t.add("@contentSecondary").left().maxWidth(1024.0f).pad(4.0f);
             t.row();
 
             if("zh_CN".equals(Core.settings.getString("locale"))){
@@ -167,7 +166,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(announces && Core.settings.getBool("noMultipleMods")){
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
-            var dialog = new BaseDialog("o_o?"){
+            new BaseDialog("o_o?"){
                 private float time = 300.0f;
                 private boolean canClose;
 
@@ -176,12 +175,13 @@ public class FireMod extends mindustry.mod.Mod{
                     cont.add("@noMultipleMods");
                     buttons.button("", this::hide).update(b -> {
                         b.setDisabled(!canClose);
-                        b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60.0f, 1)));
+                        b.setText(canClose ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
                     }).size(210.0f, 64.0f);
-                }
-            };
 
-            dialog.show();
+                    show();
+                }
+
+            };
         }
     }
 
@@ -193,19 +193,16 @@ public class FireMod extends mindustry.mod.Mod{
         int index = Mathf.random(titles.length - 1);
         var title = titles[index];
 
-        // "Today is the {0}th Day of God's Creation of the Risetar" picked
+        // "Today is the _th Day of God's Creation of the Risetar" picked
         if(index == 0)
-            title = Core.bundle.format(
-                title,
-                java.time.temporal.ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now())
-            );
+            title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
 
         Core.graphics.setTitle("Mindustry: " + title);
     }
 
     private static void setupDialog(BaseDialog dialog){
         dialog.closeOnBack();
-        dialog.buttons.button(close, dialog::hide).size(210.0f, 64.0f);
+        dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
     }
 
     private static void addContent(Table table, UnlockableContent... content){

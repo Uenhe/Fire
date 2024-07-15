@@ -25,7 +25,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     /** see {@link mindustry.entities.bullet.LightningBulletType#calculateRange()} */
     private final short lightningLength;
     private final byte lightningAmount;
-    private final float lightningDamage;
+    private final short lightningDamage;
     private final float chanceDeflect;
     protected float rotateSpeed;
     protected Color lightningColor = Color.clear;
@@ -38,12 +38,12 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     /** Prevent endless and awful creating instances. */
     private static final ObjectMap<BulletType, BulletType> bulletMap = new ObjectMap<>();
 
-    public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, float chance, float damage, int length, int amount){
+    public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
-        chanceDeflect = chance;
-        lightningDamage = damage;
         lightningLength = (short)length;
         lightningAmount = (byte)amount;
+        lightningDamage = (short)damage;
+        chanceDeflect = chance;
     }
 
     @Override
@@ -84,19 +84,19 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     @Override
     public void update(Unit unit){
-        alpha = Math.max(alpha - Time.delta / 10f, 0f);
-        broken = unit.shield <= 0f;
+        alpha = Math.max(alpha - Time.delta / 10.0f, 0.0f);
+        broken = unit.shield <= 0.0f;
 
         if(rotateSpeed > 0.0f){
             rotation += rotateSpeed * Time.delta;
-            rotation %= 360f;
+            rotation -= 360.0f;
         }
-        if(unit.shield < max && timer == 0f)
+        if(unit.shield < max && timer == 0.0f)
             unit.shield += regen * Time.delta;
 
         if(!broken){
-            radiusScale = Mathf.lerpDelta(radiusScale, 1f, 0.06f);
-            Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2f, realRad() * 2f, bullet -> {
+            radiusScale = Mathf.lerpDelta(radiusScale, 1.0f, 0.08f);
+            Groups.bullet.intersect(unit.x - realRad(), unit.y - realRad(), realRad() * 2.0f, realRad() * 2.0f, bullet -> {
                 if(bullet.team != unit.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, unit.x, unit.y, realRad(), rotation, bullet.x, bullet.y)){
                     Fx.absorb.at(bullet);
 
@@ -105,30 +105,30 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
                         if(Math.abs(unit.x - bullet.x) > Math.abs(unit.y - bullet.y))
-                            bullet.vel.x *= -1f;
+                            bullet.vel.x *= -1.0f;
                         else
-                            bullet.vel.y *= -1f;
+                            bullet.vel.y *= -1.0f;
 
                         bullet.owner = unit;
                         bullet.team = unit.team;
-                        bullet.time += 1f;
+                        bullet.time += 1.0f;
                         collision = false;
                     }
 
                     bullet.absorb();
-                    unit.shield -= collision ? bullet.damage : bullet.damage * 2f;
-                    alpha = 1f;
+                    unit.shield -= collision ? bullet.damage : bullet.damage * 2.0f;
+                    alpha = 1.0f;
 
-                    if(unit.shield <= 0f){
+                    if(unit.shield <= 0.0f){
                         broken = true;
                         regenable = false;
-                        radiusScale = 0f;
+                        radiusScale = 0.0f;
                         unit.shield -= cooldown * regen;
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
 
                         Sounds.spark.at(unit, Mathf.random(0.45f, 0.55f));
                         for(byte i = 0; i < lightningAmount; i++){
-                            Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, i * (360f / lightningAmount), lightningLength);
+                            Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, i * (360.0f / lightningAmount), lightningLength);
                         }
                     }
                 }
@@ -145,10 +145,10 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                     x = Mathf.cos(timer * speed) * radius * scl + unit.x,
                     y = Mathf.sin(timer * speed) * radius * scl + unit.y;
 
-                timer += Time.delta * (isOverloaded ? 1.333f : 1f);
+                timer += Time.delta * (isOverloaded ? 1.333f : 1.0f);
 
                 if(timer <= 180.0f)
-                    Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2f, radius * 2f, bullet -> {
+                    Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
                         if(
                             !isOverloaded
                             && bullet.team != unit.team && bullet.type.absorbable && bullet.type.hittable
@@ -157,8 +157,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         ){
                             bullet.owner = unit;
                             bullet.team = unit.team;
-                            bullet.time = 0f;
-                            bullet.lifetime = 310f;
+                            bullet.time = 0.0f;
+                            bullet.lifetime = 310.0f;
 
                             // reuse instances as possible
                             var type = bulletMap.containsKey(bullet.type) ?
@@ -187,9 +187,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         }
                     });
 
-                else if(timer > 310f){
+                else if(timer > 310.0f){
                     regenable = true;
-                    timer = 0f;
+                    timer = 0.0f;
                     bullets.clear();
                 }
 
@@ -201,21 +201,22 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
                         float range = b.type.speed * b.type.lifetime;
 
-                        if(timer <= 240f){
-                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80f * Time.delta));
-                            b.vel.setLength(5f + 3f * timer / 240f * (1f + dst / radius)); // velocity terminal = 8, has a boost depending on distance(b, dest) up to 200%
+                        if(timer <= 240.0f){
+                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80.0f * Time.delta));
+                            b.vel.setLength(5.0f + 3.0f * timer / 240.0f * (1.0f + dst / radius)); // velocity terminal = 8, has a boost depending on distance(b, dest) up to 200%
 
-                        }else if(timer > 240f && timer <= 300f){
-                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80f * Time.delta));
-                            b.vel.setLength(8f * dst / radius); // use velocity terminal here
+                        }else if(timer > 240.0f && timer <= 300.0f){
+                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80.0f * Time.delta));
+                            b.vel.setLength(8.0f * dst / radius); // use velocity terminal here
 
                         }else{
-                            b.time = 0f;
+                            b.time = 0.0f;
                             b.lifetime = range / vel;
 
                             var target =
                                 b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id) ?
-                                    b.aimTile.build : Units.closestTarget(b.team, b.x, b.y, range,
+                                    b.aimTile.build :
+                                    Units.closestTarget(b.team, b.x, b.y, range,
                                         u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
                                         t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
@@ -225,15 +226,15 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                 final float velTer = vel * 1.16f;
 
                                 b.vel.setLength(velTer);
-                                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000f));
+                                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000.0f));
                                 b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velTer * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
 
                             }else{
-                                float angle = Mathf.random(360f);
+                                float angle = Mathf.random(360.0f);
 
                                 if(target != null)
-                                    while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30f))
-                                        angle = Mathf.random(360f);
+                                    while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30.0f))
+                                        angle = Mathf.random(360.0f);
 
                                 b.initVel(angle, vel);
                             }

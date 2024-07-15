@@ -40,6 +40,7 @@ import static mindustry.Vars.*;
 /**
  * To show more details about contents.
  * See {@link mindustry.ui.dialogs.ResearchDialog}
+ * TODO all english info is done by AI; human translation is required.
  */
 public class InfoDialog extends BaseDialog{
 
@@ -76,8 +77,7 @@ public class InfoDialog extends BaseDialog{
                     if(locked(node)) continue;
 
                     in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
-                        if(node == lastNode)
-                            return;
+                        if(node == lastNode) return;
 
                         rebuildTree(node);
                         hide();
@@ -92,7 +92,6 @@ public class InfoDialog extends BaseDialog{
         cont.stack(titleTable, view = new View()).grow();
 
         titleTable.toFront();
-
         shouldPause = true;
 
         shown(() -> {
@@ -163,10 +162,10 @@ public class InfoDialog extends BaseDialog{
 
     public void rebuildTree(InfoNode node){
         switchTree(node);
+
         view.panX = 0f;
         view.panY = -200f;
         view.setScale(1f);
-
         view.hoverNode = null;
         view.infoTable.remove();
         view.infoTable.clear();
@@ -192,10 +191,10 @@ public class InfoDialog extends BaseDialog{
     }
 
     private void treeLayout(){
-        final var node = new LayoutNode(root, null);
-        final var children = node.children;
-        final var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
-        final var rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length / 2f), node.children.length);
+        var node = new LayoutNode(root, null);
+        var children = node.children;
+        var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
+        var rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length / 2f), node.children.length);
 
         node.children = leftHalf;
         new BranchTreeLayout(){{
@@ -203,7 +202,7 @@ public class InfoDialog extends BaseDialog{
             rootLocation = TreeLocation.top;
         }}.layout(node);
 
-        final float lastY = node.y;
+        float lastY = node.y;
 
         if(rightHalf.length > 0){
 
@@ -218,18 +217,18 @@ public class InfoDialog extends BaseDialog{
 
         node.children = children;
 
-        float minx = 0f, miny = 0f, maxx = 0f, maxy = 0f;
+        float minX = 0f, minY = 0f, maxX = 0f, maxY = 0f;
         copyInfo(node);
 
         for(var n : nodes){
             if(!n.visible) continue;
 
-            minx = Math.min(n.x - n.width / 2f, minx);
-            maxx = Math.max(n.x + n.width / 2f, maxx);
-            miny = Math.min(n.y - n.height / 2f, miny);
-            maxy = Math.max(n.y + n.height / 2f, maxy);
+            minX = Math.min(n.x - n.width / 2f, minX);
+            maxX = Math.max(n.x + n.width / 2f, maxX);
+            minY = Math.min(n.y - n.height / 2f, minY);
+            maxY = Math.max(n.y + n.height / 2f, maxY);
         }
-        bounds = new Rect(minx, miny, maxx - minx, maxy - miny);
+        bounds = new Rect(minX, minY, maxX - minX, maxY - minY);
         bounds.y += nodeSize * 1.5f;
     }
 
@@ -263,13 +262,14 @@ public class InfoDialog extends BaseDialog{
         }
 
         private void rebuildAll(){
+
             clear();
             hoverNode = null;
             infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
             for(var node : nodes){
-                final var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
+                var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
 
                 button.resizeImage(32f);
                 button.getImage().setScaling(Scaling.fit);
@@ -281,10 +281,10 @@ public class InfoDialog extends BaseDialog{
                         hoverNode = button;
                         rebuild();
 
-                        final float right = infoTable.getRight();
+                        float right = infoTable.getRight();
                         if(right > Core.graphics.getWidth()){
 
-                            final float moveBy = right - Core.graphics.getWidth();
+                            float moveBy = right - Core.graphics.getWidth();
                             addAction(new RelativeTemporalAction(){
                                 @Override
                                 protected void updateRelative(float percentDelta){
@@ -316,7 +316,7 @@ public class InfoDialog extends BaseDialog{
                 button.setSize(nodeSize);
 
                 button.update(() -> {
-                    final float offset = (Core.graphics.getHeight() % 2f) / 2f;
+                    float offset = (Core.graphics.getHeight() % 2f) / 2f;
                     button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : locked(node.node) || !locked(node.node) ? Tex.buttonRed : Tex.button;
 
@@ -341,9 +341,9 @@ public class InfoDialog extends BaseDialog{
         }
 
         private void clamp(){
-            final float pad = nodeSize;
-            final float ox = width/2f, oy = height/2f;
-            final float rw = bounds.width, rh = bounds.height;
+            float pad = nodeSize;
+            float ox = width / 2.0f, oy = height / 2.0f;
+            float rw = bounds.width, rh = bounds.height;
 
             float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
 
@@ -362,7 +362,7 @@ public class InfoDialog extends BaseDialog{
         }
 
         private void rebuild(){
-            final var button = hoverNode;
+            var button = hoverNode;
 
             infoTable.remove();
             infoTable.clear();
@@ -370,7 +370,7 @@ public class InfoDialog extends BaseDialog{
 
             if(button == null) return;
 
-            final var node = (InfoNode)button.userObject;
+            var node = (InfoNode)button.userObject;
 
             infoTable.exited(() -> {
                 if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
@@ -394,7 +394,7 @@ public class InfoDialog extends BaseDialog{
                     hide();
                 }).growY().width(50f);
 
-                final var t = b.table(desc -> {
+                var t = b.table(desc -> {
 
                     desc.left().defaults().left();
                     desc.add(locked(node) ? "@content.unlocked" : node.content.localizedName);
@@ -429,7 +429,7 @@ public class InfoDialog extends BaseDialog{
         public void drawChildren(){
 
             clamp();
-            final float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
             Draw.sort(true);
 
             for(var node : nodes){
@@ -438,16 +438,15 @@ public class InfoDialog extends BaseDialog{
                 for(var child : node.children){
                     if(!child.visible) continue;
 
-                    final boolean lock = locked(node.node) || locked(child.node);
+                    boolean lock = locked(node.node) || locked(child.node);
                     Draw.z(lock ? 1f : 2f);
 
                     Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
 
-                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3f)
+                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3f){
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
-
-                    else{
+                    }else{
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, node.y + offsetY);
                         Lines.line(child.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                     }
@@ -483,6 +482,7 @@ public class InfoDialog extends BaseDialog{
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
+
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
@@ -524,8 +524,8 @@ public class InfoDialog extends BaseDialog{
         public static InfoNode dnode(UnlockableContent content, boolean isRoot, Runnable children){
             if(isRoot) InfoTree.roots.add(dnode(content, children));
 
-            final var node = new InfoNode(InfoTree.context, content);
-            final var prev = InfoTree.context;
+            var node = new InfoNode(InfoTree.context, content);
+            var prev = InfoTree.context;
 
             InfoTree.context = node;
             children.run();

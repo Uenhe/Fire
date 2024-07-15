@@ -120,7 +120,7 @@ public class FStatusEffects{
                     unit.heal(regenPercent * Time.delta * unit.maxHealth);
 
                     /* The shield that unit can regen at most. */
-                    final float maxShield = 1200f;
+                    final float maxShield = 1200.0f;
 
                     if(unit.shield < maxShield)
                         unit.shield = Math.min(unit.shield + regenPercent * Time.delta * maxShield, maxShield);
@@ -132,7 +132,7 @@ public class FStatusEffects{
                 }
 
                 if(Mathf.chanceDelta(effectChance)){
-                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2f));
+                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.5f));
                     effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0f, color, parentizeEffect ? unit : null);
                 }
             }
@@ -144,10 +144,10 @@ public class FStatusEffects{
             healthMultiplier = 1.1f;
 
             effect = new Effect(40f, e -> {
-                final float scl = e.data instanceof Unit u ? 1f + u.type.hitSize / 4f : 1f;
+                float scl = e.data instanceof Unit u ? 1.0f + u.type.hitSize * 0.4f : 1.0f;
 
                 Draw.color(overgrown.color);
-                Angles.randLenVectors(e.id, 2, 1f + e.fin() * 2f, (x, y) ->
+                Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.0f, (x, y) ->
                     Fill.circle(e.x + x, e.y + y, e.fout() * scl * 1.2f)
                 );
             });
@@ -156,7 +156,7 @@ public class FStatusEffects{
         disintegrated = new StatusEffect("disintegrated"){
 
             /** The armor that unit reduces at most. */
-            private final float maxArmorReduction = 10f;
+            private final float maxArmorReduction = 10.0f;
 
             @Override
             public void setStats(){
@@ -169,16 +169,16 @@ public class FStatusEffects{
             public void update(Unit unit, float time){
                 super.update(unit, time);
 
-                if(time >= 60f)
+                if(time >= 60.0f)
                     // linearly reduces armor in 1s
-                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60f, unit.type.armor - maxArmorReduction);
+                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f, unit.type.armor - maxArmorReduction);
 
                 else
                     // linearly puts armor back in 1s
-                    unit.armor += maxArmorReduction / 60f * Time.delta;
+                    unit.armor += maxArmorReduction / 60.0f * Time.delta;
             }
             {
-            damage = 4f;
+            damage = 4.0f;
             speedMultiplier = 0.6f;
             effectChance = 0.2f;
             parentizeEffect = true;

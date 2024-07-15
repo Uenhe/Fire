@@ -27,14 +27,14 @@ public class FPlanets{
     
     public static void load(){
         
-        risetar = new Planet("lst", Planets.sun, 1f, 3){{
+        risetar = new Planet("lst", Planets.sun, 1.0f, 3){{
             meshLoader = () -> new HexMesh(this, 8);
             cloudMeshLoader = () -> new MultiMesh(
                 new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
-                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1f, 0.41f)
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
             );
             generator = new SerpuloPlanetGenerator();
-            rotateTime = 7200f;
+            rotateTime = 7200.0f;
             alwaysUnlocked = true;
             clearSectorOnLose = true;
             enemyCoreSpawnReplace = false;
@@ -43,7 +43,7 @@ public class FPlanets{
             allowSectorInvasion = false;
             allowWaveSimulation = true;
             prebuildBase = false;
-            orbitRadius = 64f;
+            orbitRadius = 64.0f;
             startSector = 0;
             sectorSeed = 3;
             atmosphereColor = Color.valueOf("1a3db1");
@@ -55,7 +55,6 @@ public class FPlanets{
     }
 
     public static void loadTree(){
-
         risetar.techTree = nodeRoot("hzgs", fireCompany, () -> {
 
             node(compositeConveyor, with(new OnSector(cornerOfZero)), () -> {
@@ -84,6 +83,7 @@ public class FPlanets{
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {});
                     node(fissionDrill, with(new OnSector(darkWorkshop)), () -> {});
+                    node(fleshSynthesizer, with(new SectorComplete(stormyCoast)), () -> {});
                 });
                 node(metaglassPlater, () ->
                     node(mirrorglassPolisher, () ->
@@ -157,6 +157,14 @@ public class FPlanets{
                 node(firefly, () ->
                     node(candlelight, with(new SectorComplete(cornerOfZero)), () -> {})
                 );
+
+                node(fleshReconstructor, with(new SectorComplete(stormyCoast), new Produce(flesh)), () ->
+                    node(blade, () -> {
+                        /*node(hatchet, () -> {
+                            node(castle, () -> {});
+                        });*/
+                    })
+                );
             });
 
             node(landingBase, with(new SectorComplete(SectorPresets.planetaryTerminal)), () ->
@@ -177,9 +185,10 @@ public class FPlanets{
                         )
                     );
 
-                    node(eteriverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () ->
-                        node(chillyMountains, with(new SectorComplete(eteriverStronghold), new Produce(conductor)), () -> {})
-                    );
+                    node(eteriverStronghold, with(new SectorComplete(darksandPlain), new Research(guarding)), () -> {
+                        node(chillyMountains, with(new SectorComplete(eteriverStronghold), new Produce(conductor)), () -> {});
+                        node(stormyCoast, with(new SectorComplete(eteriverStronghold), new Research(biomassCultivator), new Research(seaquake), new Research(distance), new Research(grudge)), () -> {});
+                    });
                 })
             );
 
@@ -198,10 +207,11 @@ public class FPlanets{
                         node(hardenedAlloy, () -> {});
                     })
                 );
+                node(flesh, () -> {});
             });
 
-            addResearch(UnitTypes.alpha, "air-factory");
-            addResearch(UnitTypes.beta, "alpha");
+            addResearch(UnitTypes.alpha, Blocks.airFactory);
+            addResearch(UnitTypes.beta, UnitTypes.alpha);
 
             /* ======== InfoNodes below ======== */
 
@@ -228,6 +238,7 @@ public class FPlanets{
                                     dnode(gambler);
 
                                     dnode(desolateFortification, () -> {
+                                        dnode(hardenedAlloyCrucible);
                                         dnode(grudge);
                                         dnode(pioneer);
 
@@ -243,6 +254,7 @@ public class FPlanets{
                             dnode(biomassCultivator);
 
                             dnode(scorchingVolcano, () -> {
+                                dnode(slagCooler);
                                 dnode(seaquake);
 
                                 dnode(lavaStronghold, () -> {
@@ -257,6 +269,9 @@ public class FPlanets{
                             dnode(chillyMountains, () ->
                                 dnode(flameGenerator)
                             );
+                            dnode(stormyCoast, () ->
+                                dnode(flesh)
+                            );
                         });
                     });
                 })
@@ -264,7 +279,7 @@ public class FPlanets{
         });
     }
 
-    private static void addResearch(UnlockableContent content, String parent){
+    private static void addResearch(UnlockableContent content, UnlockableContent parent){
 
         var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();
@@ -272,7 +287,7 @@ public class FPlanets{
         var node = new TechTree.TechNode(null, content, content.researchRequirements());
         if(node.parent != null) node.parent.children.remove(node);
 
-        var p = TechTree.all.find(t -> t.content.name.equals(parent) || t.content.name.equals("fire-" + parent));
+        var p = TechTree.all.find(t -> t.content == parent);
         if(!p.children.contains(node)) p.children.add(node);
 
         node.parent = p;
