@@ -60,6 +60,7 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
+import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.ui.Styles;
@@ -93,6 +94,7 @@ import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
 import static mindustry.Vars.state;
+import static mindustry.Vars.ui;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.type.ItemStack.with;
 
@@ -127,7 +129,7 @@ public class FBlocks{
         damWall, damWallLarge, hardenedWall, hardenedWallLarge, fleshWall,
 
         //crafting
-        thermalKiln, metaglassPlater, mirrorglassPolisher, impurityKindlingExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
+        thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
         electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
         electromagnetismDiffuser,
         hardenedAlloyCrucible,
@@ -142,21 +144,23 @@ public class FBlocks{
         envEteriverStronghold, envStormyCoast, envGlaciatedPeaks;
 
     private static BulletType destroyBullet(float dmg, float radius){
-        return new BulletType(1.0f, 0.0f){{
-            final float time = 15.0f;
-            
-            lifetime = time;
-            splashDamage = dmg;
-            splashDamageRadius = radius;
-            despawnEffect = hitEffect = new WaveEffect(){{
-                lifetime = time;
-                sizeFrom = 0.0f;
-                sizeTo = radius;
-                strokeFrom = 10.0f;
-                strokeTo = 0.0f;
-                colorFrom = colorTo = Color.white;
-            }};
-        }};
+        final float time = 15.0f;
+
+        var b = new BulletType(1.0f, 0.0f);
+        b.lifetime = time;
+        b.splashDamage = dmg;
+        b.splashDamageRadius = radius;
+
+        var e = new WaveEffect();
+        e.lifetime = time;
+        e.sizeFrom = 0.0f;
+        e.sizeTo = radius;
+        e.strokeFrom = 0.0f;
+        e.strokeTo = radius;
+        e.interp = Interp.pow2Out;
+
+        b.despawnEffect = b.hitEffect = e;
+        return b;
     }
 
     public static void load(){
@@ -233,9 +237,9 @@ public class FBlocks{
             );
             health = 800;
             size = 2;
-            reload = 60f / 1.4f;
-            range = 250f;
-            shootCone = 30f;
+            reload = 42.0f;
+            range = 250.0f;
+            shootCone = 30.0f;
             inaccuracy = 2.0f;
             rotateSpeed = 10.0f;
             targetAir = false;
@@ -995,17 +999,17 @@ public class FBlocks{
                 Items.copper, 1350,
                 Items.graphite, 475,
                 Items.phaseFabric, 175,
-                Items.surgeAlloy, 400,
+                Items.surgeAlloy, 350,
                 FItems.hardenedAlloy, 400
             ));
             health = 4320;
             size = 4;
-            armor = 10;
-            liquidCapacity = 75f;
+            armor = 10.0f;
+            liquidCapacity = 75.0f;
             canOverdrive = false;
-            reload = 14f;
-            range = 360f;
-            shootCone = 24f;
+            reload = 14.0f;
+            range = 360.0f;
+            shootCone = 24.0f;
             inaccuracy = 2.0f;
             maxAmmo = 60;
             recoil = 4.0f;
@@ -1015,11 +1019,10 @@ public class FBlocks{
             unitSort = FUnitSorts.a;
             shootSound = Sounds.shootBig;
             ammoUseEffect = Fx.casing3;
-            coolantMultiplier = 0.75f;
-            shoot = new ShootAlternate(6.3f){{
-                shots = 2;
-                barrels = 3;
-            }};
+            coolantMultiplier = 0.8f;
+            shoot = new ShootAlternate(6.3f);
+            shoot.shots = 2;
+            ((ShootAlternate)shoot).barrels = 3;
 
             consumeCoolant(1.2f);
 
@@ -1132,9 +1135,9 @@ public class FBlocks{
         }};
 
         magneticSphere = new PowerTurret("magnetic-sphere"){{
-            final float chargeTime = 90f;
-            final float accelTime = 120f;
-            final float radius = 220f;
+            final float chargeTime = 90.0f;
+            final float decelTime = 120.0f;
+            final float radius = 220.0f;
             var col = Color.valueOf("92f3fd");
 
             requirements(Category.turret, with(
@@ -1145,10 +1148,10 @@ public class FBlocks{
             ));
             health = 6000;
             size = 4;
-            liquidCapacity = 75f;
+            liquidCapacity = 75.0f;
             canOverdrive = false;
-            reload = 270f;
-            range = 600f;
+            reload = 270.0f;
+            range = 600.0f;
             shootCone = 6.0f;
             recoil = 5.0f;
             rotateSpeed = 2.7f;
@@ -1159,10 +1162,10 @@ public class FBlocks{
             shootSound = Sounds.laser;
             shoot.firstShotDelay = chargeTime;
 
-            consumePower(32f);
-            consumeCoolant(1f);
+            consumePower(32.0f);
+            consumeCoolant(1.0f);
 
-            shootType = new BulletType(15.5f, 1800f){
+            shootType = new BulletType(15.5f, 1800.0f){
 
                 /** Prevent endless creating instances, since its terminal state is always the same. */
                 private BulletType type;
@@ -1170,7 +1173,7 @@ public class FBlocks{
                 @Override
                 public void update(Bullet b){
                     super.update(b);
-                    if(b.time <= accelTime) return;
+                    if(b.time <= decelTime || b.type == type) return;
 
                     if(Units.closestTarget(
                         b.team, b.x, b.y, radius,
@@ -1182,11 +1185,10 @@ public class FBlocks{
                         b.remove();
 
                     }else{
-                        if(type == null){
-                            type = b.type.copy();
-                            type.speed = b.vel.setLength(8f).len();
-                            type.drag = 0.0f;
-                        }
+                        type = b.type.copy();
+                        type.speed = b.vel.setLength(8.0f).len();
+                        type.drag = 0.0f;
+
                         b.type = type;
                     }
                 }
@@ -1201,62 +1203,62 @@ public class FBlocks{
                         Draw.color(col);
                         Draw.alpha((0.3f + Mathf.absin(Time.time, 2.0f + i * 2.0f, 0.3f + i * 0.05f)));
                         Draw.blend(Blending.additive);
-                        Draw.rect(Core.atlas.find("impact-reactor-plasma-" + i), b.x, b.y, 28f, 28f, Time.time * (12f + i * 6.0f));
+                        Draw.rect(Core.atlas.find("impact-reactor-plasma-" + i), b.x, b.y, 28.0f, 28.0f, Time.time * (12.0f + i * 6.0f));
                         Draw.blend();
                     }
                     Draw.reset();
                 }
                 {
-                lifetime = 600f;
+                lifetime = 600.0f;
                 hitSize = 6.0f;
                 pierceCap = 10;
                 drag = 0.024f;
-                ammoMultiplier = 1;
+                ammoMultiplier = 1.0f;
                 collidesGround = false;
 
-                homingRange = radius + 40f;
+                homingRange = radius + 40.0f;
                 homingPower = 0.2f;
-                homingDelay = accelTime;
+                homingDelay = decelTime;
 
                 trailChance = 0.4f;
                 trailRotation = true;
                 trailColor = col;
-                trailEffect = new Effect(25f, e -> {
+                trailEffect = new Effect(25.0f, e -> {
                     Draw.color(Color.white, e.color, e.fin());
                     Lines.stroke(1.4f + e.fout() * 3.4f);
                     Fx.rand.setSeed(e.id);
 
                     for(byte i = 0; i < 3; i++){
-                        final float rot = e.rotation + Fx.rand.range(15f) + 180f;
-                        Fx.v.trns(rot, Fx.rand.random(e.fin() * 27f));
-                        Lines.lineAngle(e.x + Fx.v.x, e.y + Fx.v.y, rot, e.fout() * Fx.rand.random(3f, 8.0f) + 2.0f);
+                        float rot = e.rotation + Fx.rand.range(15.0f) + 180.0f;
+                        Fx.v.trns(rot, Fx.rand.random(e.fin() * 27.0f));
+                        Lines.lineAngle(e.x + Fx.v.x, e.y + Fx.v.y, rot, e.fout() * Fx.rand.random(3.0f, 8.0f) + 2.0f);
                     }
                 });
 
-                chargeEffect = new Effect(chargeTime, 20f, e -> {
+                chargeEffect = new Effect(chargeTime, 20.0f, e -> {
                     Draw.color(col);
                     Lines.stroke(e.fin() * 2.0f);
-                    Lines.circle(e.x, e.y, 4.0f + e.fout() * 20f);
-                    Fill.circle(e.x, e.y, e.fin() * 16f);
-                    Angles.randLenVectors(e.id, 16, 32f * e.fout(), (x, y) -> {
+                    Lines.circle(e.x, e.y, 4.0f + e.fout() * 20.0f);
+                    Fill.circle(e.x, e.y, e.fin() * 16.0f);
+                    Angles.randLenVectors(e.id, 16, 32.0f * e.fout(), (x, y) -> {
                         Fill.circle(e.x + x, e.y + y, e.fin() * 4.0f);
-                        Drawf.light(e.x + x, e.y + y, e.fin() * 12f, col, 0.7f);
+                        Drawf.light(e.x + x, e.y + y, e.fin() * 12.0f, col, 0.7f);
                     });
                     Draw.color();
                     Fill.circle(e.x, e.y, e.fin() * 8);
-                    Drawf.light(e.x, e.y, e.fin() * 16f, col, 0.7f);
+                    Drawf.light(e.x, e.y, e.fin() * 16.0f, col, 0.7f);
                 }).rotWithParent(true);
 
-                shootEffect = new Effect(18f, e -> {
+                shootEffect = new Effect(18.0f, e -> {
                     Draw.color(col, Color.lightGray, e.fin());
-                    Angles.randLenVectors(e.id, 18, 7.0f + e.finpow() * 19f, (x, y) ->
-                        Fill.square(e.x + x, e.y + y, e.fout() * 2.8f + 0.7f, 0f));
+                    Angles.randLenVectors(e.id, 18, 7.0f + e.finpow() * 19.0f, (x, y) ->
+                        Fill.square(e.x + x, e.y + y, e.fout() * 2.8f + 0.7f, 0.0f));
                 });
 
-                hitEffect = new Effect(14f, e -> {
+                hitEffect = new Effect(14.0f, e -> {
                     Draw.color(col, Color.lightGray, e.fin());
-                    Angles.randLenVectors(e.id, 12, 9.0f + e.finpow() * 22f, (x, y) ->
-                        Fill.square(e.x + x, e.y + y, e.fout() * 3.2f + 1.5f, 45f));
+                    Angles.randLenVectors(e.id, 12, 9.0f + e.finpow() * 22.0f, (x, y) ->
+                        Fill.square(e.x + x, e.y + y, e.fout() * 3.2f + 1.5f, 45.0f));
                 });
 
                 // create lightning while flying
@@ -1269,8 +1271,8 @@ public class FBlocks{
                     collidesGround = false;
 
                     fragBullets = 1;
-                    fragBullet = new LightningPointBulletType(165f){{
-                        homingRange = 120f;
+                    fragBullet = new LightningPointBulletType(165.0f){{
+                        homingRange = 120.0f;
                         lightningChance = 0.6f;
                         lightningColor = col;
                         collidesGround = false;
@@ -1278,14 +1280,14 @@ public class FBlocks{
                 }};
 
                 fragRandomSpread = 0.0f;
-                fragSpread = 60f;
+                fragSpread = 60.0f;
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(12f, 225f){{
-                    lifetime = 45f;
+                fragBullet = new BasicBulletType(12.0f, 225.0f){{
+                    lifetime = 45.0f;
                     width = 3.2f;
                     height = 4.0f;
                     collidesGround = false;
-                    homingRange = 150f;
+                    homingRange = 150.0f;
                     homingPower = 0.4f;
                     homingDelay = 5.0f;
 
@@ -1299,18 +1301,24 @@ public class FBlocks{
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
-            final float chargeTime = 150.0f;
-            final float baseRange = 1200.0f, extraRange = 400.0f;
-            final var col = Color.valueOf("ec7458");
-            final var coll = Color.valueOf("ec7458bb");
 
-            final var item_1 = FItems.hardenedAlloy;
-            final var item_2 = FItems.magneticAlloy;
+            final float
+                chargeTime = 150.0f,
+                baseRange = 1200.0f, extraRange = 400.0f;
 
-            final BulletType bullet_1_1;
-            final BulletType bullet_2_1;
-            final BulletType bullet_2_2;
-            final BulletType bullet_2_3;
+            Color
+                col = Color.valueOf("ec7458"),
+                coll = Color.valueOf("ec7458bb");
+
+            Item
+                item_1 = FItems.hardenedAlloy,
+                item_2 = FItems.magneticAlloy;
+
+            BulletType
+                bullet_1_1,
+                bullet_2_1,
+                bullet_2_2,
+                bullet_2_3;
 
             bullet_1_1 = new BasicBulletType(60f, 15000f){{
                 lifetime = 35f;
@@ -1494,7 +1502,7 @@ public class FBlocks{
                     sizeTo = 15f;
                     colorFrom = col;
                     colorTo = coll;
-                }}.startDelay(45)
+                }}.startDelay(45.0f)
             );
 
             bullet_2_3 = new BasicBulletType(18f, 2400f){{
@@ -2332,7 +2340,7 @@ public class FBlocks{
             consumeItem(Items.metaglass, 2);
         }};
 
-        impurityKindlingExtractor = new GenericCrafter("hhhjtqq"){{
+        sulflameExtractor = new GenericCrafter("hhhjtqq"){{
             requirements(Category.crafting, with(
                 Items.lead, 85,
                 Items.graphite, 55,
@@ -3101,6 +3109,14 @@ public class FBlocks{
                 /** Wave 59/60. */
                 @Override
                 protected void updateStart(){
+                    if(alpha == 0.0f){
+                        Core.settings.put("showweather", true);
+                        Core.settings.put("drawlight", true);
+
+                        ui.announce("@sc.weather");
+                        Time.run(180.0f, () -> ui.announce("@sc.lightning"));
+                    }
+
                     state.rules.lighting = true;
                     state.rules.ambientLight = specificColor;
                     alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
@@ -3116,7 +3132,7 @@ public class FBlocks{
                 /** After all the apollos are destructed. */
                 @Override
                 protected void updateStop(){
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0f, 0.004f);
+                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.004f);
 
                     if(state.rules.ambientLight.a <= 0.001f){
                         if(state.isCampaign())

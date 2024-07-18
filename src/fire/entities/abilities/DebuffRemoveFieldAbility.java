@@ -4,7 +4,6 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
 import mindustry.entities.Effect;
-import mindustry.gen.Unit;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -59,7 +58,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
             mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, range, u -> {
 
                 for(var e : DE_BUFFS){
-                    if(!u.hasEffect(e)) continue; //why not { if(u.hasEffect(e)) continue; } ???
+                    if(!u.hasEffect(e)) continue;
 
                     if(!(u.type instanceof fire.type.FleshUnitType && e == overgrown)){
                         u.unapply(e);

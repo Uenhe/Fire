@@ -26,14 +26,14 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         @Override
         public void craft(){
             super.craft();
-            craftSound.at(this, Mathf.random(0.45f, 0.55f));
+            craftSound.at(this, Mathf.random(0.9f, 1.1f));
             bullets.clear();
 
             //create bullet
             float rand = Mathf.random(360.0f);
-            for(byte i = 0; i < fragBullets; i++){
+            for(byte i = 0; i < fragBullets; i++)
                 bullets.add(fragBullet.create(this, x, y, 360.0f / fragBullets * i + rand));
-            }
+
             sign = (byte)Mathf.sign(bullets.get(0).id % 2 == 0);
         }
 
@@ -51,6 +51,7 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         }
     }
 
+    /** {@link arc.func.Cons3} */
     public interface Pattern{
         void get(Bullet bullet, int index, byte sign);
     }

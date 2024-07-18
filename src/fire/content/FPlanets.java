@@ -16,8 +16,7 @@ import static fire.content.FLiquids.*;
 import static fire.content.FSectorPresets.*;
 import static fire.content.FUnitTypes.*;
 import static fire.ui.dialogs.InfoDialog.InfoNode.dnode;
-import static mindustry.content.TechTree.node;
-import static mindustry.content.TechTree.nodeRoot;
+import static mindustry.content.TechTree.*;
 import static mindustry.game.Objectives.*;
 
 public class FPlanets{
@@ -97,7 +96,7 @@ public class FPlanets{
                         )
                     )
                 );
-                node(impurityKindlingExtractor, with(new OnSector(cornerOfZero)), () -> {
+                node(sulflameExtractor, with(new OnSector(cornerOfZero)), () -> {
                     node(crusher, with(new SectorComplete(sporeFiord)), () ->
                         node(slagCooler, with(new SectorComplete(scorchingVolcano)), () -> {})
                     );
@@ -129,6 +128,7 @@ public class FPlanets{
                     node(hardenedWall, with(new SectorComplete(darkWorkshop)), () ->
                         node(hardenedWallLarge, with(new OnSector(desolateFortification)), () -> {})
                     );
+                    node(fleshWall, with(new Produce(flesh), new OnSector(stormyCoast)), () -> {});
                 });
 
                 node(nightmare, with(new OnSector(landingBase)), () -> {
@@ -150,7 +150,8 @@ public class FPlanets{
             node(guarding, with(new SectorComplete(darksandPlain)), () -> {
                 node(resisting, with(new SectorComplete(cornerOfZero)), () ->
                     node(garrison, with(new SectorComplete(sporeFiord)), () ->
-                        node(shelter, with(new OnSector(darkWorkshop)), () -> {})
+                        node(shelter, with(new OnSector(darkWorkshop)), () ->
+                            node(blessing, with(new OnSector(glaciatedPeaks)), () -> {}))
                     )
                 );
 
@@ -159,11 +160,7 @@ public class FPlanets{
                 );
 
                 node(fleshReconstructor, with(new SectorComplete(stormyCoast), new Produce(flesh)), () ->
-                    node(blade, () -> {
-                        /*node(hatchet, () -> {
-                            node(castle, () -> {});
-                        });*/
-                    })
+                    node(blade, () -> {})
                 );
             });
 
@@ -192,22 +189,24 @@ public class FPlanets{
                 })
             );
 
-            node(glass, () -> {
-                node(mirrorglass, () ->
-                    node(conductor, () -> {})
+            nodeProduce(glass, () -> {
+                nodeProduce(mirrorglass, () ->
+                    nodeProduce(conductor, () -> {})
                 );
-                node(timber, () -> {});
-                node(flamefluidCrystal, () -> {});
-                node(logicAlloy, () ->
-                    node(detonationCompound, () -> {})
+                nodeProduce(timber, () -> {});
+                nodeProduce(flamefluidCrystal, () -> {});
+                nodeProduce(logicAlloy, () ->
+                    nodeProduce(detonationCompound, () -> {})
                 );
-                node(impurityKindlingAlloy, () ->
-                    node(kindlingAlloy, () -> {
-                        node(liquidNitrogen, () -> {});
-                        node(hardenedAlloy, () -> {});
+                nodeProduce(impurityKindlingAlloy, () ->
+                    nodeProduce(kindlingAlloy, () -> {
+                        nodeProduce(liquidNitrogen, () -> {});
+                        nodeProduce(hardenedAlloy, () ->
+                            nodeProduce(magneticAlloy, () -> {})
+                        );
                     })
                 );
-                node(flesh, () -> {});
+                nodeProduce(flesh, () -> {});
             });
 
             addResearch(UnitTypes.alpha, Blocks.airFactory);
@@ -242,9 +241,7 @@ public class FPlanets{
                                         dnode(grudge);
                                         dnode(pioneer);
 
-                                        dnode(glaciatedPeaks, () -> {
-
-                                        });
+                                        dnode(glaciatedPeaks, () -> {});
                                     });
                                 });
                             });
@@ -257,9 +254,7 @@ public class FPlanets{
                                 dnode(slagCooler);
                                 dnode(seaquake);
 
-                                dnode(lavaStronghold, () -> {
-
-                                });
+                                dnode(lavaStronghold, () -> {});
                             });
                         });
 

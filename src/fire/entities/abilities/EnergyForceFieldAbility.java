@@ -89,10 +89,16 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
         if(rotateSpeed > 0.0f){
             rotation += rotateSpeed * Time.delta;
-            rotation -= 360.0f;
+            rotation %= 360.0f;
         }
-        if(unit.shield < max && timer == 0.0f)
+
+        if(unit.shield < max && timer == 0.0f){
             unit.shield += regen * Time.delta;
+
+            // regen shield to full after cooldown
+            if(unit.shield > 0.0f && radiusScale == 0.0f)
+                unit.shield = max;
+        }
 
         if(!broken){
             radiusScale = Mathf.lerpDelta(radiusScale, 1.0f, 0.08f);
@@ -147,7 +153,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                 timer += Time.delta * (isOverloaded ? 1.333f : 1.0f);
 
-                if(timer <= 180.0f)
+                if(timer <= 180.0f){
                     Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
                         if(
                             !isOverloaded
@@ -166,7 +172,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                 bullet.type.copy();
 
                             if(!bulletMap.containsKey(bullet.type)){
-                                
+
                                 // make artillery collides building
                                 type.collidesTiles = type.collides = true;
 
@@ -187,7 +193,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         }
                     });
 
-                else if(timer > 310.0f){
+                }else if(timer > 310.0f){
                     regenable = true;
                     timer = 0.0f;
                     bullets.clear();

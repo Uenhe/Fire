@@ -4,6 +4,7 @@ import arc.graphics.Color;
 import mindustry.type.Liquid;
 
 public class FLiquids{
+
     public static Liquid
         liquidNitrogen;
     
