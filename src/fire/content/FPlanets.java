@@ -36,14 +36,7 @@ public class FPlanets{
             rotateTime = 7200.0f;
             alwaysUnlocked = true;
             clearSectorOnLose = true;
-            enemyCoreSpawnReplace = false;
-            allowLaunchSchematics = false;
-            allowLaunchLoadout = false;
-            allowSectorInvasion = false;
-            allowWaveSimulation = true;
             prebuildBase = false;
-            orbitRadius = 64.0f;
-            startSector = 0;
             sectorSeed = 3;
             atmosphereColor = Color.valueOf("1a3db1");
             atmosphereRadIn = 0.05f;
@@ -140,7 +133,7 @@ public class FPlanets{
                     );
                 });
 
-                node(ignite, with(new OnSector(scorchingVolcano)), () ->
+                node(ignition, with(new OnSector(scorchingVolcano)), () ->
                     node(seaquake, with(new SectorComplete(scorchingVolcano)), () -> {})
                 );
 

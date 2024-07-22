@@ -111,7 +111,7 @@ public class FBlocks{
         adaptiveSource, fireCompany,
 
         //turret
-        smasher, nightmare, scab, ignite, blossom, gambler, seaquake, distance, grudge, magneticSphere, magneticRail,
+        smasher, nightmare, scab, ignition, blossom, gambler, seaquake, distance, grudge, magneticSphere, magneticRail,
 
         //production
         chopper, treeFarm, vapourCondenser, biomassCultivator, fissionDrill,
@@ -156,7 +156,7 @@ public class FBlocks{
         e.sizeFrom = 0.0f;
         e.sizeTo = radius;
         e.strokeFrom = 0.0f;
-        e.strokeTo = radius;
+        e.strokeTo = 4.0f;
         e.interp = Interp.pow2Out;
 
         b.despawnEffect = b.hitEffect = e;
@@ -532,7 +532,7 @@ public class FBlocks{
             );
         }};
 
-        ignite = new ContinuousTurret("dr"){{
+        ignition = new ContinuousTurret("dr"){{
             requirements(Category.turret, with(
                 Items.copper, 350,
                 Items.graphite, 240,
