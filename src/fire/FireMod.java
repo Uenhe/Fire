@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import static mindustry.Vars.mods;
 import static mindustry.Vars.ui;
 
+@SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
 
     private static final String
@@ -112,9 +113,10 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             addContent(t,
-                FBlocks.adaptiveSource, FBlocks.blossom, FBlocks.gambler, FBlocks.magneticSphere,
-                FBlocks.hardenedAlloyConveyor, FUnitTypes.pioneer,
-                FStatusEffects.overgrown, FStatusEffects.disintegrated
+                FItems.flesh, FBlocks.fleshSynthesizer, FBlocks.fleshReconstructor, FBlocks.fleshWall, FUnitTypes.blade,
+                FItems.magneticAlloy, FBlocks.magneticAlloyFormer, FBlocks.electromagnetismDiffuser, FBlocks.magneticSphere,
+
+                FUnitTypes.blessing, FStatusEffects.sanctuaryGuard
             );
             t.row();
 
@@ -215,9 +217,11 @@ public class FireMod extends mindustry.mod.Mod{
 
                     info.left().add("[accent]" + c.localizedName).left();
                     info.row();
-                    info.left().add(
-                        c.description.substring(0, c.description.indexOf(Core.bundle.get("stringEnd")))
-                    ).left();
+                    try{
+                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("stringEnd")) + 1)).left();
+                    }catch(Throwable ignored){
+                        info.left().add(c.description).left();
+                    }
                 });
 
             }).growX().pad(5.0f);

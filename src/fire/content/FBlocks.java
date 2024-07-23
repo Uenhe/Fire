@@ -614,9 +614,8 @@ public class FBlocks{
             velocityRnd = 0.1f;
             coolantMultiplier = 0.975f;
             shootSound = Sounds.missile;
-            shoot = new ShootAlternate(2.4f){{
-                shots = 2;
-            }};
+            shoot = new ShootAlternate(2.4f);
+            shoot.shots = 2;
 
             consumePower(8f);
             consumeCoolant(0.3f);
@@ -2230,13 +2229,17 @@ public class FBlocks{
                 FItems.flesh, 24,
                 FItems.logicAlloy, 12
             ));
+            researchCost = ItemStack.with(
+                FItems.flesh, 200
+            );
+
             health = 8000;
             size = 2;
             enableDrawStatus = false;
-            healPercent = 5.0f / 60f;
+            healPercent = 0.0834f;
             optionalMultiplier = 2.0f;
             chanceHeal = 0.15f;
-            chanceDeflect = 12f;
+            chanceDeflect = 15.0f;
             regenPercent = 0.5f;
             flashHit = true;
             flashColor = Pal.health;

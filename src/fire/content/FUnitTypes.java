@@ -5,6 +5,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
+import arc.math.Interp;
 import arc.math.Mathf;
 import fire.ai.FUnitCommand;
 import fire.entities.abilities.*;
@@ -15,6 +16,9 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.ParticleEffect;
+import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -43,7 +47,7 @@ public class FUnitTypes{
         omicron, pioneer,
 
         //air kamikaze
-        firefly, candlelight,
+        firefly, candlelight, lampflame,
 
         //air
         javelin, apollo;
@@ -558,7 +562,7 @@ public class FUnitTypes{
             lowAltitude = true;
 
             abilities.add(
-                new DashAbility(6.0f, 15, 120, 6),
+                new DashAbility(6.7f, 15, 120, 6),
                 new FirstAidAbility(2400, 80, 1200, 0, FStatusEffects.sanctuaryGuard, 360, 120)
             );
 
@@ -693,7 +697,6 @@ public class FUnitTypes{
             speed = 1.6f;
             drag = 0.04f;
             accel = 0.08f;
-            rotateSpeed = 6f;
             engineOffset = 5.6f;
             trailLength = 3;
             itemCapacity = 15;
@@ -706,7 +709,6 @@ public class FUnitTypes{
 
             weapons.add(
                 new Weapon(){{
-                    reload = 600f;
                     shootCone = 180f;
                     mirror = false;
                     top = false;
@@ -734,7 +736,6 @@ public class FUnitTypes{
             speed = 2.7f;
             drag = 0.02f;
             accel = 0.05f;
-            rotateSpeed = 6f;
             engineOffset = 5.6f;
             trailLength = 4;
             itemCapacity = 25;
@@ -748,8 +749,7 @@ public class FUnitTypes{
             weapons.add(
                 new Weapon("fire-candlelight-weapon"){{
                     x = 0.0f;
-                    y = 2f;
-                    reload = 600f;
+                    y = 2.0f;
                     shootCone = 180f;
                     mirror = false;
                     top = false;
@@ -763,6 +763,107 @@ public class FUnitTypes{
                         killShooter = true;
                         hitEffect = Fx.pulverize;
                         hitSound = Sounds.explosion;
+                    }};
+                }}
+            );
+        }};
+
+        lampflame = new UnitType("lampflame"){{
+            constructor = UnitEntity::create;
+            flying = true;
+            health = 620.0f;
+            armor = 9.0f;
+            hitSize = 20.0f;
+            speed = 2.2f;
+            drag = 0.03f;
+            accel = 0.04f;
+            engineSize = 3.0f;
+            engineOffset = 8.0f;
+            trailLength = 12;
+            itemCapacity = 60;
+            circleTarget = true;
+
+            abilities.add(
+                new MoveLightningAbility(3.0f, 12, 0.3f, 12.0f, 0.8f, 1.8f, Color.valueOf("a9d8ff"))
+            );
+
+            weapons.add(
+                new Weapon(){{
+                    shootCone = 180.0f;
+                    mirror = false;
+                    top = false;
+                    shootOnDeath = true;
+                    shootSound = Sounds.explosion;
+                    bullet = new BasicBulletType(1.4f, 360.0f){{
+                        killShooter = true;
+
+                        lifetime = 240.0f;
+                        width = 10.0f;
+                        height = 10.0f;
+                        weaveMag = 2.0f;
+                        weaveScale = 10.0f;
+                        homingPower = 2.0f;
+                        homingRange = 60.0f;
+                        buildingDamageMultiplier = 1.4f;
+
+                        trailLength = 24;
+                        trailWidth = 5f;
+                        trailColor = backColor = frontColor = Color.valueOf("a9d8ff");
+
+                        hitEffect = Fx.pulverize;
+                        hitSound = Sounds.explosion;
+
+                        bulletInterval = 4.0f;
+                        intervalRandomSpread = 30.0f;
+                        intervalBullets = 2;
+                        intervalBullet = new ShrapnelBulletType(){{
+                            damage = 30.0f;
+                            length = 60.0f;
+                            toColor = Color.valueOf("a9d8ff");
+                        }};
+
+                        fragBullets = 1;
+                        fragVelocityMin = fragVelocityMax = 1.0f;
+                        fragRandomSpread = 0.0f;
+                        fragBullet = new BasicBulletType(0.0f, 300.0f){{
+                            lifetime = 10.0f;
+                            splashDamage = 100.0f;
+                            splashDamageRadius = 80.0f;
+                            buildingDamageMultiplier = 6.0f;
+
+                            hitEffect = new MultiEffect(
+
+                                new WaveEffect(){{
+                                    lifetime = 50.0f;
+                                    strokeFrom = 4.0f;
+                                    interp = Interp.pow3Out;
+                                }},
+
+                                new ParticleEffect(){{
+                                    lifetime = 90.0f;
+                                    particles = 8;
+                                    length = 80.0f;
+                                    interp = Interp.pow10Out;
+                                    colorFrom = colorTo = Color.valueOf("a9d8ff70");
+
+                                    sizeFrom = 16.0f;
+                                    sizeTo = 0.0f;
+                                    sizeInterp = Interp.pow5In;
+                                }},
+
+                                new ParticleEffect(){{
+                                    lifetime = 120.0f;
+                                    particles = 6;
+                                    length = 60.0f;
+                                    interp = Interp.pow10Out;
+                                    colorFrom = colorTo = Color.valueOf("a9d8ff70");
+
+                                    sizeFrom = 20.0f;
+                                    sizeTo = 0.0f;
+                                    sizeInterp = Interp.pow5In;
+                                }}
+                            );
+                        }};
                     }};
                 }}
             );
