@@ -3,7 +3,9 @@
 
 A Mindustry Mod that adds a lot of WEIRD things...
 
-Notice: There are two author: Uenhe & Raindance, but Raindance is so lazy that he doesn't want to register a Github account...
+Notice: There are two author, FlyRain and KochiyaUeneh.
+
+[Here is FlyRain.](https://github.com/nuiFghY)
 
 ## Content
 
