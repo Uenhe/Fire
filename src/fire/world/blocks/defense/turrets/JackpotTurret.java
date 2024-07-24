@@ -84,10 +84,10 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
 
     public static class JackpotAmmo{
 
-        public Item item;
-        public float chance;
-        public ShootPattern shoot;
-        public BulletType type;
+        public final Item item;
+        public final float chance;
+        public final ShootPattern shoot;
+        public final BulletType type;
 
         public JackpotAmmo(Item item, float chance, ShootPattern shoot, BulletType type){
             this.item = item;

@@ -8,6 +8,7 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
+import fire.ui.dialogs.InfoDialog;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
@@ -34,18 +35,6 @@ public class FireMod extends mindustry.mod.Mod{
     private static boolean launched;
 
     @Override
-    public void init(){
-        fire.input.FBinding.load();
-        loadSettings();
-
-        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
-            showDialog();
-            showNoMultipleMods();
-            launched = true;
-        });
-    }
-
-    @Override
     public void loadContent(){
         FIRE = mods.locateMod("fire");
         displayName = Core.bundle.get("modname");
@@ -63,6 +52,19 @@ public class FireMod extends mindustry.mod.Mod{
         FSectorPresets.load();
         FPlanets.loadTree();
         FOverride.load();
+    }
+
+    @Override
+    public void init(){
+        fire.input.FBinding.load();
+        loadSettings();
+        loadDatabase();
+
+        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
+            showDialog();
+            showNoMultipleMods();
+            launched = true;
+        });
     }
 
     private static void loadSettings(){
@@ -88,6 +90,28 @@ public class FireMod extends mindustry.mod.Mod{
                 }
             });
         });
+    }
+
+    private static void loadDatabase(){
+        var table = ui.research.titleTable;
+
+        table.row();
+        table.button(b -> b.add("@fire.showDatabase"), () -> {
+            InfoDialog.dialog.show();
+
+            if(!"zh_CN".equals(Core.settings.getString("locale"))){
+
+                var dialog = new BaseDialog("Warning");
+                dialog.closeOnBack();
+                dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
+
+                dialog.cont.pane(t ->
+                    t.add("@AITranslationWarning").left().maxWidth(1280.0f).pad(4.0f)
+                ).center();
+
+                dialog.show();
+            }
+        }).visible(() -> ui.research.root.node == FPlanets.risetar.techTree);
     }
 
     private static void showDialog(){
@@ -116,7 +140,7 @@ public class FireMod extends mindustry.mod.Mod{
                 FItems.flesh, FBlocks.fleshSynthesizer, FBlocks.fleshReconstructor, FBlocks.fleshWall, FUnitTypes.blade,
                 FItems.magneticAlloy, FBlocks.magneticAlloyFormer, FBlocks.electromagnetismDiffuser, FBlocks.magneticSphere,
 
-                FUnitTypes.blessing, FStatusEffects.sanctuaryGuard
+                FUnitTypes.blessing, FUnitTypes.lampflame, FStatusEffects.sanctuaryGuard
             );
             t.row();
 
@@ -217,8 +241,9 @@ public class FireMod extends mindustry.mod.Mod{
 
                     info.left().add("[accent]" + c.localizedName).left();
                     info.row();
+
                     try{
-                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("stringEnd")) + 1)).left();
+                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("stringEnd")))).left();
                     }catch(Throwable ignored){
                         info.left().add(c.description).left();
                     }

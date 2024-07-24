@@ -513,8 +513,9 @@ public class InfoDialog extends BaseDialog{
             InfoTree.all.add(this);
         }
 
-        public static InfoNode dnode(UnlockableContent content){
-            return dnode(content, () -> {});
+        public static void dnode(UnlockableContent content){
+            dnode(content, () -> {
+            });
         }
 
         public static InfoNode dnode(UnlockableContent content, Runnable children){

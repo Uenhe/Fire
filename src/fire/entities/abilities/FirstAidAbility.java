@@ -5,7 +5,6 @@ import arc.scene.ui.layout.Table;
 import arc.struct.FloatSeq;
 import arc.util.Strings;
 import arc.util.Time;
-import fire.world.meta.FStat;
 import mindustry.type.StatusEffect;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
@@ -64,6 +63,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(mindustry.gen.Unit unit){
+        if(unit.dead) return;
 
         //init
         if(healths.isEmpty())

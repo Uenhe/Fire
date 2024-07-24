@@ -11,7 +11,6 @@ import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import mindustry.content.Fx;
-import mindustry.game.FogControl;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.graphics.Layer;

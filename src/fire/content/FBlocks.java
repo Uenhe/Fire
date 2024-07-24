@@ -10,14 +10,11 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Time;
 import fire.entities.FUnitSorts;
 import fire.entities.bullets.LightningPointBulletType;
-import fire.ui.dialogs.InfoDialog;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
 import fire.world.blocks.defense.UnitOverdriveProjector;
@@ -63,8 +60,6 @@ import mindustry.type.Category;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
-import mindustry.ui.Styles;
-import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.BuildTurret;
@@ -155,8 +150,8 @@ public class FBlocks{
         e.lifetime = time;
         e.sizeFrom = 0.0f;
         e.sizeTo = radius;
-        e.strokeFrom = 0.0f;
-        e.strokeTo = 4.0f;
+        e.strokeFrom = 2.0f;
+        e.strokeTo = 0.0f;
         e.interp = Interp.pow2Out;
 
         b.despawnEffect = b.hitEffect = e;
@@ -192,28 +187,7 @@ public class FBlocks{
             autolink = drawRange = false;
         }};
 
-        fireCompany = new LightBlock("hzgs"){
-
-            @Override
-            public void displayExtra(Table table){
-                table.button(new TextureRegionDrawable(uiIcon), Styles.emptyi, 40.0f, () -> {
-                    InfoDialog.dialog.show();
-
-                    if(!"zh_CN".equals(Core.settings.getString("locale"))){
-
-                        var dialog = new BaseDialog("Warning");
-                        dialog.closeOnBack();
-                        dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
-
-                        dialog.cont.pane(t ->
-                            t.add("@AITranslationWarning").left().maxWidth(1280.0f).pad(4.0f)
-                        ).center();
-
-                        dialog.show();
-                    }
-                });
-            }
-        {
+        fireCompany = new LightBlock("hzgs"){{
             requirements(Category.effect, BuildVisibility.hidden, with());
             alwaysUnlocked = true;
             hasShadow = false;

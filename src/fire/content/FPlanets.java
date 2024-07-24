@@ -116,13 +116,14 @@ public class FPlanets{
             });
 
             node(smasher, with(new OnSector(landingBase)), () -> {
-                node(damWall, with(new OnSector(beachLanding)), () -> {
-                    node(damWallLarge, () -> {});
-                    node(hardenedWall, with(new SectorComplete(darkWorkshop)), () ->
-                        node(hardenedWallLarge, with(new OnSector(desolateFortification)), () -> {})
-                    );
-                    node(fleshWall, with(new Produce(flesh), new OnSector(stormyCoast)), () -> {});
-                });
+                node(damWall, with(new OnSector(beachLanding)), () ->
+                    node(damWallLarge, () -> {
+                        node(hardenedWall, with(new SectorComplete(darkWorkshop)), () ->
+                            node(hardenedWallLarge, with(new OnSector(desolateFortification)), () -> {})
+                        );
+                        node(fleshWall, with(new Produce(flesh), new OnSector(stormyCoast)), () -> {});
+                    })
+                );
 
                 node(nightmare, with(new OnSector(landingBase)), () -> {
                     node(blossom, with(new SectorComplete(beachLanding)), () ->
@@ -149,7 +150,8 @@ public class FPlanets{
                 );
 
                 node(firefly, () ->
-                    node(candlelight, with(new SectorComplete(cornerOfZero)), () -> {})
+                    node(candlelight, with(new SectorComplete(cornerOfZero)), () ->
+                        node(lampflame, with(new SectorComplete(chillyMountains)), () -> {}))
                 );
 
                 node(fleshReconstructor, with(new SectorComplete(stormyCoast), new Produce(flesh)), () ->
