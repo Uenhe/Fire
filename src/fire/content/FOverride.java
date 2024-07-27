@@ -126,7 +126,8 @@ public class FOverride{
         ((Reconstructor)multiplicativeReconstructor).upgrades.addAll(
             new UnitType[]{beta, FUnitTypes.omicron},
             new UnitType[]{FUnitTypes.resisting, FUnitTypes.garrison},
-            new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle}
+            new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle},
+            new UnitType[]{FUnitTypes.candlelight, FUnitTypes.lampflame}
         );
         ((Reconstructor)exponentialReconstructor).upgrades.addAll(
             new UnitType[]{FUnitTypes.omicron, FUnitTypes.pioneer},
