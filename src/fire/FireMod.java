@@ -28,9 +28,16 @@ public class FireMod extends mindustry.mod.Mod{
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
 
+<<<<<<< Updated upstream
     public static LoadedMod fire;
     public static String name;
     public static String close;
+=======
+    private static mindustry.mod.Mods.LoadedMod FIRE;
+    private static String displayName;
+    private static boolean launched;
+    private static byte counter;
+>>>>>>> Stashed changes
 
     public FireMod(){
 
@@ -96,8 +103,23 @@ public class FireMod extends mindustry.mod.Mod{
             t.pref(new SettingsMenuDialog.SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
 
                 @Override
+<<<<<<< Updated upstream
                 public void add(SettingsMenuDialog.SettingsTable table){
                     table.button(name, FireMod::showDialog).size(210f, 64f);
+=======
+                public void add(SettingsTable table){
+                    table.button(name, () -> {
+                        showDialog();
+
+                        //???
+                        if(counter < 5){
+                            counter++;
+                            if(counter >= 5)
+                                FPlanets.risetar.accessible = true;
+                        }
+
+                    }).size(240.0f, 64.0f);
+>>>>>>> Stashed changes
                     table.row();
                 }
             });
@@ -120,7 +142,11 @@ public class FireMod extends mindustry.mod.Mod{
 
         mainDialog.cont.pane(t -> {
 
+<<<<<<< Updated upstream
             t.image(Core.atlas.find("fire-logo", Core.atlas.find("clear"))).height(107f).width(359f).pad(3f);
+=======
+            t.image(Core.atlas.find("fire-logo")).height(107.0f).width(359.0f).pad(3.0f);
+>>>>>>> Stashed changes
             t.row();
 
             t.add(Core.bundle.format("contentMain", version)).left().width(800f).maxWidth(1024f).pad(4f);
@@ -172,6 +198,7 @@ public class FireMod extends mindustry.mod.Mod{
         mainDialog.show();
     }
 
+<<<<<<< Updated upstream
     public static void showNoMultipleMods(){
 
         boolean announces = false;
@@ -184,6 +211,11 @@ public class FireMod extends mindustry.mod.Mod{
         }
 
         if(announces && Core.settings.getBool("noMultipleMods")){
+=======
+    private static void showNoMultipleMods(){
+
+        if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && Core.settings.getBool("noMultipleMods")){
+>>>>>>> Stashed changes
 
             var dialog = new BaseDialog("o_o?"){
 
@@ -196,8 +228,17 @@ public class FireMod extends mindustry.mod.Mod{
 
                     buttons.button("", this::hide).update(b -> {
                         b.setDisabled(!canClose);
+<<<<<<< Updated upstream
                         b.setText(canClose ? close : String.format("%s(%ss)", close, Strings.fixed(time / 60f, 1)));
                     }).size(210f, 64f);
+=======
+                        b.setText(canClose ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
+                    }).size(210.0f, 64.0f);
+
+                    FPlanets.risetar.accessible = false;
+
+                    show();
+>>>>>>> Stashed changes
                 }
             };
 
@@ -207,6 +248,21 @@ public class FireMod extends mindustry.mod.Mod{
 
     public static void setupDialog(BaseDialog dialog){
 
+<<<<<<< Updated upstream
+=======
+        var titles = Core.bundle.get("fire.randTitle").split("\\|");
+        var index = Mathf.random(titles.length - 1);
+        var title = titles[index];
+
+        // "Today is the _th Day of God's Creation of the Risetar" picked
+        if(index == 0)
+            title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
+
+        Core.graphics.setTitle("Mindustry: " + title);
+    }
+
+    private static void setupDialog(BaseDialog dialog){
+>>>>>>> Stashed changes
         dialog.closeOnBack();
         dialog.buttons.button(close, dialog::hide).size(210f, 64f);
     }

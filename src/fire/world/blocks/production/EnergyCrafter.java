@@ -157,6 +157,14 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         }
 
         @Override
+<<<<<<< Updated upstream
+=======
+        public double sense(LAccess sensor){
+            return sensor == LAccess.heat ? instability / maxInstability : super.sense(sensor);
+        }
+
+        @Override
+>>>>>>> Stashed changes
         public void write(Writes write){
             super.write(write);
             write.f(instability);

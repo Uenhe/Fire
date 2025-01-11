@@ -22,6 +22,7 @@ import mindustry.world.meta.StatUnit;
 import static mindustry.Vars.tilesize;
 
 public class DashAbility extends mindustry.entities.abilities.Ability{
+<<<<<<< Updated upstream
     /** Unstable... */
     public float speedMultiplier;
     /** The tick unit becomes invincible while dashing. */
@@ -30,6 +31,16 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     public float cooldown;
     /** The number of afterimages to be displayed while dashing. */
     public int afterimage;
+=======
+
+    public final float speedMultiplier;
+    /** Tick that unit becomes invincible while dashing. */
+    public final short invincibleTime;
+    /** Dash cooldown. */
+    public final short cooldown;
+    /** Number of afterimages to be displayed while dashing. */
+    public final byte afterimage;
+>>>>>>> Stashed changes
 
     private float timer;
 

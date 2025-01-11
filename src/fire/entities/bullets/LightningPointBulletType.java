@@ -7,14 +7,17 @@ import mindustry.gen.*;
 
 public class LightningPointBulletType extends mindustry.entities.bullet.BulletType{
 
+<<<<<<< Updated upstream
     /** Chance to let the lightning take effect. Using this to control lightning releasing for some reasons... */
+=======
+    /** Chance to let the lightning take effect. Using this to control lightning releasing for some reason... */
+>>>>>>> Stashed changes
     public float lightningChance = 0.5f;
 
     public LightningPointBulletType(float damage){
-        super(0f, damage);
-        lifetime = 1f;
-        hitEffect = Fx.none;
-        despawnEffect = Fx.none;
+        super(0.0f, damage);
+        lifetime = 1.0f;
+        hitEffect = despawnEffect = Fx.none;
     }
 
     @Override
@@ -36,13 +39,20 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
         if(target != null && Mathf.chance(lightningChance)){
             Fx.chainLightning.at(b.x, b.y, 0f, lightningColor, target);
 
+<<<<<<< Updated upstream
             //target is either unit or building
             if(target instanceof Unit u){
                 b.collision(u, target.getX(), target.getY());
             }else{
+=======
+            // target is either unit or building
+            if(target instanceof Unit u)
+                b.collision(u, u.x, u.y);
+            else
+>>>>>>> Stashed changes
                 ((Building)target).collision(b);
-            }
         }
+
         b.remove();
     }
 }

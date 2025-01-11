@@ -9,6 +9,7 @@ import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
+import mindustry.Vars;
 import mindustry.entities.Units;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
@@ -21,8 +22,14 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public float healAmount, healRadius, lineSpeed, lineStroke;
     public Color lineColor;
 
+<<<<<<< Updated upstream
     protected float warmup, totalProgress;
     protected Seq<Unit> targets = new Seq<>();
+=======
+    public final float amount;
+    public final float radius;
+    public final Color lineColor;
+>>>>>>> Stashed changes
 
     public RegenFieldAbility(float amount, float radius, Color color, float speed, float stroke){
         healAmount = amount;

@@ -16,6 +16,13 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
+<<<<<<< Updated upstream:src/fire/content/FireUnitTypes.java
+=======
+import mindustry.entities.effect.ExplosionEffect;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.ParticleEffect;
+import mindustry.entities.effect.WaveEffect;
+>>>>>>> Stashed changes:src/fire/content/FUnitTypes.java
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.entities.pattern.ShootSummon;
 import mindustry.gen.*;
@@ -24,6 +31,7 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
+import mindustry.type.ammo.PowerAmmoType;
 import mindustry.type.weapons.PointDefenseWeapon;
 
 import static mindustry.Vars.tilePayload;
@@ -47,7 +55,10 @@ public class FireUnitTypes{
         firefly, candlelight,
 
         //air
-        javelin, apollo;
+        javelin, apollo,
+
+        //naval
+        mechanicalTide;
 
     public static void load(){
 
@@ -307,6 +318,7 @@ public class FireUnitTypes{
 
         castle = new UnitType("bybl"){{
             constructor = MechUnit::create;
+<<<<<<< Updated upstream:src/fire/content/FireUnitTypes.java
             health = 8200;
             armor = 9;
             hitSize = 13f;
@@ -314,6 +326,17 @@ public class FireUnitTypes{
             rotateSpeed = 6f;
             drownTimeMultiplier = 3f;
             healColor = Pal.neoplasm1;
+=======
+            health = 8200.0f;
+            armor = 9.0f;
+            hitSize = 18.0f;
+            speed = 0.53f;
+            rotateSpeed = 4.8f;
+            drownTimeMultiplier = 5.0f;
+
+            mechSideSway = 0.6f;
+            mechFrontSway = 0.7f;
+>>>>>>> Stashed changes:src/fire/content/FUnitTypes.java
 
             abilities.add(
                 new EnergyFieldAbility(15f, 30f, 128f){{
@@ -874,6 +897,7 @@ public class FireUnitTypes{
                 }},
 
                 new PointDefenseWeapon("fire-dk-point-defense-mount"){{
+<<<<<<< Updated upstream:src/fire/content/FireUnitTypes.java
                     reload = 6f;
                     x = 23f;
                     y = -2f;
@@ -881,8 +905,135 @@ public class FireUnitTypes{
                     targetSwitchInterval = 8f;
                     bullet = new BulletType(1f, 65f){{
                         maxRange = 168f;
+=======
+                    reload = 12.0f;
+                    x = 23.0f;
+                    y = -2.0f;
+                    targetInterval = 1.0f;
+                    targetSwitchInterval = 1.0f;
+                    bullet = new BulletType(1.0f, 145.0f){{
+                        maxRange = 225.0f;
+>>>>>>> Stashed changes:src/fire/content/FUnitTypes.java
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
+                    }};
+                }}
+            );
+        }};
+
+
+
+
+        mechanicalTide = new UnitType("mechanical-tide"){{
+            constructor = UnitWaterMove::create;
+            flying = false;
+            health = 122500.0f;
+            armor = 37.0f;
+            hitSize = 80.0f;
+            speed = 0.45f;
+            rotateSpeed = 0.7f;
+            accel = 0.3f;
+            waveTrailX = 30.0f;
+            waveTrailY = -45.0f;
+            trailScl = 6.0f;
+            trailLength = 12;
+            itemCapacity = 800;
+            buildSpeed = 15.0f;
+            rotateToBuilding = false;
+            faceTarget = false;
+            ammoType = new PowerAmmoType(4500.0f);
+            immunities.add(StatusEffects.burning);
+            immunities.add(StatusEffects.melting);
+            immunities.add(StatusEffects.electrified);
+            immunities.add(StatusEffects.sapped);
+            immunities.add(StatusEffects.shocked);
+            immunities.add(StatusEffects.freezing);
+
+            weapons.add(
+                new Weapon("fire-mechanicalTide-laser-big"){{
+                    reload = 300.0f;
+                    x = 0.0f;
+                    y = 1.0f;
+                    recoil = 1.5f;
+                    rotate = true;
+                    mirror = false;
+                    rotateSpeed = 0.8f;
+                    inaccuracy = 0.0f;
+                    shootSound = Sounds.laser;
+
+                    bullet = new BasicBulletType(10f,3240){{
+                        buildingDamageMultiplier = 0.8f;
+                        lifetime = 60f;
+                        knockback = 16;
+                        pierceCap =4;
+                        pierce = true;
+                        pierceBuilding = true;
+
+                        spawnBullets.add(new LaserBulletType(){{
+                            damage = 6570;
+                            buildingDamageMultiplier = 0.8f;
+                            knockback = 64;
+                            pierceCap =24;
+                            pierce = true;
+                            pierceBuilding = true;
+                            length = 700;
+                            width = 45;
+                            sideAngle = 160;
+                            sideWidth = 1;
+                            sideLength = 30;
+                            colors = new Color[] {Pal.heal, Pal.heal, Color.white};
+                        }});
+
+                        for(int j = 0; j < 12; j++){
+                            int s = j;
+                            spawnBullets.add(new FlakBulletType(20f - s * 1.2f, 100 + s * 6){{
+                                sprite = "missile-large";
+                                collidesGround = collidesAir = true;
+                                explodeRange = 20f+s;
+                                width = height = 12f+s*0.5f;
+                                shrinkY = 0f;
+                                drag = 0.01f + s * 0.001f;
+                                homingRange = 240f;
+                                keepVelocity = false;
+                                lightRadius = 60f;
+                                lightOpacity = 0.7f;
+                                lightColor = Pal.heal;
+
+                                buildingDamageMultiplier = 2f;
+                                splashDamageRadius = 40f+s*2;
+                                splashDamage = damage*2;
+                                pierceCap =4;
+                                pierce = true;
+                                pierceBuilding = false;
+
+                                lifetime = 60f + s * 5f;
+                                backColor = Pal.heal;
+                                frontColor = Color.white;
+
+                                hitEffect = new ExplosionEffect(){{
+                                    lifetime = 24f + s * 0.4f;
+                                    waveStroke = 6f;
+                                    waveLife = 10f + s * 0.2f;
+                                    waveRadBase = 7f;
+                                    waveColor = Pal.heal;
+                                    waveRad = 30f;
+                                    smokes = 6;
+                                    smokeColor = Color.white;
+                                    sparkColor = Pal.heal;
+                                    sparks = 6;
+                                    sparkRad = 35f;
+                                    sparkStroke = 1.5f + s * 0.05f;
+                                    sparkLen = 4f;
+                                }};
+
+                                weaveScale = 6f + s * 0.25f;
+                                weaveMag = 3f - s * 0.14f;
+
+                                trailColor = Pal.heal;
+                                trailWidth = 4.5f - s * 0.1f;
+                                trailLength = 29 - s;
+                            }});
+                        }
                     }};
                 }}
             );

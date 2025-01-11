@@ -20,6 +20,7 @@ import mindustry.world.meta.StatUnit;
 
 public class EnergyForceFieldAbility extends ForceFieldAbility{
 
+<<<<<<< Updated upstream
     /** {@link mindustry.entities.bullet.LightningBulletType#calculateRange()} */
     public int lightningLength;
     public int lightningAmount;
@@ -27,6 +28,16 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
     public float chanceDeflect;
     public float rotateSpeed = -1f;
     public Color lightningColor = Pal.surge;
+=======
+    /** see {@link mindustry.entities.bullet.LightningBulletType#calculateRange()} */
+    public final short lightningLength;
+    public final byte lightningAmount;
+    public final short lightningDamage;
+    public final float chanceDeflect;
+    public float rotateSpeed;
+    public Color lightningColor = Color.clear;
+    public boolean unlocks;
+>>>>>>> Stashed changes
 
     private static final float DEFLECT_DAMAGE_MUL = 2f;
 
@@ -94,9 +105,14 @@ public class EnergyForceFieldAbility extends ForceFieldAbility{
                         unit.shield -= cooldown * regen;
                         Fx.shieldBreak.at(unit.x, unit.y, radius, unit.team.color, unit);
                         Sounds.spark.at(unit, Mathf.random(0.45f, 0.55f));
+<<<<<<< Updated upstream
                         for(int i = 0; i < lightningAmount; i++){
                             Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, (i - 1) * (360f / lightningAmount), lightningLength);
                         }
+=======
+                        for(byte i = 0; i < lightningAmount; i++)
+                            Lightning.create(unit.team, lightningColor, lightningDamage, unit.x, unit.y, i * (360.0f / lightningAmount), lightningLength);
+>>>>>>> Stashed changes
                     }
                     alpha = 1f;
                 }

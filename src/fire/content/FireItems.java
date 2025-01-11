@@ -1,12 +1,17 @@
 package fire.content;
 
 import arc.graphics.Color;
+import mindustry.content.Items;
 import mindustry.type.Item;
 
 public class FireItems{
     public static Item
+<<<<<<< Updated upstream:src/fire/content/FireItems.java
 
         glass, mirrorglass, impurityKindlingAlloy, kindlingAlloy,
+=======
+        glass, mirrorglass, sulflameAlloy, kindlingAlloy,
+>>>>>>> Stashed changes:src/fire/content/FItems.java
         conductor, logicAlloy, detonationCompound, flamefluidCrystal,
         timber, flesh, hardenedAlloy, magneticAlloy;
 
@@ -16,7 +21,7 @@ public class FireItems{
 
         mirrorglass = new Item("jmbl", Color.valueOf("ffffff"));
 
-        impurityKindlingAlloy = new Item("zzhhhj", Color.valueOf("b60c13")){{
+        sulflameAlloy = new Item("zzhhhj", Color.valueOf("b60c13")){{
             explosiveness = 0.6f;
             flammability = 1.15f;
         }};
@@ -68,5 +73,11 @@ public class FireItems{
             transitionFrames = 1;
             frameTime = 2;
         }};
+
+        Items.serpuloItems.addAll(
+            glass, mirrorglass, sulflameAlloy, kindlingAlloy,
+            conductor, logicAlloy, detonationCompound, flamefluidCrystal,
+            timber, flesh, hardenedAlloy, magneticAlloy
+        );
     }
 }
