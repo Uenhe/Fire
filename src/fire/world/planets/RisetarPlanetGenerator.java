@@ -1,25 +1,11 @@
-package mindustry.maps.planet;
+package fire.world.planets;
 
-import arc.graphics.*;
 import arc.math.*;
-import arc.math.geom.*;
-import arc.struct.*;
-import arc.util.*;
-import arc.util.noise.*;
-import mindustry.ai.*;
-import mindustry.ai.BaseRegistry.*;
-import mindustry.content.*;
-import mindustry.game.*;
-import mindustry.game.FWaves;
-import mindustry.graphics.g3d.PlanetGrid.*;
-import mindustry.maps.generators.*;
-import mindustry.type.*;
-import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
+import fire.content.FWaves;
 
 import static mindustry.Vars.*;
 
-public class RisetarPlanetGenerator extends SerpuloPlanetGenerator{
+public class RisetarPlanetGenerator extends mindustry.maps.planet.SerpuloPlanetGenerator{
     //alternate, less direct generation (wip)
 
     @Override

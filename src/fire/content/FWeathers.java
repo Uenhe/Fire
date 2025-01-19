@@ -1,6 +1,9 @@
 package fire.content;
 
 import arc.math.Mathf;
+import arc.util.Log;
+import arc.util.Time;
+import arc.util.pooling.Pools;
 import fire.entities.LightningCloud;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Sounds;
@@ -26,11 +29,11 @@ public class FWeathers{
             public void update(WeatherState state){
                 super.update(state);
 
-                if(Mathf.chanceDelta(0.02))
-                    new LightningCloud(
+                if(Mathf.chanceDelta(world.width() * world.height() * 0.000002f))
+                    Pools.obtain(LightningCloud.class, () -> new LightningCloud(
                         Mathf.random(world.width() * tilesize),
                         Mathf.random(world.height() * tilesize)
-                    );
+                ));
 
                 for(var c : LightningCloud.clouds)
                     c.update();
@@ -55,5 +58,11 @@ public class FWeathers{
             sound = Sounds.rain;
             soundVol = 0.3f;
         }};
+
+        for(int i = 0; i < 1000; i++){
+            Time.runTask(60 * i, () -> {
+                Log.info(LightningCloud.clouds.size);
+            });
+        }
     }
 }

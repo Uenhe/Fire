@@ -15,7 +15,7 @@ import static mindustry.Vars.world;
 /** ...Doesn't play well with blocks size odd. */
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
 
-    public HydroelectricGenerator(String name) {
+    public HydroelectricGenerator(String name){
         super(name);
         noUpdateDisabled = true;
         buildType = HydroelectricGeneratorBuild::new;
@@ -29,7 +29,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
             table.row();
 
             for(var b : Vars.content.blocks()){
-                if(b.isFloor() && b.asFloor().liquidDrop == Liquids.water){
+                if(b.isFloor() && b.asFloor().liquidDrop == Liquids.water)
                     table.table(Styles.grayPanel, t -> {
                         t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
@@ -37,7 +37,6 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
                             info.left().add("[accent]" + FStat.floorMultiplier.localized() + b.asFloor().liquidMultiplier);
                         });
                     }).growX().pad(5.0f).row();
-                }
             }
         });
     }
@@ -55,13 +54,11 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
 
     public float totalEfficiency(Tile tile){
         if(tile == null) return 0.0f;
-        var multiplies = new FloatSeq();
+        var multiplies = new FloatSeq(size * size);
 
-        for(var other : tile.getLinkedTilesAs(this, tempTiles)){
-            if(other.floor().liquidDrop == Liquids.water){
+        for(var other : tile.getLinkedTilesAs(this, tempTiles))
+            if(other.floor().liquidDrop == Liquids.water)
                 multiplies.add(other.floor().liquidMultiplier);
-            }
-        }
 
         return (1.0f - Math.abs(size * size - multiplies.size * 2.0f) / size / size) * (multiplies.sum() / multiplies.size);
     }
@@ -72,7 +69,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
 
         @Override
         public void updateTile(){
-            productionEfficiency = sum;
+            efficiency = productionEfficiency = sum;
         }
 
         @Override

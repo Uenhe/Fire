@@ -1,9 +1,23 @@
+感谢来自其他MOD的贴图:
+  Extra Utilities (更多实用设备):
+    aim-shoot
+
+  Saturation Power (饱和火力):
+    frag-back, frag-front (经过微调)
+
+
+
 感谢 NJSAAA
-    重绘的
-        守护 (Guarding)
-        抗御 (Resisting)
-        液氮压缩机 (Liquid Nitrogen Compressor)
+  重绘的:
+    守护 (Guarding)
+    抗御 (Resisting)
+    液氮压缩机 (Liquid Nitrogen Compressor)
 
 感谢 gf
-    重绘的
-        灼阳 (Apollo)
+  绘制的:
+    磁球 (Magnetic Sphere)
+  重绘的:
+    灼阳 (Apollo)
+    利刃 (Blade)
+    柄斧 (Hatchet)
+    坚城 (Castle)

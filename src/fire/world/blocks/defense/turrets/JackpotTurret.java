@@ -4,19 +4,19 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
-import fire.world.meta.FireStatValues;
+import fire.world.meta.FStatValues;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.pattern.ShootPattern;
 import mindustry.type.Item;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.Stat;
 
-public class JackpotTurret extends ItemTurret{
-    public Seq<JackpotAmmo> jackpotAmmo = new Seq<>();
-    public boolean centerChargeEffect = false;
+public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTurret{
 
-    public JackpotTurret(String name){
+    protected final Seq<JackpotAmmo> jackpotAmmo = new Seq<>();
+
+    protected JackpotTurret(String name){
         super(name);
+        buildType = JackpotTurretBuild::new;
     }
 
     @Override
@@ -28,13 +28,11 @@ public class JackpotTurret extends ItemTurret{
         }
     }
 
-
-
     @Override
     public void setStats(){
         super.setStats();
         stats.remove(Stat.ammo);
-        stats.add(Stat.ammo, FireStatValues.ammo(jackpotAmmo, 0));
+        stats.add(Stat.ammo, FStatValues.ammo(jackpotAmmo, 0));
     }
 
     public class JackpotTurretBuild extends ItemTurretBuild{
@@ -42,15 +40,16 @@ public class JackpotTurret extends ItemTurret{
         @Override
         protected void updateShooting(){
             if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
-                JackpotAmmo type = new JackpotAmmo();
+                JackpotAmmo type = null;
 
-                if(peekAmmo() == jackpotAmmo.peek().type){
+                if(peekAmmo() == jackpotAmmo.peek().type)
                     type = jackpotAmmo.peek();
-                }else{
-                    for(JackpotAmmo e : jackpotAmmo) if(e.type == peekAmmo()){
-                        int i = Mathf.chance(e.chance) ? 1 : 0;
-                        type = jackpotAmmo.get(jackpotAmmo.indexOf(e) + i);
-                    }
+                else{
+                    for(var a : jackpotAmmo)
+                        if(a.type == peekAmmo()){
+                            byte i = (byte)(Mathf.chance(a.chance) ? 1 : 0);
+                            type = jackpotAmmo.get(jackpotAmmo.indexOf(a) + i);
+                        }
                 }
 
                 shoot(type);
@@ -58,36 +57,37 @@ public class JackpotTurret extends ItemTurret{
             }
         }
 
-        protected void shoot(JackpotAmmo ammo){
+        private void shoot(JackpotAmmo ammo){
             float
-                bulletX = centerChargeEffect ? x : x + Angles.trnsx(rotation - 90f, shootX, shootY),
-                bulletY = centerChargeEffect ? y : y + Angles.trnsy(rotation - 90f, shootX, shootY);
+                bx = x + Angles.trnsx(rotation - 90f, shootX, shootY),
+                by = y + Angles.trnsy(rotation - 90f, shootX, shootY);
 
             if(shoot.firstShotDelay > 0f){
-                chargeSound.at(bulletX, bulletY, Mathf.random(soundPitchMin, soundPitchMax));
-                ammo.type.chargeEffect.at(bulletX, bulletY, rotation);
+                chargeSound.at(bx, by, Mathf.random(soundPitchMin, soundPitchMax));
+                ammo.type.chargeEffect.at(bx, by, rotation);
             }
 
             ammo.shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
                 queuedBullets++;
-                if(delay > 0f){
+
+                if(delay > 0f)
                     Time.run(delay, () -> bullet(ammo.type, xOffset, yOffset, angle, mover));
-                }else{
+                else
                     bullet(ammo.type, xOffset, yOffset, angle, mover);
-                }
+
             }, () -> barrelCounter++);
 
-            if(consumeAmmoOnce){
+            if(consumeAmmoOnce)
                 useAmmo();
-            }
         }
     }
 
     public static class JackpotAmmo{
-        public Item item;
-        public float chance;
-        public ShootPattern shoot;
-        public BulletType type;
+
+        public final Item item;
+        public final float chance;
+        public final ShootPattern shoot;
+        public final BulletType type;
 
         public JackpotAmmo(Item item, float chance, ShootPattern shoot, BulletType type){
             this.item = item;
@@ -95,7 +95,5 @@ public class JackpotTurret extends ItemTurret{
             this.shoot = shoot;
             this.type = type;
         }
-
-        JackpotAmmo(){}
     }
 }

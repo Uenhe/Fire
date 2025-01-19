@@ -1,104 +1,93 @@
 package fire.world.blocks.units;
 
 import arc.math.Mathf;
-import fire.annotations.FireAnnotations;
+import fire.annotations.FAnnotations;
 import mindustry.content.Fx;
-import mindustry.gen.Building;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
-import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.*;
 
 public class MechPad extends mindustry.world.Block{
 
-    public UnitType unitType;
+    private final UnitType unitType;
     /** Power consumed per use. */
-    public float consumesPower = -1f;
+    protected float consumesPower;
 
-    public MechPad(String name, UnitType type){
+    protected MechPad(String name, UnitType type){
         super(name);
         solid = true;
         destructible = true;
         hasPower = true;
         canOverdrive = false;
         unitType = type;
+        buildType = MechPadBuild::new;
     }
 
     @Override
     public void setStats(){
         super.setStats();
 
-        if(consValid()) stats.add(Stat.powerUse, consumesPower);
+        if(consValid()) stats.add(mindustry.world.meta.Stat.powerUse, consumesPower);
     }
 
-    public boolean consValid(){
-        return consumesPower > 0f;
+    private boolean consValid(){
+        return consumesPower > 0.0f;
     }
 
-    @FireAnnotations.Remote(called = FireAnnotations.Loc.server)
-    public static void playerSpawn(Tile tile, Player play){
-        if(play == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
+    @FAnnotations.Remote(called = FAnnotations.Loc.server)
+    public static void playerSpawn(Tile tile, Player playee){
+        if(playee == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 
-        UnitType spawnType = ((MechPad)pad.block).unitType;
-        if(pad.wasVisible){
+        var spawnType = ((MechPad)pad.block).unitType;
+        if(pad.wasVisible)
             Fx.spawn.at(pad);
-        }
 
         //consumes power
-        if(((MechPad)pad.block).consValid()) pad.power.graph.useBatteries(((MechPad)pad.block).consumesPower);
-        play.set(pad);
+        if(((MechPad)pad.block).consValid() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).consumesPower * 60.0f)
+            pad.power.graph.useBatteries(((MechPad)pad.block).consumesPower);
+
+        playee.set(pad);
 
         if(!net.client()){
             Unit unit = spawnType.create(tile.team());
             unit.set(pad);
-            unit.rotation(90f);
-            unit.impulse(0f, 3f);
+            unit.rotation(90.0f);
+            unit.impulse(0.0f, 3.0f);
             unit.spawnedByCore(true);
-            unit.controller(play);
+            unit.controller(playee);
             unit.add();
         }
 
-        if(state.isCampaign() && play == player){
+        if(state.isCampaign() && playee == player)
             spawnType.unlock();
-        }
     }
 
-    public class MechPadBuild extends Building{
+    public class MechPadBuild extends mindustry.gen.Building{
 
+        /** Active only when the player is close enough and power is enough. */
         @Override
         public boolean canControlSelect(Unit player){
-            /* active only when:
-             *
-             * 1) player is enough close to pad
-             * 2) power is enough
-             *
-             */
-            return player.isPlayer() && Mathf.dst(player.x, player.y, x, y) <= 80f && power.graph.getBatteryStored() >= consumesPower;
+            return player.isPlayer() && Mathf.dst(player.x, player.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= consumesPower || power.graph.getPowerBalance() * 60.0f >= consumesPower);
         }
 
         @Override
         public void onControlSelect(Unit unit){
             if(!unit.isPlayer()) return;
-            Player play = unit.getPlayer();
+            Player playee = unit.getPlayer();
 
-            Fx.spawn.at(play);
-            if(net.client() && play == player){
+            Fx.spawn.at(playee);
+            if(net.client() && playee == player)
                 control.input.controlledType = null;
-            }
 
-            play.clearUnit();
-            play.deathTimer = Player.deathDelay + 1f;
-            requestSpawn(play);
-        }
+            playee.clearUnit();
+            playee.deathTimer = Player.deathDelay + 1.0f;
 
-        public void requestSpawn(Player player){
-            //do not try to respawn in unsupported environments at all
+            // do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
-
-            fire.gen.FireCall.playerSpawn(tile, player);
+            fire.gen.FCall.playerSpawn(tile, playee);
         }
     }
 }

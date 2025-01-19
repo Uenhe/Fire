@@ -5,15 +5,18 @@ import mindustry.world.meta.Stat;
 import static mindustry.Vars.content;
 
 public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
-    public int itemPerSec = 100;
 
-    public AdaptiveSource(String name){
+    protected short itemPerSec;
+
+    protected AdaptiveSource(String name){
         super(name);
         hasItems = true;
         hasLiquids = true;
         update = true;
         displayFlow = false;
         canOverdrive = true;
+        powerProduction = Float.MAX_VALUE;
+        buildType = AdaptiveSourceBuild::new;
     }
 
     @Override
@@ -36,8 +39,9 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         return true;
     }
 
-    public class AdaptiveSourceBuild extends PowerSourceBuild{
-        protected float counter;
+    public class AdaptiveSourceBuild extends PowerSourceBuild implements mindustry.world.blocks.heat.HeatBlock{
+
+        private float counter;
 
         @Override
         public void updateTile(){
@@ -45,6 +49,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
             counter += edelta();
             float limit = 60f / itemPerSec;
+
             while(counter >= limit){
                 for(var item : content.items()){
                     items.set(item, 1);
@@ -53,11 +58,22 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
                     counter -= limit;
                 }
             }
+
             liquids.clear();
             for(var liquid: content.liquids()){
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }
+        }
+
+        @Override
+        public float heat(){
+            return Float.POSITIVE_INFINITY;
+        }
+
+        @Override
+        public float heatFrac(){
+            return Float.POSITIVE_INFINITY;
         }
     }
 }
