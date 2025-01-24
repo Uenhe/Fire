@@ -14,7 +14,7 @@ public class MechPad extends mindustry.world.Block{
 
     private final UnitType unitType;
     /** Power consumed per use. */
-    protected float consumesPower;
+    protected float powerCons;
 
     protected MechPad(String name, UnitType type){
         super(name);
@@ -30,11 +30,11 @@ public class MechPad extends mindustry.world.Block{
     public void setStats(){
         super.setStats();
 
-        if(consValid()) stats.add(mindustry.world.meta.Stat.powerUse, consumesPower);
+        if(consValid()) stats.add(mindustry.world.meta.Stat.powerUse, powerCons);
     }
 
     private boolean consValid(){
-        return consumesPower > 0.0f;
+        return powerCons > 0.0f;
     }
 
     @FAnnotations.Remote(called = FAnnotations.Loc.server)
@@ -46,8 +46,8 @@ public class MechPad extends mindustry.world.Block{
             Fx.spawn.at(pad);
 
         //consumes power
-        if(((MechPad)pad.block).consValid() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).consumesPower * 60.0f)
-            pad.power.graph.useBatteries(((MechPad)pad.block).consumesPower);
+        if(((MechPad)pad.block).consValid() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).powerCons * 60.0f)
+            pad.power.graph.useBatteries(((MechPad)pad.block).powerCons);
 
         playee.set(pad);
 
@@ -70,7 +70,7 @@ public class MechPad extends mindustry.world.Block{
         /** Active only when the player is close enough and power is enough. */
         @Override
         public boolean canControlSelect(Unit player){
-            return player.isPlayer() && Mathf.dst(player.x, player.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= consumesPower || power.graph.getPowerBalance() * 60.0f >= consumesPower);
+            return player.isPlayer() && Mathf.dst(player.x, player.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= powerCons || power.graph.getPowerBalance() * 60.0f >= powerCons);
         }
 
         @Override

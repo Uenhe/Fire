@@ -1089,7 +1089,7 @@ public class FUnitTypes{
             immunities.add(StatusEffects.freezing);
 
             weapons.add(
-                new Weapon("fire-mechanicalTide-laser-big"){{
+                new Weapon("fire-mechanical-tide-laser-large"){{
                     reload = 300.0f;
                     x = 0.0f;
                     y = 1.0f;

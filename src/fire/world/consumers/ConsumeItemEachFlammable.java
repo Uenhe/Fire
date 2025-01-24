@@ -1,20 +1,24 @@
 package fire.world.consumers;
 
+import arc.struct.ObjectMap;
+import arc.util.Strings;
 import fire.world.blocks.defense.Campfire;
 import mindustry.gen.Building;
+import mindustry.ui.Styles;
 import mindustry.world.meta.Stat;
+import mindustry.world.meta.Stats;
 
 import static mindustry.Vars.tilesize;
 
 /**
  * Accepts every item, but only consume those which has flammability.
  * <p>
- * Collocates with {@link Campfire}..?
+ * Only collocates with {@link Campfire}..?
  */
 public class ConsumeItemEachFlammable extends mindustry.world.consumers.ConsumeItemFilter{
 
     public final Campfire block;
-    public float efficiencyMultiplier;
+    public static final ObjectMap<Integer, Float> efficiencyMap = new ObjectMap<>();
 
     public ConsumeItemEachFlammable(Campfire block){
         this.block = block;
@@ -33,25 +37,22 @@ public class ConsumeItemEachFlammable extends mindustry.world.consumers.ConsumeI
 
     @Override
     public void update(Building build){
-        efficiencyMultiplier = 0.0f;
-        build.items.each((item, amount) ->
-            efficiencyMultiplier += item.flammability);
+        efficiencyMap.put(build.id, build.items.sum(((item, amount) -> item.flammability)));
     }
 
     @Override
     public float efficiencyMultiplier(Building build){
-        return efficiencyMultiplier;
+        return efficiencyMap.get(build.id, 1.0f);
     }
 
     /** TODO: Hardcode */
     @Override
-    public void display(mindustry.world.meta.Stats stats){
+    public void display(Stats stats){
         stats.remove(Stat.booster);
         stats.add(Stat.booster, table ->
-            table.table(mindustry.ui.Styles.grayPanel, t -> {
-                t.row();
-                t.left().add(arc.util.Strings.format("Accepts every item, but only consume those which has flammability\nEvery 100% flammability provides extra @% speed boost and @ range boost", block.speedBoostPhase * 100, block.phaseRangeBoost / tilesize)).growX().pad(5.0f);
-            })
+            table.row().table(Styles.grayPanel, t ->
+                t.row().left().add(Strings.format("Accepts every item, but only consume those which has flammability\nEvery 100% flammability provides extra @% speed boost and @ block range boost", block.speedBoostPhase * 100, block.phaseRangeBoost / tilesize)).growX().pad(5.0f)
+            )
         );
     }
 }

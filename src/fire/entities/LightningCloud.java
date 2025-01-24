@@ -1,12 +1,15 @@
 package fire.entities;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Blending;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
 import mindustry.entities.Lightning;
+import mindustry.game.EventType.ResetEvent;
 import mindustry.game.Team;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
@@ -17,13 +20,17 @@ import mindustry.graphics.Pal;
  */
 public class LightningCloud implements arc.util.pooling.Pool.Poolable{
 
-    static final short interval = 300;
-    static final short chargeTime = 150;
-
     int x, y;
     float intensity;
     float timer;
+
+    static final short interval = 300;
+    static final short chargeTime = 150;
     public static final Seq<LightningCloud> clouds = new Seq<>();
+
+    static{{
+        Events.on(ResetEvent.class, e -> clean());
+    }}
 
     public LightningCloud(int x, int y){
         this.x = x;
@@ -35,7 +42,7 @@ public class LightningCloud implements arc.util.pooling.Pool.Poolable{
     public void update(){
         timer += Time.delta;
         if(time() >= chargeTime && time() < time2() + 10.0f && Mathf.chanceDelta(0.11 + 0.04 * intensity))
-            Lightning.create(Team.derelict, Pal.lancerLaser, (int)(12 * intensity), x, y, Mathf.random(360), (int)(10 * Mathf.pow(intensity, 1.2f)));
+            Lightning.create(Team.derelict, Pal.lancerLaser, (int)(12 * intensity), x, y, Mathf.random(360), (int)(12 * Mathf.pow(intensity, 1.2f)));
 
         if(time() > time2() + 31.0f)
             reset();
@@ -44,18 +51,21 @@ public class LightningCloud implements arc.util.pooling.Pool.Poolable{
     public void draw(){
         if(time() < 0.0f) return;
 
-        float a;
+        float alpha;
         if(time() <= time1())
-            a = time() / time1();
+            alpha = time() / time1();
         else if(time() <= time2())
-            a = 1.0f;
+            alpha = 1.0f;
         else
-            a = 1.0f - (time() - time2()) / time1();
+            alpha = 1.0f - (time() - time2()) / time1();
 
-        Draw.alpha(a);
-        Drawf.light(x, y, size(), Pal.lancerLaser, a);
+        Draw.alpha(alpha * 0.15f);
+        Draw.color(Pal.lancerLaser);
+        Fill.circle(x, y, size() * 0.15f);
+        Draw.alpha(alpha);
+        Drawf.light(x, y, size(), Pal.lancerLaser, alpha);
         Draw.blend(Blending.additive);
-        Draw.rect(Core.atlas.find("fire-portal"), x, y, size() * intensity, size() * intensity, timer);
+        Draw.rect(Core.atlas.find("fire-portal"), x, y, size() * intensity, size() * intensity, timer * intensity);
         Draw.blend();
     }
 
@@ -80,6 +90,12 @@ public class LightningCloud implements arc.util.pooling.Pool.Poolable{
             return 40.0f + Mathf.sin(time() - time1(), scl, mag);
         else
             return (1.0f - (time() - time2()) / time1()) * (40.0f + Mathf.sin(time2() - time1(), scl, mag));
+    }
+
+    public static void clean(){
+        if(clouds.any())
+            for(var ignored : clouds)
+                clouds.pop().reset();
     }
 
     @Override

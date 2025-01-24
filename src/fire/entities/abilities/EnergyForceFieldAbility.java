@@ -12,6 +12,7 @@ import arc.util.Strings;
 import arc.util.Time;
 import fire.world.meta.FStat;
 import mindustry.content.Fx;
+import mindustry.ctype.ContentType;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
@@ -19,6 +20,8 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.gen.*;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
+
+import static mindustry.Vars.content;
 
 public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceFieldAbility{
 
@@ -31,12 +34,12 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     public Color lightningColor = Color.clear;
     public boolean unlocks;
 
-    private static final String name = "ability.fire-energyforcefield";
-    private float timer;
-    private boolean broken, regenable;
-    private final Seq<Bullet> bullets = new Seq<>();
+    static final String name = "ability.fire-energyforcefield";
+    float timer;
+    boolean broken, regenable;
+    final Seq<Bullet> bullets = new Seq<>();
     /** Prevent endless and awful creating instances. */
-    private static final ObjectMap<BulletType, BulletType> bulletMap = new ObjectMap<>();
+    static final ObjectMap<Short, Short> bulletMap = new ObjectMap<>();
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
@@ -51,7 +54,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         return Core.bundle.get(name);
     }
 
-    /** TODO Reconstruct this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a>; May clash with BE? */
+    /** TODO Reconstruct this <a href="https://github.com/Anuken/Mindustry/pull/9654">if v147 is released</a>; May clash with BE? */
     @Override
     public void addStats(Table t){
         final float wid = 432.0f;
@@ -166,11 +169,11 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             bullet.lifetime = 310.0f;
 
                             // reuse instances as possible
-                            var type = bulletMap.containsKey(bullet.type) ?
-                                bulletMap.get(bullet.type) :
-                                bullet.type.copy();
+                            BulletType type = bulletMap.containsKey(bullet.type.id)
+                                ? content.getByID(ContentType.bullet, bulletMap.get(bullet.type.id))
+                                : bullet.type.copy();
 
-                            if(!bulletMap.containsKey(bullet.type)){
+                            if(!bulletMap.containsKey(bullet.type.id)){
 
                                 // make artillery collides building
                                 type.collidesTiles = type.collides = true;

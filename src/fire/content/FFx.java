@@ -10,6 +10,7 @@ import arc.math.Mathf;
 import arc.util.Tmp;
 import mindustry.entities.Effect;
 import mindustry.graphics.Drawf;
+import mindustry.graphics.Pal;
 
 import static mindustry.Vars.tilesize;
 
@@ -80,4 +81,32 @@ public class FFx{
             Drawf.light(e.x, e.y, 20f, color, 0.6f * e.fout());
         });
     }
+
+    /** @see mindustry.content.Fx#instTrail */
+    public static Effect instTrailPurple = new Effect(10.0f, e -> {
+        for(byte i = 0; i < 2; i++){
+            float m = i == 0 ? 1.0f : 0.5f;
+            float w = 15.0f * e.fout() * m;
+            float rot = e.rotation + 180.0f;
+
+            Draw.color(i == 0 ? Pal.reactorPurple2 : Pal.reactorPurple);
+            Drawf.tri(e.x, e.y, w, (30.0f + Mathf.randomSeedRange(e.id, 10.0f)) * m, rot);
+            Drawf.tri(e.x, e.y, w, 10.0f * m, rot + 180.0f);
+        }
+
+        Drawf.light(e.x, e.y, 60.0f, Pal.reactorPurple2, 0.6f * e.fout());
+    });
+
+    /** @see mindustry.content.Fx#instBomb */
+    public static Effect instBombPurple = new Effect(10.0f, 100.0f, e -> {
+
+        for(byte i = 0; i < 4; i++){
+            Draw.color(Pal.reactorPurple2);
+            Drawf.tri(e.x, e.y, 5.0f, 80.0f * e.fout(), i * 90.0f + 45.0f);
+            Draw.color();
+            Drawf.tri(e.x, e.y, 2.5f, 40.0f * e.fout(), i * 90.0f + 45.0f);
+        }
+
+        Drawf.light(e.x, e.y, 150.0f, Pal.reactorPurple2, 0.9f * e.fout());
+    });
 }

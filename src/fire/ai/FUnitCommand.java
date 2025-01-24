@@ -3,6 +3,7 @@ package fire.ai;
 import fire.ai.types.BuilderDashAI;
 import mindustry.ai.UnitCommand;
 
+/** TODO these are buggy but too lazy to fix. */
 public class FUnitCommand{
 
     public static final UnitCommand

@@ -1,5 +1,6 @@
 package fire.entities.bullets;
 
+import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.Time;
@@ -26,12 +27,12 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     public void load(){
         super.load();
 
-        arc.Events.run(Trigger.update, () -> {
+        Events.run(Trigger.update, () -> {
             mapCleanTimer += Time.delta;
 
             // clean every 300 ticks
-            if(mapCleanTimer >= 300){
-                mapCleanTimer -= 300;
+            if(mapCleanTimer >= 300.0f){
+                mapCleanTimer -= 300.0f;
 
                 for(var entry : timerMap)
                     if(!entry.key.isAdded())
@@ -55,7 +56,7 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
         if(timerMap.get(b) >= foldInterval){
             timerMap.put(b, timerMap.get(b) - foldInterval);
 
-            int sign = Mathf.sign((byte)(b.time / foldInterval) % 2 == 1);
+            int sign = Mathf.sign((b.time / foldInterval) % 2 == 1);
             b.rotation(b.rotation() + foldDegree * 2.0f * sign);
         }
     }

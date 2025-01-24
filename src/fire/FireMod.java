@@ -1,6 +1,7 @@
 package fire;
 
 import arc.Core;
+import arc.Events;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
@@ -8,19 +9,24 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.content.*;
+import fire.input.FBinding;
 import fire.ui.dialogs.InfoDialog;
+import fire.world.DEBUG;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
+import mindustry.content.UnitTypes;
 import mindustry.ctype.UnlockableContent;
+import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
+import mindustry.world.Block;
+import mindustry.world.meta.BuildVisibility;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import static mindustry.Vars.mods;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
@@ -32,7 +38,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     static mindustry.mod.Mods.LoadedMod FIRE;
     static String displayName;
-    static boolean launched;
+    static boolean launched, multiplied;
     static byte counter;
 
     @Override
@@ -58,11 +64,11 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        fire.input.FBinding.load();
+        FBinding.load();
         loadSettings();
         loadDatabase();
 
-        arc.Events.run(mindustry.game.EventType.ClientLoadEvent.class, () -> {
+        Events.on(ClientLoadEvent.class, e -> {
             showDialog();
             showNoMultipleMods();
             launched = true;
@@ -90,11 +96,12 @@ public class FireMod extends mindustry.mod.Mod{
                     table.button(name, () -> {
                         showDialog();
 
-                        //???, this is untested
                         if(counter < 5){
                             counter++;
-                            if(counter >= 5)
-                                FPlanets.risetar.accessible = true;
+                            if(counter >= 5){
+                                doSomethingPlayable();
+                                ui.announce("Debug successfully.");
+                            }
                         }
 
                     }).size(240.0f, 64.0f);
@@ -198,8 +205,8 @@ public class FireMod extends mindustry.mod.Mod{
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
             new BaseDialog("o_o?"){
-                private float time = 300.0f;
-                private boolean canClose;
+                float time = 300.0f;
+                boolean canClose;
 
                 {
                     update(() -> canClose = (time -= Time.delta) <= 0.0f);
@@ -209,8 +216,8 @@ public class FireMod extends mindustry.mod.Mod{
                         b.setText(canClose ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
                     }).size(210.0f, 64.0f);
 
-                    FPlanets.risetar.accessible = false;
-
+                    multiplied = true;
+                    doSomethingUnplayable();
                     show();
                 }
             };
@@ -257,6 +264,26 @@ public class FireMod extends mindustry.mod.Mod{
 
             }).growX().pad(5.0f);
             table.row();
+        }
+    }
+
+    /** ??? */
+    static void doSomethingUnplayable(){
+        for(var u : content.units())
+            u.health -= 10000.0f;
+    }
+
+    /** !!! */
+    static void doSomethingPlayable(){
+        for(var e : DEBUG.DEBUGS){
+            if(e instanceof Block)
+                ((Block)e).buildVisibility = BuildVisibility.shown;
+        }
+
+        if(multiplied){
+            multiplied = false;
+            for(var u : content.units())
+                u.health += 10000.0f;
         }
     }
 }

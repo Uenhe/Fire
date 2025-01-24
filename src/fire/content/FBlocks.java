@@ -16,6 +16,7 @@ import arc.util.Time;
 import fire.entities.FUnitSorts;
 import fire.entities.bullets.FoldingBulletType;
 import fire.entities.bullets.LightningPointBulletType;
+import fire.world.DEBUG;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
 import fire.world.blocks.defense.Campfire;
@@ -33,10 +34,10 @@ import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumeItemEachFlammable;
+import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawRegionPlus;
 import fire.world.meta.FAttribute;
 import mindustry.content.*;
-import mindustry.ctype.UnlockableContent;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
@@ -101,11 +102,11 @@ import static mindustry.type.ItemStack.with;
 public class FBlocks{
 
     /** Key is component itself, value is its inferior. */
-    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(5);
+    public static final ObjectMap<Short, Short> compositeMap = new ObjectMap<>(5);
     public static Block
 
         //environment
-        neoplasm, bloodyDirt,hardnedCovery,
+        neoplasm, bloodyDirt, hardenedCovering,
 
         //sandbox & misc
         adaptiveSource, fireCompany,
@@ -141,7 +142,10 @@ public class FBlocks{
         buildingHealer, campfire, skyDome, buildIndicator, coreArmored, javelinPad, compositeUnloader,
 
         //env
-        envEteriverStronghold, envStormyCoast, envGlaciatedPeaks;
+        envEteriverStronghold, envStormyCoast1, envStormyCoast2, envGlaciatedPeaks,
+
+        //DEBUG
+        DEBUG_TURRET;
 
     private static BulletType destroyBullet(float dmg, float radius){
         final float time = 15.0f;
@@ -180,7 +184,7 @@ public class FBlocks{
             attributes.set(FAttribute.flesh, 1.0f / 9.0f);
         }};
 
-        hardnedCovery = new OverlayFloor("hardned-covery"){{
+        hardenedCovering = new OverlayFloor("hardened-covering"){{
             variants = 8;
         }};
 
@@ -2280,7 +2284,7 @@ public class FBlocks{
             displayedSpeed = 26f;
             junctionReplacement = Blocks.invertedSorter;
 
-            compositeMap.put(this, Blocks.titaniumConveyor);
+            compositeMap.put(id, Blocks.titaniumConveyor.id);
         }};
 
         hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
@@ -2310,7 +2314,7 @@ public class FBlocks{
             pulse = true;
             ((Conveyor)compositeConveyor).bridgeReplacement = this;
 
-            compositeMap.put(this, Blocks.itemBridge);
+            compositeMap.put(id, Blocks.itemBridge.id);
         }};
 
         //endregion
@@ -2328,7 +2332,7 @@ public class FBlocks{
             solid = false;
             underBullets = true;
 
-            compositeMap.put(this, Blocks.liquidRouter);
+            compositeMap.put(id, Blocks.liquidRouter.id);
         }};
 
         compositeBridgeConduit = new LiquidBridge("composite-bridge-conduit"){{
@@ -2343,7 +2347,7 @@ public class FBlocks{
             range = 8;
             pulse = true;
 
-            compositeMap.put(this, Blocks.bridgeConduit);
+            compositeMap.put(id, Blocks.bridgeConduit.id);
         }};
 
         //endregion
@@ -3268,7 +3272,7 @@ public class FBlocks{
             allyStatus = FStatusEffects.inspired;
             enemyStatus = StatusEffects.sapped;
 
-            consumePower(54.0f);
+            consume(new ConsumePowerCustom(42.0f, 0.0f, false));
             consume(new ConsumeItemEachFlammable(this));
         }};
 
@@ -3326,6 +3330,7 @@ public class FBlocks{
             armor = 8;
             size = 5;
             itemCapacity = 11000;
+            enableDrawStatus = false;
 
             unitType = FUnitTypes.omicron;
             unitCapModifier = 18;
@@ -3333,6 +3338,8 @@ public class FBlocks{
             shieldHealth = 800.0f;
             cooldownNormal = 1.2f;
             cooldownBroken = 1.5f;
+
+            consume(new ConsumePowerCustom(10.0f, 0.0f, false));
         }};
 
         javelinPad = new MechPad("javelin-pad", FUnitTypes.javelin){{
@@ -3346,7 +3353,7 @@ public class FBlocks{
             health = 1200;
             size = 2;
 
-            consumesPower = 240.0f;
+            powerCons = 240.0f;
         }};
 
         compositeUnloader = new AdaptDirectionalUnloader("composite-unloader"){{
@@ -3362,7 +3369,7 @@ public class FBlocks{
             allowCoreUnload = true;
             speed = 25.0f;
 
-            compositeMap.put(this, Blocks.unloader);
+            compositeMap.put(id, Blocks.unloader.id);
         }};
 
         //endregion
@@ -3371,7 +3378,7 @@ public class FBlocks{
         envEteriverStronghold = new EnvBlock("env-eteriver-stronghold"){{
             buildType = () -> new EnvBlockBuild(){
 
-                /** Apollo spawn; placed() is not used since it's buggy. */
+                /** Apollo spawn; placed() is not used since it's buggy. TODO add() may be helpful? */
                 @Override
                 public void update(){
                     if(state.isEditor()) return;
@@ -3394,28 +3401,31 @@ public class FBlocks{
             };
         }};
 
-        envStormyCoast = new EnvBlock("env-stormy-coast"){{
+        envStormyCoast1 = new EnvBlock("env-stormy-coast1"){{
             buildType = () -> new EnvBlockBuild(){
 
+                /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
+                final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+                final Color specificColor = new Color(0.1f, 0.1f, 0.1f);
                 float alpha;
-                final Color
-                    defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f),
-                    specificColor = new Color(0.1f, 0.1f, 0.1f);
 
-                /** Wave 59/60. */
+                /** Wave 41-47 / 60. */
                 @Override
                 protected void updateStart(){
                     if(alpha == 0.0f){
-                        Core.settings.put("showweather", true);
-                        Core.settings.put("drawlight", true);
-
-                        ui.announce("@sc.weather");
-                        Time.run(180.0f, () -> ui.announce("@sc.lightning"));
+                        if(!Core.settings.getBool("showweather")){
+                            Core.settings.put("showweather", true);
+                            ui.announce("@sc.weather");
+                        }
+                        if(!Core.settings.getBool("drawlight")){
+                            Core.settings.put("drawlight", true);
+                            Time.runTask(180.0f, () -> ui.announce("@sc.lightning"));
+                        }
                     }
 
                     state.rules.lighting = true;
                     state.rules.ambientLight = specificColor;
-                    alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
+                    alpha = Mathf.lerpDelta(alpha, 0.4f, 0.003f);
                     state.rules.ambientLight.a = alpha;
 
                     for(var w : Groups.weather)
@@ -3425,12 +3435,74 @@ public class FBlocks{
                         Weathers.rain.create();
                 }
 
+                /** When wave 47 is half. */
+                @Override
+                protected void updateStop(){
+                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.003f);
+
+                    if(state.rules.ambientLight.a <= 0.01f){
+                        if(state.isCampaign())
+                            state.rules.ambientLight = defaultColor;
+                        else
+                            state.rules.ambientLight = Color.clear; //might be buggy if default light is customized
+
+                        kill();
+                    }
+                }
+
+                @Override
+                public void onRemoved(){
+                    if(isStarter()) return;
+
+                    Groups.weather.clear();
+                    if(state.isCampaign())
+                        state.rules.ambientLight = defaultColor;
+                    else
+                        state.rules.ambientLight = Color.clear;
+                }
+            };
+        }};
+
+        envStormyCoast2 = new EnvBlock("env-stormy-coast2"){{
+            buildType = () -> new EnvBlockBuild(){
+
+                /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
+                final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+                final Color specificColor = new Color(0.1f, 0.1f, 0.1f);
+                float alpha;
+
+                /** Wave 59 / 60. */
+                @Override
+                protected void updateStart(){
+                    if(alpha == 0.0f){
+                        if(!Core.settings.getBool("showweather")){
+                            Core.settings.put("showweather", true);
+                            ui.announce("@sc.weather");
+                        }
+                        if(!Core.settings.getBool("drawlight")){
+                            Core.settings.put("drawlight", true);
+                            Time.runTask(180.0f, () -> ui.announce("@sc.lightning"));
+                        }
+                    }
+
+                    state.rules.lighting = true;
+                    state.rules.ambientLight = specificColor;
+                    alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
+                    state.rules.ambientLight.a = alpha;
+
+                    for(var w : Groups.weather)
+                        if(w.weather != FWeathers.rainstorm) w.remove();
+
+                    if(Groups.weather.isEmpty())
+                        FWeathers.rainstorm.create();
+                }
+
                 /** After all the apollos are destructed. */
                 @Override
                 protected void updateStop(){
                     state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.004f);
 
-                    if(state.rules.ambientLight.a <= 0.001f){
+                    if(state.rules.ambientLight.a <= 0.01f){
                         if(state.isCampaign())
                             state.rules.ambientLight = defaultColor;
                         else
@@ -3444,10 +3516,11 @@ public class FBlocks{
                 public void onRemoved(){
                     if(isStarter()) return;
 
+                    Groups.weather.clear();
                     if(state.isCampaign())
                         state.rules.ambientLight = defaultColor;
                     else
-                        state.rules.ambientLight = Color.clear;
+                        state.rules.ambientLight = Color.clear; //might be buggy if default light is customized
                 }
             };
         }};
@@ -3463,12 +3536,11 @@ public class FBlocks{
                 public void update(){
                     if(state.isEditor() || !state.isCampaign()) return;
 
-                    for(var s : state.getPlanet().sectors){
+                    for(var s : state.getPlanet().sectors)
                         if(times < 5 && s.hasBase() && Mathf.chance(0.6)){
-                            Events.fire(new EventType.SectorInvasionEvent(s));
+                            Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
                             times++;
                         }
-                    }
 
                     kill();
                 }
@@ -3476,6 +3548,10 @@ public class FBlocks{
         }};
 
         //endregion
+        //region DEBUG
 
+        DEBUG_TURRET = new DEBUG.DEBUG_Turret("DEBUG_TURRET");
+
+        //endregion
     }
 }

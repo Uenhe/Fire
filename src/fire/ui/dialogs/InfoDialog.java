@@ -24,6 +24,7 @@ import arc.util.Align;
 import arc.util.Nullable;
 import arc.util.Scaling;
 import fire.content.FBlocks;
+import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -32,6 +33,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
+import mindustry.world.Block;
 
 import java.util.Arrays;
 
@@ -396,7 +398,7 @@ public class InfoDialog extends BaseDialog{
                 var t = b.table(desc -> {
 
                     desc.left().defaults().left();
-                    desc.add(locked(node) ? "@content.unlocked" : node.content.localizedName);
+                    desc.add(locked(node) ? "@content.locked" : node.content.localizedName);
                     desc.row();
 
                     if(locked(node))
@@ -413,8 +415,8 @@ public class InfoDialog extends BaseDialog{
 
             if(!locked(node) && hasInfo(node))
                 infoTable.table(t -> t.margin(3f).left().labelWrap(
-                    FBlocks.compositeMap.containsKey(node.content)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FBlocks.compositeMap.get(node.content).localizedName)
+                    FBlocks.compositeMap.containsKey(node.content.id)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", ((Block)content.getByID(ContentType.block, FBlocks.compositeMap.get(node.content.id))).localizedName)
                     : Core.bundle.get(getKey(node))
                 ).color(Color.lightGray).growX()).fillX();
 

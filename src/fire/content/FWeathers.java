@@ -1,8 +1,7 @@
 package fire.content;
 
 import arc.math.Mathf;
-import arc.util.Log;
-import arc.util.Time;
+
 import arc.util.pooling.Pools;
 import fire.entities.LightningCloud;
 import mindustry.content.StatusEffects;
@@ -51,6 +50,12 @@ public class FWeathers{
             public void drawUnder(WeatherState state){
                 //do nothing or a NullPointer will be thrown
             }
+
+            @Override
+            public void remove(){
+                super.remove();
+                LightningCloud.clean();
+            }
         {
             attrs.set(Attribute.light, -0.35f);
             attrs.set(Attribute.water, 0.35f);
@@ -58,11 +63,5 @@ public class FWeathers{
             sound = Sounds.rain;
             soundVol = 0.3f;
         }};
-
-        for(int i = 0; i < 1000; i++){
-            Time.runTask(60 * i, () -> {
-                Log.info(LightningCloud.clouds.size);
-            });
-        }
     }
 }
