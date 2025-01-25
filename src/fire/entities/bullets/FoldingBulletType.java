@@ -51,13 +51,11 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     @Override
     public void update(Bullet b){
         super.update(b);
-
         timerMap.put(b, timerMap.get(b) + Time.delta);
+
         if(timerMap.get(b) >= foldInterval){
             timerMap.put(b, timerMap.get(b) - foldInterval);
-
-            int sign = Mathf.sign((b.time / foldInterval) % 2 == 1);
-            b.rotation(b.rotation() + foldDegree * 2.0f * sign);
+            b.rotation(b.rotation() + foldDegree * 2.0f * Mathf.sign((b.time / foldInterval) % 2 == 1));
         }
     }
 }

@@ -1,5 +1,6 @@
 package fire.world.blocks.production;
 
+/** TODO reconstruct this if v147 is released, as {@link mindustry.world.Block#dumpTime dumpTime} is no longer {@code final}. */
 public class AdaptBurstDrill extends mindustry.world.blocks.production.BurstDrill{
 
     protected AdaptBurstDrill(String name){

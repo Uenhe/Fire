@@ -8,10 +8,10 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.util.Scaling;
-import arc.util.Time;
-import fire.world.consumers.ConsumeItemEachFlammable;
+import fire.world.consumers.ConsumeItemFlammableEach;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.meta.FStat;
+import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
@@ -21,14 +21,14 @@ import mindustry.ui.Styles;
 
 import static mindustry.Vars.ui;
 
-/** Only collocates with {@link fire.world.consumers.ConsumeItemEachFlammable}..? */
+/** Only collocates with {@link ConsumeItemFlammableEach}..? */
 public class Campfire extends mindustry.world.blocks.defense.OverdriveProjector{
 
     public StatusEffect
         allyStatus = StatusEffects.overclock,
         enemyStatus = StatusEffects.sapped;
     public float updateEffectChance;
-    public Effect updateEffect = mindustry.content.Fx.none;
+    public Effect updateEffect = Fx.none;
 
     public Campfire(String name){
         super(name);
@@ -103,8 +103,8 @@ public class Campfire extends mindustry.world.blocks.defense.OverdriveProjector{
             Draw.reset();
         }
 
-        private float getEfficiency(){
-            return consumeBuilder.find(c -> c instanceof ConsumeItemEachFlammable).efficiencyMultiplier(this);
+        float getEfficiency(){
+            return consumeBuilder.find(c -> c instanceof ConsumeItemFlammableEach).efficiencyMultiplier(this);
         }
     }
 }

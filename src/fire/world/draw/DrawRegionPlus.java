@@ -5,24 +5,22 @@ import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.world.draw.DrawRegion;
 
-public class DrawRegionPlus extends DrawRegion {
-    public float magnification=1f;
+public class DrawRegionPlus extends DrawRegion{
+    public float magnification = 1.0f;
 
-    public DrawRegionPlus() {
+    public DrawRegionPlus(){
+
     }
 
-    public void draw(Building build) {
-        float z = Draw.z();
-        if (this.layer > 0.0F) {
-            Draw.z(this.layer);
-        }
+    public void draw(Building build){
+        if(layer > 0.0f)
+            Draw.z(layer);
 
-        if (this.spinSprite) {
-            Drawf.spinSprite(this.region, build.x + this.x, build.y + this.y, magnification * build.totalProgress() * this.rotateSpeed * build.efficiency + this.rotation + (this.buildingRotate ? build.rotdeg() : 0.0F));
-        } else {
-            Draw.rect(this.region, build.x + this.x, build.y + this.y, magnification * build.totalProgress() * this.rotateSpeed * build.efficiency + this.rotation + (this.buildingRotate ? build.rotdeg() : 0.0F));
-        }
+        if(spinSprite)
+            Drawf.spinSprite(region, build.x + x, build.y + y, magnification * build.totalProgress() * rotateSpeed * build.efficiency + rotation + (buildingRotate ? build.rotdeg() : 0.0f));
+        else
+            Draw.rect(region, build.x + x, build.y + y, magnification * build.totalProgress() * rotateSpeed * build.efficiency + rotation + (buildingRotate ? build.rotdeg() : 0.0f));
 
-        Draw.z(z);
+        Draw.z(Draw.z());
     }
 }

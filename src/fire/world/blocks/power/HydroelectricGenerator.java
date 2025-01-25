@@ -2,9 +2,9 @@ package fire.world.blocks.power;
 
 import arc.Core;
 import arc.util.Scaling;
+import arc.util.Strings;
 import fire.world.meta.FStat;
 import mindustry.Vars;
-import mindustry.content.Liquids;
 import mindustry.game.Team;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
@@ -13,7 +13,6 @@ import static mindustry.Vars.world;
 
 /**
  * ...Doesn't play well with blocks size odd.
- *
  * @author fy, ue
  */
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
@@ -27,16 +26,17 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
     @Override
     public void setStats(){
         super.setStats();
+
         stats.add(FStat.specialIncrease, table -> {
             table.row();
 
             for(var b : Vars.content.blocks())
-                if(b.isFloor() && b.asFloor().liquidDrop == Liquids.water)
+                if(b.isFloor() && b.asFloor().liquidDrop != null)
                     table.table(Styles.grayPanel, t -> {
                         t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
                             info.left().add(b.localizedName).left().row();
-                            info.left().add("[accent]" + FStat.floorMultiplier.localized() + b.asFloor().liquidMultiplier);
+                            info.left().add("[accent]" + FStat.floorMultiplier.localized() + Strings.fixed(b.asFloor().liquidMultiplier * (1.0f - b.asFloor().liquidDrop.viscosity) * b.asFloor().liquidDrop.temperature * 4.0f, 2));
                         });
                     }).growX().pad(5.0f).row();
         });
@@ -59,8 +59,9 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         float efficiencyCountingDoubled = 0.0f;
         float efficiencyCounting = 0.0f;
         for(var other : tile.getLinkedTilesAs(this, tempTiles)){
-            float efficiencyCurrent = other.floor().liquidMultiplier;
-            if(other.floor().liquidDrop == null) efficiencyCurrent = 0.0f;
+            float efficiencyCurrent = other.floor().liquidDrop != null
+                ? other.floor().liquidMultiplier * (1.0f - other.floor().liquidDrop.viscosity) * other.floor().liquidDrop.temperature * 4.0f
+                : 0.0f;
             efficiencyCounting += efficiencyCurrent;
             efficiencyCountingDoubled += efficiencyCurrent * efficiencyCurrent;
         }
@@ -74,7 +75,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
 
     public class HydroelectricGeneratorBuild extends GeneratorBuild{
 
-        public float sum;
+        float sum;
 
         @Override
         public void updateTile(){

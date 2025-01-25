@@ -1,28 +1,23 @@
 name: "fire"
 displayName: "Fire"
-author: "飞雨a_ssylfyzgmz && -Uenhe饨咂-"
-version: "1.2.0"
+author: "飞雨a_ssylfyzgmz & KochiyaUeneh油苗子"
+version: "1.3.2"
 minGameVersion: "146"
 java: true
 main: "fire.FireMod"
 repo: "Uenhe/Fire"
 
-subtitle: "v1.2.0 adapts v146"
+subtitle: "v1.3.2 adapts v146"
 description:
 "
-[royal[]]A Mindustry Mod that adds a lots of WEIRD things.
+A Mindustry Mod that adds a lot of WEIRD things...
+Click the 'Repo' button below to skip to GitHub page.
+Any feedback, issue report and translation tweak is welcome.
+Star us on GitHub if you suppose it's awesome!
+
+模组QQ交流群: 711467227
+模组GitHub页面点击下方'查看'按钮即可跳转
 一个奇奇怪怪又十分核锂的mod...
-[gold[]]由 [acid[]]飞雨a_sszylfyzgmz [gold[]]和 [cyan[]]-Uenhe饨咂- [gold[]]共同制作
-[violet[]]你可以在bilibili uid516898377 和 uid327502129 找到他们
-
-[acid[]]Supports English!
-
-[lime[]]模组QQ交流群: 711467227
-如果你发现了该mod的bug, 或是有关于该mod的建议, 欢迎在此群反映
-
-[slate[]]GitHub URL: https://github.com/Uenhe/Fire
-
-If you suppose that the mod is AWESOME, plz star us on GitHub, thanks!
-如果你觉得该mod很棒的话, 一定要去GitHub给这个项目点个星星啊!
-[white[]]
+欢迎反映任何关于此模组的BUG和建议
+去GitHub star我们再好不过了!
 "

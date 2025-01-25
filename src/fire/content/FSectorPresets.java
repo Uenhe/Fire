@@ -31,15 +31,15 @@ public class FSectorPresets{
         stormyCoast = create("stormy-coast", 81, 10, 60);
     }
 
-    private static SectorPreset create(String name, int sector, float difficulty){
+    static SectorPreset create(String name, int sector, float difficulty){
         return create(name, sector, difficulty, 0, true);
     }
 
-    private static SectorPreset create(String name, int sector, float difficulty, int captureWave){
+    static SectorPreset create(String name, int sector, float difficulty, int captureWave){
         return create(name, sector, difficulty, captureWave, true);
     }
 
-    private static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
+    static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
         var s = new SectorPreset(name, FPlanets.risetar, sector);
         s.difficulty = difficulty;
         s.captureWave = captureWave;

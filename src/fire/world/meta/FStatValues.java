@@ -10,7 +10,6 @@ import arc.util.Scaling;
 import arc.util.Strings;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import mindustry.content.StatusEffects;
-import mindustry.entities.bullet.BulletType;
 import mindustry.entities.pattern.ShootAlternate;
 import mindustry.entities.pattern.ShootMulti;
 import mindustry.gen.Icon;
@@ -23,7 +22,7 @@ import static mindustry.Vars.tilesize;
 
 public class FStatValues{
 
-    /** see {@link mindustry.world.meta.StatValues#ammo(ObjectMap, int, boolean)} */
+    /** @see mindustry.world.meta.StatValues#ammo(ObjectMap, int, boolean) */
     public static StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, int indent){
 
         return table -> {
@@ -31,7 +30,7 @@ public class FStatValues{
             table.row();
 
             for(var t : map){
-                BulletType type = t.type;
+                var type = t.type;
 
                 table.table(Styles.grayPanel, bt -> {
 
@@ -43,11 +42,10 @@ public class FStatValues{
                     bt.row();
 
                     if(type.damage > 0f && (type.collides || type.splashDamage <= 0f)){
-                        if(type.continuousDamage() > 0f){
+                        if(type.continuousDamage() > 0f)
                             bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
-                        }else{
+                        else
                             bt.add(Core.bundle.format("bullet.damage", type.damage));
-                        }
                     }
 
                     if(type.buildingDamageMultiplier != 1f){

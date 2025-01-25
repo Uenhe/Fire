@@ -1,7 +1,10 @@
 package fire.world.blocks.defense;
 
+import arc.Core;
 import arc.math.Interp;
 import fire.world.meta.FStat;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
 
 import static mindustry.Vars.*;
 
@@ -29,9 +32,9 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         super.setBars();
 
         float max = armor + armorIncrease;
-        addBar("currentarmor", (ArmorWallBuild build) -> new mindustry.ui.Bar(
-            () -> arc.Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
-            () -> mindustry.graphics.Pal.accent,
+        addBar("currentarmor", (ArmorWallBuild build) -> new Bar(
+            () -> Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
+            () -> Pal.accent,
             () -> (armor + build.extraArmor) / max
         ));
     }

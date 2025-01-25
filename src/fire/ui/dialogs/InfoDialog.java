@@ -41,21 +41,21 @@ import static mindustry.Vars.*;
 
 /**
  * To show more details about contents.
- * See {@link mindustry.ui.dialogs.ResearchDialog}
+ * @see mindustry.ui.dialogs.ResearchDialog
  */
 public class InfoDialog extends BaseDialog{
 
-    private final View view;
-    private Rect bounds = new Rect();
-    private final OrderedSet<InfoTreeNode> nodes = new OrderedSet<>();
-    private InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
-    private InfoNode lastNode = root.node;
+    final View view;
+    Rect bounds = new Rect();
+    final OrderedSet<InfoTreeNode> nodes = new OrderedSet<>();
+    InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
+    InfoNode lastNode = root.node;
 
-    private static final float nodeSize = Scl.scl(70f);
-    private static final float nodeSpacing = 40f;
+    static final float nodeSize = Scl.scl(70f);
+    static final float nodeSpacing = 40f;
     public static final InfoDialog dialog = new InfoDialog();
 
-    private InfoDialog(){
+    InfoDialog(){
         super("");
 
         titleTable.remove();
@@ -152,7 +152,7 @@ public class InfoDialog extends BaseDialog{
         });
     }
 
-    public void switchTree(InfoNode node){
+    void switchTree(InfoNode node){
         if(lastNode == node || node == null) return;
 
         nodes.clear();
@@ -161,7 +161,7 @@ public class InfoDialog extends BaseDialog{
         view.rebuildAll();
     }
 
-    public void rebuildTree(InfoNode node){
+    void rebuildTree(InfoNode node){
         switchTree(node);
 
         view.panX = 0f;
@@ -175,7 +175,7 @@ public class InfoDialog extends BaseDialog{
         treeLayout();
     }
 
-    private void checkNodes(InfoTreeNode node){
+    void checkNodes(InfoTreeNode node){
         boolean locked = locked(node.node);
         if(!locked && (node.parent == null || node.parent.visible)) node.visible = true;
 
@@ -187,11 +187,11 @@ public class InfoDialog extends BaseDialog{
         }
     }
 
-    private boolean locked(InfoNode node){
+    boolean locked(InfoNode node){
         return node.content.locked();
     }
 
-    private void treeLayout(){
+    void treeLayout(){
         var node = new LayoutNode(root, null);
         var children = node.children;
         var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
@@ -233,7 +233,7 @@ public class InfoDialog extends BaseDialog{
         bounds.y += nodeSize * 1.5f;
     }
 
-    private void shift(LayoutNode[] children, float amount){
+    void shift(LayoutNode[] children, float amount){
         for(var node : children){
             node.y += amount;
 
@@ -242,7 +242,7 @@ public class InfoDialog extends BaseDialog{
         }
     }
 
-    private void copyInfo(LayoutNode node){
+    void copyInfo(LayoutNode node){
         node.node.x = node.x;
         node.node.y = node.y;
 
@@ -251,18 +251,18 @@ public class InfoDialog extends BaseDialog{
                 copyInfo(child);
     }
 
-    private class View extends Group{
+    class View extends Group{
 
-        private float panX = 0f, panY = -200f, lastZoom = -1f;
-        private boolean moved = false;
-        private ImageButton hoverNode;
-        private final Table infoTable = new Table();
+        float panX = 0f, panY = -200f, lastZoom = -1f;
+        boolean moved = false;
+        ImageButton hoverNode;
+        final Table infoTable = new Table();
 
         {
             rebuildAll();
         }
 
-        private void rebuildAll(){
+        void rebuildAll(){
 
             clear();
             hoverNode = null;
@@ -341,7 +341,7 @@ public class InfoDialog extends BaseDialog{
             released(() -> moved = false);
         }
 
-        private void clamp(){
+        void clamp(){
             float pad = nodeSize;
             float ox = width / 2.0f, oy = height / 2.0f;
             float rw = bounds.width, rh = bounds.height;
@@ -354,15 +354,15 @@ public class InfoDialog extends BaseDialog{
             panY = ry - bounds.y - oy;
         }
 
-        private String getKey(InfoNode node){
+        String getKey(InfoNode node){
             return node.content.getContentType() + "." + node.content.name + ".info";
         }
 
-        private boolean hasInfo(InfoNode node){
+        boolean hasInfo(InfoNode node){
             return !Core.bundle.get(getKey(node)).startsWith("?");
         }
 
-        private void rebuild(){
+        void rebuild(){
             var button = hoverNode;
 
             infoTable.remove();
@@ -460,11 +460,11 @@ public class InfoDialog extends BaseDialog{
         }
     }
 
-    private class LayoutNode extends TreeLayout.TreeNode<LayoutNode>{
+    class LayoutNode extends TreeLayout.TreeNode<LayoutNode>{
 
-        private final InfoTreeNode node;
+        final InfoTreeNode node;
 
-        private LayoutNode(InfoTreeNode node, LayoutNode parent){
+        LayoutNode(InfoTreeNode node, LayoutNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -476,10 +476,10 @@ public class InfoDialog extends BaseDialog{
 
     public class InfoTreeNode extends TreeLayout.TreeNode<InfoTreeNode>{
 
-        private final InfoNode node;
-        private boolean visible = true, selectable = true;
+        final InfoNode node;
+        boolean visible = true, selectable = true;
 
-        private InfoTreeNode(InfoNode node, InfoTreeNode parent){
+        InfoTreeNode(InfoNode node, InfoTreeNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -496,16 +496,16 @@ public class InfoDialog extends BaseDialog{
     public static class InfoTree{
         public static final Seq<InfoNode> all = new Seq<>();
         public static final Seq<InfoNode> roots = new Seq<>();
-        private static InfoNode context;
+        static InfoNode context;
     }
 
     public static class InfoNode{
 
-        private final short depth;
-        private final UnlockableContent content;
-        private final Seq<InfoNode> children = new Seq<>();
+        final short depth;
+        final UnlockableContent content;
+        final Seq<InfoNode> children = new Seq<>();
 
-        private InfoNode(@Nullable InfoNode parent, UnlockableContent content){
+        InfoNode(@Nullable InfoNode parent, UnlockableContent content){
             if(parent != null) parent.children.add(this);
 
             this.content = content;
@@ -514,8 +514,9 @@ public class InfoDialog extends BaseDialog{
             InfoTree.all.add(this);
         }
 
-        public static void dnode(UnlockableContent content){
-            dnode(content, () -> {
+        public static InfoNode dnode(UnlockableContent content){
+            return dnode(content, () -> {
+
             });
         }
 

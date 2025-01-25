@@ -80,7 +80,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     public void setBars(){
         super.setBars();
         addBar("shield", (ForceCoreBuild e) -> new Bar(
-            () -> Core.bundle.format("bar.detailedshield", (int) (shieldHealth - e.buildup), shieldHealth),
+            () -> Core.bundle.format("bar.detailedshield", (int)(shieldHealth - e.buildup), shieldHealth),
             () -> e.broken ? Color.gray : Pal.accent,
             () -> 1.0f - (e.buildup / shieldHealth)
         ));

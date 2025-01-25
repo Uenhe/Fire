@@ -12,7 +12,7 @@ public class MelterPlus extends ItemIncinerator {
 
     public class MelterPlusBuild extends ItemIncinerator.ItemIncineratorBuild {
 
-        public float sum;
+        float sum;
 
         @Override
         public void updateTile(){
@@ -22,14 +22,12 @@ public class MelterPlus extends ItemIncinerator {
         @Override
         public void onProximityAdded(){
             super.onProximityAdded();
-            //sum = returnEfficiency(tile.x,tile.y);
+            //sum = returnEfficiency(tile.x, tile.y);
         }
 
         @Override
         public float totalProgress(){
             return enabled ? super.totalProgress() : 0f;
         }
-
-
     }
 }

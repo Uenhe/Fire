@@ -33,7 +33,7 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.units.MechPad;
-import fire.world.consumers.ConsumeItemEachFlammable;
+import fire.world.consumers.ConsumeItemFlammableEach;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawRegionPlus;
 import fire.world.meta.FAttribute;
@@ -226,7 +226,7 @@ public class FBlocks{
             size = 2;
             reload = 42.0f;
             range = 250.0f;
-            shootCone = 30.0f;
+            shootCone = 10.0f;
             inaccuracy = 2.0f;
             rotateSpeed = 10.0f;
             recoil = 1.6f;
@@ -3012,8 +3012,8 @@ public class FBlocks{
             size = 5;
             hasPower = true;
             hasLiquids = true;
-            itemCapacity = 40;
-            liquidCapacity = 75f;
+            itemCapacity = 80;
+            liquidCapacity = 75.0f;
             craftSound = Sounds.spark;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
@@ -3024,18 +3024,19 @@ public class FBlocks{
                 new DrawDefault()
             );
 
-            craftTime = 120f;
+            craftTime = 240.0f;
             outputItems = ItemStack.with(
-                Items.surgeAlloy, 16,
-                FItems.hardenedAlloy, 1
+                Items.surgeAlloy, 32,
+                FItems.hardenedAlloy, 2
             );
 
             fragBullets = 6;
-            fragBullet = new BasicBulletType(4f, 220f){{
-                lifetime = 120.0f;
+            fragBullet = new BasicBulletType(4.0f, 220.0f){{
+                lifetime = craftTime - 0.1f;
                 width = 8.0f;
                 height = 8.0f;
                 homingRange = radius;
+                homingDelay = 10.0f;
                 homingPower = 0.35f;
 
                 backColor = Pal.surge;
@@ -3045,26 +3046,23 @@ public class FBlocks{
                 trailColor = Pal.surge;
             }};
 
-            pattern = (b, i, s) -> {
+            pattern = (b, i, sign, scl) -> {
 
                 // check whether there's any target first
                 if(Units.closestTarget(b.team, b.x, b.y, radius, e -> e != null && !b.hasCollided(e.id)) != null)
                     return;
 
-                final float
-                    spd = 3.0f,
-                    scl = b.time / b.lifetime,
-
-                    x = Mathf.cosDeg(s * (b.time * spd + 360.0f / fragBullets * i)) * radius * scl + b.x,
-                    y = Mathf.sinDeg(s * (b.time * spd + 360.0f / fragBullets * i)) * radius * scl + b.y;
-
-                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 60.0f * Time.delta));
+                final float spd = 3.0f;
+                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(
+                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * radius * b.time / b.lifetime + b.x,
+                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * radius * b.time / b.lifetime + b.y
+                ), 65535.0f));
             };
 
             consumePower(120.0f);
             consumeItems(with(
-                FItems.flamefluidCrystal, 16,
-                FItems.magneticAlloy, 1
+                FItems.flamefluidCrystal, 32,
+                FItems.magneticAlloy, 2
             ));
             consumeLiquid(Liquids.cryofluid, 0.5f);
         }};
@@ -3091,7 +3089,9 @@ public class FBlocks{
             updateEffectChance = 0.01f;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(Color.valueOf("ffef99"))
+                new DrawFlame(Color.valueOf("ffef99")){{
+                    flameRadius = 2.0f;
+                }}
             );
 
             craftTime = 120f;
@@ -3272,8 +3272,8 @@ public class FBlocks{
             allyStatus = FStatusEffects.inspired;
             enemyStatus = StatusEffects.sapped;
 
-            consume(new ConsumePowerCustom(42.0f, 0.0f, false));
-            consume(new ConsumeItemEachFlammable(this));
+            consume(new ConsumePowerCustom(42.0f, 0.0f, false, this));
+            consume(new ConsumeItemFlammableEach(this));
         }};
 
         skyDome = new ForceProjector("sky-dome"){{
@@ -3339,7 +3339,7 @@ public class FBlocks{
             cooldownNormal = 1.2f;
             cooldownBroken = 1.5f;
 
-            consume(new ConsumePowerCustom(10.0f, 0.0f, false));
+            consume(new ConsumePowerCustom(10.0f, 0.0f, false, this));
         }};
 
         javelinPad = new MechPad("javelin-pad", FUnitTypes.javelin){{

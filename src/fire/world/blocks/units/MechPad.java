@@ -2,17 +2,19 @@ package fire.world.blocks.units;
 
 import arc.math.Mathf;
 import fire.annotations.FAnnotations;
+import fire.gen.FCall;
 import mindustry.content.Fx;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.type.UnitType;
 import mindustry.world.Tile;
+import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.*;
 
 public class MechPad extends mindustry.world.Block{
 
-    private final UnitType unitType;
+    final UnitType unitType;
     /** Power consumed per use. */
     protected float powerCons;
 
@@ -30,10 +32,10 @@ public class MechPad extends mindustry.world.Block{
     public void setStats(){
         super.setStats();
 
-        if(consValid()) stats.add(mindustry.world.meta.Stat.powerUse, powerCons);
+        if(consValid()) stats.add(Stat.powerUse, powerCons);
     }
 
-    private boolean consValid(){
+    boolean consValid(){
         return powerCons > 0.0f;
     }
 
@@ -87,7 +89,7 @@ public class MechPad extends mindustry.world.Block{
 
             // do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
-            fire.gen.FCall.playerSpawn(tile, playee);
+            FCall.playerSpawn(tile, playee);
         }
     }
 }
