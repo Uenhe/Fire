@@ -10,7 +10,10 @@ import mindustry.type.UnitType;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.control;
+import static mindustry.Vars.net;
+import static mindustry.Vars.player;
+import static mindustry.Vars.state;
 
 public class MechPad extends mindustry.world.Block{
 

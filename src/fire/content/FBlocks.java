@@ -10,7 +10,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.struct.ObjectMap;
+import arc.struct.IntIntMap;
 import arc.struct.Seq;
 import arc.util.Time;
 import fire.entities.FUnitSorts;
@@ -19,7 +19,6 @@ import fire.entities.bullets.LightningPointBulletType;
 import fire.world.DEBUG;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
-import fire.world.blocks.defense.Campfire;
 import fire.world.blocks.defense.turrets.ItemBulletStackTurret;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import fire.world.blocks.environment.EnvBlock;
@@ -33,15 +32,30 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.units.MechPad;
-import fire.world.consumers.ConsumeItemFlammableEach;
 import fire.world.consumers.ConsumePowerCustom;
+import fire.world.draw.DrawArrows;
 import fire.world.draw.DrawRegionPlus;
+import fire.world.kits.Campfire;
+import fire.world.kits.EnergyField;
 import fire.world.meta.FAttribute;
-import mindustry.content.*;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
+import mindustry.content.Items;
+import mindustry.content.Liquids;
+import mindustry.content.StatusEffects;
+import mindustry.content.Weathers;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
-import mindustry.entities.bullet.*;
+import mindustry.entities.bullet.ArtilleryBulletType;
+import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.FlakBulletType;
+import mindustry.entities.bullet.LaserBulletType;
+import mindustry.entities.bullet.LightningBulletType;
+import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.entities.bullet.MissileBulletType;
+import mindustry.entities.bullet.PointLaserBulletType;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
@@ -87,6 +101,7 @@ import mindustry.world.blocks.power.ImpactReactor;
 import mindustry.world.blocks.power.LightBlock;
 import mindustry.world.blocks.production.AttributeCrafter;
 import mindustry.world.blocks.production.GenericCrafter;
+import mindustry.world.blocks.production.Pump;
 import mindustry.world.blocks.production.WallCrafter;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItemFlammable;
@@ -95,14 +110,15 @@ import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
 import static mindustry.Vars.state;
+import static mindustry.Vars.tilesize;
 import static mindustry.Vars.ui;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.type.ItemStack.with;
 
 public class FBlocks{
 
-    /** Key is component itself, value is its inferior. */
-    public static final ObjectMap<Short, Short> compositeMap = new ObjectMap<>(5);
+    /** 1st int -> component itself, 2nd int -> its inferior. */
+    public static final IntIntMap compositeMap = new IntIntMap(5);
     public static Block
 
         //environment
@@ -112,7 +128,10 @@ public class FBlocks{
         adaptiveSource, fireCompany,
 
         //turret
-        smasher, nightmare, scab, ignition, blossom, gambler, seaquake, distance, grudge, aerolite, magneticSphere, magneticRail,
+        smasher, nightmare, scab,
+        ignition, blossom, gambler, seaquake, distance, magneticDomain,
+        grudge, aerolite, magneticSphere,
+        magneticRail,
 
         //production
         chopper, treeFarm, vapourCondenser, biomassCultivator, fissionDrill,
@@ -121,7 +140,7 @@ public class FBlocks{
         compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
 
         //liquid
-        compositeLiquidRouter, compositeBridgeConduit,
+        magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit,
 
         //power
         conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, burstReactor,
@@ -132,7 +151,8 @@ public class FBlocks{
         //crafting
         thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
         electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
-        electromagnetismDiffuser,
+        cryofluidMixerLarge,
+        magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
         hardenedAlloyCrucible,
 
         //units
@@ -344,7 +364,7 @@ public class FBlocks{
             health = 1080;
             size = 2;
             reload = 21.6f;
-            range = 192.0f;
+            range = 24 * tilesize;
             shootCone = 30.0f;
             inaccuracy = 2.0f;
             rotateSpeed = 10.0f;
@@ -571,8 +591,8 @@ public class FBlocks{
                 );
             }};
 
-            consumePower(400.0f / 60.0f);
-            consumeLiquid(Liquids.slag, 20.0f / 60.0f);
+            consumePower(n(400));
+            consumeLiquid(Liquids.slag, n(20));
 
             shootType = new PointLaserBulletType(){{
                 damage = 160.0f;
@@ -606,7 +626,7 @@ public class FBlocks{
             shoot = new ShootAlternate(2.4f);
             shoot.shots = 2;
 
-            consumePower(8f);
+            consumePower(n(480));
             consumeCoolant(0.3f);
 
             shootType = new FlakBulletType(4.0f, 40.0f){{
@@ -688,7 +708,7 @@ public class FBlocks{
             hasLiquids = false;
             canOverdrive = false;
             reload = 120.0f;
-            range = 320.0f;
+            range = 40 * tilesize;
             shootCone = 30.0f;
             shootY = 0.0f;
             recoil = 13.0f;
@@ -817,7 +837,7 @@ public class FBlocks{
             size = 3;
             liquidCapacity = 75f;
             reload = 60f / 25f;
-            range = 312f;
+            range = 39 * tilesize;
             shootCone = 60f;
             inaccuracy = 2.7f;
             recoil = 2.0f;
@@ -825,7 +845,7 @@ public class FBlocks{
             shootEffect = Fx.shootLiquid;
             shoot.shots = 3;
 
-            consumePower(200f / 60f);
+            consumePower(n(200));
 
             ammo(
 
@@ -985,6 +1005,47 @@ public class FBlocks{
             );
         }};
 
+        magneticDomain = new EnergyField.EnergyFieldPowerTurret("magnetic-domain"){{
+            final byte r = 27;
+
+            requirements(Category.turret, with(
+                Items.lead, 500,
+                FItems.magneticAlloy, 200
+            ));
+            armor = 8.0f;
+            size = 3;
+            hasLiquids = false;
+            reload = 90.0f;
+            range = r * tilesize;
+            recoil = 0.0f;
+            rotateSpeed = 1.6f;
+            shootCone = 360.0f;
+            shootY = 0.0f;
+            outlineIcon = false;
+            playerControllable = false;
+            shootSound = Sounds.spark;
+
+            consumePower(n(600));
+
+            shootType = new EnergyField.EnergyFieldBulletType(30.0f, 10){{
+                homingRange = r * tilesize;
+                knockback = 5.0f;
+                pierceArmor = true;
+                displayAmmoMultiplier = false;
+                status = StatusEffects.slow;
+                statusDuration = 180.0f;
+                lightningColor = Pal.surge;
+
+                // works on EnergyFieldBulletType side
+                fragBullets = 1;
+                fragBullet = new BulletType(0.0f, 0.0f){{
+                    lifetime = Mathf.FLOAT_ROUNDING_ERROR;
+                    status = StatusEffects.electrified;
+                    statusDuration = 60.0f;
+                }};
+            }};
+        }};
+
         grudge = new ItemTurret("grudge"){{
             requirements(Category.turret, with(
                 Items.copper, 1350,
@@ -999,7 +1060,7 @@ public class FBlocks{
             liquidCapacity = 75.0f;
             canOverdrive = false;
             reload = 14.0f;
-            range = 360.0f;
+            range = 45 * tilesize;
             shootCone = 24.0f;
             inaccuracy = 2.0f;
             maxAmmo = 60;
@@ -1141,13 +1202,14 @@ public class FBlocks{
             targetAir = false;
             targetGround = true;
             reload = 90.0f;
-            range = 640.0f;
+            range = 80 * tilesize;
             inaccuracy = 15.0f;
             maxAmmo = 30;
             recoil = 3.6f;
             recoilTime = 40.0f;
             shake = 2.0f;
             rotateSpeed = 2.0f;
+            shootY = 10.0f;
             ammoPerShot = 5;
             consumeAmmoOnce = false;
             shoot.shots = 3;
@@ -1419,7 +1481,7 @@ public class FBlocks{
             liquidCapacity = 75.0f;
             canOverdrive = false;
             reload = 270.0f;
-            range = 600.0f;
+            range = 75 * tilesize;
             shootCone = 6.0f;
             recoil = 5.0f;
             rotateSpeed = 2.7f;
@@ -1430,7 +1492,7 @@ public class FBlocks{
             shootSound = Sounds.laser;
             shoot.firstShotDelay = chargeTime;
 
-            consumePower(32.0f);
+            consumePower(n(1920));
             consumeCoolant(1.0f);
 
             shootType = new BulletType(15.5f, 1800.0f){
@@ -1950,7 +2012,8 @@ public class FBlocks{
             reload = 420f;
             range = baseRange;
             shootCone = 0.5f;
-            recoil = 10.0f;
+            recoil = 12.0f;
+            recoilTime = 300.0f;
             rotateSpeed = 1.2f;
             ammoPerShot = 10;
             coolantMultiplier = 0.075f;
@@ -1960,10 +2023,10 @@ public class FBlocks{
             shoot.firstShotDelay = chargeTime;
 
             stack(
-                item_2, Seq.with(new BulletStack(30f, bullet_2_2), new BulletStack(60f, bullet_2_3))
+                (int)item_2.id, Seq.with(new BulletStack(30f, bullet_2_2), new BulletStack(60f, bullet_2_3))
             );
 
-            consumePower(5000f);
+            consumePower(n(300000));
             consumeCoolant(8f);
 
             drawer = new DrawTurret(){{
@@ -2148,7 +2211,7 @@ public class FBlocks{
             drillTime = 120;
             output = FItems.timber;
 
-            consumePower(0.4f);
+            consumePower(n(24));
         }};
 
         treeFarm = new AttributeCrafter("sc"){{
@@ -2181,8 +2244,8 @@ public class FBlocks{
             craftTime = 240f;
             outputItem = new ItemStack(FItems.timber, 4);
 
-            consumePower(2.5f);
-            consumeLiquid(Liquids.water, 0.2f);
+            consumePower(n(150));
+            consumeLiquid(Liquids.water, n(12));
         }};
 
         vapourCondenser = new GenericCrafter("sqlnq"){{
@@ -2204,7 +2267,7 @@ public class FBlocks{
             craftTime = 120f;
             outputLiquid = new LiquidStack(Liquids.water, 0.4f);
 
-            consumePower(3.5f);
+            consumePower(n(210));
         }};
 
         biomassCultivator = new AttributeCrafter("swzzsj"){{
@@ -2242,8 +2305,8 @@ public class FBlocks{
             craftTime = 60f;
             outputItem = new ItemStack(Items.sporePod, 3);
 
-            consumePower(3f);
-            consumeLiquid(Liquids.water, 0.5f);
+            consumePower(n(180));
+            consumeLiquid(Liquids.water, n(30));
         }};
 
         fissionDrill = new AdaptBurstDrill("lbzt"){{
@@ -2268,7 +2331,7 @@ public class FBlocks{
             shake = 4.0f;
             baseArrowColor = Color.valueOf("989aa4");
 
-            consumeLiquid(Liquids.water, 0.2f);
+            consumeLiquid(Liquids.water, n(12));
         }};
 
         //endregion
@@ -2281,7 +2344,7 @@ public class FBlocks{
             ));
             health = 85;
             speed = 0.22f;
-            displayedSpeed = 26f;
+            displayedSpeed = 25.0f;
             junctionReplacement = Blocks.invertedSorter;
 
             compositeMap.put(id, Blocks.titaniumConveyor.id);
@@ -2294,8 +2357,8 @@ public class FBlocks{
                 FItems.hardenedAlloy, 1
             ));
             health = 240;
-            armor = 5;
-            speed = 7.0f / 60f;
+            armor = 12.0f;
+            speed = 0.1167f; //  7.0 / 60.0
             itemCapacity = 20;
             placeableLiquid = true;
         }};
@@ -2320,6 +2383,21 @@ public class FBlocks{
         //endregion
         //region liquid
 
+        magneticRingPump = new Pump("magnetic-ring-pump"){{
+            requirements(Category.liquid, with(
+                FItems.logicAlloy, 30,
+                FItems.hardenedAlloy, 90,
+                FItems.magneticAlloy, 30
+            ));
+            health = 720;
+            armor = 16.0f;
+            size = 2;
+            hasPower = true;
+            liquidCapacity = 80.0f;
+            pumpAmount = 0.5f;
+            consumePower(n(90));
+        }};
+
         compositeLiquidRouter = new LiquidRouter("composite-liquid-router"){{
             requirements(Category.liquid, with(
                 Items.metaglass, 8,
@@ -2335,6 +2413,18 @@ public class FBlocks{
             compositeMap.put(id, Blocks.liquidRouter.id);
         }};
 
+        hardenedLiquidTank = new LiquidRouter("hardened-liquid-tank"){{
+            requirements(Category.liquid, with(
+                Items.graphite, 100,
+                FItems.mirrorglass, 60,
+                FItems.hardenedAlloy, 150
+            ));
+            health = 6000;
+            armor = 20.0f;
+            size = 4;
+            liquidCapacity = 4500.0f;
+        }};
+
         compositeBridgeConduit = new LiquidBridge("composite-bridge-conduit"){{
             requirements(Category.liquid, with(
                 Items.metaglass, 6,
@@ -2343,7 +2433,7 @@ public class FBlocks{
                 Items.plastanium, 4
             ));
             hasPower = false;
-            liquidCapacity = 16f;
+            liquidCapacity = 16.0f;
             range = 8;
             pulse = true;
 
@@ -2399,7 +2489,7 @@ public class FBlocks{
             powerProduction = 32f;
 
             consume(new ConsumeItemFlammable(1.15f));
-            consumeLiquid(Liquids.cryofluid, 0.15f);
+            consumeLiquid(Liquids.cryofluid, n(9));
         }};
 
         hydroelectricGenerator = new HydroelectricGenerator("hydroelectric-generator"){{
@@ -2475,9 +2565,9 @@ public class FBlocks{
                 Fx.impactReactorExplosion
             );
 
-            consumePower(96f);
+            consumePower(n(5760));
             consumeItem(FItems.detonationCompound, 8);
-            consumeLiquid(FLiquids.liquidNitrogen, 50f / 60f);
+            consumeLiquid(FLiquids.liquidNitrogen, n(50));
         }};
 
         //endregion
@@ -2583,7 +2673,7 @@ public class FBlocks{
             attribute = Attribute.heat;
             boostScale = 1.0f / 3.0f;
 
-            consumePower(0.5f);
+            consumePower(n(30));
             consumeItems(with(
                 Items.sand, 6,
                 Items.coal, 1
@@ -2614,7 +2704,7 @@ public class FBlocks{
             craftTime = 10.0f;
             outputItem = new ItemStack(Items.metaglass, 2);
 
-            consumePower(2f);
+            consumePower(n(120));
             consumeItems(with(
                 Items.lead, 1,
                 FItems.glass, 2
@@ -2644,7 +2734,7 @@ public class FBlocks{
             craftTime = 90f;
             outputItem = new ItemStack(FItems.mirrorglass, 1);
 
-            consumePower(2f);
+            consumePower(n(120));
             consumeItem(Items.metaglass, 2);
         }};
 
@@ -2669,12 +2759,12 @@ public class FBlocks{
             craftTime = 60f;
             outputItem = new ItemStack(FItems.sulflameAlloy, 2);
 
-            consumePower(1.5f);
+            consumePower(n(90));
             consumeItems(with(
                 Items.coal, 3,
                 Items.sporePod, 2
             ));
-            consumeLiquid(Liquids.slag, 0.4f);
+            consumeLiquid(Liquids.slag, n(24));
         }};
 
         kindlingExtractor = new GenericCrafter("hhhjcqc"){{
@@ -2692,7 +2782,7 @@ public class FBlocks{
             craftTime = 60f;
             outputItem = new ItemStack(FItems.kindlingAlloy, 1);
 
-            consumePower(2f);
+            consumePower(n(120));
             consumeItems(with(
                 Items.coal, 1,
                 FItems.sulflameAlloy, 1
@@ -2721,7 +2811,7 @@ public class FBlocks{
             craftTime = 120;
             outputItem = new ItemStack(FItems.conductor, 2);
 
-            consumePower(200f / 60f);
+            consumePower(n(200));
             consumeItems(with(
                 Items.copper, 2,
                 Items.silicon, 3
@@ -2745,7 +2835,7 @@ public class FBlocks{
             craftTime = 120f;
             outputItem = new ItemStack(FItems.logicAlloy, 2);
 
-            consumePower(2f);
+            consumePower(n(120));
             consumeItems(with(
                 Items.copper, 3,
                 Items.titanium, 2,
@@ -2769,7 +2859,7 @@ public class FBlocks{
             craftTime = 300f;
             outputItem = new ItemStack(FItems.detonationCompound, 6);
 
-            consumePower(1.5f);
+            consumePower(n(90));
             consumeItems(with(
                 Items.blastCompound, 4,
                 Items.pyratite, 4,
@@ -2800,10 +2890,10 @@ public class FBlocks{
             craftTime = 60.0f;
             outputItem = new ItemStack(FItems.flamefluidCrystal, 2);
 
-            consumePower(1.5f);
+            consumePower(n(90));
             consumeLiquids(LiquidStack.with(
-                Liquids.slag, 0.4f,
-                Liquids.cryofluid, 0.05f
+                Liquids.slag, n(24),
+                Liquids.cryofluid, n(3)
             ));
         }};
 
@@ -2828,7 +2918,7 @@ public class FBlocks{
             craftTime = 30f;
             outputItem = new ItemStack(Items.scrap, 2);
 
-            consumePower(0.5f);
+            consumePower(n(30));
             consumeItems(with(
                 Items.copper, 1,
                 Items.lead, 1
@@ -2875,7 +2965,7 @@ public class FBlocks{
             craftTime = 10.0f;
             outputItem = new ItemStack(Items.silicon, 2);
 
-            consumePower(15.0f);
+            consumePower(n(900));
             consumeItem(Items.sand, 3);
         }};
 
@@ -2900,16 +2990,16 @@ public class FBlocks{
             );
 
             attribute = FAttribute.flesh;
-            craftTime = 45f;
+            craftTime = 45.0f;
             outputItem = new ItemStack(FItems.flesh, 1);
 
-            consumePower(100f / 60f);
+            consumePower(n(100));
             consumeItems(with(
                 Items.plastanium, 2,
                 Items.phaseFabric, 1,
                 Items.sporePod, 1
             ));
-            consumeLiquid(Liquids.neoplasm, 0.2f);
+            consumeLiquid(Liquids.neoplasm, n(12));
         }};
 
         liquidNitrogenCompressor = new GenericCrafter("ydysj"){{
@@ -2923,24 +3013,25 @@ public class FBlocks{
             hasPower = true;
             hasLiquids = true;
             itemCapacity = 30;
-            liquidCapacity = 75f;
+            liquidCapacity = 75.0f;
             baseExplosiveness = 5.0f;
+            lightLiquid = FLiquids.liquidNitrogen;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.cryofluid),
-                new DrawLiquidTile(FLiquids.liquidNitrogen),
+                new DrawLiquidTile(FLiquids.liquidNitrogen){{drawLiquidLight = true;}},
                 new DrawDefault()
             );
 
-            craftTime = 120f;
-            outputLiquid = new LiquidStack(FLiquids.liquidNitrogen, 50f / 60f);
+            craftTime = 120.0f;
+            outputLiquid = new LiquidStack(FLiquids.liquidNitrogen, n(50));
 
-            consumePower(400f / 60f);
+            consumePower(n(400));
             consumeItems(with(
                 Items.blastCompound, 4,
                 FItems.kindlingAlloy, 2
             ));
-            consumeLiquid(Liquids.cryofluid, 1.0f);
+            consumeLiquid(Liquids.cryofluid, n(60));
         }};
 
         hardenedAlloySmelter = new GenericCrafter("hardened-alloy-smelter"){{
@@ -2950,9 +3041,9 @@ public class FBlocks{
                 Items.silicon, 90,
                 Items.plastanium, 80
             ));
+            armor = 4.0f;
             size = 3;
             hasPower = true;
-            hasLiquids = false;
             itemCapacity = 20;
             craftEffect = Fx.smeltsmoke;
             drawer = new DrawMulti(
@@ -2963,7 +3054,7 @@ public class FBlocks{
             craftTime = 60f;
             outputItem = new ItemStack(FItems.hardenedAlloy, 3);
 
-            consumePower(10f);
+            consumePower(n(600));
             consumeItems(with(
                 Items.thorium, 3,
                 Items.plastanium, 6,
@@ -2977,9 +3068,9 @@ public class FBlocks{
                 FItems.logicAlloy, 180,
                 FItems.hardenedAlloy, 75
             ));
+            armor = 8.0f;
             size = 3;
             hasPower = true;
-            hasLiquids = false;
             itemCapacity = 20;
             baseExplosiveness = 5.0f;
             drawer = new DrawMulti(
@@ -2988,14 +3079,107 @@ public class FBlocks{
                 new DrawDefault()
             );
 
-            craftTime = 90f;
+            craftTime = 90.0f;
             outputItem = new ItemStack(FItems.magneticAlloy, 2);
 
-            consumePower(24f);
+            consumePower(n(1440));
             consumeItems(with(
                 Items.surgeAlloy, 1,
                 FItems.conductor, 3,
                 FItems.hardenedAlloy, 2
+            ));
+        }};
+
+        cryofluidMixerLarge = new GenericCrafter("cryofluid-mixer-large"){{
+            requirements(Category.crafting, with(
+                Items.lead, 240,
+                FItems.mirrorglass, 75,
+                FItems.logicAlloy, 200,
+                FItems.hardenedAlloy, 75
+            ));
+            health = 1440;
+            armor = 8.0f;
+            size = 4;
+            hasPower = true;
+            hasLiquids = true;
+            itemCapacity = 20;
+            liquidCapacity = 150.0f;
+            lightLiquid = Liquids.cryofluid;
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawLiquidTile(Liquids.water),
+                new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}},
+                new DrawDefault()
+            );
+
+            craftTime = 120.0f;
+            outputLiquid = new LiquidStack(Liquids.cryofluid, n(90));
+
+            consumePower(n(240));
+            consumeItem(Items.titanium, 4);
+            consumeLiquid(Liquids.water, n(90));
+        }};
+
+        magnetismConcentratedRollingMill = new GenericCrafter("magnetism-concentrated-rolling-mill"){{
+            requirements(Category.crafting, with(
+                Items.lead, 450,
+                Items.graphite, 220,
+                FItems.mirrorglass, 180,
+                FItems.logicAlloy, 320,
+                FItems.hardenedAlloy, 225
+            ));
+            health = 3200;
+            armor = 16.0f;
+            size = 5;
+            hasPower = true;
+            hasLiquids = true;
+            itemCapacity = 30;
+            liquidCapacity = 50.0f;
+            craftEffect = Fx.formsmoke;
+            updateEffect = Fx.plasticburn;
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawPlasma(), //sprites are scaled from the vanilla ones by 1.25x  lol
+                new DrawDefault(),
+                new DrawFade()
+            );
+
+            craftTime = 40.0f;
+            outputItem = new ItemStack(Items.plastanium, 6);
+            consumePower(n(840));
+            consumeItem(Items.titanium, 8);
+            consumeLiquid(Liquids.oil, n(90));
+        }};
+
+        magneticRingSynthesizer = new GenericCrafter("magnetic-ring-synthesizer"){{
+            requirements(Category.crafting, with(
+                Items.lead, 450,
+                Items.phaseFabric, 125,
+                FItems.logicAlloy, 500,
+                FItems.hardenedAlloy, 225,
+                FItems.magneticAlloy, 125
+            ));
+            health = 2880;
+            armor = 16.0f;
+            size = 5;
+            hasPower = true;
+            itemCapacity = 75;
+            craftEffect = Fx.smeltsmoke;
+            updateEffect = Fx.plasticburn;
+            ambientSound = Sounds.techloop;
+            ambientSoundVolume = 0.015f;
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawWeave(),
+                new DrawDefault()
+            );
+
+            craftTime = 60.0f;
+            outputItem = new ItemStack(Items.phaseFabric, 6);
+            consumePower(n(3360));
+            consumeItems(with(
+                Items.sand, 33,
+                Items.thorium, 18
             ));
         }};
 
@@ -3008,19 +3192,16 @@ public class FBlocks{
                 FItems.hardenedAlloy, 375,
                 FItems.magneticAlloy, 250
             ));
-            armor = 6;
+            armor = 16.0f;
             size = 5;
             hasPower = true;
             hasLiquids = true;
-            itemCapacity = 80;
+            itemCapacity = 75;
             liquidCapacity = 75.0f;
             craftSound = Sounds.spark;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawArcSmelt(){{
-                    circleSpace = 3.0f;
-                    flameColor = Color.valueOf("e3ae6f");
-                }},
+                new DrawArcSmelt(){{circleSpace = 3.0f;flameColor = Color.valueOf("e3ae6f");}},
                 new DrawDefault()
             );
 
@@ -3059,12 +3240,12 @@ public class FBlocks{
                 ), 65535.0f));
             };
 
-            consumePower(120.0f);
+            consumePower(n(7200));
             consumeItems(with(
                 FItems.flamefluidCrystal, 32,
                 FItems.magneticAlloy, 2
             ));
-            consumeLiquid(Liquids.cryofluid, 0.5f);
+            consumeLiquid(Liquids.cryofluid, n(30));
         }};
 
         hardenedAlloyCrucible = new EnergyCrafter("hardened-alloy-crucible"){{
@@ -3074,13 +3255,18 @@ public class FBlocks{
                 Items.silicon, 275,
                 FItems.hardenedAlloy, 500
             ));
-            armor = 7;
+            armor = 20.0f;
             size = 6;
             hasPower = true;
             hasLiquids = true;
             itemCapacity = 60;
-            liquidCapacity = 120f;
-            craftEffect = Fx.smeltsmoke;
+            liquidCapacity = 120.0f;
+            craftEffect = new MultiEffect(
+                Fx.mineImpact,
+                FFx.drillSteamFast,
+                FFx.dynamicSpikesZ,
+                FFx.mineImpactWaveZ
+            );
             updateEffect = new Effect(50f, e -> {
                 Draw.color(Pal.reactorPurple, 0.7f);
                 Lines.stroke(e.fout() * 2.0f);
@@ -3089,12 +3275,11 @@ public class FBlocks{
             updateEffectChance = 0.01f;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(Color.valueOf("ffef99")){{
-                    flameRadius = 2.0f;
-                }}
+                new DrawFlame(Color.valueOf("ffef99")){{flameRadius = 2.0f;}},
+                new DrawArrows(2, Color.valueOf("feb380"), Color.valueOf("6e7080"))
             );
 
-            craftTime = 120f;
+            craftTime = 120.0f;
             outputItem = new ItemStack(FItems.hardenedAlloy, 20);
 
             explosionRadius = 240f;
@@ -3104,8 +3289,8 @@ public class FBlocks{
             explodeSound = Sounds.explosionbig;
             explodeEffect = Fx.reactorExplosion;
 
-            maxInstability = 360f;
-            stabilizeInterval = 900f;
+            maxInstability = 360.0f;
+            stabilizeInterval = 900.0f;
 
             lightningDamage = 80f;
             lightningAmount = 8;
@@ -3176,12 +3361,12 @@ public class FBlocks{
             baseColor = Color.valueOf("67474b");
             circleColor = new Color[]{Pal.reactorPurple, Pal.thoriumPink, Pal.lightishOrange, Pal.surge, Pal.plastanium};
 
-            consumePower(300f);
+            consumePower(n(18000));
             consumeItems(with(
                 Items.thorium, 12,
                 Items.plastanium, 20
             ));
-            consumeLiquid(Liquids.water, 2.0f);
+            consumeLiquid(Liquids.water, n(120));
         }};
 
         //endregion
@@ -3208,9 +3393,10 @@ public class FBlocks{
                     ))
                 );
 
-                consumePower(4.5f);
-                consumeLiquid(Liquids.neoplasm, 0.8f);
-            }};
+                consumePower(n(270));
+                consumeLiquid(Liquids.neoplasm, n(48));
+            }
+        };
 
         //endregion
         //region effect
@@ -3243,11 +3429,11 @@ public class FBlocks{
             optionalMultiplier = 1.5f;
             optionalUseTime = 200f;
 
-            consumePower(100f / 60f);
+            consumePower(n(100));
             consumeItem(Items.silicon).boost();
         }};
 
-        campfire = new Campfire("gh"){{
+        campfire = new Campfire.CampfireBlock("gh"){{
             requirements(Category.effect, with(
                 Items.copper, 300,
                 Items.metaglass, 220,
@@ -3264,7 +3450,7 @@ public class FBlocks{
             );
 
             reload = 60.0f;
-            range = 160.0f;
+            range = 20 * tilesize;
             useTime = 240.0f;
             speedBoost = 1.5f;
             speedBoostPhase = 0.25f;
@@ -3272,8 +3458,8 @@ public class FBlocks{
             allyStatus = FStatusEffects.inspired;
             enemyStatus = StatusEffects.sapped;
 
-            consume(new ConsumePowerCustom(42.0f, 0.0f, false, this));
-            consume(new ConsumeItemFlammableEach(this));
+            consume(new ConsumePowerCustom(n(2560), 0.0f, false, this));
+            consume(new Campfire.ConsumeCampfire(this));
         }};
 
         skyDome = new ForceProjector("sky-dome"){{
@@ -3296,7 +3482,7 @@ public class FBlocks{
             cooldownBrokenBase = 3.0f;
             coolantConsumption = 0.2f;
 
-            consumePower(20.0f);
+            consumePower(n(1200));
             itemConsumer = consumeItem(Items.phaseFabric).boost();
         }};
 
@@ -3312,7 +3498,7 @@ public class FBlocks{
             range = 285.0f;
             buildSpeed = 0.75f;
 
-            consumePower(2.0f);
+            consumePower(n(120));
         }};
 
         coreArmored = new ForceCoreBlock("zjhx"){{
@@ -3339,7 +3525,7 @@ public class FBlocks{
             cooldownNormal = 1.2f;
             cooldownBroken = 1.5f;
 
-            consume(new ConsumePowerCustom(10.0f, 0.0f, false, this));
+            consume(new ConsumePowerCustom(n(600), 0.0f, false, this));
         }};
 
         javelinPad = new MechPad("javelin-pad", FUnitTypes.javelin){{
@@ -3553,5 +3739,10 @@ public class FBlocks{
         DEBUG_TURRET = new DEBUG.DEBUG_Turret("DEBUG_TURRET");
 
         //endregion
+    }
+
+    /** Simply divide numbers by 60. */
+    static float n(int amountPerTick){
+        return amountPerTick / 60.0f;
     }
 }

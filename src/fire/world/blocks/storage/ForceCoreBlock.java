@@ -23,12 +23,12 @@ import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.player;
+import static mindustry.Vars.renderer;
+import static mindustry.Vars.state;
+import static mindustry.Vars.tilesize;
 
-/**
- * @author ue, fy
- * @see mindustry.world.blocks.defense.ForceProjector ForceProjector
- */
+/** @see mindustry.world.blocks.defense.ForceProjector ForceProjector */
 public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
     protected float
@@ -40,7 +40,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     protected byte sides = 6;
 
     /**
-     * Number of registered cores, recording to {@link mindustry.game.Team#all}.<p>
+     * Number of registered cores, according to {@link mindustry.game.Team#all}.<p>
      * Index -> Team ID, Value -> Core number<p>
      * And also see those JS files in mod Creator.
      */
@@ -72,7 +72,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     public void setStats(){
         super.setStats();
         stats.add(Stat.shieldHealth, shieldHealth);
-        stats.add(Stat.cooldownTime, (int) (shieldHealth / cooldownBroken / 60.0f), StatUnit.seconds);
+        stats.add(Stat.cooldownTime, (int)(shieldHealth / cooldownBroken / 60.0f), StatUnit.seconds);
         stats.add(Stat.range, radius / tilesize, StatUnit.blocks);
     }
 
@@ -120,19 +120,23 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         @Override
         public void updateTile(){
             super.updateTile();
-            ((ConsumePowerCustom)consPower).scale = cores[team.id];
 
-            if(power.graph.getPowerBalance() + consPower.usage * 4 < 0.0f) //allowing to place 2 cores without damage
-                damage(Mathf.sqrt(-power.graph.getPowerBalance() - consPower.usage * 4) * delta());
+            if(team == state.rules.waveTeam){
+                ((ConsumePowerCustom)consPower).scale = 0.0f; //won't damage enemy cores
+            }else{
+                ((ConsumePowerCustom)consPower).scale = cores[team.id];
+                if(power.graph.getPowerBalance() < 0.0f && power.graph.getBatteryStored() <= 0.0f && cores[team.id] > 2) //allowing to place 2 cores without damage
+                    damage(Mathf.sqrt(-power.graph.getPowerBalance() + consPower.requestedPower(this)) * delta());
+            }
 
-            scl = Mathf.lerpDelta(scl, broken ? 0.0f : warmup, 0.06f);
-            warmup = Mathf.lerpDelta(warmup, 1.0f, 0.1f);
+            scl = Mathf.lerpDelta(scl, broken ? 0.0f : warmup, 0.08f);
+            warmup = Mathf.lerpDelta(warmup, 1.0f, 0.14f);
 
             if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f))
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
 
             if(buildup > 0.0f)
-                buildup -= delta() * (!broken ? cooldownNormal : cooldownBroken);
+                buildup -= delta() * (broken ? cooldownBroken : cooldownNormal);
 
             if(broken && buildup <= 0.0f) broken = false;
 
@@ -147,7 +151,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
             if(range() > 0.0f && !broken)
                 Groups.bullet.intersect(x - range(), y - range(), range() * 2.0f, range() * 2.0f, bullet -> {
-                    if(bullet.team != this.team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, range(), rotation, bullet.x, bullet.y)){
+                    if(bullet.team != team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, range(), rotation, bullet.x, bullet.y)){
                         bullet.absorb();
                         Fx.absorb.at(bullet);
                         hit = 1.0f;

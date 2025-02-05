@@ -4,7 +4,8 @@ import arc.Core;
 import arc.input.KeyCode;
 import arc.util.Reflect;
 
-import static arc.KeyBinds.*;
+import static arc.KeyBinds.KeyBind;
+import static arc.KeyBinds.KeybindValue;
 
 public enum FBinding implements KeyBind{
 

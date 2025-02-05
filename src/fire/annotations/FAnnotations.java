@@ -25,7 +25,6 @@ public class FAnnotations{
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.SOURCE)
     public @interface Remote{
-
         Loc called() default Loc.none;
     }
 }

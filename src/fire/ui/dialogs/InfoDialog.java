@@ -37,7 +37,10 @@ import mindustry.world.Block;
 
 import java.util.Arrays;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
+import static mindustry.Vars.iconMed;
+import static mindustry.Vars.mobile;
+import static mindustry.Vars.ui;
 
 /**
  * To show more details about contents.

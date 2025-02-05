@@ -2,7 +2,7 @@ package fire.entities.bullets;
 
 import arc.Events;
 import arc.math.Mathf;
-import arc.struct.ObjectMap;
+import arc.struct.ObjectFloatMap;
 import arc.util.Time;
 import mindustry.game.EventType.Trigger;
 import mindustry.gen.Bullet;
@@ -14,7 +14,7 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     public final float foldInterval;
 
     static float mapCleanTimer;
-    static final ObjectMap<Bullet, Float> timerMap = new ObjectMap<>();
+    static final ObjectFloatMap<Bullet> timerMap = new ObjectFloatMap<>();
 
     public FoldingBulletType(float ownerSpeed, float dmg, int degree, float ownerLifetime){
         speed = ownerSpeed / Mathf.cosDeg(degree);
@@ -36,7 +36,7 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
 
                 for(var entry : timerMap)
                     if(!entry.key.isAdded())
-                        timerMap.remove(entry.key);
+                        timerMap.remove(entry.key, 0.0f);
             }
         });
     }
@@ -51,11 +51,11 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     @Override
     public void update(Bullet b){
         super.update(b);
-        timerMap.put(b, timerMap.get(b) + Time.delta);
+        timerMap.increment(b, 0.0f, Time.delta);
 
-        if(timerMap.get(b) >= foldInterval){
-            timerMap.put(b, timerMap.get(b) - foldInterval);
-            b.rotation(b.rotation() + foldDegree * 2.0f * Mathf.sign((b.time / foldInterval) % 2 == 1));
+        if(timerMap.get(b, 0.0f) >= foldInterval){
+            timerMap.increment(b, 0.0f, -foldInterval);
+            b.rotation(b.rotation() + foldDegree * 2.0f * Mathf.sign((int)(b.time / foldInterval) % 2 == 1));
         }
     }
 }

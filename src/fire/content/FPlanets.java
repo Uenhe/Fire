@@ -2,7 +2,12 @@ package fire.content;
 
 import arc.graphics.Color;
 import fire.world.planets.RisetarPlanetGenerator;
-import mindustry.content.*;
+import mindustry.content.Blocks;
+import mindustry.content.Items;
+import mindustry.content.Planets;
+import mindustry.content.SectorPresets;
+import mindustry.content.TechTree;
+import mindustry.content.UnitTypes;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.g3d.HexMesh;
 import mindustry.graphics.g3d.HexSkyMesh;
@@ -12,42 +17,44 @@ import mindustry.type.Planet;
 import static arc.struct.Seq.with;
 import static fire.content.FBlocks.*;
 import static fire.content.FItems.*;
-import static fire.content.FLiquids.*;
+import static fire.content.FLiquids.liquidNitrogen;
 import static fire.content.FSectorPresets.*;
 import static fire.content.FUnitTypes.*;
 import static fire.ui.dialogs.InfoDialog.InfoNode.dnode;
-import static mindustry.content.TechTree.*;
-import static mindustry.game.Objectives.*;
+import static mindustry.content.TechTree.node;
+import static mindustry.content.TechTree.nodeProduce;
+import static mindustry.content.TechTree.nodeRoot;
+import static mindustry.game.Objectives.OnSector;
+import static mindustry.game.Objectives.Produce;
+import static mindustry.game.Objectives.Research;
+import static mindustry.game.Objectives.SectorComplete;
 
 public class FPlanets{
 
     public static Planet risetar;
 
     public static void load(){
-        risetar = new Planet("lst", Planets.sun, 1.0f, 3){
-            {
-                meshLoader = () -> new HexMesh(this, 8);
-                cloudMeshLoader = () -> new MultiMesh(
-                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
-                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
-                );
-                generator = new RisetarPlanetGenerator();
-                rotateTime = 7200.0f;
-                clearSectorOnLose = true;
-                prebuildBase = false;
-                sectorSeed = 3;
-                atmosphereColor = Color.valueOf("1a3db1");
-                atmosphereRadIn = 0.05f;
-                atmosphereRadOut = 0.5f;
-                iconColor = Color.valueOf("5b6fff");
-                accessible = false;
-                hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems);
-            }
-        };
+        risetar = new Planet("lst", Planets.sun, 1.0f, 3){{
+            meshLoader = () -> new HexMesh(this, 8);
+            cloudMeshLoader = () -> new MultiMesh(
+                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
+            );
+            generator = new RisetarPlanetGenerator();
+            rotateTime = 7200.0f;
+            clearSectorOnLose = true;
+            prebuildBase = false;
+            sectorSeed = 3;
+            atmosphereColor = Color.valueOf("1a3db1");
+            atmosphereRadIn = 0.05f;
+            atmosphereRadOut = 0.5f;
+            iconColor = Color.valueOf("5b6fff");
+            accessible = false;
+            hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems);
+        }};
     }
 
     public static void loadTree(){
-
         risetar.techTree = nodeRoot("hzgs", fireCompany, () -> {
 
             node(compositeConveyor, with(new OnSector(frozenGround)), () -> {
@@ -59,6 +66,10 @@ public class FPlanets{
                 });
                 node(compositeLiquidRouter, with(new SectorComplete(darkWorkshop)), () ->
                     node(compositeBridgeConduit, with(new SectorComplete(darkWorkshop)), () -> {
+                        node(magneticRingPump, with(new SectorComplete(branchedRivers)), () -> {
+                        });
+                        node(hardenedLiquidTank, with(new SectorComplete(branchedRivers)), () -> {
+                        });
                     })
                 );
             });
@@ -78,7 +89,7 @@ public class FPlanets{
                 node(chopper, with(new OnSector(beachLanding)), () -> {
                     node(timberBurner, () -> {
                     });
-                    node(treeFarm, with(new SectorComplete(beachLanding)), () -> {
+                    node(treeFarm, with(new OnSector(beachLanding)), () -> {
                     });
                 });
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
@@ -107,23 +118,34 @@ public class FPlanets{
                         })
                     );
                     node(kindlingExtractor, () -> {
-                        node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () -> {
-                        });
+                        node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () ->
+                            node(cryofluidMixerLarge, with(new SectorComplete(desolateFortification)), () -> {
+                            })
+                        );
                         node(hardenedAlloySmelter, with(new SectorComplete(eteriverStronghold)), () -> {
                             node(hardenedAlloyCrucible, with(new SectorComplete(desolateFortification)), () -> {
                             });
-                            node(magneticAlloyFormer, with(new SectorComplete(glaciatedPeaks)), () ->
+                            node(magnetismConcentratedRollingMill, with(new SectorComplete(branchedRivers)), () -> {
+                            });
+                            node(magneticAlloyFormer, with(new SectorComplete(glaciatedPeaks)), () -> {
+                                node(magneticRingSynthesizer, with(new SectorComplete(taintedEstuary)), () -> {
+                                });
                                 node(electromagnetismDiffuser, () -> {
-                                })
-                            );
+                                });
+                            });
                         });
                     });
                 });
             });
 
             node(conductorPowerNode, with(new SectorComplete(frozenGround)), () -> {
+                node(hydroelectricGenerator, with(new SectorComplete(beachLanding)), () ->
+                    node(hydroelectricGeneratorLarge, () -> {
+                }));
+                
                 node(flameGenerator, with(new SectorComplete(chillyMountains)), () -> {
                 });
+                
                 node(campfire, with(new SectorComplete(beachLanding)), () ->
                     node(buildingHealer, with(new OnSector(darkWorkshop)), () ->
                         node(buildIndicator, with(new SectorComplete(darkWorkshop)), () -> {
@@ -163,6 +185,9 @@ public class FPlanets{
                 );
 
                 node(magneticSphere, with(new SectorComplete(glaciatedPeaks)), () -> {
+                });
+
+                node(magneticDomain, with(new OnSector(taintedEstuary)), () -> {
                 });
             });
 
@@ -212,6 +237,10 @@ public class FPlanets{
                         });
                         node(stormyCoast, with(new SectorComplete(eteriverStronghold), new Research(biomassCultivator), new Research(seaquake), new Research(distance), new Research(grudge)), () -> {
                         });
+                        node(branchedRivers, with(new SectorComplete(eteriverStronghold), new SectorComplete(stormyCoast), new Research(hydroelectricGeneratorLarge)), () ->
+                            node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(magneticRingPump), new Research(hardenedLiquidTank)), () -> {
+                            })
+                        );
                     });
                 })
             );
@@ -311,8 +340,8 @@ public class FPlanets{
 
     }
 
-    private static void addResearch(UnlockableContent content, UnlockableContent parent){
-
+    static void addResearch(UnlockableContent content, UnlockableContent parent){
+    
         var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();
 
@@ -323,6 +352,5 @@ public class FPlanets{
         if(!p.children.contains(node)) p.children.add(node);
 
         node.parent = p;
-
     }
 }

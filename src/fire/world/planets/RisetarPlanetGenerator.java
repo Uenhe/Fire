@@ -1,9 +1,10 @@
 package fire.world.planets;
 
-import arc.math.*;
+import arc.math.Rand;
 import fire.content.FWaves;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.spawner;
+import static mindustry.Vars.state;
 
 public class RisetarPlanetGenerator extends mindustry.maps.planet.SerpuloPlanetGenerator{
     //alternate, less direct generation (wip)

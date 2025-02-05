@@ -6,7 +6,7 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
-import arc.struct.ObjectMap;
+import arc.struct.IntIntMap;
 import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
@@ -17,7 +17,10 @@ import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
-import mindustry.gen.*;
+import mindustry.gen.Bullet;
+import mindustry.gen.Groups;
+import mindustry.gen.Sounds;
+import mindustry.gen.Unit;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -39,7 +42,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     boolean broken, regenable;
     final Seq<Bullet> bullets = new Seq<>();
     /** Prevent endless and awful creating instances. */
-    static final ObjectMap<Short, Short> bulletMap = new ObjectMap<>();
+    static final IntIntMap bulletMap = new IntIntMap();
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
@@ -90,10 +93,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         alpha = Math.max(alpha - Time.delta / 10.0f, 0.0f);
         broken = unit.shield <= 0.0f;
 
-        if(rotateSpeed > 0.0f){
+        if(rotateSpeed > 0.0f)
             rotation += rotateSpeed * Time.delta;
-            rotation %= 360.0f;
-        }
 
         if(unit.shield < max && timer == 0.0f){
             unit.shield += regen * Time.delta;

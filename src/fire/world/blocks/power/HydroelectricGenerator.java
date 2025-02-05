@@ -8,13 +8,10 @@ import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
+import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.world;
 
-/**
- * ...Doesn't play well with blocks size odd.
- * @author fy, ue
- */
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
 
     public HydroelectricGenerator(String name){
@@ -26,19 +23,18 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
     @Override
     public void setStats(){
         super.setStats();
-
-        stats.add(FStat.specialIncrease, table -> {
+        stats.add(Stat.tiles, table -> {
             table.row();
-
-            for(var b : Vars.content.blocks())
-                if(b.isFloor() && b.asFloor().liquidDrop != null)
-                    table.table(Styles.grayPanel, t -> {
-                        t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
-                        t.left().table(info -> {
-                            info.left().add(b.localizedName).left().row();
-                            info.left().add("[accent]" + FStat.floorMultiplier.localized() + Strings.fixed(b.asFloor().liquidMultiplier * (1.0f - b.asFloor().liquidDrop.viscosity) * b.asFloor().liquidDrop.temperature * 4.0f, 2));
-                        });
-                    }).growX().pad(5.0f).row();
+            for(var b : Vars.content.blocks()){
+                if(!b.isFloor() || b.asFloor().liquidDrop == null) continue;
+                table.table(Styles.grayPanel, t -> {
+                    t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
+                    t.left().table(info -> {
+                        info.left().add(b.localizedName).left().row();
+                        info.left().add("[accent]" + FStat.floorMultiplier.localized() + Strings.fixed(b.asFloor().liquidMultiplier * (1.0f - b.asFloor().liquidDrop.viscosity) * b.asFloor().liquidDrop.temperature * 4.0f, 2));
+                    });
+                }).growX().pad(5.0f).row();
+            }
         });
     }
 

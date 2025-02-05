@@ -8,13 +8,20 @@ import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
-import fire.content.*;
+import fire.content.FBlocks;
+import fire.content.FItems;
+import fire.content.FLiquids;
+import fire.content.FOverride;
+import fire.content.FPlanets;
+import fire.content.FSectorPresets;
+import fire.content.FStatusEffects;
+import fire.content.FUnitTypes;
+import fire.content.FWeathers;
 import fire.input.FBinding;
 import fire.ui.dialogs.InfoDialog;
 import fire.world.DEBUG;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
-import mindustry.content.UnitTypes;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.ui.Styles;
@@ -26,7 +33,9 @@ import mindustry.world.meta.BuildVisibility;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
+import static mindustry.Vars.mods;
+import static mindustry.Vars.ui;
 
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{

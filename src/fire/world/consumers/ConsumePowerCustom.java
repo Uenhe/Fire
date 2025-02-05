@@ -17,9 +17,9 @@ public class ConsumePowerCustom extends mindustry.world.consumers.ConsumePower{
         super(usage, capacity, buffered);
 
         //prevent adding this bar prior to others, TODO may look bad
-        Time.runTask(300.0f, () ->
+        Time.runTask(600.0f, () ->
             block.addBar("powerz", build -> new Bar(
-                () -> Core.bundle.format("bar.powerscale", scale * 100 + StatUnit.percent.localized()),
+                () -> Core.bundle.format("bar.powerscale", Math.round(scale * 100) + StatUnit.percent.localized()),
                 () -> Pal.accent,
                 () -> 1.0f
             ))

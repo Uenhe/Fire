@@ -1,16 +1,16 @@
 package fire.content;
 
 import arc.Core;
+import arc.Events;
 import arc.util.Reflect;
 import fire.world.meta.FAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
-import mindustry.entities.abilities.Ability;
 import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.game.EventType;
 import mindustry.game.Team;
-import mindustry.gen.Unit;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
@@ -26,7 +26,13 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BuildVisibility;
 
 import static mindustry.content.Blocks.*;
-import static mindustry.content.UnitTypes.*;
+import static mindustry.content.UnitTypes.alpha;
+import static mindustry.content.UnitTypes.beta;
+import static mindustry.content.UnitTypes.dagger;
+import static mindustry.content.UnitTypes.flare;
+import static mindustry.content.UnitTypes.fortress;
+import static mindustry.content.UnitTypes.gamma;
+import static mindustry.content.UnitTypes.mace;
 
 public class FOverride{
 
@@ -96,50 +102,28 @@ public class FOverride{
         phaseConduit.liquidCapacity += 14.0f;
 
         //endregion
-        //region block liquid
+        //region block power
         ((ConsumeGenerator)steamGenerator).powerProduction += 0.5f;
+
+        //endregion
+        //region block crafting
+        phaseWeaver.itemCapacity += 10;
 
         //endregion
         //region units
 
-        ((UnitFactory)groundFactory).plans.add(
-            new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500.0f, ItemStack.with(
-                Items.lead, 20,
-                Items.titanium, 25,
-                Items.silicon, 30
-            ))
-        );
         ((UnitFactory)airFactory).plans.add(
             new UnitFactory.UnitPlan(alpha, 2400.0f, ItemStack.with(
                 Items.copper, 30,
                 Items.lead, 40,
                 Items.silicon, 30
-            )),
-            new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400.0f, ItemStack.with(
-                Items.lead, 20,
-                Items.metaglass, 10,
-                Items.coal, 10,
-                Items.silicon, 15
             ))
         );
-        ((Reconstructor)additiveReconstructor).upgrades.addAll(
-            new UnitType[]{alpha, beta},
-            new UnitType[]{FUnitTypes.guarding, FUnitTypes.resisting},
-            new UnitType[]{FUnitTypes.blade, FUnitTypes.hatchet},
-            new UnitType[]{FUnitTypes.firefly, FUnitTypes.candlelight}
+        ((Reconstructor)Blocks.additiveReconstructor).upgrades.addAll(
+            new UnitType[]{alpha, beta}
         );
-        ((Reconstructor)multiplicativeReconstructor).upgrades.addAll(
-            new UnitType[]{beta, FUnitTypes.omicron},
-            new UnitType[]{FUnitTypes.resisting, FUnitTypes.garrison},
-            new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle},
-            new UnitType[]{FUnitTypes.candlelight, FUnitTypes.lampflame}
-        );
-        ((Reconstructor)exponentialReconstructor).upgrades.addAll(
-            new UnitType[]{FUnitTypes.omicron, FUnitTypes.pioneer},
-            new UnitType[]{FUnitTypes.garrison, FUnitTypes.shelter}
-        );
-        ((Reconstructor)tetrativeReconstructor).upgrades.addAll(
-            new UnitType[]{FUnitTypes.shelter, FUnitTypes.blessing}
+        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
+            new UnitType[]{beta, FUnitTypes.omicron}
         );
 
         //endregion
@@ -157,9 +141,21 @@ public class FOverride{
         //endregion
         //region unit
 
-        dagger.abilities.add(new MutableAbility(FUnitTypes.blade));
-        mace.abilities.add(new MutableAbility(FUnitTypes.hatchet));
-        fortress.abilities.add(new MutableAbility(FUnitTypes.castle));
+        Events.on(EventType.UnitDrownEvent.class, e -> {
+            if(!e.unit.hasEffect(FStatusEffects.overgrown)) return;
+
+            UnitType type;
+            if(e.unit.type == dagger)
+                type = FUnitTypes.blade;
+            else if(e.unit.type == mace)
+                type = FUnitTypes.hatchet;
+            else if(e.unit.type == fortress)
+                type = FUnitTypes.castle;
+            else
+                return;
+
+            Reflect.set(type.spawn(Team.crux, e.unit.x, e.unit.y), "statuses", Reflect.get(e.unit, "statuses"));
+        });
 
         alpha.coreUnitDock = true;
         beta.coreUnitDock = true;
@@ -177,21 +173,5 @@ public class FOverride{
 
         //endregion
 
-    }
-
-    private static class MutableAbility extends Ability{
-
-        public final UnitType toRespawn;
-
-        public MutableAbility(UnitType type){
-            toRespawn = type;
-            display = false;
-        }
-
-        @Override
-        public void death(Unit unit){
-            if(unit.hasEffect(FStatusEffects.overgrown))
-                Reflect.set(toRespawn.spawn(Team.crux, unit.x, unit.y), "statuses", Reflect.get(unit, "statuses"));
-        }
     }
 }

@@ -1,6 +1,6 @@
 package fire.world.blocks.defense.turrets;
 
-import arc.struct.ObjectMap;
+import arc.struct.IntMap;
 import arc.struct.Seq;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Building;
@@ -10,7 +10,7 @@ import mindustry.type.Item;
 public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turrets.ItemTurret{
 
     /** The first bullet to shoot should be placed in {@code ammoTypes}. */
-    protected ObjectMap<Short, Seq<BulletStack>> bulletStack;
+    protected IntMap<Seq<BulletStack>> bulletStack;
 
     protected ItemBulletStackTurret(String name){
         super(name);
@@ -19,7 +19,7 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
     }
 
     protected void stack(Object... objects){
-        bulletStack = ObjectMap.of(objects);
+        bulletStack = IntMap.of(objects);
     }
 
     public class ItemBulletStackTurretBuild extends ItemTurretBuild{

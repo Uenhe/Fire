@@ -7,28 +7,50 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.util.Time;
 import fire.ai.FUnitCommand;
-import fire.entities.abilities.*;
+import fire.entities.abilities.DashAbility;
+import fire.entities.abilities.DebuffRemoveFieldAbility;
+import fire.entities.abilities.EnergyForceFieldAbility;
+import fire.entities.abilities.ExtinguishFieldAbility;
+import fire.entities.abilities.FirstAidAbility;
+import fire.entities.abilities.RegenFieldAbility;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
+import mindustry.content.Blocks;
 import mindustry.content.Fx;
+import mindustry.content.Items;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
-import mindustry.entities.abilities.*;
+import mindustry.entities.abilities.EnergyFieldAbility;
+import mindustry.entities.abilities.ForceFieldAbility;
+import mindustry.entities.abilities.MoveLightningAbility;
+import mindustry.entities.abilities.RepairFieldAbility;
+import mindustry.entities.abilities.ShieldRegenFieldAbility;
+import mindustry.entities.abilities.StatusFieldAbility;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.gen.*;
+import mindustry.gen.LegsUnit;
+import mindustry.gen.MechUnit;
+import mindustry.gen.PayloadUnit;
+import mindustry.gen.Sounds;
+import mindustry.gen.Unit;
+import mindustry.gen.UnitEntity;
+import mindustry.gen.UnitWaterMove;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.ammo.PowerAmmoType;
 import mindustry.type.weapons.PointDefenseWeapon;
+import mindustry.world.blocks.units.Reconstructor;
+import mindustry.world.blocks.units.UnitFactory;
 
 import static mindustry.Vars.tilePayload;
 
@@ -524,16 +546,16 @@ public class FUnitTypes{
 
             weapons.add(
                 new Weapon("heal-weapon-amount"){{
-                    reload = 12f;
-                    x = 4f;
+                    reload = 12.0f;
+                    x = 4.0f;
                     y = 0.6f;
                     inaccuracy = 1.1f;
                     top = false;
                     rotate = true;
                     shootSound = Sounds.lasershoot;
-                    bullet = new LaserBoltBulletType(10f, 22f){{
-                        lifetime = 25f;
-                        healPercent = 4f;
+                    bullet = new LaserBoltBulletType(10.0f, 22.0f){{
+                        lifetime = 25.0f;
+                        healPercent = 4.0f;
                         width = 2.4f;
                         height = 5.4f;
                         buildingDamageMultiplier = 0.2f;
@@ -541,7 +563,7 @@ public class FUnitTypes{
                         backColor = Color.valueOf("8cfffb");
                         frontColor = Color.white;
                         status = StatusEffects.electrified;
-                        statusDuration = 150f;
+                        statusDuration = 150.0f;
                     }};
                 }}
             );
@@ -620,14 +642,12 @@ public class FUnitTypes{
 
                         trailEffect = new Effect(16f, e -> {
                             Draw.color(Pal.heal);
-                            for(int s : Mathf.signs){
+                            for(int s : Mathf.signs)
                                 Drawf.tri(e.x, e.y, 4.0f, 30f * e.fslope(), e.rotation + s * 90f);
-                            }
                         });
 
                         hitEffect = new Effect(50f, 100f, e -> {
                             final byte points = 8;
-                            float offset = Mathf.randomSeed(e.id, 360f);
 
                             e.scaled(7f, b -> {
                                 Draw.color(Pal.heal, b.fout());
@@ -636,10 +656,13 @@ public class FUnitTypes{
                             Draw.color(Pal.heal);
                             Lines.stroke(e.fout() * 3f);
                             Lines.circle(e.x, e.y, rad);
+
+                            float offset = Mathf.randomSeed(e.id, 360f);
                             for(byte i = 0; i < points; i++){
                                 float angle = i * 360f / points + offset;
                                 Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4.0f, 30f * e.fout(), angle);
                             }
+
                             Fill.circle(e.x, e.y, 12f * e.fout());
                             Draw.color();
                             Fill.circle(e.x, e.y, 6f * e.fout());
@@ -702,6 +725,7 @@ public class FUnitTypes{
             speed = 1.6f;
             drag = 0.04f;
             accel = 0.08f;
+            range = maxRange = 40.0f;
             engineOffset = 5.6f;
             trailLength = 3;
             itemCapacity = 15;
@@ -714,7 +738,7 @@ public class FUnitTypes{
 
             weapons.add(
                 new Weapon(){{
-                    shootCone = 180f;
+                    shootCone = 180.0f;
                     mirror = false;
                     top = false;
                     shootOnDeath = true;
@@ -741,6 +765,7 @@ public class FUnitTypes{
             speed = 2.7f;
             drag = 0.02f;
             accel = 0.05f;
+            range = maxRange = 40.0f;
             engineOffset = 5.6f;
             trailLength = 4;
             itemCapacity = 25;
@@ -782,6 +807,7 @@ public class FUnitTypes{
             speed = 2.2f;
             drag = 0.03f;
             accel = 0.04f;
+            range = maxRange = 40.0f;
             engineSize = 3.0f;
             engineOffset = 8.0f;
             trailLength = 12;
@@ -794,15 +820,16 @@ public class FUnitTypes{
 
             weapons.add(
                 new Weapon(){{
-                    shootCone = 180.0f;
+                    shootCone = 45.0f;
                     mirror = false;
                     top = false;
                     shootOnDeath = true;
                     shootSound = Sounds.explosion;
-                    bullet = new BasicBulletType(1.4f, 360.0f){{
+
+                    bullet = new BasicBulletType(1.4f, 320.0f){{
                         killShooter = true;
 
-                        lifetime = 240.0f;
+                        lifetime = 120.0f;
                         width = 10.0f;
                         height = 10.0f;
                         weaveMag = 2.0f;
@@ -818,23 +845,23 @@ public class FUnitTypes{
                         hitEffect = Fx.pulverize;
                         hitSound = Sounds.explosion;
 
-                        bulletInterval = 4.0f;
+                        bulletInterval = 5.0f;
                         intervalRandomSpread = 30.0f;
                         intervalBullets = 2;
                         intervalBullet = new ShrapnelBulletType(){{
-                            damage = 30.0f;
-                            length = 60.0f;
+                            damage = 25.0f;
+                            length = 48.0f;
                             toColor = Color.valueOf("a9d8ff");
                         }};
 
                         fragBullets = 1;
                         fragVelocityMin = fragVelocityMax = 1.0f;
                         fragRandomSpread = 0.0f;
-                        fragBullet = new BasicBulletType(0.0f, 300.0f){{
+                        fragBullet = new BasicBulletType(0.0f, 250.0f){{
                             lifetime = 10.0f;
-                            splashDamage = 100.0f;
-                            splashDamageRadius = 80.0f;
-                            buildingDamageMultiplier = 6.0f;
+                            splashDamage = 80.0f;
+                            splashDamageRadius = 60.0f;
+                            buildingDamageMultiplier = 4.0f;
 
                             hitEffect = new MultiEffect(
 
@@ -926,8 +953,6 @@ public class FUnitTypes{
         }};
 
         apollo = new UnitType("dk"){{
-            final float reg = 4f;
-
             constructor = UnitEntity::create;
             flying = true;
             health = 76000;
@@ -943,17 +968,16 @@ public class FUnitTypes{
             lowAltitude = true;
             faceTarget = false;
 
-            abilities.add(
+            abilities.add(new ForceFieldAbility(120f, 4.0f, 2000f, 480f){
+                @Override
+                public void update(Unit unit){
+                    // doubles regen when health below the half
+                    if(unit.shield < max && unit.health < unit.maxHealth * 0.5f)
+                        unit.shield += Time.delta * regen;
 
-                new ForceFieldAbility(120f, reg, 2000f, 480f){
-
-                    @Override
-                    public void update(Unit unit){
-                        super.update(unit);
-                        regen = unit.health < unit.maxHealth * 0.5f ? reg * 2f : reg;
-                    }
+                    super.update(unit);
                 }
-            );
+            });
 
             weapons.add(
 
@@ -1100,11 +1124,11 @@ public class FUnitTypes{
                     inaccuracy = 0.0f;
                     shootSound = Sounds.laser;
 
-                    bullet = new BasicBulletType(10f,3240){{
+                    bullet = new BasicBulletType(10.0f,3240.0f){{
                         buildingDamageMultiplier = 0.8f;
                         lifetime = 60f;
                         knockback = 16;
-                        pierceCap =4;
+                        pierceCap = 4;
                         pierce = true;
                         pierceBuilding = true;
 
@@ -1112,7 +1136,7 @@ public class FUnitTypes{
                             damage = 6570;
                             buildingDamageMultiplier = 0.8f;
                             knockback = 64;
-                            pierceCap =24;
+                            pierceCap = 24;
                             pierce = true;
                             pierceBuilding = true;
                             length = 700;
@@ -1120,18 +1144,19 @@ public class FUnitTypes{
                             sideAngle = 160;
                             sideWidth = 1;
                             sideLength = 30;
-                            colors = new Color[] {Pal.heal, Pal.heal, Color.white};
+                            colors = new Color[]{Pal.heal, Pal.heal, Color.white};
                         }});
 
-                        for(int j = 0; j < 12; j++){
-                            int s = j;
-                            spawnBullets.add(new FlakBulletType(20f - s * 1.2f, 100 + s * 6){{
+                        for(byte i = 0; i < 12; i++){
+                            byte j = i;
+
+                            spawnBullets.add(new FlakBulletType(20f - i * 1.2f, 100 + j * 6){{
                                 sprite = "missile-large";
                                 collidesGround = collidesAir = true;
-                                explodeRange = 20f+s;
-                                width = height = 12f+s*0.5f;
+                                explodeRange = 20f + j;
+                                width = height = 12f + j * 0.5f;
                                 shrinkY = 0f;
-                                drag = 0.01f + s * 0.001f;
+                                drag = 0.01f + j * 0.001f;
                                 homingRange = 240f;
                                 keepVelocity = false;
                                 lightRadius = 60f;
@@ -1139,20 +1164,20 @@ public class FUnitTypes{
                                 lightColor = Pal.heal;
 
                                 buildingDamageMultiplier = 2f;
-                                splashDamageRadius = 40f+s*2;
-                                splashDamage = damage*2;
-                                pierceCap =4;
+                                splashDamageRadius = 40f+ j * 2;
+                                splashDamage = damage * 2;
+                                pierceCap = 4;
                                 pierce = true;
                                 pierceBuilding = false;
 
-                                lifetime = 60f + s * 5f;
+                                lifetime = 60f + j * 5f;
                                 backColor = Pal.heal;
                                 frontColor = Color.white;
 
                                 hitEffect = new ExplosionEffect(){{
-                                    lifetime = 24f + s * 0.4f;
+                                    lifetime = 24f + j * 0.4f;
                                     waveStroke = 6f;
-                                    waveLife = 10f + s * 0.2f;
+                                    waveLife = 10f + j * 0.2f;
                                     waveRadBase = 7f;
                                     waveColor = Pal.heal;
                                     waveRad = 30f;
@@ -1161,21 +1186,55 @@ public class FUnitTypes{
                                     sparkColor = Pal.heal;
                                     sparks = 6;
                                     sparkRad = 35f;
-                                    sparkStroke = 1.5f + s * 0.05f;
+                                    sparkStroke = 1.5f + j * 0.05f;
                                     sparkLen = 4f;
                                 }};
 
-                                weaveScale = 6f + s * 0.25f;
-                                weaveMag = 3f - s * 0.14f;
+                                weaveScale = 6f + j * 0.25f;
+                                weaveMag = 3f - j * 0.14f;
 
                                 trailColor = Pal.heal;
-                                trailWidth = 4.5f - s * 0.1f;
-                                trailLength = 29 - s;
+                                trailWidth = 4.5f - j * 0.1f;
+                                trailLength = 29 - j;
                             }});
                         }
                     }};
                 }}
             );
         }};
+
+        // put these there instead of FOverride or automatic unlocks
+        ((UnitFactory)Blocks.groundFactory).plans.add(
+            new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500.0f, ItemStack.with(
+                Items.lead, 20,
+                Items.titanium, 25,
+                Items.silicon, 30
+            ))
+        );
+        ((UnitFactory)Blocks.airFactory).plans.add(
+            new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400.0f, ItemStack.with(
+                Items.lead, 20,
+                Items.metaglass, 10,
+                Items.coal, 10,
+                Items.silicon, 15
+            ))
+        );
+        ((Reconstructor)Blocks.additiveReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.guarding, FUnitTypes.resisting},
+            new UnitType[]{FUnitTypes.blade, FUnitTypes.hatchet},
+            new UnitType[]{FUnitTypes.firefly, FUnitTypes.candlelight}
+        );
+        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.resisting, FUnitTypes.garrison},
+            new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle},
+            new UnitType[]{FUnitTypes.candlelight, FUnitTypes.lampflame}
+        );
+        ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.omicron, FUnitTypes.pioneer},
+            new UnitType[]{FUnitTypes.garrison, FUnitTypes.shelter}
+        );
+        ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.addAll(
+            new UnitType[]{FUnitTypes.shelter, FUnitTypes.blessing}
+        );
     }
 }

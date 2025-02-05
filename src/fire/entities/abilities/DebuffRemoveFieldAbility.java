@@ -7,7 +7,9 @@ import mindustry.entities.Effect;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static fire.content.FStatusEffects.*;
+import static fire.content.FStatusEffects.disintegrated;
+import static fire.content.FStatusEffects.frostbite;
+import static fire.content.FStatusEffects.overgrown;
 import static mindustry.content.StatusEffects.*;
 
 public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Ability{

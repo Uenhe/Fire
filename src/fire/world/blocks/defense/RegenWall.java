@@ -66,14 +66,14 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
 
     public class RegenWallBuild extends RegenProjectorBuild{
 
-        private float healAmount, hit;
-        private boolean heals;
+        float healAmount, hit;
+        boolean heals;
 
         @Override
         public void updateTile(){
             super.updateTile();
 
-            hit = Mathf.clamp(hit - Time.delta / 10f);
+            hit = Mathf.clamp(hit - Time.delta / 10.0f);
 
             if(damaged() && heals){
                 heals = false;
@@ -84,7 +84,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         @Override
         public boolean collision(Bullet bullet){
             super.collision(bullet);
-            hit = 1f;
+            hit = 1.0f;
 
             if(Mathf.chance(chanceHeal)){
                 healAmount = bullet.damage * regenPercent;
@@ -92,20 +92,20 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
             }
 
             if(
-                chanceDeflect > 0f && bullet.vel.len() > 0.1f
+                chanceDeflect > 0.0f && bullet.vel.len() > 0.1f
                 && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)
             ){
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
                 if(Math.abs(x - bullet.x) > Math.abs(y - bullet.y)){
-                    bullet.vel.x *= -1f;
+                    bullet.vel.x *= -1.0f;
                 }else{
-                    bullet.vel.y *= -1f;
+                    bullet.vel.y *= -1.0f;
                 }
 
                 bullet.owner = this;
                 bullet.team = team;
-                bullet.time += 1f;
+                bullet.time += 1.0f;
                 return false;
             }
 
@@ -120,7 +120,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         @Override
         public void draw(){
             super.draw();
-            Draw.rect(name + (byte)((Time.time / frameTime % frames) + 1), x, y);
+            Draw.rect(name + (int)((Time.time / frameTime % frames) + 1), x, y);
 
             if(flashHit && hit >= 0.0001f){
                 Draw.color(flashColor);

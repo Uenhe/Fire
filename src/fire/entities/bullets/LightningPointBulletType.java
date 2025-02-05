@@ -1,7 +1,12 @@
 package fire.entities.bullets;
 
+import arc.math.Mathf;
 import mindustry.content.Fx;
-import mindustry.gen.*;
+import mindustry.entities.Units;
+import mindustry.gen.Building;
+import mindustry.gen.Bullet;
+import mindustry.gen.Teamc;
+import mindustry.gen.Unit;
 
 public class LightningPointBulletType extends mindustry.entities.bullet.BulletType{
 
@@ -10,7 +15,7 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
 
     public LightningPointBulletType(float damage){
         super(0.0f, damage);
-        lifetime = 1.0f;
+        lifetime = Mathf.FLOAT_ROUNDING_ERROR;
         hitEffect = despawnEffect = Fx.none;
     }
 
@@ -22,13 +27,13 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
         if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id))
             target = b.aimTile.build;
         else
-            target = mindustry.entities.Units.closestTarget(
+            target = Units.closestTarget(
                 b.team, b.x ,b.y, homingRange,
                 e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
                 t -> t != null && collidesGround && !b.hasCollided(t.id)
             );
 
-        if(target != null && arc.math.Mathf.chance(lightningChance)){
+        if(target != null && Mathf.chance(lightningChance)){
             Fx.chainLightning.at(b.x, b.y, 0f, lightningColor, target);
 
             // target is either unit or building

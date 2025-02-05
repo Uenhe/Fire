@@ -62,12 +62,12 @@ public class FStatusEffects{
          */
         sanctuaryGuard = new StatusEffect("sanctuary-guard"){
             /** This is buggy... If the world reloads, it triggers again. */
-            private boolean added = true;
+            boolean added = true;
 
             @Override
             public void setStats(){
                 super.setStats();
-                stats.add(FStat.clearDeBuffUponApplied, true);
+                stats.add(FStat.clearDebuffUponApply, true);
             }
 
             @Override
@@ -156,7 +156,7 @@ public class FStatusEffects{
         disintegrated = new StatusEffect("disintegrated"){
 
             /** The armor that unit reduces at most. */
-            private final float maxArmorReduction = 10.0f;
+            final float maxArmorReduction = 10.0f;
 
             @Override
             public void setStats(){
@@ -180,7 +180,7 @@ public class FStatusEffects{
             {
             damage = 4.0f;
             speedMultiplier = 0.6f;
-            effectChance = 0.2f;
+            effectChance = 0.15f;
             parentizeEffect = true;
             effect = Fx.unitShieldBreak;
         }};

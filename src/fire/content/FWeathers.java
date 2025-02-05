@@ -1,7 +1,6 @@
 package fire.content;
 
 import arc.math.Mathf;
-
 import arc.util.pooling.Pools;
 import fire.entities.LightningCloud;
 import mindustry.content.StatusEffects;
@@ -48,7 +47,7 @@ public class FWeathers{
 
             @Override
             public void drawUnder(WeatherState state){
-                //do nothing or a NullPointer will be thrown
+                // do nothing or a NullPointer will be thrown
             }
 
             @Override

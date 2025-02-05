@@ -25,8 +25,8 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     /** Number of afterimages to be displayed while dashing. */
     public final byte afterimage;
 
-    private static final String name = "ability.fire-dash";
-    private float timer;
+    float timer;
+    public static final String name = "ability.fire-dash";
 
     public DashAbility(float speedMul, int invTime, int cooldown, int afterimage){
         this.speedMultiplier = speedMul;
@@ -40,7 +40,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         return Core.bundle.get(name);
     }
 
-    /** TODO Change this if v147 is released: <a href="https://github.com/Anuken/Mindustry/pull/9654">DETAIL</a> */
+    /** TODO Reconstruct <a href="https://github.com/Anuken/Mindustry/pull/9654">if v147 is released</a> */
     @Override
     public void addStats(arc.scene.ui.layout.Table t){
         t.add(Core.bundle.get(name + ".description"));

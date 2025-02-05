@@ -6,7 +6,8 @@ import fire.world.meta.FStat;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.minArmorDamage;
+import static mindustry.Vars.state;
 
 public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 

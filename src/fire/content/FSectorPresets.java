@@ -5,16 +5,15 @@ import mindustry.type.SectorPreset;
 public class FSectorPresets{
 
     public static SectorPreset
-
         landingBase, darksandPlain,
         frozenGround, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
         sporeFiord, scorchingVolcano, lavaStronghold,
-        eteriverStronghold, chillyMountains, stormyCoast;
+        eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, taintedEstuary;
 
     public static void load(){
 
         landingBase = create("jljd", 0, 6, 0, false);
-        darksandPlain = create("hspy", 94, 7, 15);
+        darksandPlain = create("hspy", 94, 7, 50);
 
         frozenGround = create("lhyj", 15, 6, 35);
         beachLanding = create("htdl", 183, 6);
@@ -29,6 +28,8 @@ public class FSectorPresets{
         eteriverStronghold = create("hhys", 34, 8);
         chillyMountains = create("lfsm", 168, 9, 17);
         stormyCoast = create("stormy-coast", 81, 10, 60);
+        branchedRivers = create("branched-rivers", 158, 10, 14);
+        taintedEstuary = create("tainted-estuary", 116, 10);
     }
 
     static SectorPreset create(String name, int sector, float difficulty){
