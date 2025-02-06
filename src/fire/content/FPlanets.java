@@ -49,7 +49,6 @@ public class FPlanets{
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
             iconColor = Color.valueOf("5b6fff");
-            accessible = false;
             hiddenItems.addAll(Items.erekirItems).removeAll(Items.serpuloItems);
         }};
     }

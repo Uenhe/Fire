@@ -2,6 +2,7 @@ package fire.world.blocks.defense;
 
 import arc.Core;
 import arc.math.Interp;
+import arc.math.Mathf;
 import fire.world.meta.FStat;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
@@ -47,12 +48,13 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
-            if(arc.math.Mathf.zero(healthMul))
+            if(Mathf.zero(healthMul))
                 return health + 1.0f;
 
             float dmg = (damage - extraArmor) / healthMul;
             if(dmg < 1.0f)
                 return damage * minArmorDamage;
+
             return dmg;
         }
 
@@ -60,7 +62,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public void draw(){
             super.draw();
-            extraArmor = armorIncrease * increasePattern.apply(Math.min((1f - health / maxHealth) / maxHealthLossPercentage, 1f));
+            extraArmor = armorIncrease * increasePattern.apply(Math.min((1.0f - health / maxHealth) / maxHealthLossPercentage * 100.0f, 1.0f));
         }
     }
 }

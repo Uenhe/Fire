@@ -2,7 +2,9 @@ package fire.content;
 
 import arc.Core;
 import arc.Events;
+import arc.struct.Seq;
 import arc.util.Reflect;
+import fire.ai.FUnitCommand;
 import fire.world.meta.FAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Blocks;
@@ -25,6 +27,7 @@ import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BuildVisibility;
 
+import static mindustry.Vars.content;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.alpha;
 import static mindustry.content.UnitTypes.beta;
@@ -110,7 +113,7 @@ public class FOverride{
         phaseWeaver.itemCapacity += 10;
 
         //endregion
-        //region units
+        //region block unit
 
         ((UnitFactory)airFactory).plans.add(
             new UnitFactory.UnitPlan(alpha, 2400.0f, ItemStack.with(
@@ -165,6 +168,18 @@ public class FOverride{
 
         flare.speed += 0.5f;
         flare.trailLength = 3;
+
+        // have to do this or can't control dash-able units with other units at the same time
+        for(var type : content.units()){
+            if(type.commands.length <= 1) continue; //the first must be moveCommand, skip
+
+            var seq = new Seq<>(type.commands);
+            seq.replace(UnitCommand.repairCommand, FUnitCommand.repairDashCommand);
+            seq.replace(UnitCommand.rebuildCommand, FUnitCommand.rebuildDashCommand);
+            seq.replace(UnitCommand.assistCommand, FUnitCommand.assistDashCommand);
+
+            type.commands = seq.toArray();
+        }
 
         //endregion
         //region liquid

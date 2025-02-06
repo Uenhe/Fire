@@ -1,18 +1,30 @@
 package fire.ai;
 
 import fire.ai.types.BuilderDashAI;
+import fire.ai.types.RepairDashAI;
+import fire.entities.abilities.DashAbility;
 import mindustry.ai.UnitCommand;
+import mindustry.entities.abilities.Ability;
 
-/** TODO these are buggy but too lazy to fix. */
+/** TODO adapt these to v147 if released. */
 public class FUnitCommand{
 
     public static final UnitCommand
-        repairDashCommand = new UnitCommand("repair", "modeSurvival", u -> new fire.ai.types.RepairDashAI()),
-        rebuildDashCommand = new UnitCommand("rebuild", "hammer", u -> new BuilderDashAI()),
+        repairDashCommand = new UnitCommand("repair", "modeSurvival", u -> new RepairDashAI(find(u.abilities))),
+        rebuildDashCommand = new UnitCommand("rebuild", "hammer", u -> new BuilderDashAI(find(u.abilities))),
         assistDashCommand = new UnitCommand("assist", "players", u -> {
-            var ai = new BuilderDashAI();
+            var ai = new BuilderDashAI(find(u.abilities));
             ai.onlyAssist = true;
             return ai;
-        }),
-        mineDashCommand = new UnitCommand("mine", "production", u -> new fire.ai.types.MinerDashAI());
+        });
+        //commented: there's no unit that can both dash and mine currently
+        //mineDashCommand = new UnitCommand("mine", "production", u -> new MinerDashAI(find(u.abilities)));
+
+    private static DashAbility find(Ability[] abs){
+        for(var ab : abs)
+            if(ab instanceof DashAbility)
+                return (DashAbility)ab;
+
+        return null;
+    }
 }

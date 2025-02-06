@@ -1,44 +1,51 @@
 package fire.entities.abilities;
 
 import arc.Core;
-import arc.struct.FloatSeq;
+import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
 import arc.util.Strings;
 import arc.util.Time;
+import mindustry.entities.Effect;
+import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import java.util.Arrays;
+
 public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
-    /** Frames between two triggers. */
+    /** Ticks between two triggers. */
     public final short cooldown;
-    /** Triggers if the unit loses such health in detectDuration; 50 => 50%. */
+    /** Triggers if the unit loses such health percentage in detectDuration; 50 => 50%. */
     public final byte healthLossPercentage;
     /** Amount to heal at trigger. */
     public final int healAmount;
     /** Amount to heal at trigger. Do extra heal depend on unit's max health; 50 => 50%. */
     public final byte healPercentage;
     /** Status effect applied at trigger. */
-    public final StatusEffect effect;
+    public final StatusEffect statusEffect;
     /** Status effect duration. */
-    public final short effectDuration;
+    public final short statusDuration;
+    public final Effect effect;
 
     /** Frames between two detections. */
-    private static final byte detectInterval = 10;
+    private static final byte detectInterval = 5;
     /** Used to record health. */
-    private final FloatSeq healths;
+    private final float[] healths;
     private float timer;
-    private float cooldownTimer;
+    private float timerCooldown;
 
-    public FirstAidAbility(int cooldown, int healthLossPercentage, int healAmount, int healPercentage, StatusEffect effect, int effectDuration, int detectDuration){
-        this.cooldown = (short)cooldown;
-        this.healthLossPercentage = (byte)healthLossPercentage;
-        this.healAmount = healAmount;
-        this.healPercentage = (byte)healPercentage;
-        this.effect = effect;
-        this.effectDuration = (short)effectDuration;
+    public FirstAidAbility(int cd, int lossP, int healA, int healP, StatusEffect se, int sed, int detectDuration, Effect fx){
+        cooldown = (short)cd;
+        healthLossPercentage = (byte)lossP;
+        healAmount = healA;
+        healPercentage = (byte)healP;
+        statusEffect = se;
+        statusDuration = (short)sed;
+        effect = fx;
 
-        healths = new FloatSeq(detectDuration / detectInterval);
+        healths = new float[detectDuration / detectInterval];
     }
 
     @Override
@@ -47,7 +54,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     }
 
     @Override
-    public void addStats(arc.scene.ui.layout.Table t){
+    public void addStats(Table t){
         t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60.0f, 2) + StatUnit.seconds.localized());
         t.row();
         t.add("[lightgray]" + Stat.healing.localized() + ": [white]" + healAmount);
@@ -57,42 +64,42 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             t.row();
         }
         t.row();
-        t.add(effect.emoji() + " [accent]" + effect.localizedName + "[white], " + Strings.autoFixed(effectDuration / 60.0f, 2) + StatUnit.seconds.localized());
+        t.add(statusEffect.emoji() + " [accent]" + statusEffect.localizedName + "[white], " + Strings.autoFixed(statusDuration / 60.0f, 2) + StatUnit.seconds.localized());
     }
 
     @Override
-    public void update(mindustry.gen.Unit unit){
+    public void update(Unit unit){
         if(unit.dead) return;
 
         //init
-        if(healths.isEmpty())
-            for(byte i = 0; i < healths.items.length; i++)
-                healths.add(unit.health);
+        if(healths[0] == 0.0f) Arrays.fill(healths, unit.health);
 
-        if(cooldownTimer == 0.0f){
+        if(timerCooldown == 0.0f){
             timer += Time.delta;
 
             if(timer >= detectInterval){
-                timer %= detectInterval;
+                timer -= detectInterval;
 
-                healths.removeIndex(0);
-                healths.add(unit.health);
+                for(int i = 0; i < healths.length - 1; i++){
+                    healths[i] = healths[i + 1];
+                }
+                healths[healths.length - 1] = unit.health;
 
-                if((healths.get(0) - unit.health) >= unit.maxHealth * healthLossPercentage / 100.0f){
+                if((healths[0] - unit.health) >= unit.maxHealth * healthLossPercentage / 100.0f){
 
                     unit.heal(healAmount + healPercentage / 100.0f);
-                    unit.apply(effect, effectDuration);
+                    unit.apply(statusEffect, statusDuration);
 
                     //enter cooldown
-                    cooldownTimer = 0.001f;
+                    timerCooldown = Mathf.FLOAT_ROUNDING_ERROR;
                 }
             }
 
-        }else if(cooldownTimer >= cooldown){
-            cooldownTimer = 0.0f;
+        }else if(timerCooldown >= cooldown){
+            timerCooldown = 0.0f;
 
         }else{
-            cooldownTimer += Time.delta;
+            timerCooldown += Time.delta;
         }
     }
 }

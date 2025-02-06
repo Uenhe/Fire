@@ -23,7 +23,9 @@ import fire.world.DEBUG;
 import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
+import mindustry.game.EventType;
 import mindustry.game.EventType.ClientLoadEvent;
+import mindustry.mod.Mods;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
@@ -45,7 +47,7 @@ public class FireMod extends mindustry.mod.Mod{
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
 
-    static mindustry.mod.Mods.LoadedMod FIRE;
+    static Mods.LoadedMod FIRE;
     static String displayName;
     static boolean launched, multiplied;
     static byte counter;
@@ -68,16 +70,16 @@ public class FireMod extends mindustry.mod.Mod{
         FSectorPresets.load();
         FPlanets.loadTree();
         FWeathers.load();
-        FOverride.load();
     }
 
     @Override
     public void init(){
+        FOverride.load();
         FBinding.load();
         loadSettings();
         loadDatabase();
 
-        Events.on(ClientLoadEvent.class, e -> {
+        Events.on(EventType.ClientLoadEvent.class, e -> {
             showDialog();
             showNoMultipleMods();
             launched = true;
@@ -209,7 +211,6 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     static void showNoMultipleMods(){
-
         if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && Core.settings.getBool("noMultipleMods")){
 
             // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also

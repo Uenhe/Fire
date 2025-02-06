@@ -114,7 +114,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         @Override
         public void craft(){
-            // equals to {@code super.craft()} except for {@code craftEffect} part
+            // equals to super.craft() except for craftEffect part
             consume();
             if(outputItems != null)
                 for(var output : outputItems)

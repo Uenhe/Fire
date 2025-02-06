@@ -1,12 +1,20 @@
 package fire.ai.types;
 
+import arc.math.geom.Position;
+import fire.entities.abilities.DashAbility;
 import mindustry.gen.Building;
+import mindustry.gen.Teamc;
 
 /** Basically a copy of RepairAI. */
 public class RepairDashAI extends mindustry.ai.types.RepairAI{
 
-    private mindustry.gen.Teamc avoid;
+    private final DashAbility dash;
+    private Teamc avoid;
     private float retreatTimer;
+
+    public RepairDashAI(DashAbility ab){
+        dash = ab;
+    }
 
     @Override
     public void updateMovement(){
@@ -55,10 +63,8 @@ public class RepairDashAI extends mindustry.ai.types.RepairAI{
         }
     }
 
-    private void dash(arc.math.geom.Position pos){
-        for(var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
-            da.dash(unit, pos);
-            break;
-        }
+    private void dash(Position pos){
+        if(dash == null) return;
+        dash.dash(unit, pos);
     }
 }

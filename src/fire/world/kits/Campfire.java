@@ -87,7 +87,7 @@ public class Campfire{
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
 
-                ((ConsumePowerCustom)consPower).scale = phaseHeat;
+                ConsumePowerCustom.scaleMap.put(id, optionalEfficiency);
 
                 if(efficiency <= 0.0f) return;
 

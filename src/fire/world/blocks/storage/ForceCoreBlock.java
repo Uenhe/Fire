@@ -122,9 +122,9 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
             super.updateTile();
 
             if(team == state.rules.waveTeam){
-                ((ConsumePowerCustom)consPower).scale = 0.0f; //won't damage enemy cores
+                ConsumePowerCustom.scaleMap.put(id, 0.0f); //won't damage enemy cores
             }else{
-                ((ConsumePowerCustom)consPower).scale = cores[team.id];
+                ConsumePowerCustom.scaleMap.put(id, cores[team.id]);
                 if(power.graph.getPowerBalance() < 0.0f && power.graph.getBatteryStored() <= 0.0f && cores[team.id] > 2) //allowing to place 2 cores without damage
                     damage(Mathf.sqrt(-power.graph.getPowerBalance() + consPower.requestedPower(this)) * delta());
             }

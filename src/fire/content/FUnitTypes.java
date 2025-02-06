@@ -585,12 +585,13 @@ public class FUnitTypes{
             engineOffset = 13.0f;
             engineSize = 7.0f;
             itemCapacity = 120;
-            buildSpeed = 3.2f;
+            buildSpeed = 3.4f;
+            buildRange += 80f;
             lowAltitude = true;
 
             abilities.add(
                 new DashAbility(6.7f, 15, 120, 6),
-                new FirstAidAbility(2400, 80, 1200, 0, FStatusEffects.sanctuaryGuard, 360, 120)
+                new FirstAidAbility(2400, 75, 500, 5, FStatusEffects.sanctuaryGuard, 120, 120, Fx.none)
             );
 
             weapons.add(
@@ -1084,8 +1085,8 @@ public class FUnitTypes{
             );
         }};
 
-
-
+        //endregion
+        //region naval
 
         mechanicalTide = new UnitType("mechanical-tide"){{
             constructor = UnitWaterMove::create;
@@ -1202,6 +1203,8 @@ public class FUnitTypes{
                 }}
             );
         }};
+
+        //endregion
 
         // put these there instead of FOverride or automatic unlocks
         ((UnitFactory)Blocks.groundFactory).plans.add(
