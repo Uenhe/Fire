@@ -40,11 +40,12 @@ public class FPlanets{
                 new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
                 new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
             );
+            alwaysUnlocked = true;
             generator = new RisetarPlanetGenerator();
+            sectorSeed = 3;
             rotateTime = 7200.0f;
             clearSectorOnLose = true;
             prebuildBase = false;
-            sectorSeed = 3;
             atmosphereColor = Color.valueOf("1a3db1");
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
