@@ -14,7 +14,7 @@ import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.gen.Healthc;
-import mindustry.gen.Statusc;
+import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 
@@ -101,29 +101,33 @@ public class EnergyField{
             targets.sort(h -> h.dst2(b.x, b.y));
             int len = Math.min(targets.size, maxTargets);
 
-            for(int i = 0; i < len; i++){
+            for(short i = 0; i < len; i++){
                 var target = targets.get(i);
 
                 // lightning gets absorbed by plastanium
                 var absorber = Damage.findAbsorber(b.team, b.x, b.y, target.x(), target.y());
                 if(absorber != null) target = absorber;
 
-                // bullet owner is either unit or building
-                float scl = b.owner instanceof Building
-                    ? state.rules.blockDamage(b.team)
-                    : state.rules.unitDamage(b.team);
+                // target must be either unit or building
+                if(target instanceof Unit u)
+                    b.collision(u, u.x, u.y);
+                else
+                    ((Building)target).collision(b);
 
-                // target too
-                if(target instanceof Building build){
-                    build.damage(b.team, damage * scl);
-                }else{
-                    target.damage(damage * scl);
-                    ((Statusc)target).apply(status, statusDuration);
+                /*
+                if(target instanceof Unit u){
+                    u.damage(damage * damageMultiplier(b));
+                    u.apply(status, statusDuration);
+                    // look bad
                     if(fragBullet != null)
-                        ((Statusc)target).apply(fragBullet.status, fragBullet.statusDuration);
+                        u.apply(fragBullet.status, fragBullet.statusDuration);
+                }else{
+                    ((Building)target).damage(b.team, damage * damageMultiplier(b));
                 }
+                */
 
-                FFx.chainLightningThin.at(b.x, b.y, 0.0f, lightningColor, target);
+                hitEffect.at(b.x, b.y, 0.0f, lightningColor, target);
+                b.remove();
             }
 
             targets.clear();

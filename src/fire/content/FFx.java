@@ -8,6 +8,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Position;
+import arc.util.Nullable;
 import arc.util.Tmp;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -60,14 +61,6 @@ public class FFx{
         });
     }
 
-    public static Effect gamblerShootEffect(float lifetime, int amount){
-        return new Effect(lifetime, e -> {
-            Draw.color(e.color, Color.lightGray, e.fin());
-            Angles.randLenVectors(e.id, amount, 5f + e.finpow() * 22f, (x, y) ->
-                Fill.square(e.x + x, e.y + y, e.fout() * 2.5f + 0.5f, 45f));
-        });
-    }
-
     public static Effect hitBulletSmall(Color color){
         return new Effect(14f, e -> {
             Draw.color(Color.white, color, e.fin());
@@ -81,6 +74,36 @@ public class FFx{
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
             );
             Drawf.light(e.x, e.y, 20f, color, 0.6f * e.fout());
+        });
+    }
+
+    public static Effect squareEffect(float lifetime, int amount, float size, float rotation, @Nullable Color color){
+        return new Effect(lifetime, e -> {
+            Draw.color(color == null ? e.color : color, Color.white, e.fin());
+            Angles.randLenVectors(e.id, amount, size * (e.finpow() * 4.0f + 1.0f), (x, y) ->
+                Fill.square(e.x + x, e.y + y, e.fout() * size + 1.0f, rotation));
+        });
+    }
+
+    public static Effect crossEffect(float lifetime, float size, float rotation, boolean circle, @Nullable Color color){
+        return new Effect(lifetime, 100.0f, e -> {
+            float circleRad = size * (e.finpow() * 16.0f + 1.0f);
+            var col = color == null ? e.color : color;
+
+            Drawf.light(e.x, e.y, circleRad * 1.6f, col, e.fout());
+
+            if(circle){
+                Draw.color(col);
+                Lines.stroke(e.fout() * 2.0f);
+                Lines.circle(e.x, e.y, circleRad);
+            }
+
+            for(byte i = 0; i < 4; i++){
+                Draw.color(col);
+                Drawf.tri(e.x, e.y, size * 1.8f, size * 24.0f * e.foutpow(), i * 90.0f + rotation);
+                Draw.color();
+                Drawf.tri(e.x, e.y, size * 0.8f, size * 9.0f * e.foutpow(), i * 90.0f + rotation);
+            }
         });
     }
 
@@ -99,49 +122,19 @@ public class FFx{
         Drawf.light(e.x, e.y, 60.0f, Pal.reactorPurple2, 0.6f * e.fout());
     });
 
-    /** @see Fx#instBomb */
-    public static final Effect instBombPurple = new Effect(10.0f, 100.0f, e -> {
-
-        for(byte i = 0; i < 4; i++){
-            Draw.color(Pal.reactorPurple2);
-            Drawf.tri(e.x, e.y, 5.0f, 80.0f * e.fout(), i * 90.0f + 45.0f);
-            Draw.color();
-            Drawf.tri(e.x, e.y, 2.5f, 40.0f * e.fout(), i * 90.0f + 45.0f);
-        }
-
-        Drawf.light(e.x, e.y, 150.0f, Pal.reactorPurple2, 0.9f * e.fout());
-    });
-
     /** @see Fx#drillSteam */
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
-        float length = 4.0f + e.finpow() * 24.0f;
         Fx.rand.setSeed(e.id);
-        
+
+        float length = 4.0f + e.finpow() * 24.0f;
         for(byte i = 0; i < 16; i++){
             Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(length));
-            float sizer = Fx.rand.random(1.4f, 4.0f);
 
             e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), b -> {
                 Draw.color(Color.gray, b.fslope() * 0.93f);
-                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, sizer + b.fslope() * 1.4f);
+                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, Fx.rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
             });
         }
-    });
-
-    /** @see Fx#dynamicSpikes */
-    public static final Effect dynamicSpikesZ = new Effect(40.0f, 100.0f, e -> {
-        float circleRad = 4.0f + e.finpow() * 30.0f;
-        Lines.stroke(e.fout() * 2.0f);
-        Lines.circle(e.x, e.y, circleRad);
-
-        for(byte i = 0; i < 4; i++){
-            Draw.color(e.color);
-            Drawf.tri(e.x, e.y, 8.0f, 60.0f * e.fout(), i * 90.0f);
-            Draw.color();
-            Drawf.tri(e.x, e.y, 4.0f, 19.2f * e.fout(), i * 90.0f);
-        }
-
-        Drawf.light(e.x, e.y, circleRad * 1.8f, Pal.heal, e.fout());
     });
 
     /** @see Fx#mineImpactWave */
@@ -162,15 +155,14 @@ public class FFx{
     public static final Effect chainLightningThin = new Effect(20.0f, 300.0f, e -> {
         if(!(e.data instanceof Position p)) return;
 
-        float tx = p.getX(), ty = p.getY();
-        float dst = Mathf.dst(e.x, e.y, tx, ty);
-
-        Tmp.v1.set(p).sub(e.x, e.y).nor();
-
         final float rangeBetweenPoints = 12.0f;
 
+        float tx = p.getX(), ty = p.getY();
+        float dst = Mathf.dst(e.x, e.y, tx, ty);
         int links = Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
+
+        Tmp.v1.set(p).sub(e.x, e.y).nor();
         float nx = Tmp.v1.x, ny = Tmp.v1.y;
 
         Lines.stroke(1.2f * e.fout());
@@ -180,7 +172,7 @@ public class FFx{
 
         Fx.rand.setSeed(e.id);
 
-        for(int i = 0; i < links; i++){
+        for(short i = 0; i < links; i++){
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{

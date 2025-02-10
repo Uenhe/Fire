@@ -31,10 +31,10 @@ import static mindustry.game.Objectives.SectorComplete;
 
 public class FPlanets{
 
-    public static Planet risetar;
+    public static Planet lysetta;
 
     public static void load(){
-        risetar = new Planet("lst", Planets.sun, 1.0f, 3){{
+        lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
             meshLoader = () -> new HexMesh(this, 8);
             cloudMeshLoader = () -> new MultiMesh(
                 new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
@@ -55,7 +55,7 @@ public class FPlanets{
     }
 
     public static void loadTree(){
-        risetar.techTree = nodeRoot("hzgs", fireCompany, () -> {
+        lysetta.techTree = nodeRoot("lysetta", lysetta, () -> {
 
             node(compositeConveyor, with(new OnSector(frozenGround)), () -> {
                 node(compositeUnloader, with(new SectorComplete(darkWorkshop)), () -> {
@@ -207,8 +207,12 @@ public class FPlanets{
                 );
 
                 node(fleshReconstructor, with(new SectorComplete(stormyCoast), new Produce(flesh)), () ->
-                    node(blade, () -> {
-                    })
+                    node(blade, () ->
+                        node(hatchet, with(new SectorComplete(branchedRivers)), () ->
+                            node(castle, with(new SectorComplete(taintedEstuary)), () -> {
+                            })
+                        )
+                    )
                 );
             });
 

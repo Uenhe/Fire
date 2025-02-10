@@ -13,8 +13,8 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     public final byte foldDegree;
     public final float foldInterval;
 
-    static float mapCleanTimer;
-    static final ObjectFloatMap<Bullet> timerMap = new ObjectFloatMap<>();
+    private static float mapCleanTimer;
+    private static final ObjectFloatMap<Bullet> timerMap = new ObjectFloatMap<>();
 
     public FoldingBulletType(float ownerSpeed, float dmg, int degree, float ownerLifetime){
         speed = ownerSpeed / Mathf.cosDeg(degree);
@@ -27,12 +27,13 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     public void load(){
         super.load();
 
+        // clean every 300 ticks
+        final short interval = 300;
         Events.run(Trigger.update, () -> {
             mapCleanTimer += Time.delta;
 
-            // clean every 300 ticks
-            if(mapCleanTimer >= 300.0f){
-                mapCleanTimer -= 300.0f;
+            if(mapCleanTimer >= interval){
+                mapCleanTimer -= interval;
 
                 for(var entry : timerMap)
                     if(!entry.key.isAdded())

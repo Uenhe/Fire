@@ -26,7 +26,7 @@ public class FWaves{
             {flare, horizon, omicron, rand.chance(0.5) ? quad : pioneer, eclipse},
             {guarding, resisting, garrison, shelter, blessing},
             {firefly, candlelight, lampflame, pioneer, eclipse}
-        };//sorry but there are no lakes in Risetar:(
+        };//sorry but there are no lakes in Lysetta:(
 
 
         if(airOnly){

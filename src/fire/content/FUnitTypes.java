@@ -21,6 +21,7 @@ import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.content.Items;
 import mindustry.content.StatusEffects;
+import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.entities.abilities.EnergyFieldAbility;
 import mindustry.entities.abilities.ForceFieldAbility;
@@ -28,6 +29,7 @@ import mindustry.entities.abilities.MoveLightningAbility;
 import mindustry.entities.abilities.RepairFieldAbility;
 import mindustry.entities.abilities.ShieldRegenFieldAbility;
 import mindustry.entities.abilities.StatusFieldAbility;
+import mindustry.entities.abilities.UnitSpawnAbility;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
@@ -281,7 +283,7 @@ public class FUnitTypes{
                 new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 28, 24, 15, 30.0f){{
                     sides = 24;
                     lightningColor = Pal.surge;
-                    unlocks = true;
+                    extended = true;
                 }},
 
                 new RegenFieldAbility(3f, 120f, colLegSpt),
@@ -574,8 +576,8 @@ public class FUnitTypes{
             defaultCommand = FUnitCommand.repairDashCommand;
             commands = new UnitCommand[]{UnitCommand.moveCommand, FUnitCommand.repairDashCommand, FUnitCommand.rebuildDashCommand, FUnitCommand.assistDashCommand};
             flying = true;
-            health = 5600;
-            armor = 7;
+            health = 5600.0f;
+            armor = 7.0f;
             hitSize = 30.0f;
             speed = 2.7f;
             drag = 0.05f;
@@ -586,12 +588,20 @@ public class FUnitTypes{
             engineSize = 7.0f;
             itemCapacity = 120;
             buildSpeed = 3.4f;
-            buildRange += 80f;
+            buildRange += 80.0f;
             lowAltitude = true;
 
             abilities.add(
                 new DashAbility(6.7f, 15, 120, 6),
-                new FirstAidAbility(2400, 75, 500, 5, FStatusEffects.sanctuaryGuard, 120, 120, Fx.none)
+                new FirstAidAbility(2400, 75, 500, 5, FStatusEffects.sanctuaryGuard, 120, 120, new MultiEffect(
+                    new Effect(45.0f, e-> {
+                        Draw.color(Pal.heal);
+                        Lines.stroke(e.fout() * 4.0f);
+                        Lines.circle(e.x, e.y, 4.0f + e.finpow() * 32.0f);
+                    }),
+                    FFx.squareEffect(60.0f, 10, 4.0f, 0.0f, Pal.heal),
+                    FFx.crossEffect(50.0f, 3.0f, 45.0f, true, Pal.heal)
+                ))
             );
 
             weapons.add(
@@ -618,9 +628,7 @@ public class FUnitTypes{
                         height = 10.0f;
                         splashDamage = 120.0f;
                         splashDamageRadius = rad;
-                        powerDamageScl = 2.0f;
                         healPercent = 10.0f;
-                        timeIncrease = 0.0f;
                         hitShake = 3.0f;
                         trailLength = 18;
                         trailWidth = 5;
@@ -631,6 +639,12 @@ public class FUnitTypes{
                         trailRotation = true;
                         statusDuration = 180.0f;
                         status = StatusEffects.electrified;
+
+                        radius = rad;
+                        timeIncrease = 0.0f;
+                        powerDamageScl = 2.0f;
+                        powerSclDecrease = 0.5f;
+                        unitDamageScl = 1.0f;
 
                         hitSound = Sounds.plasmaboom;
                         hitColor = Pal.heal;
@@ -983,41 +997,69 @@ public class FUnitTypes{
             weapons.add(
 
                 new Weapon("omura-cannon"){{
-                    reload = 495f;
+                    reload = 495.0f;
                     x = 0.0f;
-                    y = -13f;
-                    shootY = 14f;
-                    rotateSpeed = 2f;
-                    recoil = 5f;
-                    recoilTime = 360f;
+                    y = -13.0f;
+                    shootY = 10.0f;
+                    rotateSpeed = 1.6f;
+                    recoil = 7.0f;
+                    recoilTime = 360.0f;
                     rotate = true;
                     mirror = false;
                     shootSound = Sounds.release;
-                    bullet = new BasicBulletType(10f, 840f){{
-                        lifetime = 66.7f;
-                        width = 16f;
-                        height = 20f;
-                        splashDamageRadius = 80f;
-                        splashDamage = 560f;
+
+                    bullet = new BasicBulletType(5.1f, 720.0f){{
+                        lifetime = 65.0f;
+                        width = 16.0f;
+                        height = 20.0f;
+                        splashDamageRadius = 74.0f;
+                        splashDamage = 500.0f;
+                        drag = -0.02f;
+                        trailLength = 20;
+                        trailWidth = 3.9f;
                         pierceCap = 2;
                         pierceBuilding = true;
-                        collidesGround = true;
+                        hitEffect = despawnEffect = new MultiEffect(
+                            FFx.crossEffect(30.0f, 4.5f, 0.0f, true, Pal.missileYellowBack),
+                            FFx.crossEffect(30.0f, 3.0f, 45.0f, true, Pal.missileYellowBack),
+                            new Effect(30.0f, e -> {
+                                Draw.color(Pal.missileYellowBack);
+                                Lines.stroke(e.fout() * 2.0f);
+                                Lines.circle(e.x, e.y, 4.0f + e.finpow() * 100.0f);
+                            })
+                        );
+
+                        bulletInterval = 1.0f;
+                        intervalRandomSpread = 0.0f;
+                        intervalSpread = 359.0f;
+                        intervalBullets = 1;
+                        intervalBullet = new LightningBulletType(){{
+                            damage = 5.0f;
+                            lightningColor = Pal.missileYellowBack;
+                            lightningLength = 5;
+                        }};
+
                         fragBullets = 12;
-                        fragBullet = new BasicBulletType(10f, 0.0f){{
-                            lifetime = 35f;
-                            splashDamageRadius = 70f;
-                            splashDamage = 320f;
-                            collidesGround = true;
-                            fragBullets = 2;
-                            fragBullet = new LaserBulletType(160f){{
-                                lifetime = 16f;
-                                length = 260f;
+                        fragBullet = new BasicBulletType(12.4f, 0.0f){{
+                            lifetime = 32.0f;
+                            splashDamageRadius = 60.0f;
+                            splashDamage = 80.0f;
+                            drag = 0.015f;
+                            trailLength = 1;
+                            trailWidth = 2.0f;
+                            trailInterval = 10.0f;
+                            trailEffect = Fx.artilleryTrail.wrap(Pal.missileYellowBack);
+                            hitEffect = despawnEffect = Fx.none;
+
+                            fragBullets = 3;
+                            fragBullet = new LaserBulletType(90.0f){{
+                                length = 230.0f;
                                 colors = new Color[]{Color.valueOf("a9d8ff66"), Color.valueOf("a9d8ff66"), Color.white};
-                                fragBullets = 2;
+
+                                fragBullets = 3;
                                 fragBullet = new LightningBulletType(){{
-                                    damage = 8f;
-                                    lightningLength = 30;
-                                    collidesAir = true;
+                                    damage = 8.0f;
+                                    lightningLength = 24;
                                 }};
                             }};
                         }};
@@ -1025,44 +1067,46 @@ public class FUnitTypes{
                 }},
 
                 new Weapon("large-laser-mount"){{
-                    reload = 20f;
-                    x = 21f;
-                    y = -22f;
-                    shootY = 12f;
-                    rotateSpeed = 3f;
+                    reload = 20.0f;
+                    x = 21.0f;
+                    y = -22.0f;
+                    shootY = 12.0f;
+                    rotateSpeed = 3.0f;
+                    recoil = 2.0f;
                     rotate = true;
                     shootSound = Sounds.laser;
-                    bullet = new LaserBulletType(288f){{
-                        lifetime = 16f;
-                        length = 288f;
-                        width = 22f;
+                    bullet = new LaserBulletType(288.0f){{
+                        length = 288.0f;
+                        width = 18.0f;
                         colors = new Color[]{Color.valueOf("f6efa1"), Color.valueOf("f6efa1"), Color.white};
-                        lightningSpacing = 15f;
-                        lightningLength = 1;
-                        lightningDelay = 1.2f;
-                        lightningLengthRand = 10;
-                        lightningDamage = 12f;
-                        lightningAngleRand = 30f;
+                        lightningSpacing = 20.0f;
+                        lightningLength = 2;
+                        lightningLengthRand = 2;
+                        lightningDamage = 20.0f;
+                        lightningAngleRand = 25.0f;
                         status = StatusEffects.shocked;
                     }};
                 }},
 
                 new Weapon("large-artillery"){{
-                    reload = 8f;
-                    x = 18f;
-                    y = 18f;
+                    reload = 8.0f;
+                    x = 18.0f;
+                    y = 18.0f;
                     inaccuracy = 2.2f;
-                    shootY = 6f;
-                    rotateSpeed = 4f;
+                    shootY = 6.0f;
+                    rotateSpeed = 4.0f;
                     rotate = true;
                     ejectEffect = Fx.casing1;
                     shootSound = Sounds.shoot;
-                    bullet = new FlakBulletType(12f, 60f){{
-                        lifetime = 30f;
-                        width = 14f;
-                        height = 20f;
-                        splashDamageRadius = 27f;
-                        splashDamage = 85f;
+                    bullet = new FlakBulletType(14.2f, 60.0f){{
+                        lifetime = 30.0f;
+                        width = 12.0f;
+                        height = 18.0f;
+                        splashDamageRadius = 27.0f;
+                        splashDamage = 85.0f;
+                        drag = 0.012f;
+                        trailLength = 2;
+                        trailWidth = 4.0f;
                         pierceCap = 3;
                         pierceBuilding = true;
                         collidesGround = true;
@@ -1076,6 +1120,9 @@ public class FUnitTypes{
                     y = -2.0f;
                     targetInterval = 1.0f;
                     targetSwitchInterval = 1.0f;
+                    color = Pal.surge;
+                    beamEffect = FFx.chainLightningThin;
+
                     bullet = new BulletType(1.0f, 145.0f){{
                         maxRange = 225.0f;
                         shootEffect = Fx.sparkShoot;
@@ -1105,20 +1152,23 @@ public class FUnitTypes{
             buildSpeed = 15.0f;
             rotateToBuilding = false;
             faceTarget = false;
-            ammoType = new PowerAmmoType(4500.0f);
-            immunities.add(StatusEffects.burning);
-            immunities.add(StatusEffects.melting);
-            immunities.add(StatusEffects.electrified);
-            immunities.add(StatusEffects.sapped);
-            immunities.add(StatusEffects.shocked);
-            immunities.add(StatusEffects.freezing);
+            immunities.addAll(
+                StatusEffects.burning, StatusEffects.melting,
+                StatusEffects.electrified, StatusEffects.sapped,
+                StatusEffects.shocked, StatusEffects.freezing
+            );
+
+            abilities.add(
+                new UnitSpawnAbility(UnitTypes.cyerce, 2100.0f, 25.0f, -35.0f),
+                new UnitSpawnAbility(UnitTypes.cyerce, 2100.0f, -25.0f, -35.0f)
+            );
 
             weapons.add(
                 new Weapon("fire-mechanical-tide-laser-large"){{
                     reload = 300.0f;
                     x = 0.0f;
                     y = 1.0f;
-                    recoil = 1.5f;
+                    recoil = 10.0f;
                     rotate = true;
                     mirror = false;
                     rotateSpeed = 0.8f;
@@ -1133,19 +1183,32 @@ public class FUnitTypes{
                         pierce = true;
                         pierceBuilding = true;
 
-                        spawnBullets.add(new LaserBulletType(){{
-                            damage = 6570;
+                        spawnBullets.add(new LaserBulletType(6750.0f){{
+                            length = 700.0f;
+                            width = 75.0f;
+                            lifetime = 65.0f;
                             buildingDamageMultiplier = 0.8f;
-                            knockback = 64;
+                            knockback = 64.0f;
                             pierceCap = 24;
                             pierce = true;
                             pierceBuilding = true;
-                            length = 700;
-                            width = 45;
-                            sideAngle = 160;
-                            sideWidth = 1;
-                            sideLength = 30;
-                            colors = new Color[]{Pal.heal, Pal.heal, Color.white};
+
+                            lightningSpacing = 35.0f;
+                            lightningLength = 8;
+                            lightningDelay = 1.2f;
+                            lightningLengthRand = 15;
+                            lightningDamage = 75;
+                            lightningAngleRand = 45.0f;
+                            largeHit = true;
+                            lightColor = lightningColor = Pal.heal;
+
+                            healPercent = 55.0f;
+                            collidesTeam = true;
+
+                            sideAngle = 160.0f;
+                            sideWidth = 1.0f;
+                            sideLength = 30.0f;
+                            colors = new Color[]{Pal.heal.cpy().a(0.4f), Pal.heal, Color.white};
                         }});
 
                         for(byte i = 0; i < 12; i++){
@@ -1205,8 +1268,8 @@ public class FUnitTypes{
         }};
 
         //endregion
-
         // put these there instead of FOverride or automatic unlocks
+
         ((UnitFactory)Blocks.groundFactory).plans.add(
             new UnitFactory.UnitPlan(FUnitTypes.guarding, 1500.0f, ItemStack.with(
                 Items.lead, 20,
@@ -1214,7 +1277,13 @@ public class FUnitTypes{
                 Items.silicon, 30
             ))
         );
+
         ((UnitFactory)Blocks.airFactory).plans.add(
+            new UnitFactory.UnitPlan(UnitTypes.alpha, 2400.0f, ItemStack.with(
+                Items.copper, 30,
+                Items.lead, 40,
+                Items.silicon, 30
+            )),
             new UnitFactory.UnitPlan(FUnitTypes.firefly, 2400.0f, ItemStack.with(
                 Items.lead, 20,
                 Items.metaglass, 10,
@@ -1222,20 +1291,26 @@ public class FUnitTypes{
                 Items.silicon, 15
             ))
         );
+
         ((Reconstructor)Blocks.additiveReconstructor).upgrades.addAll(
+            new UnitType[]{UnitTypes.alpha, UnitTypes.beta},
             new UnitType[]{FUnitTypes.guarding, FUnitTypes.resisting},
             new UnitType[]{FUnitTypes.blade, FUnitTypes.hatchet},
             new UnitType[]{FUnitTypes.firefly, FUnitTypes.candlelight}
         );
+
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
+            new UnitType[]{UnitTypes.beta, FUnitTypes.omicron},
             new UnitType[]{FUnitTypes.resisting, FUnitTypes.garrison},
             new UnitType[]{FUnitTypes.hatchet, FUnitTypes.castle},
             new UnitType[]{FUnitTypes.candlelight, FUnitTypes.lampflame}
         );
+
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(
             new UnitType[]{FUnitTypes.omicron, FUnitTypes.pioneer},
             new UnitType[]{FUnitTypes.garrison, FUnitTypes.shelter}
         );
+
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.addAll(
             new UnitType[]{FUnitTypes.shelter, FUnitTypes.blessing}
         );

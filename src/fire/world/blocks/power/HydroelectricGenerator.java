@@ -27,6 +27,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
             table.row();
             for(var b : Vars.content.blocks()){
                 if(!b.isFloor() || b.asFloor().liquidDrop == null) continue;
+
                 table.table(Styles.grayPanel, t -> {
                     t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                     t.left().table(info -> {
@@ -52,8 +53,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
     public float getEfficiency(Tile tile){
         if(tile == null) return 0.0f;
 
-        float efficiencyCountingDoubled = 0.0f;
-        float efficiencyCounting = 0.0f;
+        float efficiencyCountingDoubled = 0.0f, efficiencyCounting = 0.0f;
         for(var other : tile.getLinkedTilesAs(this, tempTiles)){
             float efficiencyCurrent = other.floor().liquidDrop != null
                 ? other.floor().liquidMultiplier * (1.0f - other.floor().liquidDrop.viscosity) * other.floor().liquidDrop.temperature * 4.0f
@@ -62,16 +62,16 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
             efficiencyCountingDoubled += efficiencyCurrent * efficiencyCurrent;
         }
 
-        return (efficiencyCountingDoubled / sqr() - efficiencyCounting * efficiencyCounting / (sqr() * sqr())) * 4;
+        return (efficiencyCountingDoubled / sqr() - efficiencyCounting * efficiencyCounting / (sqr() * sqr())) * 4.0f;
     }
 
     private short sqr(){
-        return (short) (size * size);
+        return (short)(size * size);
     }
 
     public class HydroelectricGeneratorBuild extends GeneratorBuild{
 
-        float sum;
+        private float sum;
 
         @Override
         public void updateTile(){
@@ -82,6 +82,12 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         public void onProximityAdded(){
             super.onProximityAdded();
             sum = getEfficiency(tile);
+        }
+
+        @Override
+        public float totalProgress(){
+            // for drawer
+            return super.totalProgress() * efficiency;
         }
     }
 }

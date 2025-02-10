@@ -41,7 +41,7 @@ public class FSectorPresets{
     }
 
     static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
-        var s = new SectorPreset(name, FPlanets.risetar, sector);
+        var s = new SectorPreset(name, FPlanets.lysetta, sector);
         s.difficulty = difficulty;
         s.captureWave = captureWave;
         s.addStartingItems = addStartingItems;

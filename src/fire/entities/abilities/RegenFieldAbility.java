@@ -24,7 +24,6 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public final Color lineColor;
 
     private float warmup, totalProgress;
-    private final Seq<Unit> targets = new Seq<>();
 
     public RegenFieldAbility(float amount, float radius, Color color){
         this.amount = amount;
@@ -48,19 +47,15 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
     public void update(Unit unit){
         final float lineSpeed = 120.0f;
 
-        targets.clear();
+        boolean[] any = new boolean[1];
         Units.nearby(unit.team, unit.x, unit.y, radius, u -> {
-            if(u.damaged()) targets.add(u);
+            if(u.damaged()){
+                u.heal(amount * Time.delta);
+                any[0] = true;
+            }
         });
 
-        boolean any = false;
-        for(var target : targets)
-            if(target.damaged()){
-                target.heal(amount * Time.delta);
-                any = true;
-            }
-
-        warmup = Mathf.lerpDelta(warmup, Mathf.num(any), 0.08f);
+        warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
         totalProgress += Time.delta / lineSpeed;
     }
 

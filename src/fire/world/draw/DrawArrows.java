@@ -17,7 +17,7 @@ public class DrawArrows extends DrawRegion{
     public final byte arrows;
     public final Color arrowColor, baseArrowColor;
 
-    final TextureRegion[] arrowRegion, arrowBlurRegion;
+    private final TextureRegion[] arrowRegion, arrowBlurRegion;
 
     public DrawArrows(int n, Color c1, Color c2){
         arrows = (byte)n;

@@ -10,6 +10,7 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.PointBulletType;
 import mindustry.gen.Sounds;
+import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
@@ -49,7 +50,7 @@ public class DEBUG{
             type.smokeEffect = Fx.none;
             type.hitEffect = Fx.none;
             type.trailEffect = FFx.instTrailPurple;
-            type.despawnEffect = FFx.instBombPurple;
+            type.despawnEffect = FFx.crossEffect(15.0f, 3.0f, 45.0f, false, Pal.reactorPurple2);
         }
 
         @Override

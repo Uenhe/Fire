@@ -13,9 +13,12 @@ import arc.math.Mathf;
 import arc.struct.IntIntMap;
 import arc.struct.Seq;
 import arc.util.Time;
+import arc.util.Tmp;
 import fire.entities.FUnitSorts;
+import fire.entities.bullets.FleshBulletType;
 import fire.entities.bullets.FoldingBulletType;
 import fire.entities.bullets.LightningPointBulletType;
+import fire.entities.bullets.SpriteBulletType;
 import fire.world.DEBUG;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
@@ -34,7 +37,7 @@ import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
-import fire.world.draw.DrawRegionPlus;
+import fire.world.draw.DrawWeavePlus;
 import fire.world.kits.Campfire;
 import fire.world.kits.EnergyField;
 import fire.world.meta.FAttribute;
@@ -65,6 +68,7 @@ import mindustry.entities.part.HaloPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootAlternate;
+import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootMulti;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.game.EventType;
@@ -98,7 +102,6 @@ import mindustry.world.blocks.liquid.LiquidBridge;
 import mindustry.world.blocks.liquid.LiquidRouter;
 import mindustry.world.blocks.power.ConsumeGenerator;
 import mindustry.world.blocks.power.ImpactReactor;
-import mindustry.world.blocks.power.LightBlock;
 import mindustry.world.blocks.production.AttributeCrafter;
 import mindustry.world.blocks.production.GenericCrafter;
 import mindustry.world.blocks.production.Pump;
@@ -128,10 +131,11 @@ public class FBlocks{
         adaptiveSource, fireCompany,
 
         //turret
-        smasher, nightmare, scab,
+        smasher, nightmare,
         ignition, blossom, gambler, seaquake, distance, magneticDomain,
         grudge, aerolite, magneticSphere,
         magneticRail,
+        scab,
 
         //production
         chopper, treeFarm, vapourCondenser, biomassCultivator, fissionDrill,
@@ -220,11 +224,9 @@ public class FBlocks{
             autolink = drawRange = false;
         }};
 
-        fireCompany = new LightBlock("hzgs"){{
+        fireCompany = new Block("fire-company"){{
             requirements(Category.effect, BuildVisibility.hidden, with());
             alwaysUnlocked = true;
-            hasShadow = false;
-            targetable = false;
             size = 2;
         }};
 
@@ -507,37 +509,46 @@ public class FBlocks{
             );
         }};
 
-        //TODO...
         scab = new ItemTurret("scab"){{
             requirements(Category.turret, BuildVisibility.hidden, with(
                 FItems.flesh, 50
             ));
-            health = 1600;
-            size = 2;
-            reload = 45.0f;
-            range = 260.0f;
+            health = 4000;
+            size = 4;
+            reload = 50.0f;
+            range = 40 * tilesize;
             shootCone = 15.0f;
             inaccuracy = 1.0f;
             rotateSpeed = 4.0f;
+            shoot = new ShootBarrel(){{
+                shots = 3;
+                barrels = new float[]{
+                    -4.0f, 0.0f, 335.0f,
+                    0.0f, 0.0f, 0.0f,
+                    4.0f, 0.0f, 25.0f
+                };
+            }};
 
             ammo(
-                FItems.flesh, new BulletType(2.0f, 75.0f){
+                FItems.flesh, new FleshBulletType(15.6f, 75.0f, 12, 6, 120.0f){{
+                    lifetime = 125.0f;
+                    drag = 0.05f;
+                    homingDelay = 10.0f;
+                    homingPower = 0.06f;
+                    homingRange = 8 * tilesize;
+                    statusDuration = 360.0f;
 
-                    @Override
-                    public void draw(Bullet b){
-                        super.draw(b);
-                        var item = FItems.flesh;
+                    trailLength = 3;
+                    trailWidth = 2.2f;
+                    trailColor = Color.valueOf("f57946");
+                    trailEffect = FStatusEffects.overgrown.effect;
+                    trailChance = 0.15f;
 
-                        Draw.alpha(1.0f);
-                        Draw.blend(Blending.additive);
-                        Draw.rect(Core.atlas.find("fire-flesh" + (b.time / item.frameTime % item.frames) + 1), b.x, b.y, 10.0f, 10.0f);
-                        Draw.blend();
-                    }
-                    {
-                        lifetime = 131.0f;
-                        status = FStatusEffects.overgrown;
-                        statusDuration = 360.0f;
-                    }}
+                    adhereChance = 0.4f;
+                    removeAmount = 10;
+                    maxSpread = 2.0f;
+                    spreadIntensity = 0.03f;
+                }}
             );
         }};
 
@@ -644,7 +655,7 @@ public class FBlocks{
                 weaveScale = 10.0f;
                 weaveMag = 2.0f;
                 trailLength = 24;
-                trailWidth = 3.0f;
+                trailWidth = 2.7f;
                 lightRadius = 100.0f;
                 lightOpacity = 1.2f;
                 ammoMultiplier = 1.0f;
@@ -673,15 +684,15 @@ public class FBlocks{
                 fragBullets = 6;
                 fragBullet = new BasicBulletType(4.0f, 25.0f){{
                     lifetime = 16.0f;
-                    width = 3.0f;
-                    height = 5.0f;
+                    width = 5.0f;
+                    height = 12.0f;
                     splashDamageRadius = 32.0f;
                     splashDamage = 35.0f;
                     homingPower = 0.15f;
                     homingRange = 80.0f;
                     homingDelay = 8.0f;
                     trailLength = 3;
-                    trailWidth = 3.0f;
+                    trailWidth = 1.0f;
                     buildingDamageMultiplier = 0.25f;
                     collidesGround = true;
                     status = StatusEffects.blasted;
@@ -734,7 +745,7 @@ public class FBlocks{
                         statusDuration = 240.0f;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(60.0f, 4);
+                        shootEffect = FFx.squareEffect(60.0f, 4, 3.0f, 45.0f, null);
                         frontColor = Color.white;
                         backColor = hitColor = colors[0];
                     }}),
@@ -758,7 +769,7 @@ public class FBlocks{
                         pierceCap = 2;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(60.0f, 2);
+                        shootEffect = FFx.squareEffect(60.0f, 2, 3.0f, 45.0f, null);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[1]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[1];
@@ -789,7 +800,7 @@ public class FBlocks{
                         lightningLengthRand = 1;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(25.0f, 1);
+                        shootEffect = FFx.squareEffect(25.0f, 1, 3.0f, 45.0f, null);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[2]);
                         frontColor = Color.white;
                         backColor = hitColor = colors[2];
@@ -816,7 +827,7 @@ public class FBlocks{
                         pierceCap = 4;
 
                         chargeEffect = chargeFx;
-                        shootEffect = FFx.gamblerShootEffect(15.0f, 1);
+                        shootEffect = FFx.squareEffect(15.0f, 1, 3.0f, 45.0f, null);
                         hitEffect = despawnEffect = FFx.hitBulletSmall(colors[3]);
                         frontColor = Pal.sapBullet;
                         backColor = hitColor = colors[3];
@@ -923,13 +934,13 @@ public class FBlocks{
                 FItems.hardenedAlloy, 225
             ));
             health = 2160;
-            armor = 5;
+            armor = 8.0f;
             size = 3;
-            liquidCapacity = 45f;
-            reload = 600f;
-            range = 500f;
-            shootCone = 15f;
-            rotateSpeed = 1.0f;
+            liquidCapacity = 45.0f;
+            reload = 600.0f;
+            range = 500.0f;
+            shootCone = 10.0f;
+            rotateSpeed = 1.2f;
             recoil = 2.0f;
             shake = 4.0f;
             coolantMultiplier = 3.0f;
@@ -940,26 +951,40 @@ public class FBlocks{
 
             ammo(
 
-                FItems.logicAlloy, new MissileBulletType(3.0f, 300.0f){{
+                FItems.logicAlloy, new SpriteBulletType(3.0f, 300.0f, 18.0f, 30.0f, "fire-missile"){{
                     lifetime = 167.0f;
-                    width = 25.0f;
-                    height = 28.0f;
                     splashDamageRadius = 30.0f;
                     splashDamage = 75.0f;
                     homingPower = 0.16f;
                     despawnShake = 3.0f;
                     ammoMultiplier = 1.0f;
                     buildingDamageMultiplier = 0.2f;
+
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootSmokeMissile;
-                    hitEffect = Fx.massiveExplosion;
                     hitSound = Sounds.mediumCannon;
+                    hitColor = Pal.redLight;
+                    hitEffect = despawnEffect = Fx.massiveExplosion;
+
+                    trailChance = 0.1f;
+                    trailColor = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
+                    trailEffect = new Effect(100.0f, 180.0f, e -> {
+
+                        Draw.color(e.color, 0.5f);
+                        Fx.rand.setSeed(e.id * 2L + 1);
+                        e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), f ->
+                            Angles.randLenVectors(f.id, f.fin(Interp.pow10Out), 2, 10.0f, (x, y, in, out) -> {
+                                float rad = f.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f) * 7.2f;
+
+                                Fill.circle(f.x + x, f.y + y, rad);
+                                Drawf.light(f.x + x, f.y + y, rad * 2.0f, f.color, 0.5f);
+                            }));
+
+                    }).layer(Layer.bullet - 1.0f);
                 }},
 
-                FItems.detonationCompound, new MissileBulletType(4.0f, 210.0f){{
+                FItems.detonationCompound, new SpriteBulletType(4.0f, 210.0f, 18.0f, 30.0f, "fire-missile"){{
                     lifetime = 193.0f;
-                    width = 25.0f;
-                    height = 28.0f;
                     splashDamage = 330.0f;
                     splashDamageRadius = 64.0f;
                     rangeChange = 270.0f;
@@ -968,21 +993,49 @@ public class FBlocks{
                     makeFire = true;
                     ammoMultiplier = 1.0f;
                     buildingDamageMultiplier = 0.2f;
+
                     shootEffect = Fx.shootBig;
                     smokeEffect = Fx.shootSmokeMissile;
-                    hitEffect = Fx.massiveExplosion;
                     hitSound = Sounds.mediumCannon;
+                    hitColor = Pal.redLight;
+                    hitEffect = despawnEffect = new Effect(50.0f, 140.0f, e -> {
+                        float circleRad = 6.0f + e.finpow() * 40.0f;
 
-                    trailColor = Pal.lightishOrange;
-                    trailInterval = 20.0f;
-                    trailEffect = new Effect(30.0f, e -> {
                         Draw.color(e.color);
-                        Fill.circle(e.x, e.y, 1.8f * e.rotation * e.fout() + 1.4f);
+                        Lines.stroke(e.fout() * 5.0f);
+                        Lines.circle(e.x, e.y, circleRad);
+
+                        Fx.rand.setSeed(e.id);
+                        for(byte i = 0; i < 12; i++){
+                            float angle = Fx.rand.random(360.0f);
+                            float lenRand = Fx.rand.random(0.5f, 1f);
+                            Tmp.v1.trns(angle, circleRad);
+
+                            for(int s : Mathf.signs)
+                                Drawf.tri(e.x + Tmp.v1.x, e.y + Tmp.v1.y, e.foutpow() * 30.0f, e.fout() * 24.0f * lenRand + 6.0f, angle + 90.0f + s * 90.0f);
+                        }
                     });
 
+                    trailChance = 0.3f;
+                    trailColor = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
+                    trailEffect = new Effect(140.0f, 240.0f, e -> {
+                        final float intensity = 1.6f;
+
+                        Draw.color(e.color, 0.7f);
+                        Fx.rand.setSeed(e.id * 2L + 1);
+                        e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), f ->
+                            Angles.randLenVectors(f.id, f.fin(Interp.pow10Out), (int)(2.4f * intensity), 10.0f * intensity, (x, y, in, out) -> {
+                                float rad = f.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f) * (2.0f + intensity) * 2.35f;
+
+                                Fill.circle(f.x + x, f.y + y, rad);
+                                Drawf.light(f.x + x, f.y + y, rad * 2.0f, f.color, 0.5f);
+                        }));
+
+                    }).layer(Layer.bullet - 1.0f);
+
                     fragBullets = 3;
-                    fragBullet = new MissileBulletType(2.0f, 105.0f){{
-                        lifetime = 144.0f;
+                    fragBullet = new MissileBulletType(3.0f, 105.0f){{
+                        lifetime = 72.0f;
                         width = 20.0f;
                         height = 24.0f;
                         splashDamage = 225.0f;
@@ -994,7 +1047,7 @@ public class FBlocks{
                         status = StatusEffects.blasted;
                         hitEffect = Fx.blastExplosion;
 
-                        trailColor = Pal.lightishOrange;
+                        trailColor = Pal.redLight;
                         trailInterval = 25.0f;
                         trailEffect = new Effect(30.0f, e -> {
                             Draw.color(e.color);
@@ -1012,6 +1065,7 @@ public class FBlocks{
                 Items.lead, 500,
                 FItems.magneticAlloy, 200
             ));
+            health = 1980;
             armor = 8.0f;
             size = 3;
             hasLiquids = false;
@@ -1034,9 +1088,9 @@ public class FBlocks{
                 displayAmmoMultiplier = false;
                 status = StatusEffects.slow;
                 statusDuration = 180.0f;
+                hitEffect = FFx.chainLightningThin;
                 lightningColor = Pal.surge;
 
-                // works on EnergyFieldBulletType side
                 fragBullets = 1;
                 fragBullet = new BulletType(0.0f, 0.0f){{
                     lifetime = Mathf.FLOAT_ROUNDING_ERROR;
@@ -1056,7 +1110,7 @@ public class FBlocks{
             ));
             health = 4320;
             size = 4;
-            armor = 10.0f;
+            armor = 20.0f;
             liquidCapacity = 75.0f;
             canOverdrive = false;
             reload = 14.0f;
@@ -1072,70 +1126,68 @@ public class FBlocks{
             shootSound = Sounds.shootBig;
             ammoUseEffect = Fx.casing3;
             coolantMultiplier = 0.8f;
-            shoot = new ShootAlternate(6.3f);
-            shoot.shots = 2;
-            ((ShootAlternate)shoot).barrels = 3;
+            shoot = new ShootAlternate(6.3f){{shots=2;barrels=3;}};
 
             consumeCoolant(1.2f);
 
             ammo(
 
-                Items.thorium, new BasicBulletType(8f, 90f){{
-                    lifetime = 46f;
+                Items.thorium, new BasicBulletType(8.0f, 90.0f){{
+                    lifetime = 46.0f;
                     knockback = 0.8f;
-                    width = 20f;
-                    height = 27f;
+                    width = 20.0f;
+                    height = 27.0f;
                     hitSize = 6.0f;
                     pierceCap = 4;
                     pierceBuilding = true;
                     pierceArmor = true;
                     ammoMultiplier = 4;
                     status = FStatusEffects.disintegrated;
-                    statusDuration = 120f;
+                    statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
                     fragBullets = 4;
-                    fragBullet = new BasicBulletType(4f, 25f){{
+                    fragBullet = new BasicBulletType(4.0f, 30.0f){{
                         lifetime = 8.0f;
                         width = 8.0f;
-                        height = 11f;
+                        height = 11.0f;
                         drag = 0.02f;
                         status = StatusEffects.corroded;
-                        statusDuration = 240f;
+                        statusDuration = 240.0f;
                     }};
                 }},
 
-                FItems.detonationCompound, new BasicBulletType(8f, 60f){{
-                    lifetime = 46f;
+                FItems.detonationCompound, new BasicBulletType(8.0f, 65.0f){{
+                    lifetime = 46.0f;
                     knockback = 0.7f;
-                    width = 18f;
-                    height = 25f;
+                    width = 18.0f;
+                    height = 25.0f;
                     hitSize = 6.0f;
                     pierceCap = 2;
                     pierceBuilding = true;
                     makeFire = true;
                     ammoMultiplier = 8;
                     reloadMultiplier = 0.6f;
-                    buildingDamageMultiplier = 0.1f;
+                    buildingDamageMultiplier = 0.2f;
                     status = FStatusEffects.disintegrated;
-                    statusDuration = 120f;
+                    statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.lightishOrange;
                     backColor = Pal.lightOrange;
                     fragBullets = 2;
-                    fragBullet = new BulletType(4f, 0f){{
+                    fragBullet = new BulletType(4.0f, 0.0f){{
                         lifetime = 1.0f;
-                        splashDamageRadius = 62f;
-                        splashDamage = 90f;
+                        splashDamageRadius = 62.0f;
+                        splashDamage = 90.0f;
                         hittable = reflectable = absorbable = false;
                         status = StatusEffects.melting;
-                        statusDuration = 480f;
+                        statusDuration = 480.0f;
                         hitSoundVolume = 0.5f;
                         hitSound = Sounds.mediumCannon;
                         hitEffect = Fx.pulverize;
                         despawnEffect = new WaveEffect(){{
-                            lifetime = 16f;
+                            lifetime = 16.0f;
                             sizeFrom = 0.0f;
-                            sizeTo = 56f;
+                            sizeTo = 56.0f;
                             strokeFrom = 3.0f;
                             strokeTo = 0.0f;
                             interp = Interp.pow2Out;
@@ -1145,36 +1197,36 @@ public class FBlocks{
                     }};
                 }},
 
-                FItems.hardenedAlloy, new BasicBulletType(9f, 210f){{
+                FItems.hardenedAlloy, new BasicBulletType(9.0f, 220.0f){{
                     lifetime = 72f;
                     knockback = 2.0f;
                     width = 28f;
                     height = 32f;
                     drag = 0.01f;
                     hitSize = 7.0f;
-                    rangeChange = 120f;
+                    rangeChange = 120.0f;
                     pierceCap = 4;
                     pierceBuilding = true;
                     reloadMultiplier = 0.2f;
-                    buildingDamageMultiplier = 0.1f;
+                    buildingDamageMultiplier = 0.2f;
                     status = FStatusEffects.disintegrated;
-                    statusDuration = 120f;
+                    statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
                     frontColor = Pal.sapBullet;
                     backColor = Pal.sapBulletBack;
                     fragBullets = 2;
-                    fragBullet = new BulletType(48f, 0f){{
+                    fragBullet = new BulletType(48.0f, 0.0f){{
                         lifetime = 1.0f;
-                        splashDamageRadius = 52f;
-                        splashDamage = 85f;
+                        splashDamageRadius = 52.0f;
+                        splashDamage = 90.0f;
                         hittable = reflectable = absorbable = false;
                         hitSoundVolume = 0.5f;
                         hitSound = Sounds.mediumCannon;
                         hitEffect = Fx.pulverizeMedium;
                         despawnEffect = new WaveEffect(){{
-                            lifetime = 15f;
+                            lifetime = 15.0f;
                             sizeFrom = 0.0f;
-                            sizeTo = 54f;
+                            sizeTo = 54.0f;
                             strokeFrom = 3.0f;
                             strokeTo = 0.0f;
                             interp = Interp.pow3Out;
@@ -1196,7 +1248,7 @@ public class FBlocks{
             ));
             health = 3840;
             size = 4;
-            armor = 8.0f;
+            armor = 20.0f;
             liquidCapacity = 75.0f;
             canOverdrive = false;
             targetAir = false;
@@ -1204,7 +1256,7 @@ public class FBlocks{
             reload = 90.0f;
             range = 80 * tilesize;
             inaccuracy = 15.0f;
-            maxAmmo = 30;
+            maxAmmo = 50;
             recoil = 3.6f;
             recoilTime = 40.0f;
             shake = 2.0f;
@@ -1220,14 +1272,14 @@ public class FBlocks{
 
             ammo(
 
-                Items.plastanium, new ArtilleryBulletType(16.0f,560.0f){{
+                Items.plastanium, new ArtilleryBulletType(16.0f,0.0f){{
                     lifetime = 40.0f;
                     width = 16.0f;
                     height = 12.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 40.0f;
-                    splashDamage = 500.0f;
-                    ammoMultiplier = 12.0f;
+                    splashDamage = 375.0f;
+                    ammoMultiplier = 8.0f;
                     status = StatusEffects.blasted;
                     frontColor = Color.white;
                     backColor = trailColor = Pal.plastanium;
@@ -1257,10 +1309,9 @@ public class FBlocks{
                     }};
                 }},
 
-                Items.blastCompound, new ArtilleryBulletType(4.0f,210.0f){{
-                    //this is lazy
+                Items.blastCompound, new ArtilleryBulletType(4.0f,0.0f){{
                     Color
-                        color1 = ((ItemTurret)Blocks.titan).ammoTypes.get(Items.thorium).trailColor,
+                        color1 = Color.valueOf("ea8878").lerp(Pal.redLight, 0.5f),
                         color2 = color1.cpy().a(0.7f);
 
                     lifetime = 160.0f;
@@ -1268,8 +1319,8 @@ public class FBlocks{
                     height = 16.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 160.0f;
-                    splashDamage = 400.0f;
-                    ammoMultiplier = 7.0f;
+                    splashDamage = 500.0f;
+                    ammoMultiplier = 12.0f;
                     status = StatusEffects.blasted;
                     frontColor = Color.white;
                     backColor = trailColor = color1;
@@ -1328,14 +1379,15 @@ public class FBlocks{
                     );
                 }},
 
-                Items.pyratite, new ArtilleryBulletType(16.0f,375.0f){{
+                Items.pyratite, new ArtilleryBulletType(16.0f,0.0f){{
                     lifetime = 40.0f;
                     width = 16.0f;
                     height = 12.0f;
                     knockback = 10.0f;
                     splashDamageRadius = 80.0f;
-                    splashDamage = 500.0f;
+                    splashDamage = 430.0f;
                     ammoMultiplier = 12.0f;
+                    makeFire = true;
                     status = StatusEffects.burning;
                     statusDuration = 840.0f;
                     frontColor = Color.white;
@@ -1367,7 +1419,7 @@ public class FBlocks{
                     );
                 }},
 
-                FItems.detonationCompound, new ArtilleryBulletType(8.0f,80.0f){{
+                FItems.detonationCompound, new ArtilleryBulletType(8.0f,0.0f){{
                     Color
                         color1 = Color.valueOf("ea8878"),
                         color2 = Color.valueOf("ea8878b3");
@@ -1377,8 +1429,8 @@ public class FBlocks{
                     height = 16.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 100.0f;
-                    splashDamage = 500.0f;
-                    ammoMultiplier = 12.0f;
+                    splashDamage = 600.0f;
+                    ammoMultiplier = 15.0f;
                     status = StatusEffects.blasted;
 
                     hitEffect = new MultiEffect(
@@ -1631,7 +1683,6 @@ public class FBlocks{
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
-
             final float
                 chargeTime = 150.0f,
                 baseRange = 1200.0f, extraRange = 400.0f;
@@ -1653,6 +1704,7 @@ public class FBlocks{
             final float
                 speed_1_1 = 60.0f,
                 lifetime_1_1 = 35.0f;
+
             bullet_1_1 = new BasicBulletType(speed_1_1,18000.0f){{
                 lifetime = lifetime_1_1;
                 width = 20.0f;
@@ -1924,10 +1976,10 @@ public class FBlocks{
 
                         //wave
                         new WaveEffect(){{
-                            lifetime = 36f;
+                            lifetime = 24.0f;
                             interp = Interp.circleOut;
-                            sizeFrom = 108f;
-                            sizeTo = 4.0f;
+                            sizeFrom = 8.0f;
+                            sizeTo = 108.0f;
                             strokeFrom = 4.0f;
                             strokeTo = 0.0f;
                             colorFrom = colorTo = col1;
@@ -1935,24 +1987,24 @@ public class FBlocks{
 
                         //circles
                         new ParticleEffect(){{
-                            lifetime = 36f;
+                            lifetime = 30.0f;
                             particles = 6;
-                            baseLength = 40f;
-                            sizeFrom = 20f;
+                            baseLength = 40.0f;
+                            sizeFrom = 20.0f;
                             sizeTo = 0.0f;
                             colorFrom = colorTo = col1;
                         }},
 
                         //lines
                         new ParticleEffect(){{
-                            lifetime = 30f;
+                            lifetime = 30.0f;
                             particles = 12;
-                            length = 40f;
-                            baseLength = 24f;
+                            length = 40.0f;
+                            baseLength = 24.0f;
                             line = true;
                             strokeFrom = 4.0f;
                             strokeTo = 0.0f;
-                            lenFrom = 40f;
+                            lenFrom = 40.0f;
                             lenTo = 0.0f;
                             colorFrom = colorTo = col1;
                         }}
@@ -2494,21 +2546,16 @@ public class FBlocks{
 
         hydroelectricGenerator = new HydroelectricGenerator("hydroelectric-generator"){{
             requirements(Category.power, with(
-                Items.graphite, 120,
                 Items.metaglass, 80,
+                Items.graphite, 120,
                 Items.plastanium, 60,
                 FItems.logicAlloy, 60
             ));
             health = 640;
             size = 2;
             drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawRegionPlus(){{
-                    suffix = "-turbine";
-                    rotateSpeed = 3f;
-                    magnification = 0.6f;
-                }},
-                new DrawRegion("-cap")
+                new DrawRegion("-turbine", 2.4f, true),
+                new DrawDefault()
             );
             powerProduction = 6.0f;
             floating = true;
@@ -2524,16 +2571,12 @@ public class FBlocks{
                 FItems.logicAlloy, 160,
                 FItems.hardenedAlloy, 120
             ));
-            health = 1640;
+            health = 2560;
+            armor = 4.0f;
             size = 4;
             drawer = new DrawMulti(
-                new DrawDefault(),
-                new DrawRegionPlus(){{
-                    suffix = "-turbine";
-                    rotateSpeed = 1f;
-                    magnification = 0.6f;
-                }},
-                new DrawRegion("-cap")
+                new DrawRegion("-turbine", 2.0f, true),
+                new DrawDefault()
             );
             powerProduction = 35.0f;
             floating = true;
@@ -3097,7 +3140,7 @@ public class FBlocks{
                 FItems.logicAlloy, 200,
                 FItems.hardenedAlloy, 75
             ));
-            health = 1440;
+            scaledHealth = 90.0f;
             armor = 8.0f;
             size = 4;
             hasPower = true;
@@ -3105,6 +3148,8 @@ public class FBlocks{
             itemCapacity = 20;
             liquidCapacity = 150.0f;
             lightLiquid = Liquids.cryofluid;
+            updateEffectChance = 0.03f;
+            updateEffect = FFx.squareEffect(30.0f, 6, 2.4f, 0.0f, Liquids.cryofluid.color.cpy().mul(1.05f));
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.water),
@@ -3128,7 +3173,7 @@ public class FBlocks{
                 FItems.logicAlloy, 320,
                 FItems.hardenedAlloy, 225
             ));
-            health = 3200;
+            scaledHealth = 90.0f;
             armor = 16.0f;
             size = 5;
             hasPower = true;
@@ -3159,18 +3204,22 @@ public class FBlocks{
                 FItems.hardenedAlloy, 225,
                 FItems.magneticAlloy, 125
             ));
-            health = 2880;
+            scaledHealth = 90.0f;
             armor = 16.0f;
             size = 5;
             hasPower = true;
             itemCapacity = 75;
-            craftEffect = Fx.smeltsmoke;
-            updateEffect = Fx.plasticburn;
             ambientSound = Sounds.techloop;
             ambientSoundVolume = 0.015f;
+            updateEffectChance = 0.03f;
+            updateEffect = new Effect(33.0f, e -> {
+                Draw.color(Items.phaseFabric.color, Pal.accent, e.fin() * 0.8f);
+                Lines.stroke(3.0f * e.fout());
+                Lines.spikes(e.x, e.y, 10.0f * e.finpow(), 2.0f * e.fout() + 4.0f * e.fslope(), 4, 45.0f);
+            });
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawWeave(),
+                new DrawWeavePlus(8, 0.8f),
                 new DrawDefault()
             );
 
@@ -3184,7 +3233,7 @@ public class FBlocks{
         }};
 
         electromagnetismDiffuser = new SurgeCrafter("electromagnetism-diffuser"){{
-            final float radius = 120.0f;
+            final float rad = 120.0f;
 
             requirements(Category.crafting, with(
                 Items.surgeAlloy, 325,
@@ -3192,6 +3241,7 @@ public class FBlocks{
                 FItems.hardenedAlloy, 375,
                 FItems.magneticAlloy, 250
             ));
+            scaledHealth = 90.0f;
             armor = 16.0f;
             size = 5;
             hasPower = true;
@@ -3201,7 +3251,7 @@ public class FBlocks{
             craftSound = Sounds.spark;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawArcSmelt(){{circleSpace = 3.0f;flameColor = Color.valueOf("e3ae6f");}},
+                new DrawArcSmelt(){{circleSpace=3.0f;flameColor=Color.valueOf("e3ae6f");}},
                 new DrawDefault()
             );
 
@@ -3216,7 +3266,7 @@ public class FBlocks{
                 lifetime = craftTime - 0.1f;
                 width = 8.0f;
                 height = 8.0f;
-                homingRange = radius;
+                homingRange = rad;
                 homingDelay = 10.0f;
                 homingPower = 0.35f;
 
@@ -3230,13 +3280,13 @@ public class FBlocks{
             pattern = (b, i, sign, scl) -> {
 
                 // check whether there's any target first
-                if(Units.closestTarget(b.team, b.x, b.y, radius, e -> e != null && !b.hasCollided(e.id)) != null)
+                if(Units.closestTarget(b.team, b.x, b.y, rad, e -> e != null && !b.hasCollided(e.id)) != null)
                     return;
 
                 final float spd = 3.0f;
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(
-                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * radius * b.time / b.lifetime + b.x,
-                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * radius * b.time / b.lifetime + b.y
+                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * rad * b.time / b.lifetime + b.x,
+                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * rad * b.time / b.lifetime + b.y
                 ), 65535.0f));
             };
 
@@ -3255,6 +3305,7 @@ public class FBlocks{
                 Items.silicon, 275,
                 FItems.hardenedAlloy, 500
             ));
+            scaledHealth = 10.0f;
             armor = 20.0f;
             size = 6;
             hasPower = true;
@@ -3262,12 +3313,12 @@ public class FBlocks{
             itemCapacity = 60;
             liquidCapacity = 120.0f;
             craftEffect = new MultiEffect(
+                FFx.crossEffect(45.0f, 4.0f, 0.0f, true, null),
                 Fx.mineImpact,
                 FFx.drillSteamFast,
-                FFx.dynamicSpikesZ,
                 FFx.mineImpactWaveZ
             );
-            updateEffect = new Effect(50f, e -> {
+            updateEffect = new Effect(45.0f, e -> {
                 Draw.color(Pal.reactorPurple, 0.7f);
                 Lines.stroke(e.fout() * 2.0f);
                 Lines.circle(e.x, e.y, 4.0f + e.finpow() * 60f);
@@ -3282,17 +3333,17 @@ public class FBlocks{
             craftTime = 120.0f;
             outputItem = new ItemStack(FItems.hardenedAlloy, 20);
 
-            explosionRadius = 240f;
-            explosionDamage = 2880f;
+            explosionRadius = 240.0f;
+            explosionDamage = 2880.0f;
             explosionShake = 6.0f;
-            explosionShakeDuration = 30f;
+            explosionShakeDuration = 30.0f;
             explodeSound = Sounds.explosionbig;
             explodeEffect = Fx.reactorExplosion;
 
             maxInstability = 360.0f;
             stabilizeInterval = 900.0f;
 
-            lightningDamage = 80f;
+            lightningDamage = 80.0f;
             lightningAmount = 8;
 
             fragBullets = 3;
@@ -3301,8 +3352,7 @@ public class FBlocks{
             fragRoundRand = true;
             fragDelay = 10;
             fragDelayRand = true;
-            fragBulletVelRand = true;
-            fragBullet = new BasicBulletType(30f, 80f, "fire-frag-front"){{
+            fragBullet = new BasicBulletType(30.0f, 80.0f, "fire-frag-front"){{
                 backSprite = "fire-frag-back";
                 lifetime = 24f;
                 width = 20f;
@@ -3350,7 +3400,7 @@ public class FBlocks{
 
                 fragBullets = 4;
                 fragBullet = new LightningBulletType(){{
-                    damage = 40;
+                    damage = 40.0f;
                     lightningLength = 10;
                     lightningLengthRand = 1;
                     lightningColor = Pal.reactorPurple;
@@ -3387,7 +3437,7 @@ public class FBlocks{
                 liquidCapacity = 30f;
 
                 plans.add(
-                    new UnitFactory.UnitPlan(FUnitTypes.blade, 2700f, with(
+                    new UnitFactory.UnitPlan(FUnitTypes.blade, 2700.0f, with(
                         FItems.flesh, 55,
                         FItems.logicAlloy, 65
                     ))
@@ -3564,18 +3614,14 @@ public class FBlocks{
         envEteriverStronghold = new EnvBlock("env-eteriver-stronghold"){{
             buildType = () -> new EnvBlockBuild(){
 
-                /** Apollo spawn; placed() is not used since it's buggy. TODO add() may be helpful? */
+                /** Apollo spawn. */
                 @Override
-                public void update(){
-                    if(state.isEditor()) return;
-
-                    for(var w : Groups.weather)
-                        if(w.weather != Weathers.rain) w.remove();
-
-                    if(Groups.weather.isEmpty())
+                public void add(){
+                    super.add();
+                    if(!Groups.weather.contains(w -> w.weather == Weathers.rain)){
+                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
                         Weathers.rain.create();
-
-                    kill();
+                    }
                 }
 
                 /** Apollo death. */
@@ -3614,11 +3660,10 @@ public class FBlocks{
                     alpha = Mathf.lerpDelta(alpha, 0.4f, 0.003f);
                     state.rules.ambientLight.a = alpha;
 
-                    for(var w : Groups.weather)
-                        if(w.weather != Weathers.rain) w.remove();
-
-                    if(Groups.weather.isEmpty())
+                    if(!Groups.weather.contains(w -> w.weather == Weathers.rain)){
+                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
                         Weathers.rain.create();
+                    }
                 }
 
                 /** When wave 47 is half. */
@@ -3676,11 +3721,10 @@ public class FBlocks{
                     alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
                     state.rules.ambientLight.a = alpha;
 
-                    for(var w : Groups.weather)
-                        if(w.weather != FWeathers.rainstorm) w.remove();
-
-                    if(Groups.weather.isEmpty())
+                    if(!Groups.weather.contains(w -> w.weather == FWeathers.rainstorm)){
+                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
                         FWeathers.rainstorm.create();
+                    }
                 }
 
                 /** After all the apollos are destructed. */
@@ -3717,15 +3761,16 @@ public class FBlocks{
                 /** Limits invasion times. */
                 byte times;
 
-                /** Landing; placed() is not used since it won't be called if placed by world processor... */
+                /** Landing. */
                 @Override
-                public void update(){
-                    if(state.isEditor() || !state.isCampaign()) return;
+                public void add(){
+                    super.add();
+                    if(!state.isCampaign()) return;
 
+                    int n = Mathf.random(4, 6);
                     for(var s : state.getPlanet().sectors)
-                        if(times < 5 && s.hasBase() && Mathf.chance(0.6)){
+                        if(times++ < n && s.hasBase()){
                             Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
-                            times++;
                         }
 
                     kill();

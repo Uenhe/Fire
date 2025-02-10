@@ -115,7 +115,6 @@ public class FStatusEffects{
 
                 // check whether unit is neoplasm-about
                 if(unit.type instanceof FleshUnitType){
-
                     unit.healthMultiplier *= healthMultiplier;
                     unit.heal(regenPercent * Time.delta * unit.maxHealth);
 
@@ -143,12 +142,14 @@ public class FStatusEffects{
             effectChance = 0.1f;
             healthMultiplier = 1.1f;
 
-            effect = new Effect(40f, e -> {
-                float scl = e.data instanceof Unit u ? 1.0f + u.type.hitSize * 0.4f : 1.0f;
+            effect = new Effect(40.0f, e -> {
+                float scl = e.data instanceof Unit u
+                    ? 1.0f + u.type.hitSize * 0.4f
+                    : 1.0f;
 
                 Draw.color(overgrown.color);
-                Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.0f, (x, y) ->
-                    Fill.circle(e.x + x, e.y + y, e.fout() * scl * 1.2f)
+                Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.2f, (x, y) ->
+                    Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * scl * 1.4f)
                 );
             });
         }};

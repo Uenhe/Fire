@@ -3,6 +3,7 @@ package fire.entities.abilities;
 import arc.Core;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
+import arc.struct.IntMap;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.entities.Effect;
@@ -24,28 +25,29 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     /** Amount to heal at trigger. Do extra heal depend on unit's max health; 50 => 50%. */
     public final byte healPercentage;
     /** Status effect applied at trigger. */
-    public final StatusEffect statusEffect;
+    public final StatusEffect status;
     /** Status effect duration. */
     public final short statusDuration;
     public final Effect effect;
 
+    private final byte healthSize;
+    private float timerDetect;
+    private float timerCooldown;
     /** Frames between two detections. */
     private static final byte detectInterval = 5;
-    /** Used to record health. */
-    private final float[] healths;
-    private float timer;
-    private float timerCooldown;
+    /** Used to record health; Why I have to use a map or buggy????????????? */
+    private static final IntMap<float[]> healthMap = new IntMap<>();
 
     public FirstAidAbility(int cd, int lossP, int healA, int healP, StatusEffect se, int sed, int detectDuration, Effect fx){
         cooldown = (short)cd;
         healthLossPercentage = (byte)lossP;
         healAmount = healA;
         healPercentage = (byte)healP;
-        statusEffect = se;
+        status = se;
         statusDuration = (short)sed;
         effect = fx;
 
-        healths = new float[detectDuration / detectInterval];
+        healthSize = (byte)(detectDuration / detectInterval);
     }
 
     @Override
@@ -64,36 +66,35 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             t.row();
         }
         t.row();
-        t.add(statusEffect.emoji() + " [accent]" + statusEffect.localizedName + "[white], " + Strings.autoFixed(statusDuration / 60.0f, 2) + StatUnit.seconds.localized());
+        t.add(status.emoji() + " [accent]" + status.localizedName + "[white], " + Strings.autoFixed(statusDuration / 60.0f, 2) + StatUnit.seconds.localized());
     }
 
     @Override
     public void update(Unit unit){
-        if(unit.dead) return;
-
-        //init
-        if(healths[0] == 0.0f) Arrays.fill(healths, unit.health);
+        var health = healthMap.get(unit.id, new float[healthSize]);
+        if(health[0] == 0.0f) Arrays.fill(health, unit.health);
 
         if(timerCooldown == 0.0f){
-            timer += Time.delta;
+            timerDetect += Time.delta;
 
-            if(timer >= detectInterval){
-                timer -= detectInterval;
+            if(timerDetect >= detectInterval){
+                timerDetect -= detectInterval;
 
-                for(int i = 0; i < healths.length - 1; i++){
-                    healths[i] = healths[i + 1];
-                }
-                healths[healths.length - 1] = unit.health;
+                for(byte i = 0; i < health.length - 1; i++)
+                    health[i] = health[i + 1];
 
-                if((healths[0] - unit.health) >= unit.maxHealth * healthLossPercentage / 100.0f){
-
-                    unit.heal(healAmount + healPercentage / 100.0f);
-                    unit.apply(statusEffect, statusDuration);
-
-                    //enter cooldown
-                    timerCooldown = Mathf.FLOAT_ROUNDING_ERROR;
-                }
+                health[health.length - 1] = unit.health;
+                healthMap.put(unit.id, health);
             }
+
+            if(health[0] - unit.health < unit.maxHealth * healthLossPercentage / 100.0f) return;
+
+            unit.heal(healAmount + unit.maxHealth * healPercentage / 100.0f);
+            unit.apply(status, statusDuration);
+            effect.at(unit);
+
+            // enter cooldown
+            timerCooldown = Mathf.FLOAT_ROUNDING_ERROR;
 
         }else if(timerCooldown >= cooldown){
             timerCooldown = 0.0f;

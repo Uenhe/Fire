@@ -1,6 +1,7 @@
 package fire.entities.abilities;
 
 import arc.Core;
+import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.math.Angles;
 import arc.math.Mathf;
@@ -16,6 +17,7 @@ import mindustry.content.StatusEffects;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
+import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.tilesize;
@@ -30,7 +32,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     /** Number of afterimages to be displayed while dashing. */
     public final byte afterimage;
 
-    float timer;
+    private float timer;
     public static final String name = "ability.fire-dash";
 
     public DashAbility(float speedMul, int invTime, int cooldown, int afterimage){
@@ -52,7 +54,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         t.row();
         t.add("[lightgray]" + FStat.invincibleTime.localized() + ": [white]" + Strings.autoFixed(invincibleTime / 60.0f, 2) + " " + StatUnit.seconds.localized());
         t.row();
-        t.add("[lightgray]" + mindustry.world.meta.Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60.0f, 2) + " " + StatUnit.seconds.localized());
+        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(cooldown / 60.0f, 2) + " " + StatUnit.seconds.localized());
     }
 
     @Override
@@ -67,7 +69,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     public void draw(Unit unit){
         if(timer > invincibleTime) return;
 
-        Draw.color(arc.graphics.Color.white);
+        Draw.color(Color.white);
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
 
         for(byte i = 0; i < afterimage; i++){

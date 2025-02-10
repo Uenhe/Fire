@@ -24,7 +24,6 @@ import fire.world.meta.FAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
-import mindustry.game.EventType.ClientLoadEvent;
 import mindustry.mod.Mods;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
@@ -42,15 +41,15 @@ import static mindustry.Vars.ui;
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
 
-    static final String
+    private static final String
         linkRaindance = "https://space.bilibili.com/516898377",
         linkUeneh = "https://space.bilibili.com/327502129",
         linkGitHub = "https://github.com/Uenhe/Fire";
 
-    static Mods.LoadedMod FIRE;
-    static String displayName;
-    static boolean launched, multiplied;
-    static byte counter;
+    private static Mods.LoadedMod FIRE;
+    private static String displayName;
+    private static boolean launched, multiplied;
+    private static byte counter;
 
     @Override
     public void loadContent(){
@@ -141,7 +140,7 @@ public class FireMod extends mindustry.mod.Mod{
 
                 dialog.show();
             }
-        }).visible(() -> ui.research.root.node == FPlanets.risetar.techTree);
+        }).visible(() -> ui.research.root.node == FPlanets.lysetta.techTree);
     }
 
     static void showDialog(){
@@ -167,10 +166,10 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             addContent(t,
-                FItems.flesh, FBlocks.fleshSynthesizer, FBlocks.fleshReconstructor, FBlocks.fleshWall, FUnitTypes.blade,
-                FItems.magneticAlloy, FBlocks.magneticAlloyFormer, FBlocks.electromagnetismDiffuser, FBlocks.magneticSphere,
-
-                FUnitTypes.blessing, FUnitTypes.lampflame, FStatusEffects.sanctuaryGuard
+                FBlocks.magneticDomain, FBlocks.aerolite,
+                FBlocks.magneticRingPump, FBlocks.hardenedLiquidTank, FBlocks.hydroelectricGenerator,
+                FBlocks.cryofluidMixerLarge, FBlocks.magnetismConcentratedRollingMill, FBlocks.magneticRingSynthesizer,
+                FUnitTypes.hatchet, FUnitTypes.castle, FUnitTypes.mechanicalTide
             );
             t.row();
 
@@ -242,7 +241,7 @@ public class FireMod extends mindustry.mod.Mod{
         var index = Mathf.random(titles.length - 1);
         var title = titles[index];
 
-        // "Today is the _th Day of God's Creation of the Risetar" picked
+        // "Today is the _th Day of God's Creation of the Lysetta" picked
         if(index == 0)
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
 

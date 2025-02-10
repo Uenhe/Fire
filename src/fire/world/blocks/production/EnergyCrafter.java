@@ -50,8 +50,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     protected boolean
         fragBulletsRand,
         fragRoundRand,
-        fragDelayRand,
-        fragBulletVelRand;
+        fragDelayRand;
     protected Effect explodeEffect = Fx.none;
     protected Sound
         craftSound = Sounds.none,
@@ -82,9 +81,9 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
     public class EnergyCrafterBuild extends GenericCrafterBuild implements mindustry.logic.Ranged, SmoothCrafter{
 
-        float instability, fraction, flash, smoothProgress;
-        byte index;
-        short angle;
+        private float instability, fraction, flash, smoothProgress;
+        private byte counter;
+        private short angle;
 
         @Override
         public void updateTile(){
@@ -92,14 +91,10 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             fraction = Interp.smoother.apply(1.0f - progress);
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (1.0f - 20.0f / craftTime), 0.1f);
 
-            if(efficiency > 0.0f)
-                indexer.eachBlock(this, explosionRadius, b -> true, build -> {
-                    if(build != null && build.block == block && build.efficiency > 0.0f && build != this){
-
-                        instability += delta();
-                        if(instability > maxInstability) kill();
-                    }
-                });
+            if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, ignored -> {})){
+                instability += delta();
+                if(instability >= maxInstability) kill();
+            }
 
             if(instability <= 0.0f) return;
 
@@ -107,7 +102,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 createLightning();
 
             if(timer(timerStabilize, stabilizeInterval)){
-                Fx.healBlockFull.at(x, y, size, circleColor[index], block);
+                Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
                 instability = Math.max(instability - maxInstability * 0.1f, 0.0f);
             }
         }
@@ -118,14 +113,14 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             consume();
             if(outputItems != null)
                 for(var output : outputItems)
-                    for(int i = 0; i < output.amount; i++)
+                    for(byte i = 0; i < output.amount; i++)
                         offload(output.item);
                         
-            if(wasVisible) craftEffect.at(x, y, 0.0f, circleColor[index]);
-            progress %= 1.0f;
+            if(wasVisible) craftEffect.at(x, y, 0.0f, circleColor[counter]);
+            progress -= 1.0f;
 
             // customized below
-            index = (byte)((index + 1) % circleColor.length);
+            counter = (byte)((counter + 1) % circleColor.length);
             angle = (short)Mathf.random(360);
             createLightning();
         }
@@ -149,7 +144,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 Time.run(delay, () -> {
                     for(byte j = 0; j < bullets; j++)
                         fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f),
-                            fragBulletVelRand ? Mathf.random(0.9f, 1.1f) : 1.0f
+                            Mathf.random(fragBullet.fragVelocityMin, fragBullet.fragVelocityMax)
                         );
                 });
             }
@@ -165,12 +160,13 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void draw(){
             super.draw();
 
-            if(efficiency > 0.0f){
-                flash += (1.0f + instability / maxInstability * 6.0f) * delta();
-                Draw.z(Layer.effect);
-                Lines.stroke(2.4f, circleColor[index]);
-                Lines.arc(x, y, size * 5.0f, fraction, angle);
-            }
+            Draw.z(Layer.effect);
+            Lines.stroke(2.4f * Interp.slope.apply(1.0f - fraction) * warmup(), circleColor[counter]);
+            Draw.alpha(warmup());
+            Lines.arc(x, y, size * 5.0f, fraction, angle);
+
+            if(efficiency > 0.0f)
+                flash += (1.0f + instability / maxInstability * 6.0f) * delta(); //update in draw() but nuclear reactor does the same
 
             if(instability > maxInstability * 0.3f && Core.settings.getBool("showBlockRange")){
                 float alpha = Mathf.absin(2.4f, 0.6f);
@@ -182,7 +178,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 Fill.circle(x, y, range());
             }
 
-            Draw.color(circleColor[index], baseColor, Mathf.absin(flash, 9.0f, 1.0f));
+            Draw.color(circleColor[counter], baseColor, Mathf.absin(flash, 9.0f, 1.0f));
             Draw.alpha(0.5f);
             Draw.z(Layer.blockOver);
             Draw.rect(name + "-lights", x, y);
@@ -217,15 +213,15 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             return smoothProgress;
         }
 
-        void createLightning(){
+        private void createLightning(){
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
-            byte realLightningAmount = (byte)(lightningAmount * (1 + instability / maxInstability));
 
-            for(byte i = 0; i < realLightningAmount; i++)
-                Lightning.create(team, circleColor[index], lightningDamage, x, y, i * (360.0f / realLightningAmount), (int)(size * 2.0f + instability * 0.03f));
+            byte amount = (byte)(lightningAmount * (1 + instability / maxInstability));
+            for(byte i = 0; i < amount; i++)
+                Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
         }
 
-        float scale(){
+        private float scale(){
             return (timeScale - 1.0f) * 0.25f + 1.0f;
         }
     }

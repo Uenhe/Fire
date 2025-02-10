@@ -115,19 +115,7 @@ public class FOverride{
         //endregion
         //region block unit
 
-        ((UnitFactory)airFactory).plans.add(
-            new UnitFactory.UnitPlan(alpha, 2400.0f, ItemStack.with(
-                Items.copper, 30,
-                Items.lead, 40,
-                Items.silicon, 30
-            ))
-        );
-        ((Reconstructor)Blocks.additiveReconstructor).upgrades.addAll(
-            new UnitType[]{alpha, beta}
-        );
-        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
-            new UnitType[]{beta, FUnitTypes.omicron}
-        );
+        //see FUnitTypes
 
         //endregion
         //region block effect

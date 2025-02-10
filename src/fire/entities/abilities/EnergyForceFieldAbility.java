@@ -12,15 +12,17 @@ import arc.util.Strings;
 import arc.util.Time;
 import fire.world.meta.FStat;
 import mindustry.content.Fx;
-import mindustry.ctype.ContentType;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
+import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -35,14 +37,13 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     public final float chanceDeflect;
     public float rotateSpeed;
     public Color lightningColor = Color.clear;
-    public boolean unlocks;
+    public boolean extended;
 
-    static final String name = "ability.fire-energyforcefield";
-    float timer;
-    boolean broken, regenable;
-    final Seq<Bullet> bullets = new Seq<>();
-    /** Prevent endless and awful creating instances. */
-    static final IntIntMap bulletMap = new IntIntMap();
+    private float timer;
+    private boolean broken, regenable;
+    private final Seq<Bullet> bullets = new Seq<>();
+    private static final IntIntMap bulletMap = new IntIntMap();
+    public static final String name = "ability.fire-energyforcefield";
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
@@ -64,7 +65,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
         t.add(Core.bundle.get(name + ".description")).wrap().width(wid);
         t.row();
-        if(unlocks){
+        if(extended){
             t.add(Core.bundle.get(name + ".unlocks")).wrap().width(wid);
             t.row();
         }
@@ -81,28 +82,28 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new mindustry.ui.Bar(
+        bars.add(new Bar(
             "stat.shieldhealth",
-            broken ? Color.gray : mindustry.graphics.Pal.accent,
-            () -> broken ? -unit.shield / (regen * cooldown) : unit.shield / max)
+            broken ? Color.gray : Pal.accent,
+            () -> broken ? 1.0f + unit.shield / (regen * cooldown) : unit.shield / max)
         ).row();
     }
 
     @Override
     public void update(Unit unit){
-        alpha = Math.max(alpha - Time.delta / 10.0f, 0.0f);
-        broken = unit.shield <= 0.0f;
-
         if(rotateSpeed > 0.0f)
             rotation += rotateSpeed * Time.delta;
 
         if(unit.shield < max && timer == 0.0f){
-            unit.shield += regen * Time.delta;
-
             // regen shield to full after cooldown
-            if(unit.shield > 0.0f && radiusScale == 0.0f)
+            if(unit.shield < 0.0f && unit.shield + regen * Time.delta > 0.0f)
                 unit.shield = max;
+            else
+                unit.shield += regen * Time.delta;
         }
+
+        alpha = Math.max(alpha - Time.delta / 10.0f, 0.0f);
+        broken = unit.shield <= 0.0f;
 
         if(!broken){
             radiusScale = Mathf.lerpDelta(radiusScale, 1.0f, 0.08f);
@@ -143,116 +144,113 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 }
             });
 
-        }else{
-            if(unlocks && !regenable){
+        }else if(extended && !regenable){
+            boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.4f;
+            float scl = Math.min(1.0f - ((timer - 240.0f) / 60.0f), 1.0f);
+            final float
+                speed = 0.2f,
+                x = Mathf.cos(timer * speed) * radius * scl + unit.x,
+                y = Mathf.sin(timer * speed) * radius * scl + unit.y;
 
-                boolean isOverloaded = bullets.sumf(b -> b.damage) >= unit.maxHealth * 0.5f;
+            timer += Time.delta * (isOverloaded ? 1.3333f : 1.0f);
 
-                final float speed = 0.2f;
-                float scl = Math.min(1.0f - ((timer - 240.0f) / 60.0f), 1.0f);
-                float
-                    x = Mathf.cos(timer * speed) * radius * scl + unit.x,
-                    y = Mathf.sin(timer * speed) * radius * scl + unit.y;
+            if(timer <= 180.0f){
+                Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
+                    if(
+                        !isOverloaded
+                        && bullet.team != unit.team && bullet.type.absorbable && bullet.type.hittable
+                        && !(bullet.type instanceof LiquidBulletType)
+                        && Intersector.isInRegularPolygon(sides, unit.x, unit.y, radius, rotation, bullet.x, bullet.y)
+                    ){
+                        bullet.owner = unit;
+                        bullet.team = unit.team;
+                        bullet.damage *= 0.7f;
+                        bullet.time = 0.0f;
+                        bullet.lifetime = 310.0f;
 
-                timer += Time.delta * (isOverloaded ? 1.333f : 1.0f);
+                        BulletType type;
 
-                if(timer <= 180.0f){
-                    Groups.bullet.intersect(unit.x - radius, unit.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
-                        if(
-                            !isOverloaded
-                            && bullet.team != unit.team && bullet.type.absorbable && bullet.type.hittable
-                            && !(bullet.type instanceof mindustry.entities.bullet.LiquidBulletType)
-                            && Intersector.isInRegularPolygon(sides, unit.x, unit.y, radius, rotation, bullet.x, bullet.y)
-                        ){
-                            bullet.owner = unit;
-                            bullet.team = unit.team;
-                            bullet.time = 0.0f;
-                            bullet.lifetime = 310.0f;
+                        if(!bulletMap.containsKey(bullet.type.id)){
+                            type = bullet.type.copy();
 
-                            // reuse instances as possible
-                            BulletType type = bulletMap.containsKey(bullet.type.id)
-                                ? content.getByID(ContentType.bullet, bulletMap.get(bullet.type.id))
-                                : bullet.type.copy();
+                            // make artillery collides building
+                            type.collidesTiles = type.collides = true;
 
-                            if(!bulletMap.containsKey(bullet.type.id)){
-
-                                // make artillery collides building
-                                type.collidesTiles = type.collides = true;
-
-                                // add a default trail to bullets that without a trail
-                                if(type.trailLength <= 0){
-                                    if(type instanceof BasicBulletType bt){
-                                        type.trailWidth = bt.width * 0.22f;
-                                        type.trailLength = (int)bt.height / 2;
-                                        type.trailColor = bt.backColor;
-                                    }else{
-                                        type.trailLength = 12;
-                                    }
+                            // add a default trail to bullets that without a trail
+                            if(type.trailLength <= 0){
+                                if(type instanceof BasicBulletType bt){
+                                    type.trailWidth = bt.width * 0.22f;
+                                    type.trailLength = (int)(bt.height / 2);
+                                    type.trailColor = bt.backColor;
+                                }else{
+                                    type.trailLength = 12;
                                 }
                             }
-
-                            bullet.type = type;
-                            bullets.add(bullet);
-                        }
-                    });
-
-                }else if(timer > 310.0f){
-                    regenable = true;
-                    timer = 0.0f;
-                    bullets.clear();
-                }
-
-                bullets.each(b -> {
-
-                    if(b.type != null){
-
-                        final float vel = 12.0f;
-                        float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
-                        float range = b.type.speed * b.type.lifetime;
-
-                        if(timer <= 240.0f){
-                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80.0f * Time.delta));
-                            b.vel.setLength(5.0f + 3.0f * timer / 240.0f * (1.0f + dst / radius)); // velocity terminal = 8, has a boost depending on distance(b, dest) up to 200%
-
-                        }else if(timer > 240.0f && timer <= 300.0f){
-                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 80.0f * Time.delta));
-                            b.vel.setLength(8.0f * dst / radius); // use velocity terminal here
+                            bulletMap.put(bullet.type.id, type.id);
 
                         }else{
-                            b.time = 0.0f;
-                            b.lifetime = range / vel;
-
-                            var target =
-                                b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id) ?
-                                    b.aimTile.build :
-                                    Units.closestTarget(b.team, b.x, b.y, range,
-                                        u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
-                                        t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
-
-                            b.set(unit.x, unit.y);
-                            if(target != null && Mathf.chance(0.48)){
-                                final float mag = 5.0f;
-                                final float velTer = vel * 1.16f;
-
-                                b.vel.setLength(velTer);
-                                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 1000.0f));
-                                b.mover = bullet -> bullet.moveRelative(0f, Mathf.cos(b.time * velTer * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
-
-                            }else{
-                                float angle = Mathf.random(360.0f);
-
-                                if(target != null)
-                                    while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30.0f))
-                                        angle = Mathf.random(360.0f);
-
-                                b.initVel(angle, vel);
-                            }
-
-                            bullets.remove(b);
+                            type = content.getByID(bullet.type.getContentType(), bulletMap.get(bullet.type.id));
                         }
+
+                        bullet.type = type;
+                        bullets.add(bullet);
                     }
                 });
+
+            }else if(timer > 310.0f){
+                regenable = true;
+                timer = 0.0f;
+                bullets.clear();
             }
+
+            bullets.each(b -> {
+                if(b.type == null) return;
+
+                final float vel = 12.0f;
+                float dst = Math.min(Mathf.dst(x, y, b.x, b.y), radius);
+                float range = b.type.speed * b.type.lifetime;
+
+                if(timer <= 240.0f){
+                    b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 600.0f));
+                    b.vel.setLength(5.0f + 3.0f * timer / 240.0f * (1.0f + dst / radius)); // velocity terminal = 8, has a boost depending on dst(bullet, target) up to 200%
+
+                }else if(timer > 240.0f && timer <= 300.0f){
+                    b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(x, y), 600.0f));
+                    b.vel.setLength(8.0f * dst / radius); // use velocity terminal here
+
+                }else{
+                    b.time = 0.0f;
+                    b.lifetime = range / vel;
+
+                    var target =
+                        b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
+                            ? b.aimTile.build
+                            : Units.closestTarget(b.team, b.x, b.y, range,
+                                u -> u != null && u.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(u.id),
+                                t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
+
+                    b.set(unit.x, unit.y);
+                    if(target != null && Mathf.chance(0.48)){
+                        final float mag = 5.0f;
+                        final float velTer = vel * 1.16f;
+
+                        b.vel.setLength(velTer);
+                        b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(target), 600.0f));
+                        b.mover = bullet -> bullet.moveRelative(0.0f, Mathf.cos(b.time * velTer * Mathf.PI / Mathf.dst(unit.x, unit.y, target.x(), target.y())) * mag * Mathf.sign(b.id % 2 == 0));
+
+                    }else{
+                        float angle = Mathf.random(360.0f);
+
+                        if(target != null)
+                            while(Angles.near(angle, Angles.angle(unit.x, unit.y, target.x(), target.y()), 30.0f))
+                                angle = Mathf.random(360.0f);
+
+                        b.initVel(angle, vel);
+                    }
+
+                    bullets.remove(b);
+                }
+            });
         }
     }
 
