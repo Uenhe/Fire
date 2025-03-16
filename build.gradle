@@ -12,7 +12,7 @@ repositories{
 
 java{
     targetCompatibility = 8
-    sourceCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 ext{
@@ -33,7 +33,7 @@ allprojects{
 
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:fd597080a6" //adapt to BE
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
@@ -64,7 +64,7 @@ task jarAndroid{
 
         //dex and desugar files - this requires d8 in your PATH
         "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+            .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
@@ -75,7 +75,7 @@ jar{
         configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it) }
     }
 
-    from(rootDir){
+    from(projectDir){
         include "mod.hjson"
     }
 

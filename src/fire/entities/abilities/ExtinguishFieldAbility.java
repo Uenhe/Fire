@@ -6,19 +6,21 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
+import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
 import arc.util.Strings;
+import arc.util.Time;
+import mindustry.content.Fx;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.renderer;
+import static mindustry.Vars.tilesize;
 
 public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability{
 
-    private final float range;
-    private final Color color;
+    public float range;
+    public Color color;
 
     private float warmup;
 
@@ -28,13 +30,14 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     }
 
     @Override
-    public String localized(){
-        return Core.bundle.get("ability.fire-extinguishfield");
+    public String getBundle(){
+        return "ability.fire-extinguishfield";
     }
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
     }
 
     /** see {@link mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)} */
@@ -43,11 +46,11 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
         boolean any = false;
 
         for(var fire : mindustry.gen.Groups.fire)
-            if(arc.math.geom.Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0f, fire.x, fire.y)){
+            if(Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0.0f, fire.x, fire.y)){
                 any = true;
 
-                fire.time(fire.time + 100f * arc.util.Time.delta);
-                mindustry.content.Fx.steam.at(fire);
+                fire.time(fire.time + 100.0f * Time.delta);
+                Fx.steam.at(fire);
             }
 
         warmup = Math.min(Mathf.lerpDelta(warmup, Mathf.num(any), 0.04f), 0.8f);
@@ -72,5 +75,11 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
         }
 
         Draw.reset();
+    }
+
+    @Override
+    public void death(Unit unit){
+        range = warmup = 0.0f;
+        color = null;
     }
 }

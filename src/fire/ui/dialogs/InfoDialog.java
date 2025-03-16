@@ -23,7 +23,8 @@ import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Nullable;
 import arc.util.Scaling;
-import fire.content.FBlocks;
+import fire.content.FRBlocks;
+import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -32,15 +33,18 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
+import mindustry.world.Block;
 
 import java.util.Arrays;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
+import static mindustry.Vars.iconMed;
+import static mindustry.Vars.mobile;
+import static mindustry.Vars.ui;
 
 /**
  * To show more details about contents.
- * See {@link mindustry.ui.dialogs.ResearchDialog}
- * TODO all english info is done by AI; human translation is required.
+ * @see mindustry.ui.dialogs.ResearchDialog
  */
 public class InfoDialog extends BaseDialog{
 
@@ -54,7 +58,7 @@ public class InfoDialog extends BaseDialog{
     private static final float nodeSpacing = 40f;
     public static final InfoDialog dialog = new InfoDialog();
 
-    private InfoDialog(){
+    public InfoDialog(){
         super("");
 
         titleTable.remove();
@@ -151,7 +155,7 @@ public class InfoDialog extends BaseDialog{
         });
     }
 
-    public void switchTree(InfoNode node){
+    private void switchTree(InfoNode node){
         if(lastNode == node || node == null) return;
 
         nodes.clear();
@@ -160,7 +164,7 @@ public class InfoDialog extends BaseDialog{
         view.rebuildAll();
     }
 
-    public void rebuildTree(InfoNode node){
+    private void rebuildTree(InfoNode node){
         switchTree(node);
 
         view.panX = 0f;
@@ -397,7 +401,7 @@ public class InfoDialog extends BaseDialog{
                 var t = b.table(desc -> {
 
                     desc.left().defaults().left();
-                    desc.add(locked(node) ? "@content.unlocked" : node.content.localizedName);
+                    desc.add(locked(node) ? "@fire.lockedcontent" : node.content.localizedName);
                     desc.row();
 
                     if(locked(node))
@@ -414,8 +418,8 @@ public class InfoDialog extends BaseDialog{
 
             if(!locked(node) && hasInfo(node))
                 infoTable.table(t -> t.margin(3f).left().labelWrap(
-                    FBlocks.compositeMap.containsKey(node.content)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FBlocks.compositeMap.get(node.content).localizedName)
+                    FRBlocks.compositeMap.containsKey(node.content.id)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", ((Block)content.getByID(ContentType.block, FRBlocks.compositeMap.get(node.content.id))).localizedName)
                     : Core.bundle.get(getKey(node))
                 ).color(Color.lightGray).growX()).fillX();
 
@@ -463,7 +467,7 @@ public class InfoDialog extends BaseDialog{
 
         private final InfoTreeNode node;
 
-        private LayoutNode(InfoTreeNode node, LayoutNode parent){
+        LayoutNode(InfoTreeNode node, LayoutNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -513,8 +517,9 @@ public class InfoDialog extends BaseDialog{
             InfoTree.all.add(this);
         }
 
-        public static void dnode(UnlockableContent content){
-            dnode(content, () -> {
+        public static InfoNode dnode(UnlockableContent content){
+            return dnode(content, () -> {
+
             });
         }
 

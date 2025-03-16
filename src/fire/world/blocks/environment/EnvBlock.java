@@ -1,11 +1,17 @@
 package fire.world.blocks.environment;
 
+import mindustry.gen.Building;
+import mindustry.type.Category;
+import mindustry.type.ItemStack;
+import mindustry.world.Tile;
+import mindustry.world.meta.BuildVisibility;
+
 /** TODO reconstruct this if v147 is released, since it will be able to change weather in world processor... */
 public class EnvBlock extends mindustry.world.Block{
 
     public EnvBlock(String name){
         super(name);
-        requirements(mindustry.type.Category.effect, mindustry.world.meta.BuildVisibility.hidden, mindustry.type.ItemStack.with());
+        requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
         update = true;
         targetable = false;
         forceDark = true;
@@ -15,11 +21,11 @@ public class EnvBlock extends mindustry.world.Block{
     }
 
     @Override
-    public boolean canBreak(mindustry.world.Tile tile){
+    public boolean canBreak(Tile tile){
         return false;
     }
 
-    public static class EnvBlockBuild extends mindustry.gen.Building{
+    public static class EnvBlockBuild extends Building{
 
         @Override
         public void update(){

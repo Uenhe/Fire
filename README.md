@@ -20,7 +20,7 @@ Notice: There are two author, FlyRain and KochiyaUeneh.
 
 #### Campaign:
 
-- Adds new planet - Risetar, with 10+ preset sectors and its own tech tree
+- Adds new planet - Lysetta, with 15 preset sectors and its own tech tree
 
 #### Blocks:
 

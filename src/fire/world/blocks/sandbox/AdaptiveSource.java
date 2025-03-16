@@ -1,5 +1,6 @@
 package fire.world.blocks.sandbox;
 
+import mindustry.type.CellLiquid;
 import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.content;
@@ -15,7 +16,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         update = true;
         displayFlow = false;
         canOverdrive = true;
-        powerProduction = Float.MAX_VALUE;
+        powerProduction = Float.POSITIVE_INFINITY;
         buildType = AdaptiveSourceBuild::new;
     }
 
@@ -41,26 +42,26 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
     public class AdaptiveSourceBuild extends PowerSourceBuild implements mindustry.world.blocks.heat.HeatBlock{
 
-        private float counter;
+        private float dumpTimer;
 
         @Override
         public void updateTile(){
             if(proximity.size == 0) return;
 
-            counter += edelta();
-            float limit = 60f / itemPerSec;
+            dumpTimer += delta();
+            float limit = 60.0f / itemPerSec;
 
-            while(counter >= limit){
+            while(dumpTimer >= limit)
                 for(var item : content.items()){
                     items.set(item, 1);
                     dump(item);
                     items.set(item, 0);
-                    counter -= limit;
+                    dumpTimer -= limit;
                 }
-            }
 
             liquids.clear();
             for(var liquid: content.liquids()){
+                if(liquid instanceof CellLiquid) continue;
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }

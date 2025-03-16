@@ -1,11 +1,20 @@
 package fire.ai.types;
 
+import arc.math.geom.Position;
+import fire.entities.abilities.DashAbility;
 import mindustry.content.Blocks;
+import mindustry.gen.Call;
 
 import static mindustry.Vars.indexer;
 
 /** Basically a copy of MinerAI. */
 public class MinerDashAI extends mindustry.ai.types.MinerAI{
+
+    private final DashAbility dash;
+
+    public MinerDashAI(DashAbility ab){
+        dash = ab;
+    }
 
     @Override
     public void updateMovement(){
@@ -22,13 +31,11 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
             if(timer.get(timerTarget2, 60 * 4) || targetItem == null){
                 targetItem = unit.type.mineItems.min(i -> indexer.hasOre(i) && unit.canMine(i), i -> core.items.get(i));
             }
-            // if core full of the target item, do nothing
             if(targetItem != null && core.acceptStack(targetItem, 1, unit) == 0){
                 unit.clearItem();
                 unit.mineTile = null;
                 return;
             }
-            // if inventory fulls, drop it off
             if(unit.stack.amount >= unit.type.itemCapacity || (targetItem != null && !unit.acceptsItem(targetItem))){
                 mining = false;
             }else{
@@ -38,7 +45,6 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
                 if(ore != null){
                     moveTo(ore, unit.type.mineRange / 2f, 20f);
                     dash(ore);
-
                     if(ore.block() == Blocks.air && unit.within(ore, unit.type.mineRange)){
                         unit.mineTile = ore;
                     }
@@ -55,21 +61,18 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
             }
             if(unit.within(core, unit.type.range)){
                 if(core.acceptStack(unit.stack.item, unit.stack.amount, unit) > 0){
-                    mindustry.gen.Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
+                    Call.transferItemTo(unit, unit.stack.item, unit.stack.amount, unit.x, unit.y, core);
                 }
                 unit.clearItem();
                 mining = true;
             }
             circle(core, unit.type.range / 1.8f);
             dash(core);
-
         }
     }
 
-    private void dash(arc.math.geom.Position pos){
-        for(var a : unit.abilities) if(a instanceof fire.entities.abilities.DashAbility da){
-            da.dash(unit, pos);
-            break;
-        }
+    private void dash(Position pos){
+        if(dash == null) return;
+        dash.dash(unit, pos);
     }
 }
