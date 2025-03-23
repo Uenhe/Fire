@@ -35,7 +35,6 @@ public class FRWeathers{
                         Mathf.random(world.height() * tilesize)
                     );
                 }
-
             }
             {
                 attrs.set(Attribute.light, -0.35f);

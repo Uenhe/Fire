@@ -1,6 +1,20 @@
 package fire;
 
+import arc.graphics.Color;
+
 public final class FRUtils{
+
+    public static void colors(Color[] colors, Color... color){
+        System.arraycopy(color, 0, colors, 0, 3);
+    }
+
+    public static Color color(int... component){
+        return new Color(component[0] / 255.0f, component[1] / 255.0f, component[2] / 255.0f);
+    }
+
+    public static Color colora(int... component){
+        return new Color(component[0] / 255.0f, component[1] / 255.0f, component[2] / 255.0f, component[3] / 255.0f);
+    }
 
     public static final class TimeNode{
 

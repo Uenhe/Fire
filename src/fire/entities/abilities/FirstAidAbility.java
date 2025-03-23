@@ -2,7 +2,7 @@ package fire.entities.abilities;
 
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
-import arc.struct.IntMap;
+import arc.struct.ObjectMap;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.entities.Effect;
@@ -16,16 +16,17 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     /** Ticks between two triggers. */
     public short cooldown;
-    /** Triggers if the unit loses such health percentage in detectDuration; 50 => 50%. */
+    /** Triggers if the unit is damaged the percentage in detectDuration; 50 -> 50% */
     public byte healthLossPercentage;
     /** Amount to heal at trigger. */
     public int healAmount;
-    /** Amount to heal at trigger. Do extra heal depend on unit's max health; 50 => 50%. */
+    /** Percentage to heal at trigger. 50 -> 50% */
     public byte healPercentage;
     /** Status effect applied at trigger. */
     public StatusEffect status;
     /** Status effect duration. */
     public short statusDuration;
+    /** Effect created at trigger. */
     public Effect effect;
 
     private byte healthSize;
@@ -34,7 +35,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     /** Frames between two detections. */
     private static final byte detectInterval = 5;
     /** Used to record health; Why I have to use a map or buggy????????????? */
-    private static final IntMap<float[]> healthMap = new IntMap<>();
+    private static final ObjectMap<Unit, float[]> healthMap = new ObjectMap<>();
 
     public FirstAidAbility(int cd, int lossP, int healA, int healP, StatusEffect se, int sed, int detectDuration, Effect fx){
         cooldown = (short)cd;
@@ -63,7 +64,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(Unit unit){
-        var health = healthMap.get(unit.id, new float[healthSize]);
+        var health = healthMap.get(unit, new float[healthSize]);
         if(health[0] == 0.0f) Arrays.fill(health, unit.health);
 
         if(cooldownTimer == 0.0f){
@@ -76,7 +77,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
                     health[i] = health[i + 1];
 
                 health[health.length - 1] = unit.health;
-                healthMap.put(unit.id, health);
+                healthMap.put(unit, health);
             }
 
             if(health[0] - unit.health < unit.maxHealth * healthLossPercentage / 100.0f) return;

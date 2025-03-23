@@ -3,9 +3,7 @@ package fire.world;
 import arc.struct.Seq;
 import fire.content.FRBlocks;
 import fire.content.FRFx;
-import mindustry.content.Blocks;
 import mindustry.content.Fx;
-import mindustry.content.Items;
 import mindustry.ctype.UnlockableContent;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.PointBulletType;
@@ -13,7 +11,6 @@ import mindustry.gen.Sounds;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.BuildVisibility;
 
 public class DEBUG{
@@ -24,7 +21,7 @@ public class DEBUG{
 
     public static class DEBUG_Turret extends mindustry.world.blocks.defense.turrets.Turret{
 
-        public static final PointBulletType type = new PointBulletType();
+        private static final PointBulletType type = new PointBulletType();
 
         public DEBUG_Turret(String name){
             super(name);
@@ -62,7 +59,7 @@ public class DEBUG{
 
             @Override
             public void updateTile(){
-                unit.ammo(200.0f);
+                unit.ammo(60.0f);
                 super.updateTile();
             }
 

@@ -27,9 +27,7 @@ import mindustry.logic.LAccess;
 import mindustry.logic.Ranged;
 import mindustry.ui.Bar;
 
-import static mindustry.Vars.indexer;
-import static mindustry.Vars.state;
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.power.PowerGenerator */
 public class EnergyCrafter extends mindustry.world.blocks.production.GenericCrafter{

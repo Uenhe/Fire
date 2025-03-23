@@ -22,8 +22,8 @@ public class FRUnitCommand{
 
     private static DashAbility find(Ability[] abs){
         for(var ab : abs)
-            if(ab instanceof DashAbility)
-                return (DashAbility)ab;
+            if(ab instanceof DashAbility dab)
+                return dab;
 
         return null;
     }

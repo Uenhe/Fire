@@ -19,10 +19,12 @@ public class RepairDashAI extends mindustry.ai.types.RepairAI{
     @Override
     public void updateMovement(){
         if(target instanceof Building){
-            boolean shoot = false;
+            final boolean shoot;
             if(target.within(unit, unit.type.range)){
                 unit.aim(target);
                 shoot = true;
+            }else{
+                shoot = false;
             }
             unit.controlWeapons(shoot);
         }else if(target == null){

@@ -1,12 +1,8 @@
 package fire.content;
 
 import arc.graphics.Color;
-import fire.maps.RisetarPlanetGenerator;
-import mindustry.content.Blocks;
-import mindustry.content.Planets;
-import mindustry.content.SectorPresets;
-import mindustry.content.TechTree;
-import mindustry.content.UnitTypes;
+import fire.maps.LysettaPlanetGenerator;
+import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.g3d.HexMesh;
 import mindustry.graphics.g3d.HexSkyMesh;
@@ -20,13 +16,8 @@ import static fire.content.FRLiquids.liquidNitrogen;
 import static fire.content.FRSectorPresets.*;
 import static fire.content.FRUnitTypes.*;
 import static fire.ui.dialogs.InfoDialog.InfoNode.dnode;
-import static mindustry.content.TechTree.node;
-import static mindustry.content.TechTree.nodeProduce;
-import static mindustry.content.TechTree.nodeRoot;
-import static mindustry.game.Objectives.OnSector;
-import static mindustry.game.Objectives.Produce;
-import static mindustry.game.Objectives.Research;
-import static mindustry.game.Objectives.SectorComplete;
+import static mindustry.content.TechTree.*;
+import static mindustry.game.Objectives.*;
 
 public class FRPlanets{
 
@@ -40,7 +31,7 @@ public class FRPlanets{
                 new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
                 new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
             );
-            generator = new RisetarPlanetGenerator();
+            generator = new LysettaPlanetGenerator();
             sectorSeed = 3;
             rotateTime = 7200.0f;
             clearSectorOnLose = true;

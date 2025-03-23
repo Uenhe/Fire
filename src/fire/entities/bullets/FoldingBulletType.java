@@ -1,7 +1,7 @@
 package fire.entities.bullets;
 
 import arc.math.Mathf;
-import arc.struct.IntIntMap;
+import arc.struct.ObjectIntMap;
 import arc.util.Time;
 import mindustry.gen.Bullet;
 
@@ -11,7 +11,7 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     public final byte foldAngle;
     private final float foldInterval;
 
-    private static final IntIntMap foldTimesMap = new IntIntMap();
+    private static final ObjectIntMap<Bullet> foldTimesMap = new ObjectIntMap<>();
 
     public FoldingBulletType(float ownerSpeed, float dmg, int angle, float ownerLifetime){
         speed = ownerSpeed / Mathf.cosDeg(angle);
@@ -25,9 +25,9 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
         super.init(b);
         b.rotation(b.rotation() + foldAngle);
         b.mover = bl -> {
-            int ft = foldTimesMap.get(bl.id);
+            int ft = foldTimesMap.get(bl);
             if(bl.time < foldInterval * (0.5f + ft) && bl.time + Time.delta >= foldInterval * (0.5f + ft)){
-                foldTimesMap.increment(bl.id, 1);
+                foldTimesMap.increment(bl, 1);
                 bl.rotation(bl.rotation() + 2.0f * foldAngle * Mathf.sign(ft % 2 == 1));
             }
         };
@@ -36,6 +36,6 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
     @Override
     public void removed(Bullet b){
         super.removed(b);
-        foldTimesMap.remove(b.id);
+        foldTimesMap.remove(b);
     }
 }

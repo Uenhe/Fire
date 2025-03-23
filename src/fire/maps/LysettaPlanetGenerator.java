@@ -7,7 +7,7 @@ import mindustry.type.Sector;
 import static mindustry.Vars.spawner;
 import static mindustry.Vars.state;
 
-public class RisetarPlanetGenerator extends mindustry.maps.planet.SerpuloPlanetGenerator{
+public class LysettaPlanetGenerator extends mindustry.maps.planet.SerpuloPlanetGenerator{
     //alternate, less direct generation (wip)
 
     @Override

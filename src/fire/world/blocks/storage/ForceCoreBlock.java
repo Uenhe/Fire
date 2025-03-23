@@ -23,10 +23,7 @@ import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static mindustry.Vars.player;
-import static mindustry.Vars.renderer;
-import static mindustry.Vars.state;
-import static mindustry.Vars.tilesize;
+import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.defense.ForceProjector ForceProjector */
 public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
@@ -122,9 +119,9 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
             super.updateTile();
 
             if(team == state.rules.waveTeam){
-                ConsumePowerCustom.scaleMap.put(id, 0.0f); //won't damage enemy cores
+                ConsumePowerCustom.scaleMap.put(this, 0.0f); //won't damage enemy cores
             }else{
-                ConsumePowerCustom.scaleMap.put(id, cores[team.id]);
+                ConsumePowerCustom.scaleMap.put(this, cores[team.id]);
                 if(power.graph.getPowerBalance() < 0.0f && power.graph.getBatteryStored() <= 0.0f && cores[team.id] > 2) //allowing to place 2 cores without damage
                     damage(Mathf.sqrt(-power.graph.getPowerBalance() + consPower.requestedPower(this)) * delta());
             }

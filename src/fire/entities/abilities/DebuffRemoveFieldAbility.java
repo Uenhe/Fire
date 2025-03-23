@@ -9,9 +9,7 @@ import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.Unit;
 
-import static fire.content.FRStatusEffects.disintegrated;
-import static fire.content.FRStatusEffects.frostbite;
-import static fire.content.FRStatusEffects.overgrown;
+import static fire.content.FRStatusEffects.*;
 import static mindustry.Vars.tilesize;
 import static mindustry.content.StatusEffects.*;
 

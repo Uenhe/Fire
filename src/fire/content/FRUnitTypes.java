@@ -10,41 +10,21 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
+import fire.FRUtils;
 import fire.ai.FRUnitCommand;
-import fire.entities.abilities.DashAbility;
-import fire.entities.abilities.DebuffRemoveFieldAbility;
-import fire.entities.abilities.EnergyForceFieldAbility;
-import fire.entities.abilities.ExtinguishFieldAbility;
-import fire.entities.abilities.FirstAidAbility;
-import fire.entities.abilities.RegenFieldAbility;
+import fire.entities.abilities.*;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
-import mindustry.content.Items;
-import mindustry.content.StatusEffects;
-import mindustry.content.UnitTypes;
+import mindustry.content.*;
 import mindustry.entities.Effect;
-import mindustry.entities.abilities.EnergyFieldAbility;
-import mindustry.entities.abilities.ForceFieldAbility;
-import mindustry.entities.abilities.MoveLightningAbility;
-import mindustry.entities.abilities.RepairFieldAbility;
-import mindustry.entities.abilities.ShieldRegenFieldAbility;
-import mindustry.entities.abilities.StatusFieldAbility;
-import mindustry.entities.abilities.UnitSpawnAbility;
+import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
 import mindustry.entities.pattern.ShootSpread;
-import mindustry.gen.LegsUnit;
-import mindustry.gen.MechUnit;
-import mindustry.gen.PayloadUnit;
-import mindustry.gen.Sounds;
-import mindustry.gen.Unit;
-import mindustry.gen.UnitEntity;
-import mindustry.gen.UnitWaterMove;
+import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -55,6 +35,9 @@ import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 
+import static fire.FRUtils.color;
+import static fire.FRUtils.colors;
+import static fire.FRVars.*;
 import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
@@ -85,7 +68,6 @@ public class FRUnitTypes{
     public static void load(){
 
         //region legs support
-        var colLegSpt = Color.valueOf("8cfffb");
 
         guarding = new UnitType("sh"){{
             constructor = LegsUnit::create;
@@ -119,7 +101,7 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new ForceFieldAbility(44f, 20f / 60f, 200f, 400f)
+                new ForceFieldAbility(44.0f, 20.0f / 60.0f, 200.0f, 400.0f)
             );
         }};
 
@@ -155,8 +137,8 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new ForceFieldAbility(54f, 0.6f, 300f, 360f),
-                new RegenFieldAbility(1f, 40f, colLegSpt)
+                new ForceFieldAbility(54f, 0.6f, 300.0f, 360.0f),
+                new RegenFieldAbility(1.0f, 40.0f, _8cfffb)
             );
         }};
 
@@ -245,7 +227,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new EnergyForceFieldAbility(80f, 2.5f, 1080f, 270f, 20, 16, 10, 10.0f),
-                new RegenFieldAbility(2.5f, 120f, colLegSpt)
+                new RegenFieldAbility(2.5f, 120f, _8cfffb)
             );
         }};
 
@@ -287,12 +269,12 @@ public class FRUnitTypes{
                     extended = true;
                 }},
 
-                new RegenFieldAbility(3f, 120f, colLegSpt),
+                new RegenFieldAbility(3f, 120f, _8cfffb),
 
-                new ExtinguishFieldAbility(120f, colLegSpt),
+                new ExtinguishFieldAbility(120f, _8cfffb),
 
                 new DebuffRemoveFieldAbility(120f, 120f, new Effect(30f, e -> {
-                    Draw.color(colLegSpt, Color.lightGray, e.fin());
+                    Draw.color(_8cfffb, Color.lightGray, e.fin());
                     Angles.randLenVectors(e.id, 3, 6f + e.finpow() * 20f, (x, y) ->
                         Fill.square(e.x + x, e.y + y, e.fout() * 4f + 0.5f, 45f));
                 }))
@@ -330,8 +312,8 @@ public class FRUnitTypes{
                         width = 5.4f;
                         height = 10.8f;
 
-                        backColor = Color.valueOf("f9a27a");
-                        frontColor = Color.valueOf("ffd8e8");
+                        backColor = _f9a27a;
+                        frontColor = _ffd8e8;
                     }};
                 }}
             );
@@ -399,7 +381,8 @@ public class FRUnitTypes{
                     healPercent = 0.1f;
                     statusDuration = 40.0f;
                     status = StatusEffects.burning;
-                    color = Color.valueOf("ff3300");
+
+                    color = _ff3300;
                 }}
             );
 
@@ -427,8 +410,8 @@ public class FRUnitTypes{
                         splashDamageRadius = 40.0f;
 
                         hitEffect = Fx.blastExplosion;
-                        backColor = Color.valueOf("f9a27a");
-                        frontColor = Color.valueOf("ffd8e8");
+                        backColor = _f9a27a;
+                        frontColor = _ffd8e8;
                     }};
                 }}
             );
@@ -484,8 +467,8 @@ public class FRUnitTypes{
                         lifetime = 30.0f;
                         knockback = -1.0f;
                         sapStrength = 0.6f;
-                        color = Color.valueOf("990003");
-                        hitColor = Color.valueOf("990003");
+
+                        color = hitColor = _990003;
                         shootEffect = Fx.shootSmall;
                     }};
                 }},
@@ -508,7 +491,7 @@ public class FRUnitTypes{
                         damage = 525f;
                         length = 320f;
                         width = 20f;
-                        toColor = Color.valueOf("990003");
+                        toColor = _990003;
                     }};
                 }}
             );
@@ -563,7 +546,7 @@ public class FRUnitTypes{
                         height = 5.4f;
                         buildingDamageMultiplier = 0.2f;
                         collidesTeam = true;
-                        backColor = Color.valueOf("8cfffb");
+                        backColor = _8cfffb;
                         frontColor = Color.white;
                         status = StatusEffects.electrified;
                         statusDuration = 150.0f;
@@ -722,7 +705,7 @@ public class FRUnitTypes{
                             lifetime = 15f;
                             pierceCap = 2;
                             pierceBuilding = true;
-                            colors = new Color[] {Pal.heal, Pal.heal, Color.white};
+                            colors(colors, Pal.heal, Pal.heal, Color.white);
                         }};
                     }};
                 }}
@@ -749,7 +732,7 @@ public class FRUnitTypes{
             lowAltitude = false;
 
             abilities.add(
-                new MoveLightningAbility(2f, 8, 0.1f, 0.0f, 1.2f, 1.6f, Color.valueOf("a9d8ff"))
+                new MoveLightningAbility(2f, 8, 0.1f, 0.0f, 1.2f, 1.6f, Pal.lancerLaser)
             );
 
             weapons.add(
@@ -789,7 +772,7 @@ public class FRUnitTypes{
             lowAltitude = false;
 
             abilities.add(
-                new MoveLightningAbility(2f, 12, 0.4f, 8f, 1.2f, 2.4f, Color.valueOf("a9d8ff"))
+                new MoveLightningAbility(2f, 12, 0.4f, 8f, 1.2f, 2.4f, Pal.lancerLaser)
             );
 
             weapons.add(
@@ -831,7 +814,7 @@ public class FRUnitTypes{
             circleTarget = true;
 
             abilities.add(
-                new MoveLightningAbility(3.0f, 12, 0.3f, 12.0f, 0.8f, 1.8f, Color.valueOf("a9d8ff"))
+                new MoveLightningAbility(3.0f, 12, 0.3f, 12.0f, 0.8f, 1.8f, Pal.lancerLaser)
             );
 
             weapons.add(
@@ -856,7 +839,9 @@ public class FRUnitTypes{
 
                         trailLength = 24;
                         trailWidth = 5f;
-                        trailColor = backColor = frontColor = Color.valueOf("a9d8ff");
+                        trailColor.set(Pal.lancerLaser);
+                        backColor.set(Pal.lancerLaser);
+                        frontColor.set(Pal.lancerLaser);
 
                         hitEffect = Fx.pulverize;
                         hitSound = Sounds.explosion;
@@ -867,7 +852,7 @@ public class FRUnitTypes{
                         intervalBullet = new ShrapnelBulletType(){{
                             damage = 25.0f;
                             length = 48.0f;
-                            toColor = Color.valueOf("a9d8ff");
+                            toColor.set(Pal.lancerLaser);
                         }};
 
                         fragBullets = 1;
@@ -892,7 +877,8 @@ public class FRUnitTypes{
                                     particles = 8;
                                     length = 80.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom = colorTo = Color.valueOf("a9d8ff70");
+                                    colorFrom.set(_lancer_a04);
+                                    colorTo.set(_lancer_a04);
 
                                     sizeFrom = 16.0f;
                                     sizeTo = 0.0f;
@@ -904,7 +890,8 @@ public class FRUnitTypes{
                                     particles = 6;
                                     length = 60.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom = colorTo = Color.valueOf("a9d8ff70");
+                                    colorFrom.set(_lancer_a04);
+                                    colorTo.set(_lancer_a04);
 
                                     sizeFrom = 20.0f;
                                     sizeTo = 0.0f;
@@ -937,7 +924,7 @@ public class FRUnitTypes{
             lowAltitude = true;
 
             abilities.add(
-                new MoveLightningAbility(10f, 16, 0.2f, 16f, 3.6f, 8f, Color.valueOf("a9d8ff"), "fire-javelin-heat")
+                new MoveLightningAbility(10f, 16, 0.2f, 16f, 3.6f, 8f, Pal.lancerLaser, "fire-javelin-heat")
             );
 
             weapons.add(
@@ -958,7 +945,7 @@ public class FRUnitTypes{
                         splashDamageRadius = 20f;
                         weaveScale = 8f;
                         weaveMag = 2f;
-                        trailColor = Color.valueOf("b6c6fd");
+                        trailColor = _b6c6fd;
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
                         backColor = Pal.bulletYellowBack;
@@ -971,20 +958,20 @@ public class FRUnitTypes{
         apollo = new UnitType("dk"){{
             constructor = UnitEntity::create;
             flying = true;
-            health = 76000;
-            armor = 18;
-            hitSize = 64f;
+            health = 76000.0f;
+            armor = 18.0f;
+            hitSize = 60.0f;
             speed = 0.36f;
             drag = 0.08f;
             accel = 0.15f;
-            rotateSpeed = 2f;
-            buildSpeed = 1f;
+            rotateSpeed = 2.0f;
+            buildSpeed = 1.0f;
             itemCapacity = 280;
-            engineOffset = 6f;
+            engineOffset = 6.0f;
             lowAltitude = true;
             faceTarget = false;
 
-            abilities.add(new ForceFieldAbility(120f, 4.0f, 2000f, 480f){
+            abilities.add(new ForceFieldAbility(120.0f, 4.0f, 2000.0f, 480.0f){
                 @Override
                 public void update(Unit unit){
                     // doubles regen when health below the half
@@ -1055,7 +1042,6 @@ public class FRUnitTypes{
                             fragBullets = 3;
                             fragBullet = new LaserBulletType(90.0f){{
                                 length = 230.0f;
-                                colors = new Color[]{Color.valueOf("a9d8ff66"), Color.valueOf("a9d8ff66"), Color.white};
 
                                 fragBullets = 3;
                                 fragBullet = new LightningBulletType(){{
@@ -1079,7 +1065,7 @@ public class FRUnitTypes{
                     bullet = new LaserBulletType(288.0f){{
                         length = 288.0f;
                         width = 12.0f;
-                        colors = new Color[]{Color.valueOf("f6efa1"), Color.valueOf("f6efa1"), Color.white};
+                        colors(colors, _f6efa1, _f6efa1, Color.white);
                         lightningSpacing = 20.0f;
                         lightningLength = 2;
                         lightningLengthRand = 2;
@@ -1144,7 +1130,7 @@ public class FRUnitTypes{
                 hitSize = 4f;
                 length = 60f;
                 drawSize = 150f;
-                colors[0] = colors[1] = Pal.heal; colors[2] = Color.white;
+                colors(colors, Pal.heal, Pal.heal, Color.white);
                 collidesAir = true;
             }},
 
@@ -1285,7 +1271,7 @@ public class FRUnitTypes{
                             sideAngle = 160;
                             sideWidth = 1;
                             sideLength = 30;
-                            colors = new Color[]{Pal.heal, Pal.heal, Color.white};
+                            colors(colors, Pal.heal, Pal.heal, Color.white);
                         }});
 
                         for(int j = 0; j < 12; j++){

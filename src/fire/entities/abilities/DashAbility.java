@@ -11,14 +11,11 @@ import arc.util.Nullable;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.input.FRBinding;
-import fire.world.meta.FRStat;
 import mindustry.ai.types.CommandAI;
 import mindustry.content.StatusEffects;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.tilesize;
 

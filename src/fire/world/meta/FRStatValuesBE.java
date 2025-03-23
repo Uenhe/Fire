@@ -26,7 +26,7 @@ import static mindustry.world.meta.StatValues.withTooltip;
 
 public class FRStatValuesBE{
 
-    public static <T extends UnlockableContent> StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, boolean nested){
+    public static StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, boolean nested){
         return table -> {
 
             table.row();
@@ -34,8 +34,6 @@ public class FRStatValuesBE{
             map.sort();
 
             for(JackpotTurret.JackpotAmmo t : map){
-
-
 
                 BulletType type = t.type;
                 Item it = t.item;

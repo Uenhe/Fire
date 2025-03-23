@@ -25,13 +25,7 @@ import mindustry.world.meta.BuildVisibility;
 
 import static mindustry.Vars.content;
 import static mindustry.content.Blocks.*;
-import static mindustry.content.UnitTypes.alpha;
-import static mindustry.content.UnitTypes.beta;
-import static mindustry.content.UnitTypes.dagger;
-import static mindustry.content.UnitTypes.flare;
-import static mindustry.content.UnitTypes.fortress;
-import static mindustry.content.UnitTypes.gamma;
-import static mindustry.content.UnitTypes.mace;
+import static mindustry.content.UnitTypes.*;
 
 public class FROverride{
 
@@ -154,9 +148,8 @@ public class FROverride{
         flare.trailLength = 3;
 
         // have to do this or can't control dash-able units with other units at the same time
-
         for(var type : content.units()){
-            // the first two must be moveCommand and enterPayloadCommand, skip
+            // the first two commands must be moveCommand and enterPayloadCommand, skip
             if(type.commands.size <= 2) continue;
 
             type.commands.replace(UnitCommand.repairCommand, FRUnitCommand.repairDashCommand);

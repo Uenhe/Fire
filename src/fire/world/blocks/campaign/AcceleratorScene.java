@@ -21,43 +21,55 @@ import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.campaign.Accelerator;
 import mindustry.world.blocks.storage.CoreBlock;
 
-import static mindustry.Vars.control;
-import static mindustry.Vars.renderer;
-import static mindustry.Vars.state;
-import static mindustry.Vars.ui;
-import static mindustry.Vars.universe;
+import static mindustry.Vars.*;
 
 public class AcceleratorScene extends Accelerator{
 
     private Color originColor;
-
-    /** Set manually. */
-    private final short[] sectors = {0, 41, 70, 185, 79};
-    private final String[] texts = Core.bundle.get("fire.planetarySceneTexts").split("\\|");
+    private final String[] texts;
+    private final String sourceText;
     /** Switch; Mask; Detect; Text; Unmask.<p>
      * Have to set manually according to text number. */
-    private final FRUtils.TimeNode node = new FRUtils.TimeNode(90, 210, 810, 2010, 2130);
+    private final FRUtils.TimeNode node;
+    /** Set manually, length = 5 */
+    private final short[] sectors;
 
-    public AcceleratorScene(String name){
+    private static final Image[] masks = new Image[2];
+
+    static{{
+        for(byte i = 0; i < masks.length; i++)
+            masks[i] = new Image();
+    }}
+
+    public AcceleratorScene(String name, String textKey, String sourceKey, int[] nodes, short[] sects){
         super(name);
-        buildType = AcceleratorPlusBuild::new;
+        texts = Core.bundle.get(textKey).split("\\|");
+        sourceText = Core.bundle.get(sourceKey);
+        node = new FRUtils.TimeNode(nodes);
+        sectors = sects;
+        buildType = AcceleratorSceneBuild::new;
     }
 
     @Override
     public void init(){
-        launchCandidates = Seq.with(FRPlanets.lysetta);
-        originColor = launchCandidates.first().atmosphereColor.cpy();
+        launchCandidates = Seq.with(FRPlanets.lysetta); //byd Anuke
+
+        if(launchCandidates.size == 1) originColor = launchCandidates.first().atmosphereColor.cpy();
         super.init();
     }
 
-    public class AcceleratorPlusBuild extends AcceleratorBuild{
+    public class AcceleratorSceneBuild extends AcceleratorBuild{
 
         private boolean scene, messaged, detected;
         private float sceneTimer;
-        private final Image[] masks = {new Image(), new Image()};
 
         @Override
         public void buildConfiguration(Table table){
+            if(launchCandidates.size > 1){
+                super.buildConfiguration(table);
+                return;
+            }
+
             deselect();
             if(!canLaunch()) return;
 
@@ -89,6 +101,7 @@ public class AcceleratorScene extends Accelerator{
         @Override
         public void updateTile(){
             super.updateTile();
+            if(launchCandidates.size > 1) return;
 
             if(scene){
                 sceneTimer += Time.delta;
@@ -101,8 +114,9 @@ public class AcceleratorScene extends Accelerator{
                             ui.planet.newPresets.add(ui.planet.state.planet.sectors.get(id));
                     });
                 }
-                // avoid side effect, doesn't work entirely
-                // is this necessary?
+
+                //avoid side effect, doesn't work entirely
+                //is this necessary?
                 //if(ui.hasAnnouncement())
                 //    ((Element)Reflect.get(ui, "lastAnnouncement")).visible = false;
 
@@ -114,6 +128,7 @@ public class AcceleratorScene extends Accelerator{
                         mask.setWidth(Core.graphics.getWidth());
                         mask.setScaling(Scaling.stretch);
                         if(mask == masks[1]) mask.y = Core.graphics.getHeight();
+
                         mask.update(() -> {
                             mask.setHeight(Core.graphics.getHeight() * 0.2f * maskScale() * Mathf.sign(mask == masks[0]));
                             mask.toFront();
@@ -123,7 +138,7 @@ public class AcceleratorScene extends Accelerator{
                     }
 
                 if(node.checkBelonging(sceneTimer, 1, 2)){
-                    float tr = 0.9f, tg = 0.1f, tb = 0.0f;
+                    final float tr = 0.9f, tg = 0.1f, tb = 0.0f;
                     ui.planet.state.planet.atmosphereColor.set(
                         originColor.r + Mathf.absin(sceneTimer - node.first(), 10.0f, tr - originColor.r),
                         originColor.g + Mathf.absin(sceneTimer - node.first(), 10.0f, tg - originColor.g),
@@ -135,8 +150,8 @@ public class AcceleratorScene extends Accelerator{
                     messaged = true;
 
                     for(byte i = 0; i < texts.length; i++){
-                        byte j = i;
-                        float delay = j != 0
+                        final byte j = i;
+                        final float delay = j != 0
                             ? node.get(2) - node.get(1) + 150.0f * (j - 1)
                             : 0.0f;
 
@@ -157,20 +172,24 @@ public class AcceleratorScene extends Accelerator{
                     }
 
                     Time.runTask(node.get(2) - node.get(1), () ->
-                        ui.announce("@fire.planetarySceneSource", 5.0f));
+                        ui.announce(sourceText, 5.0f));
                 }
             }
         }
 
         @Override
         public void remove(){
-            reset();
+            if(launchCandidates.size == 1) reset();
             super.remove();
         }
 
         private void setup(){
             Reflect.set(BaseDialog.class, ui.planet, "shouldPause", false);
-            Core.settings.put("skipcoreanimation", false); //without announcement since it will be covered by PlanetDialog
+
+            // without announcement since it will be covered by PlanetDialog
+            Core.settings.put("skipcoreanimation", false);
+            Core.settings.put("atmosphere", true);
+
             ui.planet.state.planet.sectors.get(ui.planet.state.planet.startSector).preset.clearUnlock();
             launchCandidates.first().unlock();
             scene = true;

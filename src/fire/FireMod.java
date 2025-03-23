@@ -11,15 +11,7 @@ import arc.util.Log;
 import arc.util.Scaling;
 import arc.util.Strings;
 import arc.util.Time;
-import fire.content.FRPlanets;
-import fire.content.FRBlocks;
-import fire.content.FRItems;
-import fire.content.FRLiquids;
-import fire.content.FROverride;
-import fire.content.FRSectorPresets;
-import fire.content.FRStatusEffects;
-import fire.content.FRUnitTypes;
-import fire.content.FRWeathers;
+import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.InfoDialog;
 import fire.world.DEBUG;
@@ -37,14 +29,12 @@ import mindustry.world.meta.BuildVisibility;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import static mindustry.Vars.content;
-import static mindustry.Vars.mods;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
 
-    private static final int version = 139;
+    private static final int version = 140;
     private static final String
         linkRaindance = "https://space.bilibili.com/516898377",
         linkUeneh = "https://space.bilibili.com/327502129",
@@ -85,8 +75,7 @@ public class FireMod extends mindustry.mod.Mod{
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLogs();
             showNoMultipleMods();
-            if(Core.settings.getInt("mod-fire-version") != version) showUpdate();
-            Core.settings.put("mod-fire-version", version);
+            showUpdate();
             launched = true;
         });
     }
@@ -235,6 +224,9 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showUpdate(){
+        if(Core.settings.getInt("mod-fire-version") == version) return;
+        Core.settings.put("mod-fire-version", version);
+
         new BaseDialog("Update"){
             float time = 300.0f;
             boolean closable;

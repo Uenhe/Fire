@@ -24,9 +24,7 @@ import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 
-import static mindustry.Vars.content;
-import static mindustry.Vars.tilesize;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 public class Campfire{
 
@@ -88,7 +86,7 @@ public class Campfire{
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
 
-                ConsumePowerCustom.scaleMap.put(id, optionalEfficiency);
+                ConsumePowerCustom.scaleMap.put(this, optionalEfficiency);
 
                 if(efficiency <= 0.0f) return;
 

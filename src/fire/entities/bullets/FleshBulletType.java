@@ -1,8 +1,8 @@
 package fire.entities.bullets;
 
 import arc.math.Mathf;
-import arc.struct.IntFloatMap;
-import arc.struct.IntMap;
+import arc.struct.ObjectFloatMap;
+import arc.struct.ObjectMap;
 import arc.util.Time;
 import fire.content.FRItems;
 import fire.content.FRStatusEffects;
@@ -25,8 +25,8 @@ public class FleshBulletType extends SpritesBulletType{
     private final FleshBulletType adhereType;
     public static final Item ITEM = FRItems.flesh;
 
-    private static final IntMap<Healthc> adheringMap = new IntMap<>();
-    private static final IntFloatMap intensityMap = new IntFloatMap();
+    private static final ObjectMap<Bullet, Healthc> adheringMap = new ObjectMap<>();
+    private static final ObjectFloatMap<Bullet> intensityMap = new ObjectFloatMap<>();
 
     public FleshBulletType(float speed, float damage, int size, float subDamage, float subLifetime){
         super(speed, damage, size, size, ITEM.frames, ITEM.frameTime, ITEM.name);
@@ -44,11 +44,11 @@ public class FleshBulletType extends SpritesBulletType{
     }
 
     private Healthc adhering(Bullet b){
-        return adheringMap.get(b.id);
+        return adheringMap.get(b);
     }
 
     private float intensity(Bullet b){
-        return intensityMap.get(b.id, 1.0f);
+        return intensityMap.get(b, 1.0f);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FleshBulletType extends SpritesBulletType{
             // these are unused... right?
             bullet.originX = b.x - entity.x();
             bullet.originY = b.y - entity.y();
-            adheringMap.put(bullet.id, entity);
+            adheringMap.put(bullet, entity);
         }
     }
 
@@ -88,7 +88,7 @@ public class FleshBulletType extends SpritesBulletType{
 
             if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > removeAmount * Time.delta){
                 build.liquids.remove(Liquids.water, removeAmount * Time.delta);
-                intensityMap.increment(b.id, 1.0f, spreadIntensity * Time.delta);
+                intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
                 b.time -= Time.delta;
             }
 
@@ -100,8 +100,8 @@ public class FleshBulletType extends SpritesBulletType{
     @Override
     public void removed(Bullet b){
         super.removed(b);
-        adheringMap.remove(b.id);
-        intensityMap.remove(b.id, 1.0f);
+        adheringMap.remove(b);
+        intensityMap.remove(b, 1.0f);
     }
 
     @Override

@@ -15,7 +15,6 @@ import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
-import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
@@ -149,10 +148,11 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         bullet.time = 0.0f;
                         bullet.lifetime = node.last();
 
-                        BulletType type;
+                        if(bulletMap.containsKey(bullet.type.id)){
+                            bullet.type = content.bullet(bulletMap.get(bullet.type.id));
 
-                        if(!bulletMap.containsKey(bullet.type.id)){
-                            type = bullet.type.copy();
+                        }else{
+                            var type = bullet.type.copy();
 
                             // make artillery collides building
                             type.collidesTiles = type.collides = true;
@@ -167,13 +167,11 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                     type.trailLength = 12;
                                 }
                             }
-                            bulletMap.put(bullet.type.id, type.id);
 
-                        }else{
-                            type = content.getByID(bullet.type.getContentType(), bulletMap.get(bullet.type.id));
+                            bulletMap.put(bullet.type.id, type.id);
+                            bullet.type = type;
                         }
 
-                        bullet.type = type;
                         damageSum += bullet.damage;
 
                         bullet.mover = b -> {
