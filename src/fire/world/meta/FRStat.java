@@ -15,8 +15,7 @@ public class FRStat{
         floorMultiplier = new Stat("floorMultiplier"),
 
         statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
-        lightningLength = new Stat("lightningLength", StatCat.function),
-        lightningAmount = new Stat("lightningAmount", StatCat.function),
-        invincibleTime = new Stat("invincibleTime", StatCat.function),
-        maxTargets = new Stat("maxTargets", StatCat.function);
+        maxTargets = new Stat("maxTargets", StatCat.function),
+        ammoDetails = new Stat("ammoDetails", StatCat.function)
+            ;
 }

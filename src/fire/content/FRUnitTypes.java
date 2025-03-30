@@ -10,7 +10,6 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Time;
-import fire.FRUtils;
 import fire.ai.FRUnitCommand;
 import fire.entities.abilities.*;
 import fire.type.FleshUnitType;
@@ -35,7 +34,6 @@ import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 
-import static fire.FRUtils.color;
 import static fire.FRUtils.colors;
 import static fire.FRVars.*;
 import static mindustry.Vars.tilePayload;
@@ -421,8 +419,6 @@ public class FRUnitTypes{
         //region ground
 
         error = new FleshUnitType("error"){{
-            hidden = true;
-            
             constructor = LegsUnit::create;
             hovering = true;
             health = 128000;
@@ -839,9 +835,9 @@ public class FRUnitTypes{
 
                         trailLength = 24;
                         trailWidth = 5f;
-                        trailColor.set(Pal.lancerLaser);
-                        backColor.set(Pal.lancerLaser);
-                        frontColor.set(Pal.lancerLaser);
+                        trailColor = Pal.lancerLaser;
+                        backColor = Pal.lancerLaser;
+                        frontColor = Pal.lancerLaser;
 
                         hitEffect = Fx.pulverize;
                         hitSound = Sounds.explosion;
@@ -852,7 +848,7 @@ public class FRUnitTypes{
                         intervalBullet = new ShrapnelBulletType(){{
                             damage = 25.0f;
                             length = 48.0f;
-                            toColor.set(Pal.lancerLaser);
+                            toColor = Pal.lancerLaser;
                         }};
 
                         fragBullets = 1;
@@ -1198,6 +1194,7 @@ public class FRUnitTypes{
                             sizeTo = 0.0f;
                             strokeFrom = 0.0f;
                             strokeTo = 6.0f;
+                            interp = Interp.pow3In;
                         }},
                         new WaveEffect(){{
                             startDelay = 30.0f;
@@ -1413,7 +1410,8 @@ public class FRUnitTypes{
         }};
 
         //endregion
-        // put these there instead of FROverride or automatic unlocks
+
+        // put these there instead of FROverride or automatic unlocking
 
         ((UnitFactory)Blocks.groundFactory).plans.add(
             new UnitFactory.UnitPlan(FRUnitTypes.guarding, 1500.0f, ItemStack.with(

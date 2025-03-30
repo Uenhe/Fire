@@ -35,7 +35,7 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
 
     @Override
     public void removed(Bullet b){
-        super.removed(b);
         foldTimesMap.remove(b);
+        super.removed(b);
     }
 }

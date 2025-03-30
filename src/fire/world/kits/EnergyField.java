@@ -36,7 +36,7 @@ public class EnergyField{
             stats.add(FRStat.maxTargets, type().maxTargets);
         }
 
-        EnergyFieldBulletType type(){
+        private EnergyFieldBulletType type(){
             return (EnergyFieldBulletType)shootType;
         }
 
@@ -55,7 +55,6 @@ public class EnergyField{
                 if(shootWarmup < 0.01f) return;
 
                 final byte sectors = 6;
-
                 Draw.z(Layer.bullet - 0.001f);
                 Draw.color(type().lightningColor);
                 Lines.stroke(Lines.getStroke() * shootWarmup * 0.8f);
@@ -112,18 +111,6 @@ public class EnergyField{
                     b.collision(u, u.x, u.y);
                 else
                     ((Building)target).collision(b);
-
-                /*
-                if(target instanceof Unit u){
-                    u.damage(damage * damageMultiplier(b));
-                    u.apply(status, statusDuration);
-                    // look bad
-                    if(fragBullet != null)
-                        u.apply(fragBullet.status, fragBullet.statusDuration);
-                }else{
-                    ((Building)target).damage(b.team, damage * damageMultiplier(b));
-                }
-                */
 
                 hitEffect.at(b.x, b.y, 0.0f, lightningColor, target);
                 b.remove();

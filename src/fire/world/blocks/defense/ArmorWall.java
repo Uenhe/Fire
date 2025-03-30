@@ -58,7 +58,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
             return dmg;
         }
 
-        /** Might be a hacky way to update {@code extraArmor} without {@code updateTile()}... */
+        /** Might be a hacky way to update extraArmor without updating... */
         @Override
         public void draw(){
             super.draw();

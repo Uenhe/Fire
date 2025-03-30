@@ -32,8 +32,8 @@ public class SurgeCrafter extends GenericCrafter{
             craftSound.at(this, Mathf.random(0.9f, 1.1f));
 
             for(byte i = 0; i < fragBullets; i++){
-                byte j = i;
-                byte[] sign = {1, -1, (byte) Mathf.sign(Mathf.range(1)), (byte) Mathf.sign(j % 2 == 0)};
+                final byte j = i;
+                byte[] sign = {1, -1, (byte)Mathf.sign(Mathf.range(1)), (byte)Mathf.sign(j % 2 == 0)};
 
                 var bullet = fragBullet.create(this, x, y, 360.0f / fragBullets * j);
                 bullet.lifetime /= timeScale;

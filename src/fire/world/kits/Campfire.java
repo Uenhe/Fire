@@ -7,7 +7,7 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
-import arc.struct.IntFloatMap;
+import arc.struct.ObjectFloatMap;
 import arc.util.Scaling;
 import fire.FRVars;
 import fire.world.consumers.ConsumePowerCustom;
@@ -20,7 +20,6 @@ import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Styles;
-import mindustry.world.blocks.defense.OverdriveProjector;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 
@@ -28,7 +27,7 @@ import static mindustry.Vars.*;
 
 public class Campfire{
 
-    public static class CampfireBlock extends OverdriveProjector{
+    public static class CampfireBlock extends mindustry.world.blocks.defense.OverdriveProjector{
 
         public StatusEffect
             allyStatus = StatusEffects.overclock,
@@ -52,10 +51,10 @@ public class Campfire{
 
                         t.left().button(new TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
-
                             var detail = s == allyStatus
                                 ? FRStat.allyStatusEffect.localized()
                                 : FRStat.enemyStatusEffect.localized();
+
                             info.left().add("[accent]" + detail).left();
                             info.row();
                             info.left().add(s.localizedName).color(s.color).left();
@@ -111,7 +110,14 @@ public class Campfire{
                 Draw.reset();
             }
 
-            float getEfficiency(){
+            @Override
+            public void remove(){
+                ConsumePowerCustom.scaleMap.remove(this, 0.0f);
+                ConsumeCampfire.efficiencyMap.remove(this, 0.0f);
+                super.remove();
+            }
+
+            private float getEfficiency(){
                 return consumeBuilder.find(c -> c instanceof ConsumeCampfire).efficiencyMultiplier(this);
             }
         }
@@ -121,7 +127,7 @@ public class Campfire{
     public static class ConsumeCampfire extends mindustry.world.consumers.ConsumeItemFilter{
 
         public final CampfireBlock block;
-        public static final IntFloatMap efficiencyMap = new IntFloatMap();
+        public static final ObjectFloatMap<Building> efficiencyMap = new ObjectFloatMap<>();
 
         public ConsumeCampfire(CampfireBlock block){
             this.block = block;
@@ -129,7 +135,7 @@ public class Campfire{
             optional(true, true);
         }
 
-        /** Only support consume 1 item each time, currently. Multiple items need extra judgment. */
+        /** Only support consumes 1 item each time, currently. Multiple items need extra judgment. */
         @Override
         public void trigger(Building build){
             build.items.each((item, amount) -> {
@@ -140,12 +146,12 @@ public class Campfire{
 
         @Override
         public void update(Building build){
-            efficiencyMap.put(build.id, build.items.sum(((item, amount) -> item.flammability)));
+            efficiencyMap.put(build, build.items.sum(((item, amount) -> item.flammability)));
         }
 
         @Override
         public float efficiencyMultiplier(Building build){
-            return efficiencyMap.get(build.id, 1.0f);
+            return efficiencyMap.get(build, 1.0f);
         }
 
         @Override

@@ -23,7 +23,7 @@ public class FleshBulletType extends SpritesBulletType{
     public float spreadIntensity;
 
     private final FleshBulletType adhereType;
-    public static final Item ITEM = FRItems.flesh;
+    private static final Item ITEM = FRItems.flesh;
 
     private static final ObjectMap<Bullet, Healthc> adheringMap = new ObjectMap<>();
     private static final ObjectFloatMap<Bullet> intensityMap = new ObjectFloatMap<>();
@@ -64,13 +64,12 @@ public class FleshBulletType extends SpritesBulletType{
     }
 
     private void afterHit(Bullet b, Healthc entity){
-        if(Mathf.chance(adhereChance)){
-            var bullet = adhereType.create(b, b.x, b.y, b.rotation());
-            // these are unused... right?
-            bullet.originX = b.x - entity.x();
-            bullet.originY = b.y - entity.y();
-            adheringMap.put(bullet, entity);
-        }
+        if(!Mathf.chance(adhereChance)) return;
+        var bullet = adhereType.create(b, b.x, b.y, b.rotation());
+        // these are unused... right?
+        bullet.originX = b.x - entity.x();
+        bullet.originY = b.y - entity.y();
+        adheringMap.put(bullet, entity);
     }
 
     @Override
@@ -99,9 +98,9 @@ public class FleshBulletType extends SpritesBulletType{
 
     @Override
     public void removed(Bullet b){
-        super.removed(b);
         adheringMap.remove(b);
-        intensityMap.remove(b, 1.0f);
+        intensityMap.remove(b, 0.0f);
+        super.removed(b);
     }
 
     @Override

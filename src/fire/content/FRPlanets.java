@@ -188,14 +188,16 @@ public class FRPlanets{
                     node(garrison, with(new SectorComplete(sporeFiord)), () ->
                         node(shelter, with(new OnSector(darkWorkshop)), () ->
                             node(blessing, with(new OnSector(glaciatedPeaks)), () -> {
-                            }))
+                            })
+                        )
                     )
                 );
 
                 node(firefly, () ->
                     node(candlelight, with(new SectorComplete(frozenGround)), () ->
                         node(lampflame, with(new SectorComplete(chillyMountains)), () -> {
-                        }))
+                        })
+                    )
                 );
 
                 node(fleshReconstructor, with(new SectorComplete(stormyCoast), new Produce(flesh)), () ->
@@ -287,6 +289,7 @@ public class FRPlanets{
 
                             dnode(beachLanding, () -> {
                                 dnode(blossom);
+                                dnode(aerolite);
 
                                 dnode(darkWorkshop, () -> {
                                     dnode(compositeUnloader);

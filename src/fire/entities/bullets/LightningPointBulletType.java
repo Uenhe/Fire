@@ -23,8 +23,8 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
     public void init(Bullet b){
         super.init(b);
         if(!Mathf.chance(lightningChance)) return;
-        Teamc target;
 
+        Teamc target;
         if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id))
             target = b.aimTile.build;
         else

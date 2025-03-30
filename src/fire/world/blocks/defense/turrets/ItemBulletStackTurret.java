@@ -24,9 +24,9 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
 
     public class ItemBulletStackTurretBuild extends ItemTurretBuild{
 
-        float reloadTimer;
-        byte index;
-        boolean shooting;
+        private float reloadTimer;
+        private byte counter;
+        private boolean shooting;
 
         @Override
         protected void updateShooting(){
@@ -34,7 +34,6 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
 
             if(unavailable()){
                 super.updateShooting();
-
             }else if(reloadCounter >= reload && !charging() && shootWarmup >= minWarmup){
                 shoot(peekAmmo());
                 shooting = true;
@@ -47,19 +46,16 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
 
             if(unavailable() || !shooting){
                 super.updateTile();
-
             }else{
-                var stack = bulletStack.get(item().id).get(index);
-
+                var stack = bulletStack.get(item().id).get(counter);
                 if((reloadTimer += delta()) >= stack.delay){
-                    reloadTimer %= stack.delay;
-
                     shoot(stack.type);
-                    index++;
+                    counter++;
+                    reloadTimer -= stack.delay;
                 }
 
-                if(index > bulletStack.size){
-                    index = 0;
+                if(counter > bulletStack.size){
+                    counter = 0;
                     reloadCounter -= reload;
                     shooting = false;
                 }
@@ -79,20 +75,22 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
         }
 
         /** For items that have no BulletStack (WiP or not intended). */
-        boolean unavailable(){
+        private boolean unavailable(){
             return bulletStack.get(item().id) == null;
         }
 
-        Item item(){
+        private Item item(){
             return ((ItemEntry)ammo.peek()).item;
         }
     }
 
     public static class BulletStack{
-        final float delay;
-        final BulletType type;
-        public BulletStack(float delay, BulletType type){
-            this.delay = delay;
+
+        private final short delay;
+        private final BulletType type;
+
+        public BulletStack(int delay, BulletType type){
+            this.delay = (short)delay;
             this.type = type;
         }
     }

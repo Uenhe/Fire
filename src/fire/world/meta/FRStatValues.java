@@ -1,155 +1,53 @@
 package fire.world.meta;
 
-public class FRStatValues{/*
+import arc.Core;
+import arc.struct.ObjectMap;
+import arc.struct.Seq;
+import arc.util.Scaling;
+import fire.FRUtils;
+import fire.world.blocks.defense.turrets.JackpotTurret;
+import mindustry.entities.pattern.ShootAlternate;
+import mindustry.entities.pattern.ShootMulti;
+import mindustry.ui.Styles;
+import mindustry.world.meta.StatValue;
+import mindustry.world.meta.StatValues;
 
-    public static StatValue ammo(Seq<JackpotTurret.JackpotAmmo> map, int indent){
+public class FRStatValues{
 
+    /** @see StatValues#ammo(ObjectMap, boolean, boolean)  */
+    public static StatValue ammoDetails(Seq<JackpotTurret.JackpotAmmo> ammo){
         return table -> {
-
             table.row();
 
-            for(var t : map){
-                var type = t.type;
+            for(byte i = 0; i < ammo.size; i++){
+                final byte j = i;
+                var entry = ammo.get(j);
 
                 table.table(Styles.grayPanel, bt -> {
-
-                    bt.left().top().defaults().padRight(3f).left();
+                    bt.left().top().defaults().padRight(3.0f).left();
                     bt.table(title -> {
-                        title.image(t.item.uiIcon).size(3 * 8).padRight(4).right().scaling(Scaling.fit).top();
-                        title.add(t.item.localizedName).padRight(10).left().top();
+                        title.image(entry.item.uiIcon).size(24.0f).padRight(4.0f).right().scaling(Scaling.fit).top().with(e -> StatValues.withTooltip(e, entry.item, false));
+                        title.add(entry.item.localizedName).padRight(10.0f).left().top();
                     });
-                    bt.row();
 
-                    if(type.damage > 0f && (type.collides || type.splashDamage <= 0f)){
-                        if(type.continuousDamage() > 0f)
-                            bt.add(Core.bundle.format("bullet.damage", type.continuousDamage()) + StatUnit.perSecond.localized());
-                        else
-                            bt.add(Core.bundle.format("bullet.damage", type.damage));
-                    }
+                    bt.row().add(Core.bundle.format("bullet.level", FRUtils.toRomanNumeral(j + 1)));
 
-                    if(type.buildingDamageMultiplier != 1f){
-                        int val = (short)(type.buildingDamageMultiplier * 100 - 100);
-                        sep(bt, Core.bundle.format("bullet.buildingdamage", ammoStat(val)));
-                    }
+                    if(entry.chancePercentage != 0) bt.row().add(Core.bundle.format("bullet.chance", entry.chancePercentage));
 
-                    if(type.rangeChange != 0f){
-                        sep(bt, Core.bundle.format("bullet.range", ammoStat(type.rangeChange / tilesize)));
-                    }
-
-                    if(type.splashDamage > 0f){
-                        sep(bt, Core.bundle.format("bullet.splashdamage", (int)type.splashDamage, Strings.fixed(type.splashDamageRadius / tilesize, 1)));
-                    }
-
-                    if(!Mathf.equal(type.ammoMultiplier, 1f) && type.displayAmmoMultiplier){
-                        sep(bt, Core.bundle.format("bullet.multiplier", (byte)type.ammoMultiplier));
-                    }
-
-                    if(!Mathf.equal(type.reloadMultiplier, 1f)){
-                        short val = (short)(type.reloadMultiplier * 100 - 100);
-                        sep(bt, Core.bundle.format("bullet.reload", ammoStat(val)));
-                    }
-
-                    if(type.knockback > 0f){
-                        sep(bt, Core.bundle.format("bullet.knockback", Strings.autoFixed(type.knockback, 2)));
-                    }
-
-                    if(type.healPercent > 0f){
-                        sep(bt, Core.bundle.format("bullet.healpercent", Strings.autoFixed(type.healPercent, 2)));
-                    }
-
-                    if(type.healAmount > 0f){
-                        sep(bt, Core.bundle.format("bullet.healamount", Strings.autoFixed(type.healAmount, 2)));
-                    }
-
-                    if(type.pierce || type.pierceCap != -1){
-                        sep(bt, type.pierceCap == -1 ? "@bullet.infinitepierce" : Core.bundle.format("bullet.pierce", type.pierceCap));
-                    }
-
-                    if(type.incendAmount > 0){
-                        sep(bt, "@bullet.incendiary");
-                    }
-
-                    if(type.homingPower > 0.01f){
-                        sep(bt, "@bullet.homing");
-                    }
-
-                    if(type.lightning > 0){
-                        sep(bt, Core.bundle.format("bullet.lightning", type.lightning, type.lightningDamage < 0f ? type.damage : type.lightningDamage));
-                    }
-
-                    if(type.pierceArmor){
-                        sep(bt, "@bullet.armorpierce");
-                    }
-
-                    if(type.suppressionRange > 0f){
-                        sep(bt, Core.bundle.format("bullet.suppression", Strings.autoFixed(type.suppressionDuration / 60f, 2), Strings.fixed(type.suppressionRange / tilesize, 1)));
-                    }
-
-                    if(type.status != StatusEffects.none){
-                        sep(bt, (type.status.minfo.mod == null ? type.status.emoji() : "") + "[stat]" + type.status.localizedName + (type.status.reactive ? "" : "[lightgray] ~ [stat]" + ((byte)(type.statusDuration / 60f)) + "[lightgray] " + StatUnit.seconds.localized()));
-                    }
-
-                    if(t.chance != 0f){
-                        sep(bt, Core.bundle.format("bullet.chance", (byte)(t.chance * 100) + StatUnit.percent.localized()));
-                    }
-
-                    int a = 1, n = 1;
-                    if(t.shoot instanceof ShootAlternate s){
+                    final int a, n;
+                    if(entry.shoot instanceof ShootAlternate s){
                         a = s.shots;
-                    }
-                    if(t.shoot instanceof ShootMulti s){
+                        n = 1;
+                    }else if(entry.shoot instanceof ShootMulti s){
                         a = s.dest[0].shots;
                         n = s.source.shots;
+                    }else{
+                        a = n = 1;
                     }
-                    sep(bt, Core.bundle.format("bullet.pattern", a, n));
-
-                    if(type.intervalBullet != null){
-                        bt.row();
-
-                        Table ic = new Table();
-                        StatValues.ammo(ObjectMap.of(t, type.intervalBullet), indent + 1, false).display(ic);
-                        Collapser coll = new Collapser(ic, true);
-                        coll.setDuration(0.1f);
-
-                        bt.table(it -> {
-                            it.left().defaults().left();
-
-                            it.add(Core.bundle.format("bullet.interval", Strings.autoFixed(type.intervalBullets / type.bulletInterval * 60f, 2)));
-                            it.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8f).padLeft(16f).expandX();
-                        });
-                        bt.row();
-                        bt.add(coll);
-                    }
-
-                    if(type.fragBullet != null){
-                        bt.row();
-
-                        Table fc = new Table();
-                        StatValues.ammo(ObjectMap.of(t, type.fragBullet), indent + 1, false).display(fc);
-                        Collapser coll = new Collapser(fc, true);
-                        coll.setDuration(0.1f);
-
-                        bt.table(ft -> {
-                            ft.left().defaults().left();
-
-                            ft.add(Core.bundle.format("bullet.frags", type.fragBullets));
-                            ft.button(Icon.downOpen, Styles.emptyi, () -> coll.toggle(false)).update(i -> i.getStyle().imageUp = (!coll.isCollapsed() ? Icon.upOpen : Icon.downOpen)).size(8f).padLeft(16f).expandX();
-                        });
-                        bt.row();
-                        bt.add(coll);
-                    }
-                }).padLeft(indent * 5f).padTop(5f).padBottom(5f).growX().margin(10f);
-                table.row();
+                    bt.row().add(Core.bundle.format("bullet.pattern", a, n));
+                }).padLeft(5.0f).padTop(5.0f).padBottom(5.0f).growX().margin(10.0f);
+                if(j != ammo.size - 1) table.row();
             }
         };
     }
-
-    private static void sep(Table table, String text){
-        table.row();
-        table.add(text);
-    }
-
-    private static String ammoStat(float val){
-        return (val > 0f ? "[stat]+" : "[negstat]") + Strings.autoFixed(val, 1);
-    }*/
 }

@@ -39,7 +39,7 @@ public class FRWaves{
         //required progression:
         //- extra periodic patterns
 
-        Seq<SpawnGroup> out = new Seq<>();
+        var out = new Seq<SpawnGroup>();
 
         //max reasonable wave, after which everything gets boring
         int cap = 225;

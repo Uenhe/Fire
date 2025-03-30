@@ -1,8 +1,18 @@
 package fire;
 
+import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
+import mindustry.game.EventType;
 
 public final class FRUtils{
+
+    private static final String[] rnumerals = new String[10];
+
+    static{{
+        Events.on(EventType.ClientLoadEvent.class, e ->
+            System.arraycopy(Core.bundle.get("fire.rnumerals").split("\\|"), 0, rnumerals, 0, 10));
+    }}
 
     public static void colors(Color[] colors, Color... color){
         System.arraycopy(color, 0, colors, 0, 3);
@@ -14,6 +24,11 @@ public final class FRUtils{
 
     public static Color colora(int... component){
         return new Color(component[0] / 255.0f, component[1] / 255.0f, component[2] / 255.0f, component[3] / 255.0f);
+    }
+
+    /** 1 to 10, that should be enough. */
+    public static String toRomanNumeral(int n){
+        return rnumerals[n - 1];
     }
 
     public static final class TimeNode{

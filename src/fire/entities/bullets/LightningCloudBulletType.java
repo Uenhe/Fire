@@ -75,7 +75,6 @@ public class LightningCloudBulletType extends BulletType{
         @Override
         public void update(){
             time += delta();
-
             if(time >= timeNodes[1] && time < timeNodes[2] + 10.0f && Mathf.chanceDelta(type().baseChance + intensity * 0.04f)){
                 Lightning.create(team, type.lightningColor, damage * intensity, x, y, Mathf.random(360.0f), (int)((type.lightningLength + Mathf.random(type.lightningLengthRand)) * Mathf.pow(intensity, 1.2f)));
             }else if(time >= lifetime){

@@ -14,7 +14,7 @@ import static mindustry.Vars.*;
 
 public class MechPad extends mindustry.world.Block{
 
-    final UnitType unitType;
+    protected final UnitType unitType;
     /** Power consumed per use. */
     protected float powerCons;
 
@@ -31,17 +31,16 @@ public class MechPad extends mindustry.world.Block{
     @Override
     public void setStats(){
         super.setStats();
-
         if(consValid()) stats.add(Stat.powerUse, powerCons);
     }
 
-    boolean consValid(){
+    private boolean consValid(){
         return powerCons > 0.0f;
     }
 
     @FRAnnotations.Remote(called = FRAnnotations.Loc.server)
-    public static void playerSpawn(Tile tile, Player playee){
-        if(playee == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
+    public static void playerSpawn(Tile tile, Player pl){
+        if(pl == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 
         var spawnType = ((MechPad)pad.block).unitType;
         if(pad.wasVisible)
@@ -51,7 +50,7 @@ public class MechPad extends mindustry.world.Block{
         if(((MechPad)pad.block).consValid() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).powerCons * 60.0f)
             pad.power.graph.useBatteries(((MechPad)pad.block).powerCons);
 
-        playee.set(pad);
+        pl.set(pad);
 
         if(!net.client()){
             Unit unit = spawnType.create(tile.team());
@@ -59,11 +58,11 @@ public class MechPad extends mindustry.world.Block{
             unit.rotation(90.0f);
             unit.impulse(0.0f, 3.0f);
             unit.spawnedByCore(true);
-            unit.controller(playee);
+            unit.controller(pl);
             unit.add();
         }
 
-        if(state.isCampaign() && playee == player)
+        if(state.isCampaign() && pl == player)
             spawnType.unlock();
     }
 
@@ -71,25 +70,25 @@ public class MechPad extends mindustry.world.Block{
 
         /** Active only when the player is close enough and power is enough. */
         @Override
-        public boolean canControlSelect(Unit player){
-            return player.isPlayer() && Mathf.dst(player.x, player.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= powerCons || power.graph.getPowerBalance() * 60.0f >= powerCons);
+        public boolean canControlSelect(Unit unit){
+            return unit.isPlayer() && Mathf.dst(unit.x, unit.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= powerCons || power.graph.getPowerBalance() * 60.0f >= powerCons);
         }
 
         @Override
         public void onControlSelect(Unit unit){
             if(!unit.isPlayer()) return;
-            Player playee = unit.getPlayer();
+            Player pl = unit.getPlayer();
 
-            Fx.spawn.at(playee);
-            if(net.client() && playee == player)
+            Fx.spawn.at(pl);
+            if(net.client() && pl == player)
                 control.input.controlledType = null;
 
-            playee.clearUnit();
-            playee.deathTimer = Player.deathDelay + 1.0f;
+            pl.clearUnit();
+            pl.deathTimer = Player.deathDelay + 1.0f;
 
             // do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
-            FRCall.playerSpawn(tile, playee);
+            FRCall.playerSpawn(tile, pl);
         }
     }
 }

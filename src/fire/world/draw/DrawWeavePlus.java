@@ -15,8 +15,8 @@ import static mindustry.Vars.tilesize;
 
 public class DrawWeavePlus extends DrawWeave{
 
-    public byte lines;
-    public float rotateSpeed;
+    public final byte lines;
+    public final float rotateSpeed;
 
     private TextureRegion glowRegion;
 
@@ -42,7 +42,7 @@ public class DrawWeavePlus extends DrawWeave{
             Draw.alpha(build.warmup());
 
             for(byte i = 0; i < lines; i++){
-                rand.setSeed(build.id * i * 1000L);
+                rand.setSeed(build.id * i * 2L);
 
                 float value = Mathf.sin(build.totalProgress() + rand.random(10.0f), 8.0f / rotateSpeed * rand.random(0.8f, 1.2f), build.block.size * tilesize * 0.33f),
                     x = build.x + (i % 2 == 0 ? value : 0.0f),

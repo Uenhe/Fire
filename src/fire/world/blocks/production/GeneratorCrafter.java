@@ -2,7 +2,6 @@ package fire.world.blocks.production;
 
 public class GeneratorCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    /** Per frame. */
     public final float powerProduction;
 
     public GeneratorCrafter(String name, float pwr){

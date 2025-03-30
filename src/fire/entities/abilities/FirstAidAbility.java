@@ -99,6 +99,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void death(Unit unit){
+        healthMap.remove(unit);
         healAmount = cooldown = statusDuration = healthLossPercentage = healPercentage = healthSize = 0;
         detectTimer = cooldownTimer = 0.0f;
         status = null;

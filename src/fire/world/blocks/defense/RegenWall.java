@@ -18,19 +18,14 @@ import static mindustry.Vars.tilesize;
 
 public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
 
-    /** Chance of wall to heal itself on collision. -1 to disable. */
-    protected float chanceHeal = -1f;
-    /** {@link mindustry.world.blocks.defense.Wall} */
-    protected float chanceDeflect = -1f;
+    /** Chance of wall to heal itself on collision. */
+    protected byte chanceHeal;
+    protected byte chanceDeflect;
     /** How much wall heals at collision. Based on bullet damage. */
     protected float regenPercent = 0.1f;
-    /** {@link mindustry.type.Item} */
-    protected float frameTime = 3f;
-    /** {@link mindustry.type.Item} */
-    protected byte frames = 0;
-    /** {@link mindustry.world.blocks.defense.Wall} */
-    protected boolean flashHit = false;
-    /** {@link mindustry.world.blocks.defense.Wall} */
+    protected byte frameTime = 3;
+    protected byte frames;
+    protected boolean flashHit;
     protected Color flashColor = Color.white;
 
     public RegenWall(String name){
@@ -52,10 +47,9 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
     @Override
     public void setStats(){
         super.setStats();
-
         stats.remove(Stat.range);
-        stats.addPercent(FRStat.baseHealChance, chanceHeal);
-        if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect);
+        stats.addPercent(FRStat.baseHealChance, chanceHeal * 0.01f);
+        if(chanceDeflect > 0) stats.add(Stat.baseDeflectChance, chanceDeflect);
     }
 
     @Override
@@ -66,8 +60,8 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
 
     public class RegenWallBuild extends RegenProjectorBuild{
 
-        float healAmount, hit;
-        boolean heals;
+        private float healAmount, hit;
+        private boolean heals;
 
         @Override
         public void updateTile(){
@@ -86,15 +80,12 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
             super.collision(bullet);
             hit = 1.0f;
 
-            if(Mathf.chance(chanceHeal)){
+            if(Mathf.chance(chanceHeal * 0.01d)){
                 healAmount = bullet.damage * regenPercent;
                 heals = true;
             }
 
-            if(
-                chanceDeflect > 0.0f && bullet.vel.len() > 0.1f
-                && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)
-            ){
+            if(chanceDeflect > 0 && bullet.vel.len() > 0.1f && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)){
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
                 if(Math.abs(x - bullet.x) > Math.abs(y - bullet.y)){

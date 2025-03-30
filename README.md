@@ -1,11 +1,9 @@
 # Mindustry Mod - Fire
 - [English](README.md) | [中文](README_zh.md)
 
-A Mindustry Mod that adds a lot of WEIRD things...
+A Mindustry Mod that adds many unique things...
 
-Notice: There are two author, FlyRain and KochiyaUeneh.
-
-[Here is FlyRain.](https://github.com/nuiFghY)
+There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me).
 
 ## Content
 
@@ -24,20 +22,15 @@ Notice: There are two author, FlyRain and KochiyaUeneh.
 
 #### Blocks:
 
-- More powerful turrets
-- More cool factories
+- More powerful turrets, factories, generators and walls
+- More practical production and distribution facilitiess
 - More blocks as superior of some vanilla blocks
-- Cheaper and more efficient power generators
-- Adds Dam Wall that can be placed on deep water
-- Adds Hardened Alloy Wall that is extremely armored
-- Adds Flesh Wall that has the ability to repair itself
-- Advanced 5*5-sized buildable & destructible core, extremely well armored
 - Javelin Pad from Mindustry v5
 
 #### Units:
 
-- Adds 5 new ground supporting units, can step over most terrain
+- Adds 5 new ground supporting units, able to step over most terrain
 - Adds 3 new Kamikaze air units, flying toward enemies and self-destructs
-- Adds 1 new flesh ground mech unit, basically similar to the vanilla
+- Adds 3 new flesh ground mech unit, basically similar to the vanilla
 - Javelin Ship from Mindustry v5
 - And more high-tier units

@@ -22,7 +22,6 @@ import mindustry.game.EventType;
 import mindustry.mod.Mods;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 
@@ -34,22 +33,20 @@ import static mindustry.Vars.*;
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
 
-    private static final int version = 140;
+    private static final int version = 1401;
     private static final String
-        linkRaindance = "https://space.bilibili.com/516898377",
-        linkUeneh = "https://space.bilibili.com/327502129",
-        linkGitHub = "https://github.com/Uenhe/Fire";
+        linkFy = "https://space.bilibili.com/516898377",
+        linkUe = "https://space.bilibili.com/327502129",
+        linkGit = "https://github.com/Uenhe/Fire";
 
     private static Mods.LoadedMod FIRE;
-    private static String displayName;
-    private static boolean launched, multiplied;
+    private static boolean multiplied;
     private static byte counter;
 
     @Override
     public void loadContent(){
         FIRE = mods.locateMod("fire");
-        displayName = Core.bundle.get("fire.name");
-        FIRE.meta.displayName = displayName;
+        FIRE.meta.displayName = Core.bundle.get("fire.name");
 
         setRandTitle();
 
@@ -69,18 +66,17 @@ public class FireMod extends mindustry.mod.Mod{
     public void init(){
         FROverride.load();
         FRBinding.load();
-        loadSettings();
+        loadSetting();
         loadDatabase();
 
         Events.on(EventType.ClientLoadEvent.class, e -> {
-            showLogs();
+            showLog();
             showNoMultipleMods();
             showUpdate();
-            launched = true;
         });
     }
 
-    private static void loadSettings(){
+    private static void loadSetting(){
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
             t.checkPref("minesand", false, a ->
@@ -90,62 +86,35 @@ public class FireMod extends mindustry.mod.Mod{
                 Blocks.darksandWater.playerUnmineable =
                 Blocks.darksandTaintedWater.playerUnmineable = !a
             );
-
             t.checkPref("displayrange", true);
             t.checkPref("showlogs", true);
             t.checkPref("nomultimods", true);
 
-            t.button("setting.fire-showlogs", () -> {
-                showLogs();
-
-                if(counter < 5){
-                    counter++;
-                    if(counter >= 5){
-                        doSomethingPlayable();
-                        ui.announce("Debug successfully.");
-                    }
+            t.rebuild(); //to adapt MindustryX
+            t.row().button("@setting.fire-showlog", () -> {
+                showLog();
+                if(++counter >= 5){
+                    doSomethingPlayable();
+                    ui.announce("Debug successfully.");
                 }
-            }).size(240.0f, 64.0f).row();
-
-            t.pref(new SettingsTable.Setting(Core.bundle.get("setting-showDialog")){
-                @Override
-                public void add(SettingsTable table){
-                    table.button(name, () -> {
-                        showLogs();
-
-                        if(counter < 5){
-                            counter++;
-                            if(counter >= 5){
-                                doSomethingPlayable();
-                                ui.announce("Debug successfully.");
-                            }
-                        }
-
-                    }).size(240.0f, 64.0f);
-                    table.row();
-                }
-            });
+            }).size(240.0f, 80.0f);
         });
     }
 
     private static void loadDatabase(){
-        var table = ui.research.titleTable;
-        table.row();
-        table.button(b -> b.add("@fire.showdatabase"), InfoDialog.dialog::show).visible(() -> ui.research.root.node == FRPlanets.lysetta.techTree);
+        ui.research.titleTable.row().button(b -> b.add("@fire.showdatabase"), InfoDialog.dialog::show).visible(() -> ui.research.root.node == FRPlanets.lysetta.techTree);
     }
 
-    private static void showLogs(){
-        if(!FRVars.showLogs || launched) return;
+    private static void showLog(){
+        if(!FRVars.showLogs) return;
 
-        String version = FIRE.meta.version;
-
-        var historyDialog = new BaseDialog(Core.bundle.format("fire.historytitle", displayName));
+        var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
         historyDialog.cont.pane(t ->
-            t.add("@history").left().maxWidth(1280.0f).pad(4.0f)
+            t.add("@fire.history").left().maxWidth(1280.0f).pad(4.0f)
         );
 
-        var mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", displayName, version));
+        var mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
         setupDialog(mainDialog);
         mainDialog.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
         mainDialog.cont.pane(t -> {
@@ -153,44 +122,44 @@ public class FireMod extends mindustry.mod.Mod{
             t.image(Core.atlas.find("fire-logo")).height(107.0f).width(359.0f).pad(3.0f);
             t.row();
 
-            t.add(Core.bundle.format("fire.content1", version)).left().maxWidth(1024.0f).pad(4.0f);
+            t.add(Core.bundle.format("fire.content1", FIRE.meta.version)).left().maxWidth(1024.0f).pad(4.0f);
             t.row();
 
             addContent(t,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
                 FRBlocks.magneticRingPump, FRBlocks.hardenedLiquidTank, FRBlocks.hydroelectricGenerator,
+                FRBlocks.constraintExtractor,
                 FRBlocks.cryofluidMixerLarge, FRBlocks.magnetismConcentratedRollingMill, FRBlocks.magneticRingSynthesizer,
+                FRBlocks.primaryInterplanetaryAccelerator,
                 FRUnitTypes.hatchet, FRUnitTypes.castle, FRUnitTypes.mechanicalTide
             );
             t.row();
 
-            t.add("fire.content2").left().maxWidth(1024.0f).pad(4.0f);
+            t.add("@fire.content2").left().maxWidth(1024.0f).pad(4.0f);
             t.row();
 
             if("zh_CN".equals(Core.settings.getString("locale"))){
-
-                t.button(("fire.linkfy"), () -> {
-                    if(!Core.app.openURI(linkRaindance)){
+                t.button(("@fire.linkfy"), () -> {
+                    if(!Core.app.openURI(linkFy)){
                         ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkRaindance);
+                        Core.app.setClipboardText(linkFy);
                     }
                 }).size(256.0f, 64.0f);
                 t.row();
 
-                t.button(("fire.linkue"), () -> {
-                    if(!Core.app.openURI(linkUeneh)){
+                t.button(("@fire.linkue"), () -> {
+                    if(!Core.app.openURI(linkUe)){
                         ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkUeneh);
+                        Core.app.setClipboardText(linkUe);
                     }
                 }).size(256.0f, 64.0f);
                 t.row();
 
             }else{
-
-                t.button(("fire.linkgithub"), () -> {
-                    if(!Core.app.openURI(linkGitHub)){
+                t.button(("@fire.linkgithub"), () -> {
+                    if(!Core.app.openURI(linkGit)){
                         ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkGitHub);
+                        Core.app.setClipboardText(linkGit);
                     }
                 }).size(256.0f, 64.0f);
                 t.row();
@@ -209,7 +178,7 @@ public class FireMod extends mindustry.mod.Mod{
                 boolean closable;
                 {
                     update(() -> closable = (time -= Time.delta) <= 0.0f);
-                    cont.add("fire.nomultimods");
+                    cont.add("@fire.nomultimods");
                     buttons.button("", this::hide).update(b -> {
                         b.setDisabled(!closable);
                         b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
@@ -300,10 +269,9 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** !!! */
     private static void doSomethingPlayable(){
-        for(var e : DEBUG.DEBUGS){
+        for(var e : DEBUG.DEBUGS)
             if(e instanceof Block)
                 ((Block)e).buildVisibility = BuildVisibility.shown;
-        }
 
         if(multiplied){
             multiplied = false;

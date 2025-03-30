@@ -30,7 +30,7 @@ import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.production.EnergyCrafter;
 import fire.world.blocks.production.GeneratorCrafter;
-import fire.world.blocks.production.LaserDrillTower;
+import fire.world.blocks.production.BeamExtractor;
 import fire.world.blocks.production.SurgeCrafter;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
@@ -715,7 +715,7 @@ public class FRBlocks{
 
             jackpotAmmo.add(
 
-                new JackpotAmmo(Items.copper, 0.45f,
+                new JackpotAmmo(Items.copper, 45,
                     new ShootAlternate(4.0f){{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
@@ -734,7 +734,7 @@ public class FRBlocks{
                         backColor = hitColor = colors[0];
                     }}),
 
-                new JackpotAmmo(Items.thorium, 0.3f,
+                new JackpotAmmo(Items.thorium, 30,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 1;
@@ -760,7 +760,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(Items.surgeAlloy, 0.15f,
+                new JackpotAmmo(Items.surgeAlloy, 15,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 2;
@@ -791,7 +791,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(FRItems.hardenedAlloy, 0.0f,
+                new JackpotAmmo(FRItems.hardenedAlloy, 0,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 7;
@@ -1304,9 +1304,9 @@ public class FRBlocks{
                     splashDamage = 500.0f;
                     ammoMultiplier = 12.0f;
                     status = StatusEffects.blasted;
-                    frontColor.set(Color.white);
-                    backColor.set(color1);
-                    trailColor.set(color1);
+                    frontColor = Color.white;
+                    backColor = color1;
+                    trailColor = color1;
 
                     hitEffect = new MultiEffect(
 
@@ -1679,7 +1679,7 @@ public class FRBlocks{
                 speed_1_1 = 60.0f,
                 lifetime_1_1 = 35.0f;
 
-            bullet_1_1 = new BasicBulletType(speed_1_1,18000.0f){{
+            bullet_1_1 = new BasicBulletType(speed_1_1, 18000.0f){{
                 lifetime = lifetime_1_1;
                 width = 20.0f;
                 height = 60.0f;
@@ -2049,7 +2049,7 @@ public class FRBlocks{
             shoot.firstShotDelay = chargeTime;
 
             stack(
-                (int)item_2.id, Seq.with(new BulletStack(3.00f, bullet_2_2), new BulletStack(60.0f, bullet_2_3))
+                (int)item_2.id, Seq.with(new BulletStack(30, bullet_2_2), new BulletStack(60, bullet_2_3))
             );
 
             consumePower(n(300000));
@@ -2402,12 +2402,14 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, n(12));
         }};
 
-        constraintExtractor = new LaserDrillTower("constraint_extractor"){{
+        constraintExtractor = new BeamExtractor("constraint-extractor"){{
             requirements(Category.production, with(
                 Items.metaglass, 75,
                 FRItems.logicAlloy, 40,
                 FRItems.magneticAlloy, 5
             ));
+            health = 220;
+            armor = 12.0f;
             size = 2;
             hasItems = true;
             hasPower = true;
@@ -2417,10 +2419,11 @@ public class FRBlocks{
 
             tier = 3;
             range = 190;
-            speed = 1.25f;
+            drillTime = 30;
+            hardnessDrillMultiplier = 10;
             warmupSpeed = 0.05f;
             boostScale = 4.0f;
-            mineHardnessScaling = true;
+            shootY = 4;
             baseColor = Pal.accent;
             boostColor = ((BeamDrill)Blocks.plasmaBore).boostHeatColor; //lazy
             updateEffect = Fx.pulverizeSmall;
@@ -2428,7 +2431,7 @@ public class FRBlocks{
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.02f;
 
-            consumePower(n(60));
+            consumePower(n(150));
             consumeLiquid(Liquids.cryofluid, n(6)).boost();
         }};
 
@@ -2722,13 +2725,13 @@ public class FRBlocks{
             enableDrawStatus = false;
             healPercent = 0.0834f;
             optionalMultiplier = 2.0f;
-            chanceHeal = 0.15f;
-            chanceDeflect = 15.0f;
+            chanceHeal = 15;
+            chanceDeflect = 15;
             regenPercent = 0.5f;
             flashHit = true;
             flashColor = Pal.health;
             frames = 20;
-            frameTime = 6.0f;
+            frameTime = 6;
 
             consumeLiquid(Liquids.water, 0.0076f).boost();
         }};
