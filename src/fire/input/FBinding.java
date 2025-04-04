@@ -8,14 +8,14 @@ import static arc.KeyBinds.KeyBind;
 import static arc.KeyBinds.KeybindValue;
 import static mindustry.Vars.headless;
 
-public enum FRBinding implements KeyBind{
+public enum FBinding implements KeyBind{
 
     unit_ability(KeyCode.g, "fire");
 
     private final KeybindValue defaultValue;
     private final String category;
 
-    FRBinding(KeybindValue defaultValue, String cat){
+    FBinding(KeybindValue defaultValue, String cat){
         this.defaultValue = defaultValue;
         this.category = cat;
     }
