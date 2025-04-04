@@ -4,16 +4,18 @@ import arc.Core;
 import arc.input.KeyCode;
 import arc.util.Reflect;
 
-import static arc.KeyBinds.*;
+import static arc.KeyBinds.KeyBind;
+import static arc.KeyBinds.KeybindValue;
+import static mindustry.Vars.headless;
 
-public enum FBinding implements KeyBind{
+public enum FRBinding implements KeyBind{
 
     unit_ability(KeyCode.g, "fire");
 
     private final KeybindValue defaultValue;
     private final String category;
 
-    FBinding(KeybindValue defaultValue, String cat){
+    FRBinding(KeybindValue defaultValue, String cat){
         this.defaultValue = defaultValue;
         this.category = cat;
     }
@@ -30,6 +32,8 @@ public enum FBinding implements KeyBind{
 
     /** See <a href="https://github.com/RICCJ/MinerTools">MinerTools</a> also. */
     public static void load(){
+        if(headless) return;
+        
         KeyBind[] bindings = Reflect.get(Core.keybinds, "definitions");
         KeyBind[] newBindings = new KeyBind[bindings.length + values().length];
         System.arraycopy(bindings, 0, newBindings, 0, bindings.length);
