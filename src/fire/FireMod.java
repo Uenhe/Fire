@@ -19,8 +19,7 @@ import mindustry.ui.dialogs.SettingsMenuDialog.SettingsTable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import static mindustry.Vars.mods;
-import static mindustry.Vars.ui;
+import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
@@ -68,6 +67,8 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void loadSettings(){
+        if(headless) return;
+
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
             t.checkPref("allowSandMining", false, a ->
