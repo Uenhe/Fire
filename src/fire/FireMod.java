@@ -55,6 +55,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
+        if(headless) return;
         fire.input.FBinding.load();
         loadSettings();
         loadDatabase();
@@ -67,8 +68,6 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void loadSettings(){
-        if(headless) return;
-
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
             t.checkPref("allowSandMining", false, a ->

@@ -6,7 +6,6 @@ import arc.util.Reflect;
 
 import static arc.KeyBinds.KeyBind;
 import static arc.KeyBinds.KeybindValue;
-import static mindustry.Vars.headless;
 
 public enum FBinding implements KeyBind{
 
@@ -32,8 +31,6 @@ public enum FBinding implements KeyBind{
 
     /** See <a href="https://github.com/RICCJ/MinerTools">MinerTools</a> also. */
     public static void load(){
-        if(headless) return;
-        
         KeyBind[] bindings = Reflect.get(Core.keybinds, "definitions");
         KeyBind[] newBindings = new KeyBind[bindings.length + values().length];
         System.arraycopy(bindings, 0, newBindings, 0, bindings.length);
