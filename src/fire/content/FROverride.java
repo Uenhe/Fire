@@ -2,7 +2,6 @@ package fire.content;
 
 import arc.Events;
 import arc.util.Reflect;
-import fire.FRVars;
 import fire.ai.FRUnitCommand;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
@@ -23,6 +22,7 @@ import mindustry.world.blocks.production.Drill;
 import mindustry.world.blocks.production.Pump;
 import mindustry.world.meta.BuildVisibility;
 
+import static fire.FRVars.mineSand;
 import static mindustry.Vars.content;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.UnitTypes.*;
@@ -43,11 +43,13 @@ public class FROverride{
         whiteTree.attributes.set(FRAttribute.tree, 1.0f);
         grass.attributes.set(FRAttribute.grass, 0.25f);
 
+        grass.asFloor().wall = shrubs;
+
         Blocks.sand.playerUnmineable =
         Blocks.darksand.playerUnmineable =
         Blocks.sandWater.playerUnmineable =
         Blocks.darksandWater.playerUnmineable =
-        Blocks.darksandTaintedWater.playerUnmineable = !FRVars.mineSand;
+        Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
 
         //endregion
         //region block turret
@@ -125,7 +127,7 @@ public class FROverride{
         Events.on(EventType.UnitDrownEvent.class, e -> {
             if(!e.unit.hasEffect(FRStatusEffects.overgrown)) return;
 
-            UnitType type;
+            final UnitType type;
             if(e.unit.type == dagger)
                 type = FRUnitTypes.blade;
             else if(e.unit.type == mace)

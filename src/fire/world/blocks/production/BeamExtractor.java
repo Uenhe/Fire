@@ -38,8 +38,8 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 import mindustry.world.meta.StatValues;
 
+import static fire.FRVars.blockSpecial;
 import static mindustry.Vars.*;
-import static mindustry.Vars.tilesize;
 
 /** @see mindustry.world.blocks.production.Drill Drill */
 public class BeamExtractor extends mindustry.world.Block{
@@ -54,12 +54,10 @@ public class BeamExtractor extends mindustry.world.Block{
     protected Color baseColor = Color.clear;
     protected Color boostColor = Color.clear;
     protected Effect updateEffect = Fx.none;
-    protected float updateEffectChance;
-    protected Effect drillEffect = Fx.none;
-    protected float drillEffectChance;
+    protected byte updateEffectChancePercentage; //a value of 50 -> 50%
 
-    private final int beamEffectTimer = timers++;
-    private TextureRegion base, heat;
+    private TextureRegion base = new TextureRegion();
+    private final TextureRegion heat = new TextureRegion();
 
     public BeamExtractor(String name){
         super(name);
@@ -77,9 +75,9 @@ public class BeamExtractor extends mindustry.world.Block{
 
     @Override
     public void load(){
-        base = Core.atlas.find("block-" + size);
-        heat = Core.atlas.find(name + "-heat");
         super.load();
+        base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite
+        heat.set(Core.atlas.find(name + "-heat"));
     }
 
     @Override
@@ -189,8 +187,13 @@ public class BeamExtractor extends mindustry.world.Block{
             if(warmup >= 0.999f) warmup = 1.0f;
             if(boostWarmup >= 0.999f) boostWarmup = 1.0f;
             if(mining != null && valid()){
-                beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.25f);
-                beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.25f);
+                if(blockSpecial){
+                    beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.25f);
+                    beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.25f);
+                }else{
+                    beamX = mining.worldx();
+                    beamY = mining.worldy();
+                }
             }
             if(timer(timerDump, dumpTime))
                 dump(items.first());
@@ -203,9 +206,7 @@ public class BeamExtractor extends mindustry.world.Block{
             drillTimer += edelta() * warmup * Mathf.lerp(1.0f, boostScale, boostWarmup);
 
             if(wasVisible){
-                if(timer(beamEffectTimer, 5.0f))
-                    Fx.missileTrailShort.at(beamX, beamY);
-                if(Mathf.chanceDelta(updateEffectChance * warmup))
+                if(Mathf.chanceDelta(updateEffectChancePercentage * warmup * 0.01d))
                     updateEffect.at(x + Mathf.range(size * 2.0f), y + Mathf.range(size * 2.0f));
             }
 
@@ -216,8 +217,6 @@ public class BeamExtractor extends mindustry.world.Block{
 
                 if(wasVisible){
                     Fx.itemTransfer.at(mining.worldx(), mining.worldy(), 0.0f, mining.drop().color, this);
-                    if(Mathf.chance(drillEffectChance))
-                        drillEffect.at(x + Mathf.range(size * size), y + Mathf.range(size * size), mining.drop().color);
                 }
 
                 drillTimer -= getDrillTime();

@@ -3,7 +3,6 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
-import arc.util.Interval;
 import mindustry.game.EventType;
 import mindustry.graphics.Pal;
 
@@ -11,6 +10,12 @@ import static fire.FRUtils.color;
 import static fire.FRUtils.colora;
 
 public final class FRVars{
+
+    public static final short version = 140;
+    public static final String
+        linkFy = "https://space.bilibili.com/516898377",
+        linkUe = "https://space.bilibili.com/327502129",
+        linkGit = "https://github.com/Uenhe/Fire";
 
     /** Temporary colors. */
     public static final Color
@@ -33,18 +38,15 @@ public final class FRVars{
 
     /** Setting. */
     public static boolean
-        mineSand, displayRange, showLogs, noMultiMods;
-
-    private static final Interval timer = new Interval(1);
+        mineSand = false, displayRange = true, blockSpecial = true, showLog = true, noMultiMods = true;
 
     static{{
         Events.run(EventType.Trigger.update, () -> {
-            if(timer.get(0, 60.0f)){
-                mineSand = Core.settings.getBool("minesand");
-                displayRange = Core.settings.getBool("displayrange");
-                showLogs = Core.settings.getBool("showlogs");
-                noMultiMods = Core.settings.getBool("nomultimods");
-            }
+            mineSand = Core.settings.getBool("minesand");
+            displayRange = Core.settings.getBool("displayrange");
+            blockSpecial = Core.settings.getBool("blockspecial");
+            showLog = Core.settings.getBool("showlog");
+            noMultiMods = Core.settings.getBool("nomultimods");
         });
     }}
 }

@@ -6,9 +6,10 @@ import mindustry.content.Bullets;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
-import mindustry.world.blocks.production.GenericCrafter;
 
-public class SurgeCrafter extends GenericCrafter{
+import static fire.FRVars.blockSpecial;
+
+public class SurgeCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
     protected byte fragBullets;
     protected BulletType fragBullet = Bullets.placeholder;
@@ -30,19 +31,19 @@ public class SurgeCrafter extends GenericCrafter{
         public void craft(){
             super.craft();
             craftSound.at(this, Mathf.random(0.9f, 1.1f));
+            if(!blockSpecial) return;
 
             for(byte i = 0; i < fragBullets; i++){
                 final byte j = i;
                 byte[] sign = {1, -1, (byte)Mathf.sign(Mathf.range(1)), (byte)Mathf.sign(j % 2 == 0)};
 
                 var bullet = fragBullet.create(this, x, y, 360.0f / fragBullets * j);
-                bullet.lifetime /= timeScale;
-                bullet.vel.scl(timeScale, timeScale);
+                bullet.lifetime /= Mathf.pow(timeScale, 0.99f);
+                bullet.vel.scl(timeScale);
                 bullet.mover = b -> pattern.accept(b, j, sign[counter], timeScale);
             }
 
-            counter++;
-            if(counter >= 4) counter -= 4;
+            if(++counter >= 4) counter -= 4;
         }
     }
 

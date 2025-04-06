@@ -24,7 +24,7 @@ public class LightningCloudBulletType extends BulletType{
     public final byte baseSize;
     public final byte plusSize;
 
-    private static TextureRegion region;
+    private static final TextureRegion region = new TextureRegion();
     /** Set manually.<p>1st -> In<p>2nd -> Charge<p>3rd -> Release<p>4th -> Out */
     private static final short[] timeNodes = {30, 150, 300, 330}; //TODO should these be put into type?
 
@@ -41,8 +41,8 @@ public class LightningCloudBulletType extends BulletType{
 
     @Override
     public void load(){
+        if(region.u == 0.0f) region.set(Core.atlas.find("fire-lightning-cloud"));
         super.load();
-        region = Core.atlas.find("fire-lightning-cloud");
     }
 
     public LightningCloud create(Entityc owner, float x, float y){

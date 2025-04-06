@@ -12,7 +12,7 @@ public class SpriteBulletType extends mindustry.entities.bullet.BulletType{
     public final float width, height;
 
     private final String name;
-    private TextureRegion region;
+    private TextureRegion region = new TextureRegion();
 
     public SpriteBulletType(float speed, float damage, float w, float h, String name){
         super(speed, damage);
@@ -24,7 +24,7 @@ public class SpriteBulletType extends mindustry.entities.bullet.BulletType{
     @Override
     public void load(){
         super.load();
-        region = Core.atlas.find(name);
+        region=(Core.atlas.find(name, "error"));
     }
 
     @Override

@@ -1,16 +1,19 @@
 package fire.world.blocks.production;
 
+import arc.Core;
 import arc.audio.Sound;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import fire.FRVars;
+import fire.entities.LightningBranch;
 import fire.world.draw.DrawArrows.SmoothCrafter;
 import mindustry.content.Bullets;
 import mindustry.content.Fx;
@@ -27,6 +30,7 @@ import mindustry.logic.LAccess;
 import mindustry.logic.Ranged;
 import mindustry.ui.Bar;
 
+import static fire.FRVars.blockSpecial;
 import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.power.PowerGenerator */
@@ -59,11 +63,18 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     protected BulletType fragBullet = Bullets.placeholder;
 
     private final int timerStabilize = timers++;
+    private final TextureRegion lights = new TextureRegion();
 
     protected EnergyCrafter(String name){
         super(name);
         baseExplosiveness = 5.0f;
         buildType = EnergyCrafterBuild::new;
+    }
+
+    @Override
+    public void load(){
+        lights.set(Core.atlas.find(name + "-lights"));
+        super.load();
     }
 
     @Override
@@ -88,10 +99,10 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void updateTile(){
             super.updateTile();
             fraction = Mathf.lerpDelta(fraction, Interp.smoother.apply(1.0f - progress), 0.2f);
-            angle = Mathf.lerpDelta(angle, targetAngle, 0.2f);
+            angle = blockSpecial ? Mathf.lerpDelta(angle, targetAngle, 0.2f) : targetAngle;
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (1.0f - 20.0f / craftTime), 0.1f);
 
-            if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, i -> {})){
+            if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, e -> {})){
                 instability += delta();
                 if(instability >= maxInstability) kill();
             }
@@ -102,7 +113,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 createLightning();
 
             if(timer(timerStabilize, stabilizeInterval)){
-                Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
+                if(blockSpecial) Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
                 instability = Math.max(instability - maxInstability * 0.1f, 0.0f);
             }
         }
@@ -140,7 +151,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             int bullets = fragBulletsRand ? Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max)) : fragBullets;
 
             for(byte i = 0; i < round; i++){
-                float delay = fragDelayRand ? i * fragDelay * Mathf.random(0.7f, 1.3f) / scale() : i * fragDelay;
+                float delay = fragDelayRand ? i * fragDelay * Mathf.random(0.8f, 1.25f) / scale() : i * fragDelay;
                 Time.run(delay, () -> {
                     for(byte j = 0; j < bullets; j++)
                         fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f),
@@ -181,7 +192,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             Draw.color(circleColor[counter], baseColor, Mathf.absin(flash, 9.0f, 1.0f));
             Draw.alpha(0.5f);
             Draw.z(Layer.blockOver);
-            Draw.rect(name + "-lights", x, y);
+            Draw.rect(lights, x, y);
 
             Draw.reset();
         }
@@ -215,10 +226,16 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         private void createLightning(){
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
+            if(!blockSpecial) return;
 
             byte amount = (byte)(lightningAmount * (1 + instability / maxInstability));
-            for(byte i = 0; i < amount; i++)
-                Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
+            if(instability <= maxInstability * 0.5f){
+                for(byte i = 0; i < amount; i++)
+                    Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
+            }else{
+                for(byte i = 0; i < amount; i++)
+                    LightningBranch.create(null, team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size + instability * 0.024f), 2, 2);
+            }
         }
 
         private float scale(){

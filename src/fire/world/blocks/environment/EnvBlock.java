@@ -6,12 +6,12 @@ import mindustry.type.ItemStack;
 import mindustry.world.Tile;
 import mindustry.world.meta.BuildVisibility;
 
-/** TODO reconstruct this if v147 is released, since it will be able to change weather in world processor... */
+/** Too lazy to set weather in world processor. */
 public class EnvBlock extends mindustry.world.Block{
 
     public EnvBlock(String name){
         super(name);
-        requirements(Category.effect, BuildVisibility.hidden, ItemStack.with());
+        requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
         update = true;
         targetable = false;
         forceDark = true;
@@ -30,18 +30,15 @@ public class EnvBlock extends mindustry.world.Block{
         @Override
         public void update(){
             super.update();
-
-            if(isStarter())
-                updateStart();
-            else
-                updateStop();
+            if(isStarter()) updateStart();
+            else updateStop();
         }
 
         protected void updateStart(){}
 
         protected void updateStop(){}
 
-        /** Use position to decide to start or to stop, preventing registering two blocks. */
+        /** Use position to decide to start or stop. */
         protected boolean isStarter(){
             return tileX() % 2 == 0;
         }

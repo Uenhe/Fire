@@ -1,18 +1,9 @@
 package fire;
 
 import arc.Core;
-import arc.Events;
 import arc.graphics.Color;
-import mindustry.game.EventType;
 
 public final class FRUtils{
-
-    private static final String[] rnumerals = new String[10];
-
-    static{{
-        Events.on(EventType.ClientLoadEvent.class, e ->
-            System.arraycopy(Core.bundle.get("fire.rnumerals").split("\\|"), 0, rnumerals, 0, 10));
-    }}
 
     public static void colors(Color[] colors, Color... color){
         System.arraycopy(color, 0, colors, 0, 3);
@@ -27,8 +18,8 @@ public final class FRUtils{
     }
 
     /** 1 to 10, that should be enough. */
-    public static String toRomanNumeral(int n){
-        return rnumerals[n - 1];
+    public static String toNumeral(int n){
+        return Core.bundle.get("fire.numerals").split("\\|")[n - 1];
     }
 
     public static final class TimeNode{
@@ -51,13 +42,25 @@ public final class FRUtils{
             return nodes[nodes.length - 1];
         }
 
-        public boolean checkBelonging(float time, int phase){
-            return checkBelonging(time, phase, phase);
+        public int getQuantum(int quantum){
+            return getQuantum(quantum, quantum);
         }
 
-        public boolean checkBelonging(float time, int phaseStart, int phaseEnd){
-            return time >= (phaseStart == 0 ? 0.0f : nodes[phaseStart - 1])
-                && time <= nodes[phaseEnd];
+        public int getQuantum(int quantumFrom, int quantumTo){
+            return nodes[quantumTo] - (quantumFrom == 0 ? 0 : nodes[quantumFrom - 1]);
+        }
+
+        public int lastQuantum(){
+            return nodes[nodes.length - 1] - nodes[nodes.length - 2];
+        }
+
+        public boolean checkBelonging(float time, int quantum){
+            return checkBelonging(time, quantum, quantum);
+        }
+
+        public boolean checkBelonging(float time, int quantumFrom, int quantumTo){
+            return time >= (quantumFrom == 0 ? 0.0f : nodes[quantumFrom - 1])
+                && time <= nodes[quantumTo];
         }
     }
 }

@@ -1,6 +1,7 @@
 package fire.world.blocks.storage;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -12,6 +13,7 @@ import arc.util.io.Reads;
 import arc.util.io.Writes;
 import fire.world.consumers.ConsumePowerCustom;
 import mindustry.content.Fx;
+import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.graphics.Layer;
@@ -22,6 +24,8 @@ import mindustry.ui.Bar;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
+
+import java.util.Arrays;
 
 import static mindustry.Vars.*;
 
@@ -51,6 +55,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
     @Override
     public void init(){
+        Events.on(EventType.ResetEvent.class, e -> Arrays.fill(cores, (short)0)); //prevent added by editor
         updateClipRadius(radius + 3.0f);
         super.init();
     }
@@ -100,8 +105,8 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
     public class ForceCoreBuild extends CoreBuild implements Ranged{
 
-        float buildup, scl, hit, warmup;
-        boolean broken;
+        private float buildup, scl, hit, warmup;
+        private boolean broken;
 
         @Override
         public float range(){

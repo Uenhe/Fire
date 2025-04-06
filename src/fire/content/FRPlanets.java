@@ -40,7 +40,12 @@ public class FRPlanets{
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
             iconColor = Color.valueOf("5b6fff");
+
             unlockedOnLand.add(fireCompany);
+            ruleSetter = r -> {
+                r.hideBannedBlocks = true;
+                r.bannedBlocks.addAll(Blocks.launchPad, Blocks.advancedLaunchPad, Blocks.landingPad, Blocks.interplanetaryAccelerator, primaryInterplanetaryAccelerator);
+            };
         }};
     }
 
@@ -64,7 +69,7 @@ public class FRPlanets{
                 );
             });
 
-            node(coreArmored, with(new OnSector(darkWorkshop)), () -> {
+            node(coreBulwark, with(new OnSector(darkWorkshop)), () -> {
                 node(omicron, () ->
                     node(pioneer, with(new OnSector(desolateFortification)), () -> {
                     })

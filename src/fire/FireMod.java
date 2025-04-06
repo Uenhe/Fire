@@ -14,7 +14,6 @@ import arc.util.Time;
 import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.InfoDialog;
-import fire.world.DEBUG;
 import fire.world.meta.FRAttribute;
 import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
@@ -22,22 +21,16 @@ import mindustry.game.EventType;
 import mindustry.mod.Mods;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
-import mindustry.world.Block;
 import mindustry.world.meta.BuildVisibility;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
+import static fire.FRVars.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class FireMod extends mindustry.mod.Mod{
-
-    private static final int version = 1401;
-    private static final String
-        linkFy = "https://space.bilibili.com/516898377",
-        linkUe = "https://space.bilibili.com/327502129",
-        linkGit = "https://github.com/Uenhe/Fire";
 
     private static Mods.LoadedMod FIRE;
     private static boolean multiplied;
@@ -64,35 +57,35 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        FROverride.load();
-        FRBinding.load();
+        if(headless) return;
+
+        Events.fire(EventType.Trigger.update); //get setting
         loadSetting();
         loadDatabase();
-
+        FROverride.load();
+        FRBinding.load();
         Events.on(EventType.ClientLoadEvent.class, e -> {
-            showLog();
-            showNoMultipleMods();
+            showLog(false);
             showUpdate();
+            showNoMultipleMods();
         });
     }
 
     private static void loadSetting(){
         ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
 
-            t.checkPref("minesand", false, a ->
-                Blocks.sand.playerUnmineable =
-                Blocks.darksand.playerUnmineable =
-                Blocks.sandWater.playerUnmineable =
-                Blocks.darksandWater.playerUnmineable =
-                Blocks.darksandTaintedWater.playerUnmineable = !a
-            );
-            t.checkPref("displayrange", true);
-            t.checkPref("showlogs", true);
-            t.checkPref("nomultimods", true);
+            t.checkPref("minesand", false, b -> {
+                mineSand = b;
+                Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable = Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable = Blocks.darksandTaintedWater.playerUnmineable = !b;
+            });
+            t.checkPref("displayrange", true, b -> displayRange = b);
+            t.checkPref("blockspecial", true, b -> blockSpecial = b);
+            t.checkPref("showlog", true, b -> showLog = b);
+            t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
-            t.rebuild(); //to adapt MindustryX
+            t.rebuild(); //adapt to MindustryX
             t.row().button("@setting.fire-showlog", () -> {
-                showLog();
+                showLog(true);
                 if(++counter >= 5){
                     doSomethingPlayable();
                     ui.announce("Debug successfully.");
@@ -105,8 +98,8 @@ public class FireMod extends mindustry.mod.Mod{
         ui.research.titleTable.row().button(b -> b.add("@fire.showdatabase"), InfoDialog.dialog::show).visible(() -> ui.research.root.node == FRPlanets.lysetta.techTree);
     }
 
-    private static void showLog(){
-        if(!FRVars.showLogs) return;
+    private static void showLog(boolean forces){
+        if(!FRVars.showLog && !forces) return;
 
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
@@ -172,7 +165,7 @@ public class FireMod extends mindustry.mod.Mod{
     private static void showNoMultipleMods(){
         if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && FRVars.noMultiMods){
 
-            // see https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod also
+            // see ExtraUtilities also
             new BaseDialog("Warning"){
                 float time = 300.0f;
                 boolean closable;
@@ -194,7 +187,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     private static void showUpdate(){
         if(Core.settings.getInt("mod-fire-version") == version) return;
-        Core.settings.put("mod-fire-version", version);
+        Core.settings.put("mod-fire-version", (int)version);
 
         new BaseDialog("Update"){
             float time = 300.0f;
@@ -204,7 +197,7 @@ public class FireMod extends mindustry.mod.Mod{
                 cont.pane(t -> {
                     t.table(tt -> {
                         try{
-                            tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).height(800.0f).width(800.0f).padRight(120.0f);
+                            tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).height(720.0f).width(720.0f).padRight(120.0f);
                         }catch(Throwable e){
                             Log.err("Failed to load preview for mod Fire", e);
                         }
@@ -221,15 +214,16 @@ public class FireMod extends mindustry.mod.Mod{
         };
     }
 
-    /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also. */
+    /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also.<p></p>
+     * Clashes with MindustryX. */
     private static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
 
-        var titles = Core.bundle.get("fire.titles").split("\\|");
-        var index = Mathf.random(titles.length - 1);
-        var title = titles[index];
+        String[] titles = Core.bundle.get("fire.titles").split("\\|");
+        int index = Mathf.random(titles.length - 1);
+        String title = titles[index];
 
-        // "Today is the %th Day of God's Creation of the Lysetta" picked
+        // "Today is the %th Day of God's Creation of Planet Lysetta" picked
         if(index == 0)
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
 
@@ -245,16 +239,16 @@ public class FireMod extends mindustry.mod.Mod{
         for(var c : content)
             table.table(Styles.grayPanel, t -> {
 
-                t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
-                t.left().table(info -> {
+                t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
+                t.table(info -> {
 
-                    info.left().add("[accent]" + c.localizedName).left();
-                    info.row();
-
+                    info.left().add("[accent]" + c.localizedName).left().row();
                     try{
-                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend")))).left();
+                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend"))));
                     }catch(Throwable ignored){
-                        info.left().add(c.description).left();
+                        info.left().add(c.description);
+                    }finally{
+                        info.left();
                     }
                 });
 
@@ -263,20 +257,20 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** ??? */
     private static void doSomethingUnplayable(){
-        for(var u : content.units())
-            u.health -= 10000.0f;
+        for(var unit : content.units())
+            unit.health -= 10000.0f;
     }
 
     /** !!! */
     private static void doSomethingPlayable(){
-        for(var e : DEBUG.DEBUGS)
-            if(e instanceof Block)
-                ((Block)e).buildVisibility = BuildVisibility.shown;
+        if(!multiplied) return;
+        multiplied = false;
 
-        if(multiplied){
-            multiplied = false;
-            for(var u : content.units())
-                u.health += 10000.0f;
-        }
+        for(var block : content.blocks())
+            if(block.buildVisibility == BuildVisibility.debugOnly)
+                block.buildVisibility = BuildVisibility.shown;
+
+        for(var unit : content.units())
+            unit.health += 10000.0f;
     }
 }

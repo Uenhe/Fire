@@ -18,7 +18,7 @@ public class DrawWeavePlus extends DrawWeave{
     public final byte lines;
     public final float rotateSpeed;
 
-    private TextureRegion glowRegion;
+    private final TextureRegion glowRegion = new TextureRegion();
 
     public DrawWeavePlus(int lines, float rotateSpeed){
         this.lines = (byte)lines;
@@ -28,7 +28,7 @@ public class DrawWeavePlus extends DrawWeave{
     @Override
     public void load(Block block){
         super.load(block);
-        glowRegion = Core.atlas.find(block.name + "-glow");
+        glowRegion.set(Core.atlas.find(block.name + "-glow"));
     }
 
     @Override
@@ -44,7 +44,7 @@ public class DrawWeavePlus extends DrawWeave{
             for(byte i = 0; i < lines; i++){
                 rand.setSeed(build.id * i * 2L);
 
-                float value = Mathf.sin(build.totalProgress() + rand.random(10.0f), 8.0f / rotateSpeed * rand.random(0.8f, 1.2f), build.block.size * tilesize * 0.33f),
+                float value = Mathf.sin(build.totalProgress() + rand.random(10.0f), 8.0f / rotateSpeed * rand.random(0.8f, 1.25f), build.block.size * tilesize * 0.33f),
                     x = build.x + (i % 2 == 0 ? value : 0.0f),
                     y = build.y + (i % 2 == 1 ? value : 0.0f),
                     angle = i % 2 == 0 ? 90.0f : 0.0f;

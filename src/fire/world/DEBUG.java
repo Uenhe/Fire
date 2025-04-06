@@ -1,13 +1,12 @@
 package fire.world;
 
-import arc.struct.Seq;
-import fire.content.FRBlocks;
+import arc.math.Mathf;
 import fire.content.FRFx;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
-import mindustry.ctype.UnlockableContent;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.PointBulletType;
+import mindustry.gen.Building;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
@@ -15,11 +14,9 @@ import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.meta.BuildVisibility;
 
-public class DEBUG{
+import static mindustry.Vars.*;
 
-    public static final Seq<UnlockableContent> DEBUGS = Seq.with(
-        FRBlocks.DEBUG_TURRET
-    );
+public class DEBUG{
 
     public static class DEBUG_Turret extends mindustry.world.blocks.defense.turrets.Turret{
 
@@ -27,7 +24,7 @@ public class DEBUG{
 
         public DEBUG_Turret(String name){
             super(name);
-            requirements(Category.turret, BuildVisibility.debugOnly, ItemStack.empty);
+            requirements(Category.logic, BuildVisibility.debugOnly, ItemStack.empty);
             reload = 3.0f;
             range = 1600.0f;
             rotateSpeed = 60.0f;
@@ -88,6 +85,39 @@ public class DEBUG{
                     u.shield = 0.0f;
                 }
             }
+        }
+    }
+
+    public static class DEBUG_Mend extends mindustry.world.blocks.defense.MendProjector{
+
+        public DEBUG_Mend(String name){
+            super(name);
+            requirements(Category.logic, BuildVisibility.debugOnly, ItemStack.empty);
+            buildType = DEBUG_MendBuild::new;
+        }
+
+        @Override
+        public void setStats(){}
+
+        @Override
+        public void drawPlace(int x, int y, int rotation, boolean valid){}
+
+        public class DEBUG_MendBuild extends MendBuild{
+
+            @Override
+            public void placed(){
+                indexer.allBuildings(world.width() * tilesize * 0.5f, world.height() * tilesize * 0.5f, Mathf.dst(world.width(), world.height()) * tilesize * 0.5f, Building::heal);
+                killed();
+            }
+
+            @Override
+            public void drawSelect(){}
+
+            @Override
+            public void draw(){}
+
+            @Override
+            public void drawLight(){}
         }
     }
 }

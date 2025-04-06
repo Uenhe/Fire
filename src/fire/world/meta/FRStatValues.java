@@ -30,7 +30,7 @@ public class FRStatValues{
                         title.add(entry.item.localizedName).padRight(10.0f).left().top();
                     });
 
-                    bt.row().add(Core.bundle.format("bullet.level", FRUtils.toRomanNumeral(j + 1)));
+                    bt.row().add(Core.bundle.format("bullet.level", FRUtils.toNumeral(j + 1)));
 
                     if(entry.chancePercentage != 0) bt.row().add(Core.bundle.format("bullet.chance", entry.chancePercentage));
 

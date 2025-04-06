@@ -1,7 +1,6 @@
 package fire.world.blocks.units;
 
 import arc.math.Mathf;
-import fire.annotations.FRAnnotations;
 import fire.gen.FRCall;
 import mindustry.content.Fx;
 import mindustry.gen.Player;
@@ -38,7 +37,6 @@ public class MechPad extends mindustry.world.Block{
         return powerCons > 0.0f;
     }
 
-    @FRAnnotations.Remote(called = FRAnnotations.Loc.server)
     public static void playerSpawn(Tile tile, Player pl){
         if(pl == null || tile == null || !(tile.build instanceof MechPadBuild pad)) return;
 

@@ -67,6 +67,7 @@ import mindustry.gen.Sounds;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.graphics.Trail;
 import mindustry.type.Category;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -105,7 +106,7 @@ import static mindustry.type.ItemStack.with;
 
 public class FRBlocks{
 
-    /** 1st int -> component itself, 2nd int -> its inferior. */
+    /** Component itself -> its inferior. */
     public static final IntIntMap compositeMap = new IntIntMap(5);
     public static Block
 
@@ -148,13 +149,13 @@ public class FRBlocks{
         fleshReconstructor,
 
         //effect
-        buildingHealer, campfire, skyDome, buildIndicator, coreArmored, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
+        buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
 
         //env
         envEteriverStronghold, envStormyCoast1, envStormyCoast2, envGlaciatedPeaks,
 
         //DEBUG
-        DEBUG_TURRET;
+        DEBUG_TURRET, DEBUG_MEND;
 
     private static BulletType destroyBullet(float dmg, float radius){
         final float time = 15.0f;
@@ -1043,7 +1044,7 @@ public class FRBlocks{
         }};
 
         magneticDomain = new EnergyField.EnergyFieldPowerTurret("magnetic-domain"){{
-            final byte r = 27;
+            final byte r = 36;
 
             requirements(Category.turret, with(
                 Items.lead, 500,
@@ -1065,9 +1066,9 @@ public class FRBlocks{
 
             consumePower(n(600));
 
-            shootType = new EnergyField.EnergyFieldBulletType(30.0f, 10){{
+            shootType = new EnergyField.EnergyFieldBulletType(30.0f, 15){{
                 homingRange = r * tilesize;
-                knockback = 5.0f;
+                knockback = 6.0f;
                 pierceArmor = true;
                 displayAmmoMultiplier = false;
                 status = StatusEffects.slow;
@@ -2391,10 +2392,11 @@ public class FRBlocks{
                 Fx.drillSteam
             );
             baseExplosiveness = 5.0f;
-            destroyBullet = destroyBullet(800f, 48f);
+            destroyBullet = destroyBullet(800.0f, 48.0f);
 
             tier = 8;
-            drillTime = 45f;
+            drillTime = 45.0f;
+            liquidBoostIntensity = 1.0f;
             dumpTime = 1;
             shake = 4.0f;
             baseArrowColor = _989aa4;
@@ -2427,7 +2429,7 @@ public class FRBlocks{
             baseColor = Pal.accent;
             boostColor = ((BeamDrill)Blocks.plasmaBore).boostHeatColor; //lazy
             updateEffect = Fx.pulverizeSmall;
-            updateEffectChance = 0.02f;
+            updateEffectChancePercentage = 2;
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.02f;
 
@@ -2507,7 +2509,7 @@ public class FRBlocks{
                 Items.plastanium, 8
             ));
             health = 85;
-            liquidCapacity = 120f;
+            liquidCapacity = 150.0f;
             solid = false;
             underBullets = true;
 
@@ -2534,7 +2536,7 @@ public class FRBlocks{
                 Items.plastanium, 4
             ));
             hasPower = false;
-            liquidCapacity = 16.0f;
+            liquidCapacity = 108.0f;
             range = 8;
             pulse = true;
 
@@ -3282,8 +3284,6 @@ public class FRBlocks{
         }};
 
         electromagnetismDiffuser = new SurgeCrafter("electromagnetism-diffuser"){{
-            final float rad = 120.0f;
-
             requirements(Category.crafting, with(
                 Items.surgeAlloy, 325,
                 FRItems.logicAlloy, 500,
@@ -3311,33 +3311,44 @@ public class FRBlocks{
             );
 
             fragBullets = 6;
-            fragBullet = new BasicBulletType(4.0f, 220.0f){{
-                lifetime = craftTime - 0.1f;
-                width = 8.0f;
-                height = 8.0f;
-                homingRange = rad;
-                homingDelay = 10.0f;
-                homingPower = 0.35f;
+            fragBullet = new BasicBulletType(4.0f, 220.0f){
 
-                backColor = Pal.surge;
-                frontColor = Color.white;
-                trailLength = 16;
-                trailWidth = 3;
-                trailColor = Pal.surge;
-                hitEffect = despawnEffect = Fx.none;
-            }};
+                /** I am disgusted. */
+                @Override
+                public void updateTrail(Bullet b){
+                    if(!headless){
+                        byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
+                        if(b.trail == null) b.trail = new Trail(length);
+                        b.trail.length = length;
+                        b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
+                    }
+                }{
+                    lifetime = craftTime - 0.1f;
+                    width = 8.0f;
+                    height = 8.0f;
+                    homingRange = 120.0f;
+                    homingDelay = 10.0f;
+                    homingPower = 0.35f;
+
+                    backColor = Pal.surge;
+                    frontColor = Color.white;
+                    trailLength = 16;
+                    trailWidth = 3;
+                    trailColor = Pal.surge;
+                    hitEffect = despawnEffect = Fx.none;
+                }
+            };
 
             pattern = (b, i, sign, scl) -> {
-
                 // check whether there's any target first
-                if(Units.closestTarget(b.team, b.x, b.y, rad, e -> e != null && !b.hasCollided(e.id)) != null)
+                if(Units.closestTarget(b.team, b.x, b.y, b.type.homingRange, e -> e != null && !b.hasCollided(e.id)) != null)
                     return;
 
                 final float spd = 3.0f;
                 b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(
-                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * rad * b.time / b.lifetime + b.x,
-                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * rad * b.time / b.lifetime + b.y
-                ), 65535.0f));
+                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * b.type.homingRange * b.time / b.lifetime + b.x,
+                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * b.type.homingRange * b.time / b.lifetime + b.y
+                ), Float.MAX_VALUE));
             };
 
             consumePower(n(7200));
@@ -3604,7 +3615,7 @@ public class FRBlocks{
             consumePower(n(120));
         }};
 
-        coreArmored = new ForceCoreBlock("zjhx"){{
+        coreBulwark = new ForceCoreBlock("zjhx"){{
             requirements(Category.effect, with(
                 Items.copper, 9000,
                 Items.lead, 8000,
@@ -3733,11 +3744,11 @@ public class FRBlocks{
                     if(alpha == 0.0f){
                         if(!renderer.drawWeather){
                             Core.settings.put("showweather", true);
-                            ui.announce("@sc.weather");
+                            ui.announce("@fire.settingWeather");
                         }
                         if(!renderer.drawLight){
                             Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce("@sc.lightning"));
+                            Time.runTask(180.0f, () -> ui.announce("@fire.settingLighting"));
                         }
                     }
 
@@ -3794,11 +3805,11 @@ public class FRBlocks{
                     if(alpha == 0.0f){
                         if(!renderer.drawWeather){
                             Core.settings.put("showweather", true);
-                            ui.announce("@sc.weather");
+                            ui.announce("@fire.settingWeather");
                         }
                         if(!renderer.drawLight){
                             Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce("@sc.lightning"));
+                            Time.runTask(180.0f, () -> ui.announce("@fire.settingLighting"));
                         }
                     }
 
@@ -3845,7 +3856,7 @@ public class FRBlocks{
             buildType = () -> new EnvBlockBuild(){
 
                 /** Limits invasion times. */
-                byte times;
+                private byte counter;
 
                 /** Landing. */
                 @Override
@@ -3855,7 +3866,7 @@ public class FRBlocks{
 
                     int n = Mathf.random(4, 6);
                     for(var s : state.getPlanet().sectors)
-                        if(times++ < n && s.hasBase()){
+                        if(counter++ < n && s.hasBase()){
                             Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
                         }
 
@@ -3868,6 +3879,7 @@ public class FRBlocks{
         //region DEBUG
 
         DEBUG_TURRET = new DEBUG.DEBUG_Turret("DEBUG_TURRET");
+        DEBUG_MEND = new DEBUG.DEBUG_Mend("DEBUG_MEND");
 
         //endregion
 
