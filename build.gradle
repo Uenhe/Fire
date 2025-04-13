@@ -11,7 +11,7 @@ repositories{
 }
 
 java{
-    targetCompatibility = sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = sourceCompatibility = JavaVersion.VERSION_17
 }
 
 ext{
@@ -27,7 +27,7 @@ ext{
 allprojects{
     tasks.withType(JavaCompile).tap{
         configureEach{
-            options.compilerArgs.addAll(['--release', '21'])
+            options.compilerArgs.addAll(['--release', '17'])
         }
     }
 }
