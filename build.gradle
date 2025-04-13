@@ -24,6 +24,14 @@ ext{
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
+allprojects{
+    tasks.withType(JavaCompile).tap{
+        configureEach{
+            options.compilerArgs.addAll(['--release', '23'])
+        }
+    }
+}
+
 dependencies{
     compileOnly "com.github.Anuken.Arc:arc-core:$buildVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$buildVersion"
