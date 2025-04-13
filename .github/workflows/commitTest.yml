@@ -12,7 +12,7 @@ jobs:
       run: |
         echo "${ANDROID_HOME}/build-tools/34.0.0" >> $GITHUB_PATH
     - name: Set up JDK
-    - uses: graalvm/setup-graalvm@v1
+      uses: graalvm/setup-graalvm@v1
       with:
         java-version: '17'
         distribution: 'graalvm'
