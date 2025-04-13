@@ -32,21 +32,21 @@ dependencies{
 }
 
 //force arc version
-configurations.all{
-    resolutionStrategy.eachDependency { details ->
-        if(details.requested.group == 'com.github.Anuken.Arc'){
+configurations.configureEach{
+    resolutionStrategy.eachDependency{ details ->
+        if('com.github.Anuken.Arc' == details.requested.group){
             details.useVersion "$mindustryVersion"
         }
     }
 }
 
-task jarAndroid{
+tasks.register('jarAndroid'){
     dependsOn "jar"
 
     doLast{
-        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.");
+        if(!sdkRoot || !new File(sdkRoot as String).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.")
 
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{ f -> new File(f, "android.jar").exists()}
+        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{f -> new File(f, "android.jar").exists()}
 
         if(!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
 
@@ -57,7 +57,7 @@ task jarAndroid{
 
         //dex and desugar files - this requires d8 in your PATH
         "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-            .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
@@ -77,7 +77,7 @@ jar{
     }
 }
 
-task deploy(type: Jar){
+tasks.register('deploy', Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${base.archivesBaseName}.jar"
