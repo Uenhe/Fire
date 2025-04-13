@@ -74,7 +74,7 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
             return (totalAmmo == 0 || item() == item) ? super.acceptStack(item, amount, source) : 0;
         }
 
-        /** For items that have no BulletStack (WiP or not intended). */
+        /** For items that have no BulletStack. */
         private boolean unavailable(){
             return bulletStack.get(item().id) == null;
         }

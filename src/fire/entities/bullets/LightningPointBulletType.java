@@ -10,8 +10,7 @@ import mindustry.gen.Unit;
 
 public class LightningPointBulletType extends mindustry.entities.bullet.BulletType{
 
-    /** Chance to let the lightning take effect. Using this to control lightning releasing for some reason... */
-    public float lightningChance = 0.5f;
+    public byte lightningChancePercentage; //a value of 50 -> 50%
 
     public LightningPointBulletType(float damage){
         super(0.0f, damage);
@@ -22,7 +21,7 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
     @Override
     public void init(Bullet b){
         super.init(b);
-        if(!Mathf.chance(lightningChance)) return;
+        if(!Mathf.chance(lightningChancePercentage * 0.01)) return;
 
         Teamc target;
         if(b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && collidesGround && !b.hasCollided(b.aimTile.build.id))

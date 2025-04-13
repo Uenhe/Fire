@@ -19,7 +19,7 @@ public class ConsumePowerCustom extends mindustry.world.consumers.ConsumePower{
 
         //prevent adding this bar prior to others, TODO may look bad
         Time.runTask(600.0f, () ->
-            block.addBar("powerz", build -> new Bar(
+            block.addBar("power0", build -> new Bar(
                 () -> Core.bundle.format("bar.powerscale", Math.round(scaleMap.get(build, 0.0f) * 100) + StatUnit.percent.localized()),
                 () -> Pal.accent,
                 () -> 1.0f

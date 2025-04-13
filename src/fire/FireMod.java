@@ -10,12 +10,11 @@ import arc.scene.ui.layout.Table;
 import arc.util.Log;
 import arc.util.Scaling;
 import arc.util.Strings;
-import arc.util.Time;
 import fire.content.*;
 import fire.input.FRBinding;
+import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.InfoDialog;
 import fire.world.meta.FRAttribute;
-import mindustry.content.Blocks;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
 import mindustry.mod.Mods;
@@ -38,7 +37,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void loadContent(){
-        FIRE = mods.locateMod("fire");
+        FIRE = mods.getMod(getClass());
         FIRE.meta.displayName = Core.bundle.get("fire.name");
 
         setRandTitle();
@@ -59,7 +58,6 @@ public class FireMod extends mindustry.mod.Mod{
     public void init(){
         if(headless) return;
 
-        Events.fire(EventType.Trigger.update); //get setting
         loadSetting();
         loadDatabase();
         FROverride.load();
@@ -72,26 +70,24 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void loadSetting(){
-        ui.settings.addCategory(Core.bundle.get("setting.fire"), "fire-setting", t -> {
+        ui.settings.addCategory("@setting.fire", "fire-setting", t -> {
 
-            t.checkPref("minesand", false, b -> {
-                mineSand = b;
-                Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable = Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable = Blocks.darksandTaintedWater.playerUnmineable = !b;
-            });
+            t.checkPref("minesand", false, b -> mineSand = b);
             t.checkPref("displayrange", true, b -> displayRange = b);
-            t.checkPref("blockspecial", true, b -> blockSpecial = b);
+            t.checkPref("specialcontent", true, b -> specialContent = b);
             t.checkPref("showlog", true, b -> showLog = b);
             t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
-            t.rebuild(); //adapt to MindustryX
+            t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> {
                 showLog(true);
-                if(++counter >= 5){
+                if(++counter == 5){
                     doSomethingPlayable();
                     ui.announce("Debug successfully.");
                 }
             }).size(240.0f, 80.0f);
         });
+        getSettings();
     }
 
     private static void loadDatabase(){
@@ -112,7 +108,7 @@ public class FireMod extends mindustry.mod.Mod{
         mainDialog.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
         mainDialog.cont.pane(t -> {
 
-            t.image(Core.atlas.find("fire-logo")).height(107.0f).width(359.0f).pad(3.0f);
+            t.image(FRUtils.find("logo")).height(107.0f).width(359.0f).pad(3.0f);
             t.row();
 
             t.add(Core.bundle.format("fire.content1", FIRE.meta.version)).left().maxWidth(1024.0f).pad(4.0f);
@@ -163,58 +159,51 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showNoMultipleMods(){
-        if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && FRVars.noMultiMods){
+        if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && noMultiMods){
+            new DelayClosableDialog("Warning", 300.0f){{
 
-            // see ExtraUtilities also
-            new BaseDialog("Warning"){
-                float time = 300.0f;
-                boolean closable;
-                {
-                    update(() -> closable = (time -= Time.delta) <= 0.0f);
-                    cont.add("@fire.nomultimods");
-                    buttons.button("", this::hide).update(b -> {
-                        b.setDisabled(!closable);
-                        b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
-                    }).size(210.0f, 64.0f);
-
-                    multiplied = true;
-                    doSomethingUnplayable();
-                    show();
-                }
-            };
-        }
-    }
-
-    private static void showUpdate(){
-        if(Core.settings.getInt("mod-fire-version") == version) return;
-        Core.settings.put("mod-fire-version", (int)version);
-
-        new BaseDialog("Update"){
-            float time = 300.0f;
-            boolean closable;
-            {
-                update(() -> closable = (time -= Time.delta) <= 0.0f);
-                cont.pane(t -> {
-                    t.table(tt -> {
-                        try{
-                            tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).height(720.0f).width(720.0f).padRight(120.0f);
-                        }catch(Throwable e){
-                            Log.err("Failed to load preview for mod Fire", e);
-                        }
-                    });
-                    t.add(Core.bundle.format("fire.content2", version)).maxWidth(1024.0f).padRight(200.0f);
-                });
+                multiplied = true;
+                cont.add("@fire.nomultimods");
                 buttons.button("", this::hide).update(b -> {
                     b.setDisabled(!closable);
                     b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
                 }).size(210.0f, 64.0f);
 
+                doSomethingUnplayable();
                 show();
-            }
-        };
+            }};
+        }
     }
 
-    /** See <a href="https://github.com/guiYMOUR/mindustry-Extra-Utilities-mod">Extra Utilities</a> also.<p></p>
+    private static void showUpdate(){
+        try{
+            if(FIRE.meta.version.equals(Core.settings.getString("mod-fire-version"))) return;
+            Core.settings.put("mod-fire-version", FIRE.meta.version);
+        }catch(Throwable ignored){
+            Core.settings.put("mod-fire-version", "");
+        }
+
+        new DelayClosableDialog("Update", 300.0f){{
+            cont.pane(t -> {
+                t.table(tt -> {
+                    try{
+                        tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).height(720.0f).width(720.0f).padRight(120.0f);
+                    }catch(Throwable e){
+                        Log.err("Failed to load preview for mod Fire", e);
+                    }
+                });
+                t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(1024.0f).padRight(200.0f);
+            });
+            buttons.button("", this::hide).update(b -> {
+                b.setDisabled(!closable);
+                b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
+            }).size(210.0f, 64.0f);
+
+            show();
+        }};
+    }
+
+    /** See ExtraUtilities also.<p></p>
      * Clashes with MindustryX. */
     private static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
@@ -263,14 +252,14 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** !!! */
     private static void doSomethingPlayable(){
-        if(!multiplied) return;
-        multiplied = false;
-
         for(var block : content.blocks())
             if(block.buildVisibility == BuildVisibility.debugOnly)
                 block.buildVisibility = BuildVisibility.shown;
 
-        for(var unit : content.units())
-            unit.health += 10000.0f;
+        if(multiplied){
+            multiplied = false;
+            for(var unit : content.units())
+                unit.health += 10000.0f;
+        }
     }
 }

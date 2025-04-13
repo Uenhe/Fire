@@ -34,15 +34,12 @@ public class FRStatValues{
 
                     if(entry.chancePercentage != 0) bt.row().add(Core.bundle.format("bullet.chance", entry.chancePercentage));
 
-                    final int a, n;
+                    int a = 1, n = 1;
                     if(entry.shoot instanceof ShootAlternate s){
                         a = s.shots;
-                        n = 1;
                     }else if(entry.shoot instanceof ShootMulti s){
                         a = s.dest[0].shots;
                         n = s.source.shots;
-                    }else{
-                        a = n = 1;
                     }
                     bt.row().add(Core.bundle.format("bullet.pattern", a, n));
                 }).padLeft(5.0f).padTop(5.0f).padBottom(5.0f).growX().margin(10.0f);

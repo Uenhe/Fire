@@ -9,29 +9,28 @@ import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.pooling.Pools;
+import fire.FRUtils;
 import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Mover;
-import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
-import mindustry.gen.Bullet;
 import mindustry.gen.Entityc;
 import mindustry.graphics.Drawf;
 
-public class LightningCloudBulletType extends BulletType{
+public class LightningCloudBulletType extends mindustry.entities.bullet.BulletType{
 
-    public final float baseChance;
+    public final byte baseChancePercentage; //a value of 50 -> 50%
     public final byte baseSize;
     public final byte plusSize;
 
     private static final TextureRegion region = new TextureRegion();
-    /** Set manually.<p>1st -> In<p>2nd -> Charge<p>3rd -> Release<p>4th -> Out */
-    private static final short[] timeNodes = {30, 150, 300, 330}; //TODO should these be put into type?
+    /** In; Charge; Release; Out. */
+    private static final FRUtils.TimeNode node = new FRUtils.TimeNode(30, 150, 300, 330);
 
-    public LightningCloudBulletType(float dmg, int len, float chance, int bs, int ps, Color color){
+    public LightningCloudBulletType(float dmg, int len, int chance, int bs, int ps, Color color){
         super(0.0f, dmg);
         lightningLength = len;
-        baseChance = chance;
+        baseChancePercentage = (byte)chance;
         baseSize = (byte)bs;
         plusSize = (byte)ps;
         lightningColor = color;
@@ -41,7 +40,7 @@ public class LightningCloudBulletType extends BulletType{
 
     @Override
     public void load(){
-        if(region.u == 0.0f) region.set(Core.atlas.find("fire-lightning-cloud"));
+        if(region.u == 0.0f) region.set(FRUtils.find("lightning-cloud"));
         super.load();
     }
 
@@ -58,13 +57,13 @@ public class LightningCloudBulletType extends BulletType{
         bullet.set(x, y);
         bullet.damage = damage * bullet.damageMultiplier();
         bullet.time = 0.0f;
-        bullet.lifetime = timeNodes[timeNodes.length - 1];
+        bullet.lifetime = node.last();
         bullet.intensity = Mathf.random(0.75f, 1.33f);
         bullet.add();
         return bullet;
     }
 
-    public static class LightningCloud extends Bullet{
+    public static class LightningCloud extends mindustry.gen.Bullet{
 
         private float intensity;
 
@@ -75,7 +74,8 @@ public class LightningCloudBulletType extends BulletType{
         @Override
         public void update(){
             time += delta();
-            if(time >= timeNodes[1] && time < timeNodes[2] + 10.0f && Mathf.chanceDelta(type().baseChance + intensity * 0.04f)){
+
+            if(time >= node.get(1) && time < node.get(2) + 10.0f && Mathf.chanceDelta(type().baseChancePercentage * 0.01 + intensity * 0.04)){
                 Lightning.create(team, type.lightningColor, damage * intensity, x, y, Mathf.random(360.0f), (int)((type.lightningLength + Mathf.random(type.lightningLengthRand)) * Mathf.pow(intensity, 1.2f)));
             }else if(time >= lifetime){
                 remove();
@@ -84,15 +84,11 @@ public class LightningCloudBulletType extends BulletType{
 
         @Override
         public void draw(){
-            float alpha;
-            if(time <= timeNodes[0])
-                alpha = time / timeNodes[0];
-            else if(time <= timeNodes[1])
-                alpha = 1.0f;
-            else
-                alpha = 1.0f - (time - timeNodes[2]) / timeNodes[0];
+            final float alpha = 0.1f +
+                (node.checkBelonging(time, 0) ? time / node.first()
+                : node.checkBelonging(time, 1) ? 1.0f
+                : 1.0f - (time - node.get(2)) / node.lastQuantum());
 
-            alpha += 0.1f;
             Draw.color(type.lightningColor);
             Draw.alpha(alpha);
             Fill.circle(x, y, size() * 0.1f);
@@ -114,16 +110,13 @@ public class LightningCloudBulletType extends BulletType{
         }
 
         private float size(){
-            float
+            final float
                 base = type().baseSize, plus = type().plusSize,
                 scl = plus * 0.3f, mag = plus * 0.4f;
 
-            if(time <= timeNodes[0])
-                return base + (time / timeNodes[0]) * plus;
-            else if(time <= timeNodes[2])
-                return base + plus + Mathf.sin(time - timeNodes[0], scl, mag);
-            else
-                return (1.0f - (time - timeNodes[2]) / timeNodes[0]) * (base + plus + Mathf.sin(timeNodes[2] - timeNodes[0], scl, mag));
+            return node.checkBelonging(time, 0) ? base + plus * (time / node.first())
+                : node.checkBelonging(time, 1, 2) ? base + plus + Mathf.sin(time - node.first(), scl, mag)
+                : (1.0f - (time - node.get(2)) / node.lastQuantum()) * (base + plus + Mathf.sin(node.getQuantum(1, 2), scl, mag));
         }
 
         private float delta(){

@@ -19,7 +19,6 @@ import mindustry.gen.Groups;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.logic.LAccess;
-import mindustry.logic.Ranged;
 import mindustry.ui.Bar;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
@@ -103,7 +102,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         Draw.reset();
     }
 
-    public class ForceCoreBuild extends CoreBuild implements Ranged{
+    public class ForceCoreBuild extends CoreBuild implements mindustry.logic.Ranged{
 
         private float buildup, scl, hit, warmup;
         private boolean broken;
@@ -209,6 +208,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         @Override
         public void remove(){
             if(added) cores[team.id]--;
+            ConsumePowerCustom.scaleMap.remove(this, 0.0f);
             super.remove();
         }
 

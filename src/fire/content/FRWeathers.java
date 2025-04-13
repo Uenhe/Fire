@@ -22,7 +22,7 @@ public class FRWeathers{
 
         rainstorm = new RainWeather("rainstorm"){
 
-            final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 0.11f, 20, 20, Pal.lancerLaser);
+            final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
 
             @Override
             public void update(WeatherState state){

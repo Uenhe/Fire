@@ -88,7 +88,7 @@ public class FRFx{
 
     public static Effect crossEffect(float lifetime, float size, float rotation, boolean circle, @Nullable Color color){
         return new Effect(lifetime, 100.0f, e -> {
-            float circleRad = size * (e.finpow() * 16.0f + 1.0f);
+            final float circleRad = size * (e.finpow() * 16.0f + 1.0f);
             var col = color == null ? e.color : color;
 
             Drawf.light(e.x, e.y, circleRad * 1.6f, col, e.fout());
@@ -127,7 +127,7 @@ public class FRFx{
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
         Fx.rand.setSeed(e.id);
 
-        float length = 4.0f + e.finpow() * 24.0f;
+        final float length = 4.0f + e.finpow() * 24.0f;
         for(byte i = 0; i < 16; i++){
             Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(length));
 
@@ -156,10 +156,9 @@ public class FRFx{
     public static final Effect chainLightningThin = new Effect(20.0f, 300.0f, e -> {
         if(!(e.data instanceof Position p)) return;
 
-        final float rangeBetweenPoints = 12.0f;
-
-        float tx = p.getX(), ty = p.getY();
-        float dst = Mathf.dst(e.x, e.y, tx, ty);
+        final float rangeBetweenPoints = 12.0f,
+            tx = p.getX(), ty = p.getY(),
+            dst = Mathf.dst(e.x, e.y, tx, ty);
         int links = Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
 
@@ -177,7 +176,7 @@ public class FRFx{
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{
-                float len = (i + 1) * spacing;
+                final float len = (i + 1) * spacing;
                 Tmp.v1.setToRandomDirection(Fx.rand).scl(rangeBetweenPoints * 0.5f);
                 Lines.linePoint(
                     e.x + nx * len + Tmp.v1.x,
@@ -187,23 +186,26 @@ public class FRFx{
         }
 
         Lines.endLine();
-    }).followParent(false).rotWithParent(false);
+    }).followParent(false);
 
     public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
-        float intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f);
-        float baseLifetime = 25.0f + intensity * 11.0f;
+        final float
+            intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
+            baseLifetime = 25.0f + intensity * 11.0f;
         b.lifetime = 50.0f + intensity * 55.0f;
 
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
         for(byte i = 0; i < 4; i++){
-            Fx.rand.setSeed(b.id * 2L + i);
-            float lenScl = Fx.rand.random(0.4f, 1.0f);
-            int j = i;
+            final byte j = i;
+            final float lenScl = Fx.rand.random(0.4f, 1.0f);
+            Fx.rand.setSeed(b.id * 2L + j);
+
             b.scaled(b.lifetime * lenScl, e ->
                 Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22.0f * intensity, (x, y, in, out) -> {
-                    float fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f);
-                    float rad = fout * ((2.0f + intensity) * 2.35f);
+                    final float
+                        fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
+                        rad = fout * ((2.0f + intensity) * 2.35f);
 
                     Fill.circle(e.x + x, e.y + y, rad);
                     Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.reactorPurple, 0.5f);

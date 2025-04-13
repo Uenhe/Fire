@@ -169,7 +169,7 @@ public class Campfire{
 
                     c.row().table(Styles.grayPanel, t ->
                         t.table(info -> {
-                            var icon = item.hasEmoji() ? item.emoji() + " " : item.minfo.mod.meta.displayName + "-";
+                            String icon = item.hasEmoji() ? item.emoji() + " " : item.minfo.mod.meta.displayName + "-";
                             info.left().add(icon + item.localizedName).left().row();
                             info.add(Core.bundle.format("stat.campfire", item.flammability * block.speedBoostPhase * 100, item.flammability * block.phaseRangeBoost / tilesize)).left();
                         }).grow()).growX().pad(5.0f);

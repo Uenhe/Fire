@@ -24,7 +24,6 @@ public class FRPlanets{
     public static Planet lysetta;
 
     public static void load(){
-
         lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
             meshLoader = () -> new HexMesh(this, 8);
             cloudMeshLoader = () -> new MultiMesh(
@@ -346,8 +345,7 @@ public class FRPlanets{
         lysetta.techTree.addPlanet(Planets.serpulo);
     }
 
-    static void addResearch(UnlockableContent content, UnlockableContent parent){
-
+    private static void addResearch(UnlockableContent content, UnlockableContent parent){
         var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();
 

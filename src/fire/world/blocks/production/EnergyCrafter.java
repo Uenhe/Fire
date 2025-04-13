@@ -30,7 +30,7 @@ import mindustry.logic.LAccess;
 import mindustry.logic.Ranged;
 import mindustry.ui.Bar;
 
-import static fire.FRVars.blockSpecial;
+import static fire.FRVars.specialContent;
 import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.power.PowerGenerator */
@@ -58,8 +58,8 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
     protected Sound
         craftSound = Sounds.none,
         explodeSound = Sounds.none;
-    protected Color baseColor = Color.clear;
-    protected Color[] circleColor = {Color.clear};
+    protected final Color baseColor = new Color();
+    protected Color[] circleColor = {};
     protected BulletType fragBullet = Bullets.placeholder;
 
     private final int timerStabilize = timers++;
@@ -99,7 +99,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void updateTile(){
             super.updateTile();
             fraction = Mathf.lerpDelta(fraction, Interp.smoother.apply(1.0f - progress), 0.2f);
-            angle = blockSpecial ? Mathf.lerpDelta(angle, targetAngle, 0.2f) : targetAngle;
+            angle = specialContent ? Mathf.lerpDelta(angle, targetAngle, 0.2f) : targetAngle;
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (1.0f - 20.0f / craftTime), 0.1f);
 
             if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, e -> {})){
@@ -113,7 +113,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 createLightning();
 
             if(timer(timerStabilize, stabilizeInterval)){
-                if(blockSpecial) Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
+                if(specialContent) Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
                 instability = Math.max(instability - maxInstability * 0.1f, 0.0f);
             }
         }
@@ -226,7 +226,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         private void createLightning(){
             craftSound.at(this, Mathf.random(0.45f, 0.55f));
-            if(!blockSpecial) return;
+            if(!specialContent) return;
 
             byte amount = (byte)(lightningAmount * (1 + instability / maxInstability));
             if(instability <= maxInstability * 0.5f){

@@ -55,7 +55,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
 
         float efficiencyCountingDoubled = 0.0f, efficiencyCounting = 0.0f;
         for(var other : tile.getLinkedTilesAs(this, tempTiles)){
-            float efficiencyCurrent = other.floor().liquidDrop != null
+            final float efficiencyCurrent = other.floor().liquidDrop != null
                 ? other.floor().liquidMultiplier * (1.0f - other.floor().liquidDrop.viscosity) * other.floor().liquidDrop.temperature * 4.0f
                 : 0.0f;
             efficiencyCounting += efficiencyCurrent;
@@ -86,8 +86,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
 
         @Override
         public float totalProgress(){
-            // for drawer
-            return super.totalProgress() * efficiency;
+            return super.totalProgress() * efficiency; //for drawer
         }
     }
 }

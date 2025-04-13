@@ -19,9 +19,10 @@ import mindustry.gen.Iconc;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.storage.CoreBlock;
 
+import static fire.FRVars.specialContent;
 import static mindustry.Vars.*;
 
-public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerator{
+public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Accelerator{
 
     private final Color originColor = new Color();
     private final String[] texts;
@@ -32,24 +33,24 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
     /** Set manually, length = 5 */
     private final short[] sectors;
 
-    public AcceleratorScene(String name, String textKey, String sourceKey, int[] nodes, short[] sects){
+    public AcceleratorCutscene(String name, String textKey, String sourceKey, int[] nodes, short[] sects){
         super(name);
         texts = Core.bundle.get(textKey).split("\\|");
         sourceText = Core.bundle.get(sourceKey);
         node = new FRUtils.TimeNode(nodes);
         sectors = sects;
-        buildType = AcceleratorSceneBuild::new;
+        buildType = AcceleratorCutsceneBuild::new;
     }
 
     @Override
-    public void init(){
-        super.init();
+    public void load(){
+        super.load();
 
         launchCandidates = Seq.with(FRPlanets.lysetta); //byd Anuke
         if(launchCandidates.size == 1) originColor.set(launchCandidates.first().atmosphereColor);
     }
 
-    public class AcceleratorSceneBuild extends AcceleratorBuild{
+    public class AcceleratorCutsceneBuild extends AcceleratorBuild{
 
         private boolean scene;
         private float sceneTimer;
@@ -64,7 +65,7 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
             deselect();
             if(!canLaunch()) return;
 
-            reset(false);
+            reset();
             setup();
             ui.planet.showPlanetLaunch(state.rules.sector, launchCandidates, sector -> {
                 if(canLaunch()){
@@ -93,8 +94,9 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
 
             if(ui.hasAnnouncement()){
                 Table t = Reflect.get(ui, "lastAnnouncement");
-                if(t.getCells().any())((Cell<Label>)t.getCells().first()).with(label -> {
-                    final var texts = label.getText();
+                if(t.getCells().any()) ((Cell<Label>)t.getCells().first()).with(label -> {
+                    var texts = label.getText();
+
                     if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ // avoids side effect but doesn't work entirely
                         t.visible = false;
                     }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
@@ -110,19 +112,21 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
             sceneTimer += Time.delta;
             if(node.checkBelonging(sceneTimer, 1, 2)){
                 final float tr = 0.9f, tg = 0.1f, tb = 0.0f,
-                    scl = node.getQuantum(1, 2) / Mathf.PI / 40, time = sceneTimer - node.first() - scl * Mathf.PI;
+                    scl = node.getQuantum(1, 2) / Mathf.PI / 36, time = sceneTimer - node.first() - scl * Mathf.PI;
                 ui.planet.state.planet.atmosphereColor.set(
                     //absin: initial phase = PI, period = 6PI
                     originColor.r + Mathf.absin(time, scl, tr - originColor.r),
                     originColor.g + Mathf.absin(time, scl, tg - originColor.g),
                     originColor.b + Mathf.absin(time, scl, tb - originColor.b)
                 );
+            }else{
+                ui.planet.state.planet.atmosphereColor.set(originColor);
             }
         }
 
         @Override
         public void remove(){
-            if(launchCandidates.size == 1) reset(true);
+            if(launchCandidates.size == 1) reset();
             super.remove();
         }
 
@@ -135,21 +139,21 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
 
             ui.planet.state.planet.sectors.get(ui.planet.state.planet.startSector).preset.clearUnlock();
             launchCandidates.first().unlock();
-            ui.planet.launchSector = null; //cancels the weird line
 
             for(byte i = 0; i < 2; i++){
-                final var mask = new Image();
-                final float p = 0.2f, height = Core.graphics.getHeight();
+                final float p = 0.2f, height = Core.graphics.getHeight(), y1 = i == 0 ? height * -p : height * (1.0f + p);
+                var mask = new Image();
+                var interp = specialContent ? Interp.smoother : Interp.linear;
 
                 mask.color.set(Color.black);
                 mask.touchable = Touchable.disabled;
                 mask.setSize(Core.graphics.getWidth(), height * p);
                 mask.setScaling(Scaling.stretch);
-                mask.y = i == 0 ? height * -p : height * (1.0f + p);
+                mask.y = y1;
 
                 mask.actions(
-                    Actions.delay(node.first() / 60.0f), Actions.moveTo(0.0f, i == 0 ? 0.0f : height * (1.0f - p), node.getQuantum(1) / 60.0f, Interp.smoother),
-                    Actions.delay(node.getQuantum(2, 3) / 60.0f), Actions.moveTo(0.0f, i == 0 ? height * -p : height * (1.0f + p), node.lastQuantum() / 60.0f, Interp.smoother),
+                    Actions.delay(node.first() / 60.0f), Actions.moveTo(0.0f, i == 0 ? 0.0f : height * (1.0f - p), node.getQuantum(1) / 60.0f, interp),
+                    Actions.delay(node.getQuantum(2, 3) / 60.0f), Actions.moveTo(0.0f, y1, node.lastQuantum() / 60.0f, interp),
                     Actions.delay(node.lastQuantum() / 60.0f), Actions.remove()
                 );
                 mask.update(() -> {
@@ -161,6 +165,7 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
             }
 
             Time.run(60.0f, () -> {
+                ui.planet.launchSector = null; //cancels the weird line
                 for(short id : sectors)
                     ui.planet.newPresets.add(ui.planet.state.planet.sectors.get(id));
             });
@@ -179,9 +184,9 @@ public class AcceleratorScene extends mindustry.world.blocks.campaign.Accelerato
             scene = true;
         }
 
-        private void reset(boolean color){
+        private void reset(){
             Reflect.set(BaseDialog.class, ui.planet, "shouldPause", true);
-            if(color) launchCandidates.first().atmosphereColor = originColor;
+            launchCandidates.first().atmosphereColor.set(originColor);
             scene = false;
             sceneTimer = 0.0f;
         }

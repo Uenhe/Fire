@@ -11,7 +11,6 @@ import static fire.FRUtils.colora;
 
 public final class FRVars{
 
-    public static final short version = 140;
     public static final String
         linkFy = "https://space.bilibili.com/516898377",
         linkUe = "https://space.bilibili.com/327502129",
@@ -32,21 +31,25 @@ public final class FRVars{
         _f6efa1 = color(246, 239, 161), _f57946 = color(245, 121, 70), _f9a27a = color(249, 162, 122),
         _ffd8e8 = color( 255, 216, 232), _ff3300 = color(255, 51, 0), _990003 = color(153, 0, 3),
         _b6c6fd = color(182, 198, 253), _fffac6 = color(255, 250, 198), _d8d97faa = colora(216, 217, 127, 170),
-        _989aa4 = color(152, 154, 164), _67474b = color(103, 71, 75),
+        _989aa4 = color(152, 154, 164), _67474b = color(103, 71, 75), _ffef99 = color(255, 239, 153),
 
         _lancer_a04 = Pal.lancerLaser.cpy().a(0.4f);
 
     /** Setting. */
     public static boolean
-        mineSand = false, displayRange = true, blockSpecial = true, showLog = true, noMultiMods = true;
+        mineSand = false, displayRange = true, specialContent = true, showLog = true, noMultiMods = true;
 
     static{{
         Events.run(EventType.Trigger.update, () -> {
-            mineSand = Core.settings.getBool("minesand");
-            displayRange = Core.settings.getBool("displayrange");
-            blockSpecial = Core.settings.getBool("blockspecial");
-            showLog = Core.settings.getBool("showlog");
-            noMultiMods = Core.settings.getBool("nomultimods");
+            if(Core.graphics.getFrameId() % 60 == 0) getSettings(); //extremely lazy timer, I just don't care
         });
     }}
+
+    public static void getSettings(){
+        mineSand = Core.settings.getBool("minesand");
+        displayRange = Core.settings.getBool("displayrange");
+        specialContent = Core.settings.getBool("specialcontent");
+        showLog = Core.settings.getBool("showlog");
+        noMultiMods = Core.settings.getBool("nomultimods");
+    }
 }

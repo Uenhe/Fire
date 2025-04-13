@@ -12,6 +12,7 @@ import mindustry.entities.Units;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 
+import static fire.FRVars.specialContent;
 import static mindustry.Vars.tilesize;
 
 public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
@@ -51,9 +52,12 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
                 any[0] = true;
             }
         });
-
-        warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
         totalProgress += Time.delta / lineSpeed;
+
+        if(specialContent)
+            warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
+        else
+            warmup = any[0] ? 1.0f : 0.0f;
     }
 
     @Override

@@ -2,7 +2,6 @@ package fire.entities.bullets;
 
 import arc.math.Mathf;
 import arc.struct.ObjectFloatMap;
-import arc.struct.ObjectMap;
 import arc.util.Time;
 import fire.content.FRItems;
 import fire.content.FRStatusEffects;
@@ -16,8 +15,7 @@ import mindustry.type.Item;
 
 public class FleshBulletType extends SpritesBulletType{
 
-    public float adhereChance;
-
+    public byte adhereChancePercentage; //a value of 50 -> 50%
     public byte removeAmount;
     public float maxSpread;
     public float spreadIntensity;
@@ -25,7 +23,6 @@ public class FleshBulletType extends SpritesBulletType{
     private final FleshBulletType adhereType;
     private static final Item ITEM = FRItems.flesh;
 
-    private static final ObjectMap<Bullet, Healthc> adheringMap = new ObjectMap<>();
     private static final ObjectFloatMap<Bullet> intensityMap = new ObjectFloatMap<>();
 
     public FleshBulletType(float speed, float damage, int size, float subDamage, float subLifetime){
@@ -41,10 +38,6 @@ public class FleshBulletType extends SpritesBulletType{
         type.pierceArmor = true;
         type.collidesTiles = type.collidesAir = type.collidesGround = type.collides = false;
         adhereType = type;
-    }
-
-    private Healthc adhering(Bullet b){
-        return adheringMap.get(b);
     }
 
     private float intensity(Bullet b){
@@ -64,29 +57,24 @@ public class FleshBulletType extends SpritesBulletType{
     }
 
     private void afterHit(Bullet b, Healthc entity){
-        if(!Mathf.chance(adhereChance)) return;
+        if(!Mathf.chance(adhereChancePercentage * 0.01)) return;
         var bullet = adhereType.create(b, b.x, b.y, b.rotation());
-        // these are unused... right?
-        bullet.originX = b.x - entity.x();
-        bullet.originY = b.y - entity.y();
-        adheringMap.put(bullet, entity);
+        bullet.stickTo(entity);
     }
 
     @Override
     public void update(Bullet b){
         super.update(b);
-        var entity = adhering(b);
-        if(entity == null || entity.health() <= 0.0f) return;
-
-        b.set(entity.x() + b.originX, entity.y() + b.originY);
+        if(!(b.stickyTarget instanceof Healthc entity) || entity.health() <= 0.0f) return;
 
         if(entity instanceof Building build){
             b.damage *= Time.delta;
             build.collision(b);
             b.damage /= Time.delta;
 
-            if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > removeAmount * Time.delta){
-                build.liquids.remove(Liquids.water, removeAmount * Time.delta);
+            final float amount = removeAmount * Time.delta;
+            if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > amount){
+                build.liquids.remove(Liquids.water, amount);
                 intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
                 b.time -= Time.delta;
             }
@@ -98,18 +86,17 @@ public class FleshBulletType extends SpritesBulletType{
 
     @Override
     public void removed(Bullet b){
-        adheringMap.remove(b);
         intensityMap.remove(b, 0.0f);
         super.removed(b);
     }
 
     @Override
     protected float speedScale(Bullet b){
-        return adhering(b) != null ? b.foutpow() * intensity(b) : super.speedScale(b);
+        return b.stickyTarget != null ? b.foutpow() * intensity(b) : super.speedScale(b);
     }
 
     @Override
     protected float sizeScale(Bullet b){
-        return adhering(b) != null ? b.foutpow() * intensity(b) : super.sizeScale(b);
+        return b.stickyTarget != null ? b.foutpow() * intensity(b) : super.sizeScale(b);
     }
 }

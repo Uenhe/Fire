@@ -51,8 +51,8 @@ public class InfoDialog extends BaseDialog{
     private InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
     private InfoNode lastNode = root.node;
 
-    private static final float nodeSize = Scl.scl(70f);
-    private static final float nodeSpacing = 40f;
+    private static final float nodeSize = Scl.scl(70.0f);
+    private static final float nodeSpacing = 40.0f;
     public static final InfoDialog dialog = new InfoDialog();
 
     public InfoDialog(){
@@ -203,7 +203,7 @@ public class InfoDialog extends BaseDialog{
             rootLocation = TreeLocation.top;
         }}.layout(node);
 
-        float lastY = node.y;
+        final float lastY = node.y;
 
         if(rightHalf.length > 0){
 
@@ -368,11 +368,9 @@ public class InfoDialog extends BaseDialog{
             infoTable.remove();
             infoTable.clear();
             infoTable.update(null);
-
             if(button == null) return;
 
             var node = (InfoNode)button.userObject;
-
             infoTable.exited(() -> {
                 if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
                     hoverNode = null;
@@ -381,12 +379,9 @@ public class InfoDialog extends BaseDialog{
             });
 
             infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
-
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
-
             infoTable.table(b -> {
-
                 b.margin(0).left().defaults().left();
                 b.add().grow();
 
@@ -396,7 +391,6 @@ public class InfoDialog extends BaseDialog{
                 }).growY().width(50f);
 
                 var t = b.table(desc -> {
-
                     desc.left().defaults().left();
                     desc.add(locked(node) ? "@fire.lockedcontent" : node.content.localizedName);
                     desc.row();
@@ -430,7 +424,7 @@ public class InfoDialog extends BaseDialog{
         public void drawChildren(){
 
             clamp();
-            float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            float offsetX = panX + width * 0.5f, offsetY = panY + height * 0.5f;
             Draw.sort(true);
 
             for(var node : nodes){
@@ -464,7 +458,7 @@ public class InfoDialog extends BaseDialog{
 
         private final InfoTreeNode node;
 
-        LayoutNode(InfoTreeNode node, LayoutNode parent){
+        private LayoutNode(InfoTreeNode node, LayoutNode parent){
             this.node = node;
             this.parent = parent;
             this.width = this.height = nodeSize;
@@ -487,7 +481,7 @@ public class InfoDialog extends BaseDialog{
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
-            for(int i = 0; i < children.length; i++)
+            for(byte i = 0; i < children.length; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
         }
     }

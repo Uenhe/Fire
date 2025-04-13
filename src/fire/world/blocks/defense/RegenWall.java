@@ -26,7 +26,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
     protected byte frameTime = 3;
     protected byte frames;
     protected boolean flashHit;
-    protected Color flashColor = Color.white;
+    protected final Color flashColor = new Color();
 
     public RegenWall(String name){
         super(name);

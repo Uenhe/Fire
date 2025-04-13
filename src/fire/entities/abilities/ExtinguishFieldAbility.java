@@ -11,6 +11,7 @@ import arc.scene.ui.layout.Table;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.content.Fx;
+import mindustry.gen.Groups;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 
@@ -40,15 +41,14 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
     }
 
-    /** see {@link mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)} */
+    /** @see mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)*/
     @Override
     public void update(Unit unit){
         boolean any = false;
 
-        for(var fire : mindustry.gen.Groups.fire)
+        for(var fire : Groups.fire)
             if(Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0.0f, fire.x, fire.y)){
                 any = true;
-
                 fire.time(fire.time + 100.0f * Time.delta);
                 Fx.steam.at(fire);
             }
@@ -60,7 +60,7 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     public void draw(Unit unit){
         if(warmup <= 0.4f) return;
 
-        // use 24-sided polygon instead of circle, since circle looks strange
+        // uses 24-sided polygon instead circle, since circle looks strange
         if(renderer.animateShields){
             Draw.z(Layer.shields - 0.001f);
             Draw.color(Color.clear, color, Mathf.clamp(warmup));

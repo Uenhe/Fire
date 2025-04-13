@@ -1,5 +1,6 @@
 package fire.content;
 
+import arc.Core;
 import arc.Events;
 import arc.util.Reflect;
 import fire.ai.FRUnitCommand;
@@ -45,11 +46,14 @@ public class FROverride{
 
         grass.asFloor().wall = shrubs;
 
-        Blocks.sand.playerUnmineable =
-        Blocks.darksand.playerUnmineable =
-        Blocks.sandWater.playerUnmineable =
-        Blocks.darksandWater.playerUnmineable =
-        Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+        Events.run(EventType.Trigger.update, () -> {
+            if(Core.graphics.getFrameId() % 60 == 0)
+                Blocks.sand.playerUnmineable =
+                    Blocks.darksand.playerUnmineable =
+                        Blocks.sandWater.playerUnmineable =
+                            Blocks.darksandWater.playerUnmineable =
+                                Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+        });
 
         //endregion
         //region block turret

@@ -59,7 +59,7 @@ public class FRStatusEffects{
 
         sanctuaryGuard = new StatusEffect("sanctuary-guard"){
             /** This is buggy... If the world reloads, it triggers again. */
-            boolean added = true;
+            private boolean added = true;
 
             @Override
             public void setStats(){
@@ -74,10 +74,9 @@ public class FRStatusEffects{
                 if(added){
                     Fx.healWave.at(unit);
 
-                    DebuffRemoveFieldAbility.DE_BUFFS.each(e -> {
+                    for(var e : DebuffRemoveFieldAbility.DE_BUFFS)
                         if(!(unit.type instanceof FleshUnitType && e == overgrown))
                             unit.unapply(e);
-                    });
 
                     added = false;
                 }
@@ -86,12 +85,12 @@ public class FRStatusEffects{
             @Override
             public void onRemoved(Unit unit){
                 unit.heal(0.05f * unit.maxHealth);
+            }{
+                color = Pal.accent;
+                damage = -2.4f;
+                healthMultiplier = 2.25f;
             }
-            {
-            color = Pal.accent;
-            damage = -2.4f;
-            healthMultiplier = 2.25f;
-        }};
+        };
 
         mu = new StatusEffect("mu"){{
             damageMultiplier = 0.4f;
@@ -135,25 +134,25 @@ public class FRStatusEffects{
                     Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.5f));
                     effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0f, color, parentizeEffect ? unit : null);
                 }
+            }{
+                color = Liquids.neoplasm.color;
+                damage = 0.6f;
+                speedMultiplier = 0.9f;
+                effectChance = 0.1f;
+                healthMultiplier = 1.1f;
+
+                effect = new Effect(40.0f, e -> {
+                    float scl = e.data instanceof Unit u
+                        ? 1.0f + u.type.hitSize * 0.4f
+                        : 1.0f;
+
+                    Draw.color(overgrown.color);
+                    Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.2f, (x, y) ->
+                        Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * scl * 1.4f)
+                    );
+            }   );
             }
-            {
-            color = Liquids.neoplasm.color;
-            damage = 0.6f;
-            speedMultiplier = 0.9f;
-            effectChance = 0.1f;
-            healthMultiplier = 1.1f;
-
-            effect = new Effect(40.0f, e -> {
-                float scl = e.data instanceof Unit u
-                    ? 1.0f + u.type.hitSize * 0.4f
-                    : 1.0f;
-
-                Draw.color(overgrown.color);
-                Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.2f, (x, y) ->
-                    Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * scl * 1.4f)
-                );
-            });
-        }};
+        };
 
         disintegrated = new StatusEffect("disintegrated"){
 
@@ -182,14 +181,14 @@ public class FRStatusEffects{
             @Override
             public void onRemoved(Unit unit){
                 unit.armor = unit.type.armor;
+            }{
+                damage = 4.0f;
+                speedMultiplier = 0.6f;
+                effectChance = 0.15f;
+                parentizeEffect = true;
+                effect = Fx.unitShieldBreak;
             }
-            {
-            damage = 4.0f;
-            speedMultiplier = 0.6f;
-            effectChance = 0.15f;
-            parentizeEffect = true;
-            effect = Fx.unitShieldBreak;
-        }};
+        };
 
         magnetized = new StatusEffect("magnetized"){
 
@@ -197,9 +196,8 @@ public class FRStatusEffects{
             public void update(Unit unit, float time){
                 super.update(unit, time);
                 if(unit.moving() && Mathf.chanceDelta(0.05))
-                    unit.vel.scl(Mathf.random(0.25f, 2.0f));
-            }
-            {
+                    unit.vel.scl(Mathf.random(0.2f, 2.5f));
+            }{
                 damage = 2.0f;
                 transitionDamage = 10;
                 speedMultiplier = 0.95f;

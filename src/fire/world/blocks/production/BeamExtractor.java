@@ -38,7 +38,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 import mindustry.world.meta.StatValues;
 
-import static fire.FRVars.blockSpecial;
+import static fire.FRVars.specialContent;
 import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.production.Drill Drill */
@@ -51,8 +51,8 @@ public class BeamExtractor extends mindustry.world.Block{
     protected float warmupSpeed;
     protected float boostScale;
     protected byte shootY;
-    protected Color baseColor = Color.clear;
-    protected Color boostColor = Color.clear;
+    protected final Color baseColor = new Color();
+    protected final Color boostColor = new Color();
     protected Effect updateEffect = Fx.none;
     protected byte updateEffectChancePercentage; //a value of 50 -> 50%
 
@@ -76,7 +76,7 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     public void load(){
         super.load();
-        base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite
+        base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite?
         heat.set(Core.atlas.find(name + "-heat"));
     }
 
@@ -108,9 +108,8 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-        float wx = x * tilesize + offset, wy = y * tilesize + offset;
-        Drawf.dashCircle(wx, wy, range, baseColor);
-        Drawf.dashCircle(wx, wy, closeDst(), baseColor);
+        Drawf.dashCircle(wx(x), wy(y), range, baseColor);
+        Drawf.dashCircle(wx(x), wy(y), closeDst(), baseColor);
         checkOre(x, y, true, null, null);
     }
 
@@ -130,12 +129,11 @@ public class BeamExtractor extends mindustry.world.Block{
     private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
         if(set != null) set.clear();
         Tile closest = null;
-        float mr = range + 1.0f;
+        float mr = Float.MAX_VALUE;
 
-        float wx = x * tilesize + offset, wy = y * tilesize + offset;
-        for    (short tx = (short)((wx - range) / tilesize); tx <= Mathf.ceil((wx + range) / tilesize); tx++)
-            for(short ty = (short)((wy - range) / tilesize); ty <= Mathf.ceil((wy + range) / tilesize); ty++){
-                float dst = Mathf.dst(wx, wy, tx * tilesize, ty * tilesize);
+        for    (short tx = (short)((wx(x) - range) / tilesize); tx <= Mathf.ceil((wx(x) + range) / tilesize); tx++)
+            for(short ty = (short)((wy(y) - range) / tilesize); ty <= Mathf.ceil((wy(y) + range) / tilesize); ty++){
+                final float dst = Mathf.dst(x, y, tx, ty) * tilesize;
                 if(dst > range || dst <= closeDst()) continue;
                 var tile = world.tile(tx, ty);
                 if(tile == null || tile.block() != Blocks.air || tile.drop() == null || tile.drop().hardness > tier) continue;
@@ -159,10 +157,19 @@ public class BeamExtractor extends mindustry.world.Block{
         if(entry != null) entry.cons.get(closest);
     }
 
+    private float wx(int x){
+        return x * tilesize + offset;
+    }
+
+    private float wy(int y){
+        return y * tilesize + offset;
+    }
+
     private float closeDst(){
         return size * tilesize * 2.4f;
     }
 
+    /** A kind of mess. */
     public class BeamExtractorBuild extends mindustry.gen.Building{
 
         private byte selected = -1;
@@ -187,9 +194,9 @@ public class BeamExtractor extends mindustry.world.Block{
             if(warmup >= 0.999f) warmup = 1.0f;
             if(boostWarmup >= 0.999f) boostWarmup = 1.0f;
             if(mining != null && valid()){
-                if(blockSpecial){
-                    beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.25f);
-                    beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.25f);
+                if(specialContent){
+                    beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.3f);
+                    beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.3f);
                 }else{
                     beamX = mining.worldx();
                     beamY = mining.worldy();
@@ -199,19 +206,20 @@ public class BeamExtractor extends mindustry.world.Block{
                 dump(items.first());
 
             if(selected == -1) return;
-            checkOre(tile.x, tile.y, false, null, new Entry(selected, ore -> mining = ore));
-            if(blocked() || items.total() >= itemCapacity || efficiency <= 0.0f) return;
+            if(mining == null || selected != mining.drop().id || blocked())
+                checkOre(tile.x, tile.y, false, null, new Entry(selected, ore -> mining = ore));
+            if(!valid()) return;
 
             drawrot = Angles.angle(x, y, beamX, beamY) - 90.0f;
             drillTimer += edelta() * warmup * Mathf.lerp(1.0f, boostScale, boostWarmup);
 
             if(wasVisible){
-                if(Mathf.chanceDelta(updateEffectChancePercentage * warmup * 0.01d))
+                if(Mathf.chanceDelta(updateEffectChancePercentage * warmup * 0.01))
                     updateEffect.at(x + Mathf.range(size * 2.0f), y + Mathf.range(size * 2.0f));
             }
 
             if(drillTimer >= getDrillTime() && items.total() < itemCapacity){
-                byte amount = (byte)(drillTimer / getDrillTime());
+                final byte amount = (byte)(drillTimer / getDrillTime());
                 for(byte i = 0; i < amount; i++)
                     offload(mining.drop());
 
@@ -267,7 +275,7 @@ public class BeamExtractor extends mindustry.world.Block{
         @Override
         public BlockStatus status(){
             if(selected != -1 && efficiency <= 0.0f) return BlockStatus.noInput;
-            else if(!valid() || blocked()) return BlockStatus.noOutput;
+            else if(!valid()) return BlockStatus.noOutput;
             return super.status();
         }
 
@@ -281,7 +289,7 @@ public class BeamExtractor extends mindustry.world.Block{
             Draw.rect(region, x, y, drawrot);
             Drawf.additive(heat, Tmp.c1.set(Pal.turretHeat).a(warmup), x, y, drawrot, Layer.turretHeat);
 
-            if(warmup == 0.0f || blocked()) return;
+            if(warmup == 0.0f) return;
 
             final float swingScl = 12.0f, swingMag = 1.0f,
                 ex = beamX + Mathf.sin(Time.time, swingScl, swingMag),
@@ -344,7 +352,7 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         private boolean valid(){
-            return selected != -1 && efficiency > 0.0f && items.total() < itemCapacity;
+            return selected != -1 && efficiency > 0.0f && items.total() < itemCapacity && !blocked();
         }
 
         private float speed(){

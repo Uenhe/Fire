@@ -20,7 +20,7 @@ import fire.entities.bullets.FoldingBulletType;
 import fire.entities.bullets.LightningPointBulletType;
 import fire.entities.bullets.SpriteBulletType;
 import fire.world.DEBUG;
-import fire.world.blocks.campaign.AcceleratorScene;
+import fire.world.blocks.campaign.AcceleratorCutscene;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
 import fire.world.blocks.defense.turrets.ItemBulletStackTurret;
@@ -529,7 +529,7 @@ public class FRBlocks{
                     trailEffect = FRStatusEffects.overgrown.effect;
                     trailChance = 0.15f;
 
-                    adhereChance = 0.4f;
+                    adhereChancePercentage = 40;
                     removeAmount = 10;
                     maxSpread = 2.0f;
                     spreadIntensity = 0.03f;
@@ -1078,7 +1078,8 @@ public class FRBlocks{
 
                 fragBullets = 1;
                 fragBullet = new BulletType(0.0f, 0.0f){{
-                    lifetime = Mathf.FLOAT_ROUNDING_ERROR;
+                    lifetime = 0.0f;
+                    splashDamageRadius = homingRange;
                     status = StatusEffects.electrified;
                     statusDuration = 60.0f;
                 }};
@@ -1114,7 +1115,6 @@ public class FRBlocks{
             shoot = new ShootAlternate(6.3f){{shots=2;barrels=3;}};
 
             consumeCoolant(1.2f);
-
             ammo(
 
                 Items.thorium, new BasicBulletType(8.0f, 90.0f){{
@@ -1497,10 +1497,6 @@ public class FRBlocks{
         }};
 
         magneticSphere = new PowerTurret("magnetic-sphere"){{
-            final float chargeTime = 90.0f;
-            final float decelTime = 120.0f;
-            final float radius = 220.0f;
-
             requirements(Category.turret, with(
                 Items.plastanium, 425,
                 Items.surgeAlloy, 250,
@@ -1521,7 +1517,7 @@ public class FRBlocks{
             moveWhileCharging = false;
             unitSort = UnitSorts.strongest;
             shootSound = Sounds.laser;
-            shoot.firstShotDelay = chargeTime;
+            shoot.firstShotDelay = 90.0f;
 
             consumePower(n(1920));
             consumeCoolant(1.0f);
@@ -1534,10 +1530,10 @@ public class FRBlocks{
                 @Override
                 public void update(Bullet b){
                     super.update(b);
-                    if(b.time <= decelTime || b.type == type) return;
+                    if(b.time <= homingDelay || b.type == type) return;
 
                     if(Units.closestTarget(
-                        b.team, b.x, b.y, radius,
+                        b.team, b.x, b.y, homingRange - 40.0f,
                         e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
                         t -> t != null && collidesGround && !b.hasCollided(t.id)) == null
                     ){
@@ -1577,9 +1573,9 @@ public class FRBlocks{
                     ammoMultiplier = 1.0f;
                     collidesGround = false;
 
-                    homingRange = radius + 40.0f;
+                    homingRange = 260.0f;
                     homingPower = 0.2f;
-                    homingDelay = decelTime;
+                    homingDelay = 120.0f;
 
                     trailChance = 0.4f;
                     trailRotation = true;
@@ -1596,7 +1592,7 @@ public class FRBlocks{
                         }
                     });
 
-                    chargeEffect = new Effect(chargeTime, 20.0f, e -> {
+                    chargeEffect = new Effect(shoot.firstShotDelay, 20.0f, e -> {
                         Draw.color(_92f3fd);
                         Lines.stroke(e.fin() * 2.0f);
                         Lines.circle(e.x, e.y, 4.0f + e.fout() * 20.0f);
@@ -1634,7 +1630,7 @@ public class FRBlocks{
                         fragBullets = 1;
                         fragBullet = new LightningPointBulletType(165.0f){{
                             homingRange = 120.0f;
-                            lightningChance = 0.6f;
+                            lightningChancePercentage = 60;
                             lightningColor = _92f3fd;
                             collidesGround = false;
                         }};
@@ -2426,8 +2422,8 @@ public class FRBlocks{
             warmupSpeed = 0.05f;
             boostScale = 4.0f;
             shootY = 4;
-            baseColor = Pal.accent;
-            boostColor = ((BeamDrill)Blocks.plasmaBore).boostHeatColor; //lazy
+            baseColor.set(Pal.accent);
+            boostColor.set(((BeamDrill)Blocks.plasmaBore).boostHeatColor); //lazy
             updateEffect = Fx.pulverizeSmall;
             updateEffectChancePercentage = 2;
             ambientSound = Sounds.drill;
@@ -2731,7 +2727,7 @@ public class FRBlocks{
             chanceDeflect = 15;
             regenPercent = 0.5f;
             flashHit = true;
-            flashColor = Pal.health;
+            flashColor.set(Pal.health);
             frames = 20;
             frameTime = 6;
 
@@ -3053,7 +3049,7 @@ public class FRBlocks{
             craftEffect = Fx.smeltsmoke;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(Color.valueOf("ffef99"))
+                new DrawFlame(_ffef99)
             );
 
             craftTime = 10.0f;
@@ -3303,6 +3299,14 @@ public class FRBlocks{
                 new DrawArcSmelt(){{circleSpace=3.0f;flameColor=_e3ae6f;}},
                 new DrawDefault()
             );
+            craftEffect = new Effect(45.0f, e -> {
+                for(byte i = 0; i < 3; i++){
+                    Fx.rand.setSeed(e.id * i * 2L);
+                    Draw.color(Pal.surge, e.fout());
+                    Lines.stroke(4.0f * e.fout());
+                    Lines.spikes(e.x + Fx.rand.range(size * 2.0f), e.y + Fx.rand.range(size * 2.0f), 7.0f * e.finpow(), 1.8f * e.fout() + 4.0f * e.fslope(), 4, 45.0f);
+                }
+            });
 
             craftTime = 240.0f;
             outputItems = ItemStack.with(
@@ -3311,13 +3315,13 @@ public class FRBlocks{
             );
 
             fragBullets = 6;
-            fragBullet = new BasicBulletType(4.0f, 220.0f){
+            fragBullet = new BasicBulletType(4.0f, 250.0f){
 
                 /** I am disgusted. */
                 @Override
                 public void updateTrail(Bullet b){
                     if(!headless){
-                        byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
+                        final byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
                         if(b.trail == null) b.trail = new Trail(length);
                         b.trail.length = length;
                         b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
@@ -3329,26 +3333,26 @@ public class FRBlocks{
                     homingRange = 120.0f;
                     homingDelay = 10.0f;
                     homingPower = 0.35f;
+                    pierceArmor = true;
 
                     backColor = Pal.surge;
                     frontColor = Color.white;
                     trailLength = 16;
-                    trailWidth = 3;
+                    trailWidth = 3.0f;
                     trailColor = Pal.surge;
-                    hitEffect = despawnEffect = Fx.none;
+                    hitEffect = despawnEffect = new Effect(20.0f, e -> {
+                        Draw.color(Pal.surge);
+                        Lines.stroke(5.0f * e.fout());
+                        Lines.spikes(e.x, e.y, 10.0f * e.finpow(), 3.0f * e.fout() + 4.0f * e.fslope(), 4, 45.0f);
+                    });
                 }
             };
 
-            pattern = (b, i, sign, scl) -> {
-                // check whether there's any target first
+            signs = i -> new boolean[]{true, false, Mathf.randomBoolean(), i % 2 == 0};
+            bullets = (b, sign) -> {
                 if(Units.closestTarget(b.team, b.x, b.y, b.type.homingRange, e -> e != null && !b.hasCollided(e.id)) != null)
-                    return;
-
-                final float spd = 3.0f;
-                b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(
-                    Mathf.cosDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * b.type.homingRange * b.time / b.lifetime + b.x,
-                    Mathf.sinDeg(sign * (b.time * spd * scl + 360.0f / fragBullets * i)) * b.type.homingRange * b.time / b.lifetime + b.y
-                ), Float.MAX_VALUE));
+                    return; //checks whether there's any target first
+                b.rotation(b.rotation() + 720.0f*sign * Time.delta / b.lifetime);
             };
 
             consumePower(n(7200));
@@ -3472,7 +3476,7 @@ public class FRBlocks{
             }};
 
             craftSound = Sounds.release;
-            baseColor = _67474b;
+            baseColor.set(_67474b);
             circleColor = new Color[]{Pal.reactorPurple, Pal.thoriumPink, Pal.lightishOrange, Pal.surge, Pal.plastanium};
 
             consumePower(n(18000));
@@ -3672,7 +3676,7 @@ public class FRBlocks{
             compositeMap.put(id, Blocks.unloader.id);
         }};
 
-        primaryInterplanetaryAccelerator = new AcceleratorScene(
+        primaryInterplanetaryAccelerator = new AcceleratorCutscene(
             "primary-interplanetary-accelerator",
             "fire.planetarySceneTexts",
             "fire.planetarySceneSource",
@@ -3698,7 +3702,7 @@ public class FRBlocks{
             ringHandleLen = 20.0f;
             launchLightning = 12;
 
-            //commented: see AcceleratorScene part, byd Anuke
+            //commented: see AcceleratorCutscene part, byd Anuke
             //launchCandidates = Seq.with(FRPlanets.lysetta);
             launchBlock = Blocks.coreShard;
             powerBufferRequirement = 500000.0f;
@@ -3744,11 +3748,11 @@ public class FRBlocks{
                     if(alpha == 0.0f){
                         if(!renderer.drawWeather){
                             Core.settings.put("showweather", true);
-                            ui.announce("@fire.settingWeather");
+                            ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
                         }
                         if(!renderer.drawLight){
                             Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce("@fire.settingLighting"));
+                            Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                         }
                     }
 
@@ -3805,11 +3809,11 @@ public class FRBlocks{
                     if(alpha == 0.0f){
                         if(!renderer.drawWeather){
                             Core.settings.put("showweather", true);
-                            ui.announce("@fire.settingWeather");
+                            ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
                         }
                         if(!renderer.drawLight){
                             Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce("@fire.settingLighting"));
+                            Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                         }
                     }
 

@@ -2,6 +2,7 @@ package fire;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.graphics.g2d.TextureAtlas;
 
 public final class FRUtils{
 
@@ -15,6 +16,10 @@ public final class FRUtils{
 
     public static Color colora(int... component){
         return new Color(component[0] / 255.0f, component[1] / 255.0f, component[2] / 255.0f, component[3] / 255.0f);
+    }
+
+    public static TextureAtlas.AtlasRegion find(String name){
+        return Core.atlas.find("fire-" + name);
     }
 
     /** 1 to 10, that should be enough. */
@@ -60,7 +65,7 @@ public final class FRUtils{
 
         public boolean checkBelonging(float time, int quantumFrom, int quantumTo){
             return time >= (quantumFrom == 0 ? 0.0f : nodes[quantumFrom - 1])
-                && time <= nodes[quantumTo];
+                && time < nodes[quantumTo];
         }
     }
 }

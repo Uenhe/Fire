@@ -264,7 +264,11 @@ public class FRUnitTypes{
                 new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 28, 24, 15, 30.0f){{
                     sides = 24;
                     lightningColor = Pal.surge;
+
                     extended = true;
+                    ext_bearingFactorPercentage = 40;
+                    ext_counterBulletDamageFactorPercentage = 70;
+                    ext_counterBulletHomingChancePercentage = 40;
                 }},
 
                 new RegenFieldAbility(3f, 120f, _8cfffb),
