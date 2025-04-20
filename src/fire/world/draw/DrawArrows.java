@@ -30,7 +30,7 @@ public class DrawArrows extends DrawRegion{
     @Override
     public void load(Block block){
         super.load(block);
-        for(byte i = 0; i < arrows; i++){
+        for(byte i = 0, arrows = this.arrows; i < arrows; i++){
             arrowRegion[i] = Core.atlas.find(block.name + "-arrow" + (i + 1));
             arrowBlurRegion[i] = Core.atlas.find(block.name + "-arrow-blur" + (i + 1));
         }
@@ -41,7 +41,7 @@ public class DrawArrows extends DrawRegion{
         super.draw(build);
         if(!(build instanceof SmoothCrafter b)) return;
 
-        for(byte i = 0; i < arrows; i++){
+        for(byte i = 0, arrows = this.arrows; i < arrows; i++){
             float a = Mathf.clamp(b.smoothProgress() * (i + 1));
 
             Draw.z(Layer.blockAdditive);

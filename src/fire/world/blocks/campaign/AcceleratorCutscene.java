@@ -19,7 +19,6 @@ import mindustry.gen.Iconc;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.storage.CoreBlock;
 
-import static fire.FRVars.specialContent;
 import static mindustry.Vars.*;
 
 public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Accelerator{
@@ -141,9 +140,8 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             launchCandidates.first().unlock();
 
             for(byte i = 0; i < 2; i++){
-                final float p = 0.2f, height = Core.graphics.getHeight(), y1 = i == 0 ? height * -p : height * (1.0f + p);
+                float p = 0.2f, height = Core.graphics.getHeight(), y1 = i == 0 ? height * -p : height * (1.0f + p);
                 var mask = new Image();
-                var interp = specialContent ? Interp.smoother : Interp.linear;
 
                 mask.color.set(Color.black);
                 mask.touchable = Touchable.disabled;
@@ -152,8 +150,8 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
                 mask.y = y1;
 
                 mask.actions(
-                    Actions.delay(node.first() / 60.0f), Actions.moveTo(0.0f, i == 0 ? 0.0f : height * (1.0f - p), node.getQuantum(1) / 60.0f, interp),
-                    Actions.delay(node.getQuantum(2, 3) / 60.0f), Actions.moveTo(0.0f, y1, node.lastQuantum() / 60.0f, interp),
+                    Actions.delay(node.first() / 60.0f), Actions.moveTo(0.0f, i == 0 ? 0.0f : height * (1.0f - p), node.getQuantum(1) / 60.0f, Interp.smoother),
+                    Actions.delay(node.getQuantum(2, 3) / 60.0f), Actions.moveTo(0.0f, y1, node.lastQuantum() / 60.0f, Interp.smoother),
                     Actions.delay(node.lastQuantum() / 60.0f), Actions.remove()
                 );
                 mask.update(() -> {
@@ -166,13 +164,14 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
 
             Time.run(60.0f, () -> {
                 ui.planet.launchSector = null; //cancels the weird line
+                short[] sectors = AcceleratorCutscene.this.sectors;
                 for(short id : sectors)
                     ui.planet.newPresets.add(ui.planet.state.planet.sectors.get(id));
             });
 
-            for(byte i = 0; i < texts.length; i++){
-                final byte j = i;
-                final float delay = j != 0
+            for(byte i = 0, len = (byte)texts.length; i < len; i++){
+                byte j = i;
+                float delay = j != 0
                     ? node.getQuantum(2) + 150.0f * (j - 1)
                     : 0.0f;
                 Time.run(delay + node.get(1), () -> ui.announce(texts[j], 2.4f));

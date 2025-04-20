@@ -9,8 +9,7 @@ import arc.math.geom.Rect;
 import arc.math.geom.Vec2;
 import arc.struct.IntSet;
 import arc.struct.Seq;
-import arc.util.Nullable;
-import arc.util.Time;
+import arc.util.*;
 import mindustry.content.Bullets;
 import mindustry.content.Fx;
 import mindustry.core.World;
@@ -82,10 +81,10 @@ public class LightningBranch{
         Fx.lightning.at(x, y, angle, color, lines);
 
         if(branchLeft <= 0) return;
-        final float ax = x, ay = y, aangle = angle;
+        Tmp.v34.set(x, y, angle);
         Time.run(1.0f, () -> {
             for(byte i = 0; i < branchAmount; i++)
-                createLightningInternal(null, lastSeed++, team, color, damage, ax, ay, aangle + random.range(15.0f), length, branchAmount, branchLeft - 1);
+                createLightningInternal(null, lastSeed++, team, color, damage, Tmp.v34.x, Tmp.v34.y, Tmp.v34.z + random.range(15.0f), length, branchAmount, branchLeft - 1);
         });
     }
 }

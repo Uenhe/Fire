@@ -4,13 +4,12 @@ import arc.Core;
 import arc.util.Scaling;
 import arc.util.Strings;
 import fire.world.meta.FRStat;
-import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 
-import static mindustry.Vars.world;
+import static mindustry.Vars.*;
 
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
 
@@ -25,7 +24,8 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         super.setStats();
         stats.add(Stat.tiles, table -> {
             table.row();
-            for(var b : Vars.content.blocks()){
+            var blocks = content.blocks();
+            for(var b : blocks){
                 if(!b.isFloor() || b.asFloor().liquidDrop == null) continue;
 
                 table.table(Styles.grayPanel, t -> {
@@ -54,8 +54,9 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         if(tile == null) return 0.0f;
 
         float efficiencyCountingDoubled = 0.0f, efficiencyCounting = 0.0f;
-        for(var other : tile.getLinkedTilesAs(this, tempTiles)){
-            final float efficiencyCurrent = other.floor().liquidDrop != null
+        var tiles = tile.getLinkedTilesAs(this, tempTiles);
+        for(var other : tiles){
+            float efficiencyCurrent = other.floor().liquidDrop != null
                 ? other.floor().liquidMultiplier * (1.0f - other.floor().liquidDrop.viscosity) * other.floor().liquidDrop.temperature * 4.0f
                 : 0.0f;
             efficiencyCounting += efficiencyCurrent;

@@ -19,25 +19,25 @@ public class FRStatValues{
         return table -> {
             table.row();
 
-            for(byte i = 0; i < ammo.size; i++){
-                final byte j = i;
+            for(byte i = 0, size = (byte)ammo.size; i < size; i++){
+                byte j = i;
                 var entry = ammo.get(j);
 
                 table.table(Styles.grayPanel, bt -> {
                     bt.left().top().defaults().padRight(3.0f).left();
                     bt.table(title -> {
-                        title.image(entry.item.uiIcon).size(24.0f).padRight(4.0f).right().scaling(Scaling.fit).top().with(e -> StatValues.withTooltip(e, entry.item, false));
-                        title.add(entry.item.localizedName).padRight(10.0f).left().top();
+                        title.image(entry.item().uiIcon).size(24.0f).padRight(4.0f).right().scaling(Scaling.fit).top().with(e -> StatValues.withTooltip(e, entry.item(), false));
+                        title.add(entry.item().localizedName).padRight(10.0f).left().top();
                     });
 
                     bt.row().add(Core.bundle.format("bullet.level", FRUtils.toNumeral(j + 1)));
 
-                    if(entry.chancePercentage != 0) bt.row().add(Core.bundle.format("bullet.chance", entry.chancePercentage));
+                    if(entry.chance() != 0) bt.row().add(Core.bundle.format("bullet.chance", entry.chance() * 100.0f));
 
                     int a = 1, n = 1;
-                    if(entry.shoot instanceof ShootAlternate s){
+                    if(entry.shoot() instanceof ShootAlternate s){
                         a = s.shots;
-                    }else if(entry.shoot instanceof ShootMulti s){
+                    }else if(entry.shoot() instanceof ShootMulti s){
                         a = s.dest[0].shots;
                         n = s.source.shots;
                     }

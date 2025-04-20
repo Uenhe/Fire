@@ -2,7 +2,6 @@ package fire.maps;
 
 import arc.math.Rand;
 import arc.util.Reflect;
-import fire.content.FRBlocks;
 import fire.game.FRWaves;
 import mindustry.content.Blocks;
 import mindustry.maps.planet.SerpuloPlanetGenerator;
@@ -35,7 +34,7 @@ public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
     @Override
     protected void generate(){
         super.generate();
-        state.rules.spawns = FRWaves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode, state.rules.attackMode && spawner.countGroundSpawns() == 0);
+        state.rules.spawns = FRWaves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode && spawner.countGroundSpawns() == 0);
     }
 
     @Override

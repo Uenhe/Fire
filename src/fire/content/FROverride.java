@@ -154,7 +154,8 @@ public class FROverride{
         flare.trailLength = 3;
 
         // have to do this or can't control dash-able units with other units at the same time
-        for(var type : content.units()){
+        var units = content.units();
+        for(var type : units){
             // the first two commands must be moveCommand and enterPayloadCommand, skip
             if(type.commands.size <= 2) continue;
 

@@ -19,8 +19,9 @@ public class FRAttribute{
         sporesWater = Attribute.add("sporeswater");
 
         Events.on(EventType.ContentInitEvent.class, e -> {
-            for(var b : content.blocks()){
-                final float a = b.attributes.get(Attribute.spores);
+            var blocks = content.blocks();
+            for(var b : blocks){
+                float a = b.attributes.get(Attribute.spores);
                 if(a == 0.0f || !b.isFloor() || b.asFloor().liquidDrop != Liquids.water) continue;
 
                 b.attributes.set(sporesWater, a);

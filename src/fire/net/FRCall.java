@@ -1,19 +1,20 @@
-package fire.gen;
+package fire.net;
 
-import mindustry.gen.Player;
+import fire.world.blocks.units.*;
+import mindustry.gen.*;
 import mindustry.world.Tile;
 
 import static mindustry.Vars.net;
 
 public class FRCall{
 
-    /** see {@link mindustry.gen.Call#playerSpawn(Tile, Player)} */
+    /** @see Call#playerSpawn(Tile, Player) */
     public static void playerSpawn(Tile tile, Player player){
         if(net.server() || !net.active())
-            fire.world.blocks.units.MechPad.playerSpawn(tile, player);
+            MechPad.playerSpawn(tile, player);
 
         if(net.server()){
-            var packet = new mindustry.gen.PlayerSpawnCallPacket();
+            var packet = new PlayerSpawnCallPacket();
             packet.tile = tile;
             packet.player = player;
             net.send(packet, true);

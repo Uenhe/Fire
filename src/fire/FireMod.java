@@ -246,19 +246,23 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** ??? */
     private static void doSomethingUnplayable(){
-        for(var unit : content.units())
+        var units = content.units();
+        for(var unit : units)
             unit.health -= 10000.0f;
     }
 
     /** !!! */
     private static void doSomethingPlayable(){
-        for(var block : content.blocks())
+        var blocks = content.blocks();
+        for(var block : blocks)
             if(block.buildVisibility == BuildVisibility.debugOnly)
                 block.buildVisibility = BuildVisibility.shown;
 
         if(multiplied){
             multiplied = false;
-            for(var unit : content.units())
+
+            var units = content.units();
+            for(var unit : units)
                 unit.health += 10000.0f;
         }
     }

@@ -22,9 +22,9 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
         frostbite, overgrown, disintegrated
     };
 
-    public float range;
-    public float reload;
-    public Effect removeEffect;
+    public final float range;
+    public final float reload;
+    public final Effect removeEffect;
 
     private float timer;
 
@@ -60,11 +60,5 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
                 }
             });
         }
-    }
-
-    @Override
-    public void death(Unit unit){
-        range = reload = timer = 0.0f;
-        removeEffect = null;
     }
 }

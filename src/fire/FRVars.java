@@ -8,6 +8,7 @@ import mindustry.graphics.Pal;
 
 import static fire.FRUtils.color;
 import static fire.FRUtils.colora;
+import static mindustry.Vars.net;
 
 public final class FRVars{
 
@@ -39,16 +40,16 @@ public final class FRVars{
     public static boolean
         mineSand = false, displayRange = true, specialContent = true, showLog = true, noMultiMods = true;
 
-    static{{
+    static{
         Events.run(EventType.Trigger.update, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0) getSettings(); //extremely lazy timer, I just don't care
+            if(Core.graphics.getFrameId() % 60 == 0) getSettings();
         });
-    }}
+    }
 
     public static void getSettings(){
         mineSand = Core.settings.getBool("minesand");
         displayRange = Core.settings.getBool("displayrange");
-        specialContent = Core.settings.getBool("specialcontent");
+        specialContent = Core.settings.getBool("specialcontent") || net.server();
         showLog = Core.settings.getBool("showlog");
         noMultiMods = Core.settings.getBool("nomultimods");
     }

@@ -65,7 +65,8 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
             if(!alwaysFlee) retreatTimer = 0f;
             var req = unit.buildPlan();
             if(!req.breaking && timer.get(timerTarget2, 40f)){
-                for(var player : Groups.player){
+                var players = Groups.player;
+                for(var player : players){
                     if(player.isBuilder() && player.unit().activelyBuilding() && player.unit().buildPlan().samePos(req) && player.unit().buildPlan().breaking){
                         unit.plans.removeFirst();
                         unit.team.data().plans.remove(p -> p.x == req.x && p.y == req.y);
@@ -112,7 +113,8 @@ public class BuilderDashAI extends mindustry.ai.types.BuilderAI{
                 if(onlyAssist){
                     float minDst = Float.MAX_VALUE;
                     Player closest = null;
-                    for(var player : Groups.player){
+                    var players = Groups.player;
+                    for(var player : players){
                         if(!player.dead() && player.isBuilder() && player.team() == unit.team){
                             float dst = player.dst2(unit);
                             if(dst < minDst){

@@ -15,12 +15,11 @@ import static arc.math.Mathf.sqrt;
 import static fire.content.FRUnitTypes.*;
 import static mindustry.content.UnitTypes.*;
 
-/**
- * @author fy
- */
+/** @author fy
+ * @see mindustry.game.Waves */
 public class FRWaves{
 
-    public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean attack, boolean airOnly){
+    public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean airOnly){
         UnitType[][] species = {
             {dagger, mace, fortress, scepter, reign},
             {nova, pulsar, quasar, vela, corvus},
@@ -29,7 +28,7 @@ public class FRWaves{
             {flare, horizon, omicron, rand.chance(0.5) ? quad : pioneer, eclipse},
             {guarding, resisting, garrison, shelter, blessing},
             {firefly, candlelight, lampflame, pioneer, eclipse}
-        };//sorry but there are no lakes in Lysetta:(
+        };//sorry but there are no lakes on Lysetta:(
 
 
         if(airOnly){
@@ -42,7 +41,7 @@ public class FRWaves{
         var out = new Seq<SpawnGroup>();
 
         //max reasonable wave, after which everything gets boring
-        int cap = 225;
+        final short cap = 225;
 
         float[] scaling = {1, 1.6f, 2f, 3.1f, 4.4f};
 
@@ -52,8 +51,8 @@ public class FRWaves{
             int tier;
             int type;
 
-            for(int i = start; i < cap; ){
-                float f = (float)i;
+            for(short i = (short)start; i < cap;){
+                float f = i;
 
                 if(f < 10){
                     tier = rand.random(10) > 4 ? 1 : 2;
@@ -114,7 +113,7 @@ public class FRWaves{
                         effect = ChosenEffect;
                     }});
                 }
-                i += (int) (rand.random(10, 18 + counts) - difficulty * 0.5 + tier * 5) + counts + 5;
+                i += (short)(rand.random(10, 18 + counts) - difficulty * 0.5f + tier * 5 + counts + 5);
             }
         };
 

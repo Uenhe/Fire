@@ -1,41 +1,38 @@
 package fire.entities.abilities;
 
-import arc.math.Mathf;
-import arc.scene.ui.layout.Table;
-import arc.struct.ObjectMap;
-import arc.util.Strings;
-import arc.util.Time;
-import mindustry.entities.Effect;
-import mindustry.gen.Unit;
-import mindustry.type.StatusEffect;
-import mindustry.world.meta.StatUnit;
+import arc.math.*;
+import arc.scene.ui.layout.*;
+import arc.util.*;
+import mindustry.entities.*;
+import mindustry.gen.*;
+import mindustry.type.*;
+import mindustry.world.meta.*;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     /** Ticks between two triggers. */
-    public short cooldown;
+    public final short cooldown;
     /** Triggers if the unit is damaged the percentage in detectDuration; 50 -> 50% */
-    public byte healthLossPercentage;
+    public final byte healthLossPercentage;
     /** Amount to heal at trigger. */
-    public int healAmount;
+    public final int healAmount;
     /** Percentage to heal at trigger. 50 -> 50% */
-    public byte healPercentage;
+    public final byte healPercentage;
     /** Status effect applied at trigger. */
-    public StatusEffect status;
+    public final StatusEffect status;
     /** Status effect duration. */
-    public short statusDuration;
+    public final short statusDuration;
     /** Effect created at trigger. */
-    public Effect effect;
+    public final Effect effect;
 
-    private byte healthSize;
     private float detectTimer;
     private float cooldownTimer;
+    private float[] healthArray;
+
     /** Frames between two detections. */
     private static final byte detectInterval = 5;
-    /** Used to record health; Why I have to use a map or buggy????????????? */
-    private static final ObjectMap<Unit, float[]> healthMap = new ObjectMap<>();
 
     public FirstAidAbility(int cd, int lossP, int healA, int healP, StatusEffect se, int sed, int detectDuration, Effect fx){
         cooldown = (short)cd;
@@ -45,8 +42,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
         status = se;
         statusDuration = (short)sed;
         effect = fx;
-
-        healthSize = (byte)(detectDuration / detectInterval);
+        healthArray = new float[(byte)(detectDuration / detectInterval)];
     }
 
     @Override
@@ -64,25 +60,23 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(Unit unit){
-        var health = healthMap.get(unit, new float[healthSize]);
-        if(health[0] == 0.0f) Arrays.fill(health, unit.health);
+        if(!unit.isValid()) return;
+        if(healthArray[0] == 0.0f) Arrays.fill(healthArray, unit.health);
 
         if(cooldownTimer == 0.0f){
             detectTimer += Time.delta;
 
             if(detectTimer >= detectInterval){
+                for(byte i = 0, lenm1 = (byte)(healthArray.length - 1); i < lenm1; i++)
+                    healthArray[i] = healthArray[i + 1];
+                healthArray[healthArray.length - 1] = unit.health;
+
                 detectTimer -= detectInterval;
-
-                for(byte i = 0; i < health.length - 1; i++)
-                    health[i] = health[i + 1];
-
-                health[health.length - 1] = unit.health;
-                healthMap.put(unit, health);
             }
 
-            if(health[0] - unit.health < unit.maxHealth * healthLossPercentage / 100.0f) return;
+            if(healthArray[0] - unit.health < unit.maxHealth * healthLossPercentage * 0.01f) return;
 
-            unit.heal(healAmount + unit.maxHealth * healPercentage / 100.0f);
+            unit.heal(healAmount + unit.maxHealth * healPercentage * 0.01f);
             unit.apply(status, statusDuration);
             effect.at(unit);
 
@@ -97,12 +91,13 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
         }
     }
 
+    public FirstAidAbility setHealthArray(float[] array){
+        healthArray = array;
+        return this;
+    }
+
     @Override
-    public void death(Unit unit){
-        healthMap.remove(unit);
-        healAmount = cooldown = statusDuration = healthLossPercentage = healPercentage = healthSize = 0;
-        detectTimer = cooldownTimer = 0.0f;
-        status = null;
-        effect = null;
+    protected Object clone() throws CloneNotSupportedException{
+        return ((FirstAidAbility)super.clone()).setHealthArray(healthArray);
     }
 }

@@ -21,13 +21,13 @@ import static mindustry.Vars.tilesize;
 
 public class DashAbility extends mindustry.entities.abilities.Ability{
 
-    public float speedMultiplier;
+    public final float speedMultiplier;
     /** Tick that unit becomes invincible while dashing. */
-    public short invincibleTime;
+    public final short invincibleTime;
     /** Dash cooldown, in tick. */
-    public short cooldown;
+    public final short cooldown;
     /** Number of afterimages to be displayed while dashing. */
-    public byte afterimage;
+    public final byte afterimage;
 
     private float timer;
 
@@ -65,21 +65,16 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         Draw.color(Color.white);
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
 
-        for(byte i = 0; i < afterimage; i++){
-            final float offset = unit.type.engineOffset * 0.5f * (1.0f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * unit.speedMultiplier * 8.0f),
-                cx = unit.x + Angles.trnsx(unit.rotation + 180.0f, offset),
-                cy = unit.y + Angles.trnsy(unit.rotation + 180.0f, offset);
-            Draw.alpha(0.6f * (1.0f - (timer / invincibleTime)) * (1.0f - (float)i / afterimage));
-            Draw.rect(unit.type.name, cx, cy, unit.rotation - 90.0f);
+        for(byte i = 0, images = afterimage; i < images; i++){
+            float offset = unit.type.engineOffset * 0.5f * (1.0f + (unit.type.useEngineElevation ? unit.elevation : 1f)) + (i * unit.speedMultiplier * 8.0f);
+            Draw.alpha(0.8f * (1.0f - (timer / invincibleTime)) * (1.0f - (float)i / images));
+            Draw.rect(unit.type.name,
+            unit.x + Angles.trnsx(unit.rotation + 180.0f, offset),
+            unit.y + Angles.trnsy(unit.rotation + 180.0f, offset),
+            unit.rotation - 90.0f);
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public void death(Unit unit){
-        speedMultiplier = timer = 0.0f;
-        invincibleTime = cooldown = afterimage = 0;
     }
 
     public void dash(Unit unit, Position pos){

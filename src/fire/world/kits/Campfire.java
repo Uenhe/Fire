@@ -46,20 +46,22 @@ public class Campfire{
             stats.add(FRStat.statusEffectApplied, table -> {
                 table.row();
 
-                for(var s : new StatusEffect[]{allyStatus, enemyStatus})
-                    table.table(Styles.grayPanel, t -> {
+                for(byte i = 0; i < 2; i++){
+                    var s = i == 0 ? allyStatus : enemyStatus;
 
+                    table.table(Styles.grayPanel, t -> {
                         t.left().button(new TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
                             var detail = s == allyStatus
-                                ? FRStat.allyStatusEffect.localized()
-                                : FRStat.enemyStatusEffect.localized();
+                            ? FRStat.allyStatusEffect.localized()
+                            : FRStat.enemyStatusEffect.localized();
 
                             info.left().add("[accent]" + detail).left();
                             info.row();
                             info.left().add(s.localizedName).color(s.color).left();
                         });
                     }).growX().pad(5.0f).row();
+                }
             });
         }
 
@@ -164,7 +166,8 @@ public class Campfire{
                     ).growX().pad(5.0f));
 
                 byte i = 0;
-                for(var item : content.items()){
+                var items = content.items();
+                for(var item : items){
                     if(item.flammability <= 0.0f || item.isHidden()) continue;
 
                     c.row().table(Styles.grayPanel, t ->

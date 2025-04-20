@@ -12,21 +12,20 @@ import mindustry.entities.Units;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 
-import static fire.FRVars.specialContent;
 import static mindustry.Vars.tilesize;
 
 public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
 
-    public float amount;
-    public float radius;
-    public Color lineColor;
+    public final float amount;
+    public final float radius;
+    public final Color lineColor = new Color();
 
     private float warmup, totalProgress;
 
     public RegenFieldAbility(float amount, float radius, Color color){
         this.amount = amount;
         this.radius = radius;
-        this.lineColor = color;
+        this.lineColor.set(color);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void update(Unit unit){
-        final float lineSpeed = 120.0f;
+        final float spd = 120.0f;
 
         boolean[] any = new boolean[1];
         Units.nearby(unit.team, unit.x, unit.y, radius, u -> {
@@ -52,20 +51,17 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
                 any[0] = true;
             }
         });
-        totalProgress += Time.delta / lineSpeed;
+        totalProgress += Time.delta / spd;
 
-        if(specialContent)
-            warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
-        else
-            warmup = any[0] ? 1.0f : 0.0f;
+        warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
     }
 
     @Override
     public void draw(Unit unit){
         if(warmup < 0.001f) return;
 
-        final float lineStroke = 3.0f;
-        float mod = totalProgress % 1.0f;
+        final float lineStroke = 3.0f,
+        mod = totalProgress % 1.0f;
 
         Draw.z(Layer.effect);
         Draw.color(lineColor);
@@ -73,11 +69,5 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
         Lines.circle(unit.x, unit.y, radius * mod);
 
         Draw.reset();
-    }
-
-    @Override
-    public void death(Unit unit){
-        amount = radius = warmup = totalProgress = 0.0f;
-        lineColor = null;
     }
 }

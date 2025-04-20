@@ -27,7 +27,7 @@ public class FRFx{
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0.0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0.0f, 0.3f) * e.fin();
             Draw.color(color);
 
-            for(short i = 0; i <= range / spacing; i++){
+            for(short i = 0, interval = (short)(range / spacing); i <= interval; i++){
                 Tmp.v1.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
@@ -42,22 +42,15 @@ public class FRFx{
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
-
-            float orbSize = 2f * e.fout() + 1f;
-            float r = radius * e.fout();
-            float w = e.time * speed * e.fout(Interp.swingOut);
-            float x = Mathf.cos(w) + e.x;
-            float y = Mathf.sin(w) + e.y;
+            float orbSize = 2.0f * e.fout() + 1.0f;
 
             for(byte i = 0; i < amount; i++){
-                float angle = Angles.angle(e.x, e.y, x, y) + 360.0f / amount * i;
-                float
-                    cx = e.x + r * Mathf.sinDeg(angle),
-                    cy = e.y + r * Mathf.cosDeg(angle);
+                float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * ((float)i / amount) / speed, mag = radius * e.fout();
+                Tmp.v6.set(Mathf.cos(theta, 1.0f / speed, mag) + e.x, Mathf.sin(theta, 1.0f / speed, mag) + e.y);
 
                 Draw.color(colors[i]);
-                Lines.circle(cx, cy, orbSize);
-                Fill.circle(cx, cy, orbSize);
+                Lines.circle(Tmp.v6.x, Tmp.v6.y, orbSize);
+                Fill.circle(Tmp.v6.x, Tmp.v6.y, orbSize);
             }
         });
     }
@@ -88,7 +81,7 @@ public class FRFx{
 
     public static Effect crossEffect(float lifetime, float size, float rotation, boolean circle, @Nullable Color color){
         return new Effect(lifetime, 100.0f, e -> {
-            final float circleRad = size * (e.finpow() * 16.0f + 1.0f);
+            float circleRad = size * (e.finpow() * 16.0f + 1.0f);
             var col = color == null ? e.color : color;
 
             Drawf.light(e.x, e.y, circleRad * 1.6f, col, e.fout());
@@ -127,7 +120,7 @@ public class FRFx{
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
         Fx.rand.setSeed(e.id);
 
-        final float length = 4.0f + e.finpow() * 24.0f;
+        float length = 4.0f + e.finpow() * 24.0f;
         for(byte i = 0; i < 16; i++){
             Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(length));
 
@@ -176,7 +169,7 @@ public class FRFx{
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{
-                final float len = (i + 1) * spacing;
+                float len = (i + 1) * spacing;
                 Tmp.v1.setToRandomDirection(Fx.rand).scl(rangeBetweenPoints * 0.5f);
                 Lines.linePoint(
                     e.x + nx * len + Tmp.v1.x,
@@ -189,7 +182,7 @@ public class FRFx{
     }).followParent(false);
 
     public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
-        final float
+        float
             intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
             baseLifetime = 25.0f + intensity * 11.0f;
         b.lifetime = 50.0f + intensity * 55.0f;
@@ -197,13 +190,13 @@ public class FRFx{
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
         for(byte i = 0; i < 4; i++){
-            final byte j = i;
-            final float lenScl = Fx.rand.random(0.4f, 1.0f);
+            byte j = i;
+            float lenScl = Fx.rand.random(0.4f, 1.0f);
             Fx.rand.setSeed(b.id * 2L + j);
 
             b.scaled(b.lifetime * lenScl, e ->
                 Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22.0f * intensity, (x, y, in, out) -> {
-                    final float
+                    float
                         fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
                         rad = fout * ((2.0f + intensity) * 2.35f);
 

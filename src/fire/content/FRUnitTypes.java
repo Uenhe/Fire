@@ -261,14 +261,15 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 28, 24, 15, 30.0f){{
+                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 32, 24, 25, 40.0f){{
                     sides = 24;
-                    lightningColor = Pal.surge;
+                    lightningColor.set(Pal.surge);
 
                     extended = true;
-                    ext_bearingFactorPercentage = 40;
-                    ext_counterBulletDamageFactorPercentage = 70;
-                    ext_counterBulletHomingChancePercentage = 40;
+                    ext_bearingFactor = 0.4f;
+                    ext_counterBulletSpeedFactor = 1.2f;
+                    ext_counterBulletDamageFactor = 0.8f;
+                    ext_counterBulletHomingChancePercentage = 45;
                 }},
 
                 new RegenFieldAbility(3f, 120f, _8cfffb),
@@ -646,8 +647,6 @@ public class FRUnitTypes{
                         });
 
                         hitEffect = new Effect(50f, 100f, e -> {
-                            final byte points = 8;
-
                             e.scaled(7f, b -> {
                                 Draw.color(Pal.heal, b.fout());
                                 Fill.circle(e.x, e.y, rad);
@@ -657,7 +656,7 @@ public class FRUnitTypes{
                             Lines.circle(e.x, e.y, rad);
 
                             float offset = Mathf.randomSeed(e.id, 360f);
-                            for(byte i = 0; i < points; i++){
+                            for(byte i = 0, points = 8; i < points; i++){
                                 float angle = i * 360f / points + offset;
                                 Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4.0f, 30f * e.fout(), angle);
                             }
@@ -1124,29 +1123,32 @@ public class FRUnitTypes{
 
         mechanicalTide = new UnitType("mechanical-tide"){{
             BulletType
-            laser = new LaserBulletType(){{
-                damage = 200f;
-                lifetime = 30f;
-                hitSize = 4f;
-                length = 60f;
-                drawSize = 150f;
+            laser = new LaserBulletType(200.0f){{
+                lifetime = 30.0f;
+                hitSize = 4.0f;
+                length = 6.00f;
+                drawSize = 150.0f;
                 colors(colors, Pal.heal, Pal.heal, Color.white);
                 collidesAir = true;
             }},
 
             type1 = new BasicBulletType(0f, 200f){{
+                width = height = 0.0f;
+                hitEffect = despawnEffect = Fx.none;
                 collides = false;
-                fragAngle = 90;
-                lifetime = fragLifeMax = fragLifeMin = fragVelocityMax = fragVelocityMin = 1f;
+                fragAngle = 90.0f;
+                lifetime = fragVelocityMin = 1.0f;
                 fragRandomSpread = 0;
                 fragBullets = 1;
                 fragBullet = laser;
             }},
 
             type2 = new BasicBulletType(0f, 200f){{
+                width = height = 0.0f;
+                hitEffect = despawnEffect = Fx.none;
                 collides = false;
-                fragAngle = -90;
-                lifetime = fragLifeMax = fragLifeMin = fragVelocityMax = fragVelocityMin = 1f;
+                fragAngle = -90.0f;
+                lifetime = fragVelocityMin = 1.0f;
                 fragRandomSpread = 0;
                 fragBullets = 1;
                 fragBullet = laser;
@@ -1253,6 +1255,8 @@ public class FRUnitTypes{
                     shootSound = Sounds.laser;
 
                     bullet = new BasicBulletType(10f, 3240){{
+                        width = height = 0.0f;
+                        hitEffect = despawnEffect = Fx.none;
                         buildingDamageMultiplier = 0.8f;
                         lifetime = 60f;
                         knockback = 16;
@@ -1260,8 +1264,7 @@ public class FRUnitTypes{
                         pierce = true;
                         pierceBuilding = true;
 
-                        spawnBullets.add(new LaserBulletType(){{
-                            damage = 6570;
+                        spawnBullets.add(new LaserBulletType(6400.0f){{
                             buildingDamageMultiplier = 0.8f;
                             knockback = 64;
                             pierceCap = 24;
@@ -1275,9 +1278,9 @@ public class FRUnitTypes{
                             colors(colors, Pal.heal, Pal.heal, Color.white);
                         }});
 
-                        for(int j = 0; j < 12; j++){
-                            int s = j;
-                            spawnBullets.add(new FlakBulletType(20f - s * 1.2f, 100 + s * 6){{
+                        for(byte j = 0; j < 12; j++){
+                            byte s = j;
+                            spawnBullets.add(new FlakBulletType(20.0f - s * 1.2f, 100.0f + s * 6.0f){{
                                 sprite = "missile-large";
                                 collidesGround = collidesAir = true;
                                 explodeRange = 20f + s;
@@ -1340,6 +1343,8 @@ public class FRUnitTypes{
                     shootSound = Sounds.laser;
 
                     bullet = new BasicBulletType(40f, 980f){{
+                        width = height = 0.0f;
+                        hitEffect = despawnEffect = Fx.none;
                         lifetime = 10;
                         knockback = 60;
                         pierce = true;
@@ -1350,6 +1355,8 @@ public class FRUnitTypes{
                         intervalRandomSpread = 360;
                         intervalSpread = 0;
                         intervalBullet = new BasicBulletType(0, 200f){{
+                            width = height = 0.0f;
+                            hitEffect = despawnEffect = Fx.none;
                             lifetime = 4f;
                             fragBullets = 1;
                             fragRandomSpread = 0;

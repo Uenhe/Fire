@@ -74,7 +74,8 @@ public class FRStatusEffects{
                 if(added){
                     Fx.healWave.at(unit);
 
-                    for(var e : DebuffRemoveFieldAbility.DE_BUFFS)
+                    var debuffs = DebuffRemoveFieldAbility.DE_BUFFS;
+                    for(var e : debuffs)
                         if(!(unit.type instanceof FleshUnitType && e == overgrown))
                             unit.unapply(e);
 

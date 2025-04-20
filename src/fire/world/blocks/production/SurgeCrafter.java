@@ -34,8 +34,8 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
             if(!specialContent || fragBullets == 0) return;
 
             int len = 0;
-            for(byte i = 0; i < fragBullets; i++){
-                var bullet = fragBullet.create(this, x, y, 360.0f / fragBullets * i);
+            for(byte i = 0, bulletz = fragBullets; i < bulletz; i++){
+                var bullet = fragBullet.create(this, x, y, 360.0f / bulletz * i);
                 var ss = signs.apply(i);
                 if(i == 0) len = ss.length;
 

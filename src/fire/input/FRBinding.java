@@ -1,11 +1,13 @@
 package fire.input;
 
 import arc.Core;
+import arc.input.InputDevice.*;
 import arc.input.KeyCode;
 import arc.util.Reflect;
 
 import static arc.KeyBinds.KeyBind;
 import static arc.KeyBinds.KeybindValue;
+import static mindustry.Vars.ui;
 
 public enum FRBinding implements KeyBind{
 
@@ -20,7 +22,7 @@ public enum FRBinding implements KeyBind{
     }
 
     @Override
-    public KeybindValue defaultValue(arc.input.InputDevice.DeviceType type){
+    public KeybindValue defaultValue(DeviceType type){
         return defaultValue;
     }
 
@@ -37,6 +39,6 @@ public enum FRBinding implements KeyBind{
         System.arraycopy(values(), 0, newBindings, bindings.length, values().length);
         Core.keybinds.setDefaults(newBindings);
         Reflect.invoke(Core.keybinds, "load");
-        Reflect.invoke(mindustry.Vars.ui.controls, "setup");
+        Reflect.invoke(ui.controls, "setup");
     }
 }

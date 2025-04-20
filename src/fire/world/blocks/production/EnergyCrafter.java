@@ -99,7 +99,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void updateTile(){
             super.updateTile();
             fraction = Mathf.lerpDelta(fraction, Interp.smoother.apply(1.0f - progress), 0.2f);
-            angle = specialContent ? Mathf.lerpDelta(angle, targetAngle, 0.2f) : targetAngle;
+            angle = Mathf.lerpDelta(angle, targetAngle, 0.2f);
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (1.0f - 20.0f / craftTime), 0.1f);
 
             if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, e -> {})){
@@ -113,7 +113,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 createLightning();
 
             if(timer(timerStabilize, stabilizeInterval)){
-                if(specialContent) Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
+                Fx.healBlockFull.at(x, y, size, circleColor[counter], block);
                 instability = Math.max(instability - maxInstability * 0.1f, 0.0f);
             }
         }
@@ -122,8 +122,9 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void craft(){
             // equals to super.craft() except for craftEffect part
             consume();
-            if(outputItems != null)
-                for(var output : outputItems)
+            var items = outputItems;
+            if(items != null)
+                for(var output : items)
                     for(byte i = 0; i < output.amount; i++)
                         offload(output.item);
                         

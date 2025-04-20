@@ -68,7 +68,6 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
             super.updateTile();
 
             hit = Mathf.clamp(hit - Time.delta / 10.0f);
-
             if(damaged() && heals){
                 heals = false;
                 heal(healAmount);
@@ -80,7 +79,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
             super.collision(bullet);
             hit = 1.0f;
 
-            if(Mathf.chance(chanceHeal * 0.01d)){
+            if(Mathf.chance(chanceHeal * 0.01)){
                 healAmount = bullet.damage * regenPercent;
                 heals = true;
             }

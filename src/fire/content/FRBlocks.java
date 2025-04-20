@@ -10,6 +10,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Geometry;
 import arc.struct.IntIntMap;
 import arc.struct.Seq;
 import arc.util.Time;
@@ -124,7 +125,7 @@ public class FRBlocks{
         scab,
 
         //production
-        chopper, treeFarm, vapourCondenser, biomassCultivator, stackedCultivator, fissionDrill, constraintExtractor,
+        chopper, treeFarm, vapourCondenser, biomassCultivator, stackedCultivator, fissionDrill, constraintExtractor, constraintExtractorLarge,
 
         //distribution
         compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
@@ -495,7 +496,7 @@ public class FRBlocks{
         }};
 
         scab = new ItemTurret("scab"){{
-            requirements(Category.turret, BuildVisibility.hidden, with(
+            requirements(Category.turret, BuildVisibility.shown, with(
                 FRItems.flesh, 50
             ));
             health = 4000;
@@ -716,7 +717,7 @@ public class FRBlocks{
 
             jackpotAmmo.add(
 
-                new JackpotAmmo(Items.copper, 45,
+                new JackpotAmmo(Items.copper, 0.5f,
                     new ShootAlternate(4.0f){{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
@@ -735,7 +736,7 @@ public class FRBlocks{
                         backColor = hitColor = colors[0];
                     }}),
 
-                new JackpotAmmo(Items.thorium, 30,
+                new JackpotAmmo(Items.thorium, 0.35f,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 1;
@@ -761,7 +762,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(Items.surgeAlloy, 15,
+                new JackpotAmmo(Items.surgeAlloy, 0.2f,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 2;
@@ -802,7 +803,7 @@ public class FRBlocks{
                         }},
                         new ShootSpread(7, 3.0f)
                     ),
-                    new BasicBulletType(10.5f, 75.0f){{
+                    new BasicBulletType(10.8f, 75.0f){{
                         lifetime = 30.0f;
                         width = 8.0f;
                         height = 10.0f;
@@ -2400,7 +2401,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, n(12));
         }};
 
-        constraintExtractor = new BeamExtractor("constraint-extractor"){{
+        constraintExtractor = new BeamExtractor("constraint-extractor", 1){{
             requirements(Category.production, with(
                 Items.metaglass, 75,
                 FRItems.logicAlloy, 40,
@@ -2420,8 +2421,7 @@ public class FRBlocks{
             drillTime = 30;
             hardnessDrillMultiplier = 10;
             warmupSpeed = 0.05f;
-            boostScale = 4.0f;
-            shootY = 4;
+            boostScale = 2.7f;
             baseColor.set(Pal.accent);
             boostColor.set(((BeamDrill)Blocks.plasmaBore).boostHeatColor); //lazy
             updateEffect = Fx.pulverizeSmall;
@@ -2429,8 +2429,51 @@ public class FRBlocks{
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.02f;
 
+            barrels.add(new BeamExtractor.Barrel("", 0.0f, 0.0f, 4.0f));
+
             consumePower(n(150));
-            consumeLiquid(Liquids.cryofluid, n(6)).boost();
+            consumeLiquid(Liquids.cryofluid, n(12)).boost();
+        }};
+
+        constraintExtractorLarge = new BeamExtractor("constraint-extractor-large", 5){{
+            requirements(Category.production, with(
+                Items.graphite, 75,
+                FRItems.mirrorglass, 90,
+                FRItems.logicAlloy, 120,
+                FRItems.hardenedAlloy, 45,
+                FRItems.magneticAlloy, 25
+            ));
+            health = 1280;
+            armor = 16.0f;
+            size = 4;
+            hasItems = true;
+            hasPower = true;
+            hasLiquids = true;
+            itemCapacity = 30;
+            liquidCapacity = 30.0f;
+
+            tier = 4;
+            range = 35 * tilesize;
+            drillTime = 10;
+            hardnessDrillMultiplier = 4;
+            warmupSpeed = 0.04f;
+            boostScale = 3.2f;
+            baseColor.set(Pal.accent);
+            boostColor.set(((BeamDrill)Blocks.plasmaBore).boostHeatColor); //lazy
+            updateEffect = Fx.pulverizeSmall;
+            updateEffectChancePercentage = 2;
+            ambientSound = Sounds.drill;
+            ambientSoundVolume = 0.02f;
+
+            barrels.add(new BeamExtractor.Barrel(
+                "-pri", 0.0f, 0.0f, 4.0f
+            ));
+            for(var p : Geometry.d8edge){
+                barrels.add(new BeamExtractor.Barrel("-sec", p.x * 8.0f, p.y * 8.0f, 1.0f));
+            }
+
+            consumePower(n(150));
+            consumeLiquid(FRLiquids.liquidNitrogen, n(9)).boost();
         }};
 
         //endregion
@@ -3321,7 +3364,7 @@ public class FRBlocks{
                 @Override
                 public void updateTrail(Bullet b){
                     if(!headless){
-                        final byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
+                        byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
                         if(b.trail == null) b.trail = new Trail(length);
                         b.trail.length = length;
                         b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
@@ -3869,10 +3912,10 @@ public class FRBlocks{
                     if(!state.isCampaign()) return;
 
                     int n = Mathf.random(4, 6);
-                    for(var s : state.getPlanet().sectors)
-                        if(counter++ < n && s.hasBase()){
+                    var sectors = state.getPlanet().sectors;
+                    for(var s : sectors)
+                        if(counter++ < n && s.hasBase())
                             Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
-                        }
 
                     kill();
                 }

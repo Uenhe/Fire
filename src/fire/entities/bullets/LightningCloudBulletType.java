@@ -1,6 +1,5 @@
 package fire.entities.bullets;
 
-import arc.Core;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -84,7 +83,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
 
         @Override
         public void draw(){
-            final float alpha = 0.1f +
+            float alpha = 0.1f +
                 (node.checkBelonging(time, 0) ? time / node.first()
                 : node.checkBelonging(time, 1) ? 1.0f
                 : 1.0f - (time - node.get(2)) / node.lastQuantum());
@@ -110,7 +109,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
         }
 
         private float size(){
-            final float
+            float
                 base = type().baseSize, plus = type().plusSize,
                 scl = plus * 0.3f, mag = plus * 0.4f;
 

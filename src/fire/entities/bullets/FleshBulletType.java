@@ -72,7 +72,7 @@ public class FleshBulletType extends SpritesBulletType{
             build.collision(b);
             b.damage /= Time.delta;
 
-            final float amount = removeAmount * Time.delta;
+            float amount = removeAmount * Time.delta;
             if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > amount){
                 build.liquids.remove(Liquids.water, amount);
                 intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);

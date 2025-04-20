@@ -71,10 +71,10 @@ public class InfoDialog extends BaseDialog{
         }, () -> new BaseDialog("@techtree.select"){{
 
             cont.pane(t -> t.table(Tex.button, in -> {
-
                 in.defaults().width(300f).height(60f);
 
-                for(var node : InfoTree.roots){
+                var roots = InfoTree.roots;
+                for(var node : roots){
                     if(locked(node)) continue;
 
                     in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
@@ -181,7 +181,8 @@ public class InfoDialog extends BaseDialog{
 
         node.selectable = !locked(node.node);
 
-        for(var n : node.children){
+        var children = node.children;
+        for(var n : children){
             n.visible = !locked && n.parent.visible;
             checkNodes(n);
         }
@@ -203,7 +204,7 @@ public class InfoDialog extends BaseDialog{
             rootLocation = TreeLocation.top;
         }}.layout(node);
 
-        final float lastY = node.y;
+        float lastY = node.y;
 
         if(rightHalf.length > 0){
 
@@ -221,6 +222,7 @@ public class InfoDialog extends BaseDialog{
         float minX = 0f, minY = 0f, maxX = 0f, maxY = 0f;
         copyInfo(node);
 
+        var nodes = this.nodes;
         for(var n : nodes){
             if(!n.visible) continue;
 
@@ -246,9 +248,11 @@ public class InfoDialog extends BaseDialog{
         node.node.x = node.x;
         node.node.y = node.y;
 
-        if(node.children != null)
-            for(var child : node.children)
+        if(node.children != null){
+            var children = node.children;
+            for(var child : children)
                 copyInfo(child);
+        }
     }
 
     private class View extends Group{
@@ -263,12 +267,12 @@ public class InfoDialog extends BaseDialog{
         }
 
         private void rebuildAll(){
-
             clear();
             hoverNode = null;
             infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
+            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
 
@@ -284,12 +288,10 @@ public class InfoDialog extends BaseDialog{
 
                         float right = infoTable.getRight();
                         if(right > Core.graphics.getWidth()){
-
-                            float moveBy = right - Core.graphics.getWidth();
                             addAction(new RelativeTemporalAction(){
                                 @Override
                                 protected void updateRelative(float percentDelta){
-                                    panX -= moveBy * percentDelta;
+                                    panX -= (right - Core.graphics.getWidth()) * percentDelta;
                                     setDuration(0.1f);
                                     setInterpolation(Interp.fade);
                                 }
@@ -422,15 +424,16 @@ public class InfoDialog extends BaseDialog{
 
         @Override
         public void drawChildren(){
-
             clamp();
             float offsetX = panX + width * 0.5f, offsetY = panY + height * 0.5f;
             Draw.sort(true);
 
+            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 if(!node.visible) continue;
 
-                for(var child : node.children){
+                var children = node.children;
+                for(var child : children){
                     if(!child.visible) continue;
 
                     boolean lock = locked(node.node) || locked(child.node);
@@ -481,7 +484,7 @@ public class InfoDialog extends BaseDialog{
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
-            for(byte i = 0; i < children.length; i++)
+            for(byte i = 0, len = (byte)children.length; i < len; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
         }
     }

@@ -20,14 +20,14 @@ import static mindustry.Vars.tilesize;
 
 public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability{
 
-    public float range;
-    public Color color;
+    public final float range;
+    public final Color color = new Color();
 
     private float warmup;
 
     public ExtinguishFieldAbility(float range, Color color){
         this.range = range;
-        this.color = color;
+        this.color.set(color);
     }
 
     @Override
@@ -46,7 +46,8 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     public void update(Unit unit){
         boolean any = false;
 
-        for(var fire : Groups.fire)
+        var fires = Groups.fire;
+        for(var fire : fires)
             if(Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0.0f, fire.x, fire.y)){
                 any = true;
                 fire.time(fire.time + 100.0f * Time.delta);
@@ -68,18 +69,12 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
 
         }else{
             Draw.z(Layer.shields);
-            Draw.alpha(1f);
+            Draw.alpha(1.0f);
             Draw.color(color);
             Lines.stroke(1.5f);
-            Lines.poly(unit.x, unit.y, 24, range, 0f);
+            Lines.poly(unit.x, unit.y, 24, range, 0.0f);
         }
 
         Draw.reset();
-    }
-
-    @Override
-    public void death(Unit unit){
-        range = warmup = 0.0f;
-        color = null;
     }
 }

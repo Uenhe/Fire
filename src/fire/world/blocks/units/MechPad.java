@@ -1,7 +1,7 @@
 package fire.world.blocks.units;
 
 import arc.math.Mathf;
-import fire.gen.FRCall;
+import fire.net.FRCall;
 import mindustry.content.Fx;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
@@ -51,7 +51,7 @@ public class MechPad extends mindustry.world.Block{
         pl.set(pad);
 
         if(!net.client()){
-            Unit unit = spawnType.create(tile.team());
+            var unit = spawnType.create(tile.team());
             unit.set(pad);
             unit.rotation(90.0f);
             unit.impulse(0.0f, 3.0f);

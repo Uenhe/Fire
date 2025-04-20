@@ -46,21 +46,22 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
         @Override
         public void updateTile(){
-            if(proximity.size == 0) return;
-
             dumpTimer += delta();
             float limit = 60.0f / itemPerSec;
 
-            while(dumpTimer >= limit)
-                for(var item : content.items()){
+            while(dumpTimer >= limit){
+                var itemz = content.items();
+                for(var item : itemz){
                     items.set(item, 1);
                     dump(item);
                     items.set(item, 0);
                     dumpTimer -= limit;
                 }
+            }
 
             liquids.clear();
-            for(var liquid: content.liquids()){
+            var liquidz = content.liquids();
+            for(var liquid: liquidz){
                 if(liquid instanceof CellLiquid) continue;
                 liquids.add(liquid, liquidCapacity);
                 dumpLiquid(liquid);

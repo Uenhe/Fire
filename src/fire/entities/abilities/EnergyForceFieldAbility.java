@@ -25,22 +25,23 @@ import static mindustry.Vars.content;
 public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceFieldAbility{
 
     /** @see mindustry.entities.bullet.LightningBulletType#calculateRange() */
-    public short lightningLength;
-    public byte lightningAmount;
-    public short lightningDamage;
-    public float chanceDeflect;
+    public final short lightningLength;
+    public final byte lightningAmount;
+    public final short lightningDamage;
+    public final float chanceDeflect;
     public float rotateSpeed;
-    public Color lightningColor = Color.clear;
+    public final Color lightningColor = new Color();
 
     public boolean extended;
-    public byte ext_bearingFactorPercentage; //a value of 50 -> 50%
-    public byte ext_counterBulletDamageFactorPercentage;
-    public byte ext_counterBulletHomingChancePercentage;
+    public float ext_bearingFactor;
+    public float ext_counterBulletSpeedFactor;
+    public float ext_counterBulletDamageFactor;
+    public byte ext_counterBulletHomingChancePercentage;//a value of 50 -> 50%
 
     private float timer, damageSum;
     private boolean regenable;
     private static final IntIntMap bulletMap = new IntIntMap();
-    /** Stop collecting; Charge; Fire; Clean. */
+    /** Stop collecting; Charge; Fire; Cleanup. */
     private static final FRUtils.TimeNode node = new FRUtils.TimeNode(180, 240, 300, 310);
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
@@ -124,26 +125,25 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         Fx.shieldBreak.at(u.x, u.y, radius, u.team.color, u);
 
                         Sounds.spark.at(u, Mathf.random(0.45f, 0.55f));
-                        for(byte i = 0; i < lightningAmount; i++)
+                        for(byte i = 0, lightningAmount = this.lightningAmount; i < lightningAmount; i++)
                             Lightning.create(u.team, lightningColor, lightningDamage, u.x, u.y, i * (360.0f / lightningAmount), lightningLength);
                     }
                 }
             });
 
         }else if(extended && !regenable){
-            final boolean isOverloaded = damageSum >= u.maxHealth * ext_bearingFactorPercentage * 0.01f;
+            final boolean isOverloaded = damageSum >= u.maxHealth * ext_bearingFactor;
             timer += Time.delta * (isOverloaded ? 1.3f : 1.0f);
 
             if(node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
                     if(
-                        !isOverloaded && Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
-                        && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable
-                        && !(bullet.type instanceof LiquidBulletType)
+                        !isOverloaded && Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y) && bullet.time > 15.0f
+                        && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable && !(bullet.type instanceof LiquidBulletType)
                     ){
                         bullet.owner = u;
                         bullet.team = u.team;
-                        bullet.damage *= ext_counterBulletDamageFactorPercentage * 0.01f;
+                        bullet.damage *= ext_counterBulletDamageFactor;
                         bullet.time = 0.0f;
                         bullet.lifetime = node.last();
                         bullet.drag = 0.0f;
@@ -156,6 +156,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                             // make artillery collides building
                             type.collidesTiles = type.collides = true;
+                            type.buildingDamageMultiplier *= 1.5f;
 
                             // pierce here is just annoying
                             type.pierce = type.pierceBuilding = false;
@@ -184,7 +185,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             if(u.dead) b.remove();
 
                             if(node.checkBelonging(timer, 0, 2)){
-                                final float
+                                float
                                     scale =
                                         node.checkBelonging(timer, 0) ? timer / node.first()
                                         : node.checkBelonging(timer, 1) ? 1.0f
@@ -193,13 +194,13 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                     realrad = radius * scale,
                                     val = u.angleTo(b) + b.type.speed * Time.delta / realrad * Mathf.radDeg;
 
-                                b.vel.setLength(b.type.speed * scale);
+                                b.vel.setLength(b.type.speed * scale * ext_counterBulletSpeedFactor);
                                 b.rotation(b.angleTo(u.x + Mathf.cosDeg(val) * realrad, u.y + Mathf.sinDeg(val) * realrad));
 
                             }else if(b.lifetime != 60.01f){
                                 b.time = 0.0f;
                                 b.lifetime = 60.01f;
-                                b.vel.setLength(8.0f);
+                                b.vel.setLength(8.0f * ext_counterBulletSpeedFactor);
                                 b.set(u.x, u.y);
 
                                 var tgt =
@@ -209,8 +210,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                             e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
                                             t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
-                                final boolean homing = tgt != null && Mathf.chance(ext_counterBulletHomingChancePercentage * 0.01);
-                                final float theta = homing ? 0.0f : Mathf.random(Mathf.PI2);
+                                boolean homing = tgt != null && Mathf.chance(ext_counterBulletHomingChancePercentage * 0.01);
+                                float theta = homing ? 0.0f : Mathf.random(Mathf.PI2);
                                 if(tgt != null && homing) b.rotation(b.angleTo(tgt));
                                 b.mover = bb -> bb.moveRelative(0.0f, Mathf.cos(
                                     b.time,
@@ -233,14 +234,6 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 damageSum = 0.0f;
             }
         }
-    }
-
-    @Override
-    public void death(Unit unit){
-        lightningLength = lightningDamage = lightningAmount = ext_bearingFactorPercentage = ext_counterBulletDamageFactorPercentage = 0;
-        chanceDeflect = rotateSpeed = timer = damageSum = 0.0f;
-        extended = regenable = false;
-        lightningColor = null;
     }
 
     private float realRad(){
