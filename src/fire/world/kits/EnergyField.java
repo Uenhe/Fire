@@ -75,7 +75,6 @@ public class EnergyField{
         public EnergyFieldBulletType(float damage, int max){
             super(0.0f, damage);
             maxTargets = (byte)max;
-            lifetime = Mathf.FLOAT_ROUNDING_ERROR;
             shootEffect = Fx.none;
         }
 
@@ -103,6 +102,9 @@ public class EnergyField{
                 var absorber = Damage.findAbsorber(b.team, b.x, b.y, target.x(), target.y());
                 if(absorber != null) target = absorber;
 
+                if(b.owner instanceof Building build)
+                    b.damage *= Mathf.pow(build.timeScale(), 0.5f);
+
                 // target must be either unit or building
                 if(target instanceof Unit u)
                     b.collision(u, u.x, u.y);
@@ -110,10 +112,10 @@ public class EnergyField{
                     ((Building)target).collision(b);
 
                 hitEffect.at(b.x, b.y, 0.0f, lightningColor, target);
-                b.remove();
             }
 
             targets.clear();
+            b.remove();
         }
     }
 }

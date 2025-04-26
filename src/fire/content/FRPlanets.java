@@ -198,8 +198,8 @@ public class FRPlanets{
                 );
 
                 node(firefly, () ->
-                    node(candlelight, with(new SectorComplete(frozenGround)), () ->
-                        node(lampflame, with(new SectorComplete(chillyMountains)), () -> {
+                    node(candlight, with(new SectorComplete(frozenGround)), () ->
+                        node(lumiflame, with(new SectorComplete(chillyMountains)), () -> {
                         })
                     )
                 );

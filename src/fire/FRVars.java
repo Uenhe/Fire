@@ -30,9 +30,11 @@ public final class FRVars{
         _ffe099 = color(255, 224, 153), _ffcf99 = color(255, 207, 153), _e3ae6f = color(227, 174, 111),
         _feb380 = color(254, 179, 128), _6e7080 = color(110, 112, 128), _8cfffb = color(140, 255, 251),
         _f6efa1 = color(246, 239, 161), _f57946 = color(245, 121, 70), _f9a27a = color(249, 162, 122),
-        _ffd8e8 = color( 255, 216, 232), _ff3300 = color(255, 51, 0), _990003 = color(153, 0, 3),
+        _ffd8e8 = color(255, 216, 232), _ff3300 = color(255, 51, 0), _990003 = color(153, 0, 3),
         _b6c6fd = color(182, 198, 253), _fffac6 = color(255, 250, 198), _d8d97faa = colora(216, 217, 127, 170),
         _989aa4 = color(152, 154, 164), _67474b = color(103, 71, 75), _ffef99 = color(255, 239, 153),
+        _ffa166 = Color.valueOf("ffa166"), _ffa16670 = Color.valueOf("ffa16670"),
+        _444444 = Color.valueOf("444444"), _44444488 = Color.valueOf("44444488"),
 
         _lancer_a04 = Pal.lancerLaser.cpy().a(0.4f);
 

@@ -196,7 +196,7 @@ public class FRStatusEffects{
             @Override
             public void update(Unit unit, float time){
                 super.update(unit, time);
-                if(unit.moving() && Mathf.chanceDelta(0.05))
+                if(unit.moving() && Mathf.chanceDelta(0.06))
                     unit.vel.scl(Mathf.random(0.2f, 2.5f));
             }{
                 damage = 2.0f;

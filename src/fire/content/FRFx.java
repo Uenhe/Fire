@@ -45,12 +45,14 @@ public class FRFx{
             float orbSize = 2.0f * e.fout() + 1.0f;
 
             for(byte i = 0; i < amount; i++){
-                float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * ((float)i / amount) / speed, mag = radius * e.fout();
-                Tmp.v6.set(Mathf.cos(theta, 1.0f / speed, mag) + e.x, Mathf.sin(theta, 1.0f / speed, mag) + e.y);
+                float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * ((float)i / amount) / speed,
+                    mag = radius * e.fout(),
+                    x = Mathf.cos(theta, 1.0f / speed, mag) + e.x,
+                    y = Mathf.sin(theta, 1.0f / speed, mag) + e.y;
 
                 Draw.color(colors[i]);
-                Lines.circle(Tmp.v6.x, Tmp.v6.y, orbSize);
-                Fill.circle(Tmp.v6.x, Tmp.v6.y, orbSize);
+                Lines.circle(x, y, orbSize);
+                Fill.circle(x, y, orbSize);
             }
         });
     }

@@ -14,7 +14,6 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
 
     public LightningPointBulletType(float damage){
         super(0.0f, damage);
-        lifetime = Mathf.FLOAT_ROUNDING_ERROR;
         hitEffect = despawnEffect = Fx.none;
     }
 

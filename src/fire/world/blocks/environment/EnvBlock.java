@@ -1,6 +1,5 @@
 package fire.world.blocks.environment;
 
-import mindustry.gen.Building;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Tile;
@@ -25,7 +24,7 @@ public class EnvBlock extends mindustry.world.Block{
         return false;
     }
 
-    public static class EnvBlockBuild extends Building{
+    public static class EnvBlockBuild extends mindustry.gen.Building{
 
         @Override
         public void update(){

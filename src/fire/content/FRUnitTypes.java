@@ -55,7 +55,7 @@ public class FRUnitTypes{
         omicron, pioneer,
 
         //air kamikaze
-        firefly, candlelight, lampflame,
+        firefly, candlight, lumiflame, flambent,
 
         //air
         javelin, apollo,
@@ -754,7 +754,7 @@ public class FRUnitTypes{
             );
         }};
 
-        candlelight = new UnitType("candlelight"){{
+        candlight = new UnitType("candlelight"){{
             constructor = UnitEntity::create;
             flying = true;
             health = 280;
@@ -771,7 +771,7 @@ public class FRUnitTypes{
             lowAltitude = false;
 
             abilities.add(
-                new MoveLightningAbility(2f, 12, 0.4f, 8f, 1.2f, 2.4f, Pal.lancerLaser)
+                new MoveLightningAbility(2.0f, 12, 0.4f, 8.0f, 1.2f, 2.4f, Pal.lancerLaser)
             );
 
             weapons.add(
@@ -785,9 +785,9 @@ public class FRUnitTypes{
                     shootSound = Sounds.explosion;
                     shoot = new ShootSpread(5, 36f);
                     bullet = new ShrapnelBulletType(){{
-                        damage = 65f;
-                        length = 63f;
-                        width = 18f;
+                        damage = 65.0f;
+                        length = 63.0f;
+                        width = 18.0f;
                         killShooter = true;
                         hitEffect = Fx.pulverize;
                         hitSound = Sounds.explosion;
@@ -796,7 +796,7 @@ public class FRUnitTypes{
             );
         }};
 
-        lampflame = new UnitType("lampflame"){{
+        lumiflame = new UnitType("lampflame"){{
             constructor = UnitEntity::create;
             flying = true;
             health = 620.0f;
@@ -818,7 +818,8 @@ public class FRUnitTypes{
 
             weapons.add(
                 new Weapon(){{
-                    shootCone = 45.0f;
+                    shootCone = 180.0f;
+                    rotateSpeed = 360.0f;
                     mirror = false;
                     top = false;
                     shootOnDeath = true;
@@ -826,6 +827,7 @@ public class FRUnitTypes{
 
                     bullet = new BasicBulletType(1.4f, 320.0f){{
                         killShooter = true;
+                        rangeOverride = 40.0f;
 
                         lifetime = 120.0f;
                         width = 10.0f;
@@ -864,37 +866,250 @@ public class FRUnitTypes{
                             buildingDamageMultiplier = 4.0f;
 
                             hitEffect = new MultiEffect(
-
                                 new WaveEffect(){{
                                     lifetime = 50.0f;
                                     strokeFrom = 4.0f;
                                     interp = Interp.pow3Out;
                                 }},
-
                                 new ParticleEffect(){{
                                     lifetime = 90.0f;
                                     particles = 8;
                                     length = 80.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom.set(_lancer_a04);
-                                    colorTo.set(_lancer_a04);
-
+                                    colorFrom.set(colorTo.set(_lancer_a04));
                                     sizeFrom = 16.0f;
                                     sizeTo = 0.0f;
                                     sizeInterp = Interp.pow5In;
                                 }},
-
                                 new ParticleEffect(){{
                                     lifetime = 120.0f;
                                     particles = 6;
                                     length = 60.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom.set(_lancer_a04);
-                                    colorTo.set(_lancer_a04);
-
+                                    colorFrom.set(colorTo.set(_lancer_a04));
                                     sizeFrom = 20.0f;
                                     sizeTo = 0.0f;
                                     sizeInterp = Interp.pow5In;
+                                }}
+                            );
+                        }};
+                    }};
+                }}
+            );
+        }};
+
+        flambent = new UnitType("flambent"){{
+            constructor = UnitEntity::create;
+            flying = true;
+            health = 4750.0f;
+            armor = 12.0f;
+            hitSize = 24.0f;
+            speed = 1.65f;
+            drag = 0.03f;
+            accel = 0.04f;
+            range = maxRange = 40.0f;
+            engineSize = 4.0f;
+            engineOffset = 12.0f;
+            trailLength = 12;
+            itemCapacity = 90;
+            circleTarget = true;
+
+            immunities.addAll(
+                StatusEffects.burning, StatusEffects.melting
+            );
+
+            abilities.add(
+                new DashAbility(4.8f, 12, 150, 6)
+            );
+
+            weapons.add(
+                new Weapon(){{
+                    alwaysShooting = true;
+                    x = 8.0f;
+                    reload = 3.333f;
+                    baseRotation = 180.0f;
+                    minShootVelocity = speed * 0.6f;
+                    shootSound = Sounds.flame;
+
+                    bullet = new LiquidBulletType(Liquids.slag){{
+                        speed = 2.0f;
+                        lifetime = 40.0f;
+                        damage = 25.0f;
+                        drag = 0.03f;
+                        orbSize = 2.4f;
+                        collidesAir = false;
+                        statusDuration = 480.0f;
+                        status = StatusEffects.melting;
+                    }};
+                }},
+
+                new Weapon(){{
+                    alwaysShooting = true;
+                    x = 5.0f;
+                    reload = 1.333f;
+                    baseRotation = 180.0f;
+                    minShootVelocity = speed * 3.0f;
+                    shootSound = Sounds.flame;
+
+                    bullet = new LiquidBulletType(Liquids.slag){{
+                        speed = 4.0f;
+                        lifetime = 30.0f;
+                        damage = 40.0f;
+                        drag = 0.04f;
+                        orbSize = 3.0f;
+                        collidesAir = false;
+                        statusDuration = 600.0f;
+                        status = StatusEffects.melting;
+                    }};
+                }},
+
+                new Weapon(){{
+                    shootOnDeath = true;
+                    x = 0.0f;
+                    shootCone = 180.0f;
+                    rotateSpeed = 360.0f;
+                    mirror = false;
+                    ejectEffect = Fx.casing1;
+                    shootSound = Sounds.explosionbig;
+
+                    bullet = new BulletType(8.0f, 600.0f){{
+                        killShooter = true;
+                        instantDisappear = true;
+                        rangeOverride = 40.0f;
+
+                        splashDamage = 1650.0f;
+                        splashDamageRadius = 120.0f;
+                        buildingDamageMultiplier = 2.0f;
+                        status = StatusEffects.melting;
+                        statusDuration = 360.0f;
+
+                        hitEffect = new MultiEffect(
+                            new WaveEffect(){{
+                                lifetime = 15.0f;
+                                sizeFrom = 0.0f;
+                                sizeTo = 80.0f;
+                                strokeFrom = 8.0f;
+                                strokeTo = 4.0f;
+                                colorFrom.set(colorTo.set(_ffa166));
+                            }},
+                            new WaveEffect(){{
+                                lifetime = 15.0f;
+                                sizeFrom = 80.0f;
+                                sizeTo = 120.0f;
+                                strokeFrom = 4.0f;
+                                strokeTo = 3.0f;
+                                colorFrom.set(colorTo.set(_ffa166));
+                            }}.startDelay(15.0f),
+                            new WaveEffect(){{
+                                lifetime = 15.0f;
+                                sizeFrom = 120.0f;
+                                sizeTo = 140.0f;
+                                strokeFrom = 3.0f;
+                                strokeTo = 2.0f;
+                                colorFrom.set(colorTo.set(_ffa166));
+                            }}.startDelay(30.0f),
+                            new WaveEffect(){{
+                                lifetime = 15.0f;
+                                sizeFrom = 140.0f;
+                                sizeTo = 150.0f;
+                                strokeFrom = 2.0f;
+                                strokeTo = 0.0f;
+                                colorFrom.set(colorTo.set(_ffa166));
+                            }}.startDelay(45.0f),
+                            new ParticleEffect(){{
+                                particles = 10;
+                                lifetime = 120.0f;
+                                length = 120.0f;
+                                sizeFrom = 25.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow10Out;
+                                sizeInterp = Interp.pow5In;
+                                colorFrom = _ffa166;
+                                colorFrom.set(_ffa166);
+                                colorTo.set(_ffa16670);
+                            }},
+                            new ParticleEffect(){{
+                                particles = 6;
+                                lifetime = 170.0f;
+                                length = 80.0f;
+                                sizeFrom = 30.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow10Out;
+                                sizeInterp = Interp.pow5In;
+                                colorFrom.set(_ffa166);
+                                colorTo.set(_ffa16670);
+                            }},
+                            new ParticleEffect(){{
+                                particles = 4;
+                                lifetime = 220.0f;
+                                length = 50.0f;
+                                sizeFrom = 35.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow10Out;
+                                sizeInterp = Interp.pow5In;
+                                colorFrom.set(_ffa166);
+                                colorTo.set(_ffa16670);
+                            }}
+                        );
+
+                        fragBullets = 8;
+                        fragBullet = new BasicBulletType(8.0f, 35.0f){{
+                            lifetime = 90.0f;
+                            width = height = 16.0f;
+                            drag = 0.04f;
+                            splashDamageRadius = 60.0f;
+                            splashDamage = 85.0f;
+                            buildingDamageMultiplier = 2.5f;
+
+                            frontColor = backColor = _ffa166;
+                            status = StatusEffects.burning;
+                            statusDuration = 600.0f;
+
+                            trailInterval = 3.0f;
+                            trailEffect = new ParticleEffect(){{
+                                particles = 3;
+                                lifetime = 80.0f;
+                                length = 5.0f;
+                                baseLength = 2.0f;
+                                sizeFrom = 6.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow3Out;
+                                sizeInterp = Interp.pow3In;
+                                colorFrom.set(_444444);
+                                colorTo.set(_44444488);
+                            }};
+
+                            hitEffect = despawnEffect = new MultiEffect(
+                                new WaveEffect(){{
+                                    lifetime = 40.0f;
+                                    sizeFrom = 0.0f;
+                                    sizeTo = 60.0f;
+                                    strokeFrom = 8.0f;
+                                    strokeTo = 0.0f;
+                                    interp = Interp.pow3Out;
+                                    colorFrom.set(_ffa166);
+                                }},
+                                new ParticleEffect(){{
+                                    particles = 6;
+                                    lifetime = 120.0f;
+                                    length = 50.0f;
+                                    sizeFrom = 16.0f;
+                                    sizeTo = 0.0f;
+                                    interp = Interp.pow5Out;
+                                    sizeInterp = Interp.pow5In;
+                                    colorFrom.set(_ffa166);
+                                    colorTo.set(_ffa16670);
+                                }},
+                                new ParticleEffect(){{
+                                    particles = 3;
+                                    lifetime = 150.0f;
+                                    length = 40.0f;
+                                    sizeFrom = 20.0f;
+                                    sizeTo = 0.0f;
+                                    interp = Interp.pow5Out;
+                                    sizeInterp = Interp.pow5In;
+                                    colorFrom.set(_ffa166);
+                                    colorTo.set(_ffa16670);
                                 }}
                             );
                         }};
@@ -1450,14 +1665,14 @@ public class FRUnitTypes{
             new UnitType[]{UnitTypes.alpha, UnitTypes.beta},
             new UnitType[]{FRUnitTypes.guarding, FRUnitTypes.resisting},
             new UnitType[]{FRUnitTypes.blade, FRUnitTypes.hatchet},
-            new UnitType[]{FRUnitTypes.firefly, FRUnitTypes.candlelight}
+            new UnitType[]{FRUnitTypes.firefly, FRUnitTypes.candlight}
         );
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
             new UnitType[]{UnitTypes.beta, FRUnitTypes.omicron},
             new UnitType[]{FRUnitTypes.resisting, FRUnitTypes.garrison},
             new UnitType[]{FRUnitTypes.hatchet, FRUnitTypes.castle},
-            new UnitType[]{FRUnitTypes.candlelight, FRUnitTypes.lampflame}
+            new UnitType[]{FRUnitTypes.candlight, FRUnitTypes.lumiflame}
         );
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(

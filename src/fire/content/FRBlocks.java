@@ -717,13 +717,13 @@ public class FRBlocks{
 
             jackpotAmmo.add(
 
-                new JackpotAmmo(Items.copper, 0.5f,
+                new JackpotAmmo(Items.copper, 50,
                     new ShootAlternate(4.0f){{
                         shots = barrels = 3;
                         firstShotDelay = chargeTime;
                     }},
                     new BasicBulletType(18.0f, 180.0f){{
-                        lifetime = 30.0f;
+                        lifetime = 33.0f;
                         width = 6.0f;
                         height = 12.0f;
                         drag = 0.04f;
@@ -736,7 +736,7 @@ public class FRBlocks{
                         backColor = hitColor = colors[0];
                     }}),
 
-                new JackpotAmmo(Items.thorium, 0.35f,
+                new JackpotAmmo(Items.thorium, 35,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 1;
@@ -746,7 +746,7 @@ public class FRBlocks{
                         new ShootSpread(7, 2.0f)
                     ),
                     new BasicBulletType(10.5f, 160.0f){{
-                        lifetime = 30.0f;
+                        lifetime = 33.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FRStatusEffects.disintegrated;
@@ -762,7 +762,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(Items.surgeAlloy, 0.2f,
+                new JackpotAmmo(Items.surgeAlloy, 20,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 2;
@@ -773,7 +773,7 @@ public class FRBlocks{
                         new ShootSpread(7, 3.0f)
                     ),
                     new BasicBulletType(10.5f, 90.0f){{
-                        lifetime = 30.0f;
+                        lifetime = 33.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FRStatusEffects.disintegrated;
@@ -804,7 +804,7 @@ public class FRBlocks{
                         new ShootSpread(7, 3.0f)
                     ),
                     new BasicBulletType(10.8f, 75.0f){{
-                        lifetime = 30.0f;
+                        lifetime = 33.0f;
                         width = 8.0f;
                         height = 10.0f;
                         status = FRStatusEffects.disintegrated;
@@ -1079,7 +1079,7 @@ public class FRBlocks{
 
                 fragBullets = 1;
                 fragBullet = new BulletType(0.0f, 0.0f){{
-                    lifetime = 0.0f;
+                    instantDisappear = true;
                     splashDamageRadius = homingRange;
                     status = StatusEffects.electrified;
                     statusDuration = 60.0f;
@@ -1258,7 +1258,7 @@ public class FRBlocks{
 
             ammo(
 
-                Items.plastanium, new ArtilleryBulletType(16.0f,0.0f){{
+                Items.plastanium, new ArtilleryBulletType(16.0f, 0.0f){{
                     lifetime = 40.0f;
                     width = 16.0f;
                     height = 12.0f;
@@ -1286,7 +1286,7 @@ public class FRBlocks{
                     fragLifeMin = 0.3f;
                     fragLifeMax = 1.0f;
                     fragRandomSpread = 120.0f;
-                    fragBullet = new BasicBulletType(6.0f,55.0f){{
+                    fragBullet = new BasicBulletType(6.0f, 55.0f){{
                         lifetime = 30.0f;
                         width = 9.0f;
                         height = 6.0f;
@@ -1295,8 +1295,8 @@ public class FRBlocks{
                     }};
                 }},
 
-                Items.blastCompound, new ArtilleryBulletType(4.0f,0.0f){{
-                    Color color1 = _ea8878.cpy().lerp(Pal.redLight, 0.5f);
+                Items.blastCompound, new ArtilleryBulletType(4.0f, 0.0f){{
+                    var color1 = _ea8878.cpy().lerp(Pal.redLight, 0.5f);
 
                     lifetime = 160.0f;
                     width = 16.0f;
@@ -1311,7 +1311,6 @@ public class FRBlocks{
                     trailColor = color1;
 
                     hitEffect = new MultiEffect(
-
                         new WaveEffect(){{
                             lifetime = 30.0f;
                             interp = Interp.pow3Out;
@@ -1319,10 +1318,9 @@ public class FRBlocks{
                             sizeTo = 160.0f;
                             strokeFrom = 8.0f;
                             strokeTo = 0.0f;
-                            colorFrom = color1;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(color1);
+                            colorTo.set(_ea8878_a07);
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 80.0f;
                             particles = 20;
@@ -1332,10 +1330,9 @@ public class FRBlocks{
                             sizeInterp = Interp.pow3In;
                             sizeFrom = 20.0f;
                             sizeTo = 0.0f;
-                            colorFrom = color1;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(color1);
+                            colorTo.set(_ea8878_a07);
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 110.0f;
                             particles = 12;
@@ -1345,10 +1342,9 @@ public class FRBlocks{
                             sizeInterp = Interp.pow3In;
                             sizeFrom = 24.0f;
                             sizeTo = 0.0f;
-                            colorFrom = color1;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(color1);
+                            colorTo.set(_ea8878_a07);
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 130.0f;
                             particles = 6;
@@ -1358,8 +1354,8 @@ public class FRBlocks{
                             sizeInterp = Interp.pow3In;
                             sizeFrom = 32.0f;
                             sizeTo = 0.0f;
-                            colorFrom = color1;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(color1);
+                            colorTo.set(_ea8878_a07);
                         }}
                     );
                 }},
@@ -1379,7 +1375,6 @@ public class FRBlocks{
                     backColor = trailColor = Pal.lightishOrange;
 
                     hitEffect = new MultiEffect(
-
                         new WaveEffect(){{
                             lifetime = 45.0f;
                             interp = Interp.pow3Out;
@@ -1387,9 +1382,7 @@ public class FRBlocks{
                             sizeTo = 80.0f;
                             strokeFrom = 8.0f;
                             strokeTo = 0.0f;
-                            colorFrom = colorTo = Color.white;
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 45.0f;
                             particles = 1;
@@ -1398,8 +1391,8 @@ public class FRBlocks{
                             sizeFrom = 32.0f;
                             sizeTo = 0.0f;
                             sizeInterp = Interp.pow3In;
-                            colorFrom = Pal.lightishOrange;
-                            colorTo = Pal.lightishOrange.cpy().a(0.7f);
+                            colorFrom.set(Pal.lightishOrange);
+                            colorTo.set(Pal.lightishOrange.cpy().a(0.7f));
                         }}
                     );
                 }},
@@ -1415,7 +1408,6 @@ public class FRBlocks{
                     status = StatusEffects.blasted;
 
                     hitEffect = new MultiEffect(
-
                         new WaveEffect(){{
                             lifetime = 50.0f;
                             interp = Interp.pow3Out;
@@ -1423,10 +1415,9 @@ public class FRBlocks{
                             sizeTo = 120.0f;
                             strokeFrom = 8.0f;
                             strokeTo = 0.0f;
-                            colorFrom = _ea8878;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(_ea8878);
+                            colorTo.set(_ea8878_a07);
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 100.0f;
                             particles = 16;
@@ -1436,10 +1427,9 @@ public class FRBlocks{
                             sizeInterp = Interp.pow5In;
                             sizeFrom = 20.0f;
                             sizeTo = 0.0f;
-                            colorFrom = _ea8878;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(_ea8878);
+                            colorTo.set(_ea8878_a07);
                         }},
-
                         new ParticleEffect(){{
                             lifetime = 130.0f;
                             particles = 12;
@@ -1449,8 +1439,8 @@ public class FRBlocks{
                             sizeInterp = Interp.pow5In;
                             sizeFrom = 24.0f;
                             sizeTo = 0.0f;
-                            colorFrom = _ea8878;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(_ea8878);
+                            colorTo.set(_ea8878_a07);
                         }},
 
                         new ParticleEffect(){{
@@ -1462,15 +1452,15 @@ public class FRBlocks{
                             sizeInterp = Interp.pow5In;
                             sizeFrom = 32.0f;
                             sizeTo = 0.0f;
-                            colorFrom = _ea8878;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(_ea8878);
+                            colorTo.set(_ea8878_a07);
                         }}
                     );
 
                     fragBullets = 5;
                     fragLifeMin = 0.4f;
                     fragLifeMax = 1.0f;
-                    fragBullet = new BasicBulletType(6.0f,60.0f){{
+                    fragBullet = new BasicBulletType(6.0f, 60.0f){{
                         lifetime = 50.0f;
                         width = 9.0f;
                         height = 6.0f;
@@ -1489,8 +1479,8 @@ public class FRBlocks{
                             sizeInterp = Interp.pow5In;
                             sizeFrom = 45.0f;
                             sizeTo = 0.0f;
-                            colorFrom = _ea8878;
-                            colorTo = _ea8878_a07;
+                            colorFrom.set(_ea8878);
+                            colorTo.set(_ea8878_a07);
                         }};
                     }};
                 }}
@@ -1520,8 +1510,8 @@ public class FRBlocks{
             shootSound = Sounds.laser;
             shoot.firstShotDelay = 90.0f;
 
-            consumePower(n(1920));
-            consumeCoolant(1.0f);
+            consumePower(n(2250));
+            consumeCoolant(n(60));
 
             shootType = new BulletType(15.5f, 1800.0f){
 
@@ -1559,20 +1549,21 @@ public class FRBlocks{
                     // this is really lazy
                     for(byte i = 0; i < 4; i++){
                         Draw.color(_92f3fd);
-                        Draw.alpha((0.3f + Mathf.absin(Time.time, 2.0f + i * 2.0f, 0.3f + i * 0.05f)));
+                        Draw.alpha(0.3f + Mathf.absin(Time.time, 2.0f + i * 2.0f, 0.3f + i * 0.05f));
                         Draw.blend(Blending.additive);
                         Draw.rect(Core.atlas.find("impact-reactor-plasma-" + i), b.x, b.y, 28.0f, 28.0f, Time.time * (12.0f + i * 6.0f));
                         Draw.blend();
                     }
                     Draw.reset();
-                }
-                {
+                }{
                     lifetime = 600.0f;
                     hitSize = 6.0f;
                     pierceCap = 10;
                     drag = 0.024f;
-                    ammoMultiplier = 1.0f;
+                    displayAmmoMultiplier = false;
                     collidesGround = false;
+                    status = FRStatusEffects.magnetized;
+                    statusDuration = 240.0f;
 
                     homingRange = 260.0f;
                     homingPower = 0.2f;
@@ -1634,6 +1625,7 @@ public class FRBlocks{
                             lightningChancePercentage = 60;
                             lightningColor = _92f3fd;
                             collidesGround = false;
+                            status = StatusEffects.shocked;
                         }};
                     }};
 
@@ -1645,6 +1637,9 @@ public class FRBlocks{
                         width = 3.2f;
                         height = 4.0f;
                         collidesGround = false;
+                        status = FRStatusEffects.magnetized;
+                        statusDuration = 60.0f;
+
                         homingRange = 150.0f;
                         homingPower = 0.4f;
                         homingDelay = 5.0f;
@@ -1700,7 +1695,7 @@ public class FRBlocks{
                 );
 
                 spawnBullets.add(
-                    new FoldingBulletType(speed_1_1,18000.0f, 20, lifetime_1_1){{
+                    new FoldingBulletType(speed_1_1, 18000.0f, 20, lifetime_1_1){{
                         lifetime = lifetime_1_1;
                         width = 16.0f;
                         height = 48.0f;
@@ -1754,8 +1749,8 @@ public class FRBlocks{
                         sizeTo = 4.0f;
                         strokeFrom = 4.0f;
                         strokeTo = 0.0f;
-                        colorFrom = _ec7458;
-                        colorTo = _ec7458_a07;
+                        colorFrom.set(_ec7458);
+                        colorTo.set(_ec7458_a07);
                     }},
 
                     //circles
@@ -1765,8 +1760,8 @@ public class FRBlocks{
                         baseLength = 24f;
                         sizeFrom = 12f;
                         sizeTo = 0.0f;
-                        colorFrom = _ec7458;
-                        colorTo = _ec7458_a07;
+                        colorFrom.set(_ec7458);
+                        colorTo.set(_ec7458_a07);
                     }},
 
                     //lines
@@ -1780,8 +1775,8 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         lenFrom = 20f;
                         lenTo = 0.0f;
-                        colorFrom = _ec7458;
-                        colorTo = _ec7458_a07;
+                        colorFrom.set(_ec7458);
+                        colorTo.set(_ec7458_a07);
                     }}
                 );
 
@@ -1820,8 +1815,8 @@ public class FRBlocks{
                     baseLength = -180f;
                     sizeFrom = 0.0f;
                     sizeTo = 10.0f;
-                    colorFrom = _ec7458_a07;
-                    colorTo = _ec7458;
+                    colorFrom.set(_ec7458_a07);
+                    colorTo.set(_ec7458);
                 }},
 
                 new ParticleEffect(){{
@@ -1831,8 +1826,8 @@ public class FRBlocks{
                     length = 0.0f;
                     sizeFrom = 0.0f;
                     sizeTo = 40f;
-                    colorFrom = _ec7458_a07;
-                    colorTo = _ec7458;
+                    colorFrom.set(_ec7458_a07);
+                    colorTo.set(_ec7458);
                 }},
 
                 new ParticleEffect(){{
@@ -1841,8 +1836,8 @@ public class FRBlocks{
                     length = 0.0f;
                     sizeFrom = 40f;
                     sizeTo = 15f;
-                    colorFrom = _ec7458;
-                    colorTo = _ec7458_a07;
+                    colorFrom.set(_ec7458);
+                    colorTo.set(_ec7458_a07);
                 }}.startDelay(45.0f)
             );
 
@@ -1876,7 +1871,7 @@ public class FRBlocks{
                         sizeTo = 8.0f;
                         strokeFrom = 8.0f;
                         strokeTo = 0.0f;
-                        colorFrom = colorTo = _ec7458;
+                        colorFrom.set(colorTo.set(_ec7458));
                     }},
 
                     //circles
@@ -1886,7 +1881,7 @@ public class FRBlocks{
                         baseLength = 72f;
                         sizeFrom = 32f;
                         sizeTo = 0.0f;
-                        colorFrom = colorTo = _ec7458;
+                        colorFrom.set(colorTo.set(_ec7458));
                     }},
 
                     //lines
@@ -1900,7 +1895,7 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         lenFrom = 60f;
                         lenTo = 0.0f;
-                        colorFrom = colorTo = _ec7458;
+                        colorFrom.set(colorTo.set(_ec7458));
                     }}
                 );
 
@@ -1954,7 +1949,7 @@ public class FRBlocks{
                             sizeTo = 108.0f;
                             strokeFrom = 4.0f;
                             strokeTo = 0.0f;
-                            colorFrom = colorTo = _ec7458;
+                            colorFrom.set(colorTo.set(_ec7458));
                         }},
 
                         //circles
@@ -1964,7 +1959,7 @@ public class FRBlocks{
                             baseLength = 40.0f;
                             sizeFrom = 20.0f;
                             sizeTo = 0.0f;
-                            colorFrom = colorTo = _ec7458;
+                            colorFrom.set(colorTo.set(_ec7458));
                         }},
 
                         //lines
@@ -1978,7 +1973,7 @@ public class FRBlocks{
                             strokeTo = 0.0f;
                             lenFrom = 40.0f;
                             lenTo = 0.0f;
-                            colorFrom = colorTo = _ec7458;
+                            colorFrom.set(colorTo.set(_ec7458));
                         }}
                     );
 
@@ -2228,11 +2223,10 @@ public class FRBlocks{
             ));
             researchCost = mult(requirements, 5);
             health = 65;
-            size = 1;
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.01f;
             attribute = FRAttribute.tree;
-            drillTime = 120;
+            drillTime = 120.0f;
             output = FRItems.timber;
 
             consumePower(n(24));
@@ -2429,7 +2423,7 @@ public class FRBlocks{
             ambientSound = Sounds.drill;
             ambientSoundVolume = 0.02f;
 
-            barrels.add(new BeamExtractor.Barrel("", 0.0f, 0.0f, 4.0f));
+            barrels.add(new BeamExtractor.Barrel("", 0.0f, 0.0f, 4.0f, 1.0f, 1.0f));
 
             consumePower(n(150));
             consumeLiquid(Liquids.cryofluid, n(12)).boost();
@@ -2466,10 +2460,10 @@ public class FRBlocks{
             ambientSoundVolume = 0.02f;
 
             barrels.add(new BeamExtractor.Barrel(
-                "-pri", 0.0f, 0.0f, 4.0f
+                "-pri", 0.0f, 0.0f, 4.0f, 1.0f, 1.2f
             ));
             for(var p : Geometry.d8edge){
-                barrels.add(new BeamExtractor.Barrel("-sec", p.x * 8.0f, p.y * 8.0f, 1.0f));
+                barrels.add(new BeamExtractor.Barrel("-sec", p.x * 8.0f, p.y * 8.0f, 1.0f, 0.8f, 0.6f));
             }
 
             consumePower(n(150));

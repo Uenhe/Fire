@@ -48,7 +48,7 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
                 }else{
                     for(var a : jackpotAmmo)
                         if(a.type == peekAmmo())
-                            type = jackpotAmmo.get(jackpotAmmo.indexOf(a) + Mathf.num(Mathf.chance(a.chance)));
+                            type = jackpotAmmo.get(jackpotAmmo.indexOf(a) + Mathf.num(Mathf.chance(a.chancePercentage * 0.01)));
                 }
 
                 shoot(type);
@@ -57,14 +57,12 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
         }
 
         private void shoot(JackpotAmmo ammo){
-            Tmp.v1.set(
-            x + Angles.trnsx(rotation - 90.0f, shootX, shootY),
-            y + Angles.trnsy(rotation - 90.0f, shootX, shootY)
-            );
+            float bx = x + Angles.trnsx(rotation - 90.0f, shootX, shootY),
+                by = y + Angles.trnsy(rotation - 90.0f, shootX, shootY);
 
             if(shoot.firstShotDelay > 0.0f){
-                chargeSound.at(Tmp.v1.x, Tmp.v1.y, Mathf.random(soundPitchMin, soundPitchMax));
-                ammo.type.chargeEffect.at(Tmp.v1.x, Tmp.v1.y, rotation);
+                chargeSound.at(bx, by, Mathf.random(soundPitchMin, soundPitchMax));
+                ammo.type.chargeEffect.at(bx, by, rotation);
             }
 
             ammo.shoot.shoot(barrelCounter, (xOffset, yOffset, angle, delay, mover) -> {
@@ -81,5 +79,16 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
         }
     }
 
-    public record JackpotAmmo(Item item, float chance, ShootPattern shoot, BulletType type){}
+    public static class JackpotAmmo{
+        public final Item item;
+        public final byte chancePercentage;
+        public final ShootPattern shoot;
+        public final BulletType type;
+        public JackpotAmmo(Item item, int chancePercentage, ShootPattern shoot, BulletType type){
+            this.item = item;
+            this.chancePercentage = (byte)chancePercentage;
+            this.shoot = shoot;
+            this.type = type;
+        }
+    }
 }

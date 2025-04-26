@@ -45,12 +45,11 @@ public class MinerDashAI extends mindustry.ai.types.MinerAI{
                 if(ore != null){
                     moveTo(ore, unit.type.mineRange / 2f, 20f);
                     dash(ore);
-                    if(ore.block() == Blocks.air && unit.within(ore, unit.type.mineRange)){
+                    if(ore.block().isAir() && unit.within(ore, unit.type.mineRange)){
                         unit.mineTile = ore;
                     }
-                    if(ore.block() != Blocks.air){
+                    if(!ore.block().isAir())
                         mining = false;
-                    }
                 }
             }
         }else{

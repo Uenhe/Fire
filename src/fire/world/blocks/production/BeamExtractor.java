@@ -4,10 +4,9 @@ import arc.Core;
 import arc.func.Cons;
 import arc.graphics.Blending;
 import arc.graphics.Color;
-import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.Fill;
-import arc.graphics.g2d.Lines;
-import arc.graphics.g2d.TextureRegion;
+import arc.graphics.Pixmap;
+import arc.graphics.Pixmaps;
+import arc.graphics.g2d.*;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
@@ -20,12 +19,12 @@ import arc.util.Time;
 import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
-import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
+import mindustry.graphics.MultiPacker;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.ui.Bar;
@@ -40,7 +39,7 @@ import mindustry.world.meta.StatValues;
 
 import static mindustry.Vars.*;
 
-/** @see mindustry.world.blocks.production.Drill Drill */
+/** @see mindustry.world.blocks.production.Drill */
 public class BeamExtractor extends mindustry.world.Block{
 
     protected byte tier;
@@ -65,12 +64,10 @@ public class BeamExtractor extends mindustry.world.Block{
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
-        outlineIcon = true;
-        outlinedIcon = 1;
-        buildType = BeamExtractorBuild::new;
-
         barrelRegions = new TextureRegion[n];
         heatRegions = new TextureRegion[n];
+        buildType = BeamExtractorBuild::new;
+
         config(Item.class, (BeamExtractorBuild build, Item item) -> build.selected = (byte)item.id);
         configClear((BeamExtractorBuild build) -> build.selected = -1);
     }
@@ -101,7 +98,7 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(Stat.range, (float) range / tilesize, StatUnit.blocks);
+        stats.add(Stat.range, (float)range / tilesize, StatUnit.blocks);
         stats.add(Stat.drillTier, StatValues.drillables(drillTime, hardnessDrillMultiplier, 1.0f, new ObjectFloatMap<>(),
             b -> b instanceof Floor f && !f.wallOre && f.itemDrop != null && f.itemDrop.hardness <= tier && (indexer.isBlockPresent(f) || state.isMenu()))
         );
@@ -121,17 +118,47 @@ public class BeamExtractor extends mindustry.world.Block{
     }
 
     @Override
-    public void getRegionsToOutline(Seq<TextureRegion> out){
-        for(var region : barrelRegions)
-            //if(!(outlinedIcon > 0 && outlinedIcon < getGeneratedIcons().length && getGeneratedIcons()[outlinedIcon].equals(region)))
-                out.add(region);
+    protected TextureRegion[] icons(){
+        var regions = Seq.with(base, region);
+        var barrelRegions = this.barrelRegions;
 
-        resetGeneratedIcons();
+        if(barrelRegions.length > 1){
+            var names = new Seq<String>(barrelRegions.length);
+
+            for(var region : barrelRegions){
+                if(names.contains(region.asAtlas().name))
+                    continue;
+                regions.add(region);
+                names.add(region.asAtlas().name);
+            }
+        }
+
+        return regions.toArray(TextureRegion.class);
     }
 
+    /** Modified from super's one. */
     @Override
-    protected TextureRegion[] icons(){
-        return new TextureRegion[]{base, region};
+    public void createIcons(MultiPacker packer){
+        var toDispose = new Seq<Pixmap>();
+
+        var icons = icons();
+        for(var icon : icons){
+            var region = Pixmaps.outline(Core.atlas.getPixmap(icon), outlineColor, outlineRadius);
+            toDispose.add(region);
+            Drawf.checkBleed(region);
+            packer.add(MultiPacker.PageType.main, icon.asAtlas().name, region);
+        }
+
+        var pixmap = Core.atlas.getPixmap(base).crop();
+        toDispose.add(pixmap);
+        pixmap.draw(Core.atlas.getPixmap(base), true);
+        pixmap.draw(Core.atlas.getPixmap(region), true);
+
+        packer.add(MultiPacker.PageType.main, "block-" + name + "-full", pixmap);
+        packer.add(MultiPacker.PageType.editor, name + "-icon-editor", new PixmapRegion(pixmap));
+
+        for(var pm : toDispose) pm.dispose();
+        toDispose.clear();
     }
 
     private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
@@ -139,14 +166,13 @@ public class BeamExtractor extends mindustry.world.Block{
         Tile closest = null;
         float mr = Float.MAX_VALUE;
 
-        short range = this.range;
         int mx = Mathf.ceil((wp(x) + range) / tilesize), my = Mathf.ceil((wp(y) + range) / tilesize);
         for    (short tx = (short)((wp(x) - range) / tilesize); tx <= mx; tx++)
             for(short ty = (short)((wp(y) - range) / tilesize); ty <= my; ty++){
                 float dst = Mathf.dst(wp(x), wp(y), tx * tilesize, ty * tilesize);
                 if(dst > range || dst <= closeDst()) continue;
                 var tile = world.tile(tx, ty);
-                if(tile == null || tile.block() != Blocks.air || tile.drop() == null || tile.drop().hardness > tier) continue;
+                if(tile == null || !tile.block().isAir() || tile.drop() == null || tile.drop().hardness > tier) continue;
 
                 if(draw){
                     Draw.color(Tmp.c1.set(baseColor).lerp(tile.drop().color, 1.0f).a(Mathf.absin(4.0f, 0.4f)));
@@ -201,8 +227,8 @@ public class BeamExtractor extends mindustry.world.Block{
             if(warmup >= 0.999f) warmup = 1.0f;
             if(boostWarmup >= 0.999f) boostWarmup = 1.0f;
             if(mining != null && valid()){
-                beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.3f);
-                beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.3f);
+                beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.25f);
+                beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.25f);
             }
             if(timer(timerDump, dumpTime))
                 dump(items.first());
@@ -287,24 +313,26 @@ public class BeamExtractor extends mindustry.world.Block{
             final float swingScl = 12.0f, swingMag = 1.0f;
             Draw.rect(base, x, y);
             Draw.color();
+
             for(byte i = 0, len = (byte)barrels.size; i < len; i++){
                 var barrel = barrels.get(i);
-                float rot = drawrots[i];
+                float rot = drawrots[i], bx = x + barrel.x, by = y + barrel.y;
+
                 Draw.z(Layer.turret - 0.5f);
-                Drawf.shadow(barrelRegions[i], x + barrel.x, y + barrel.y, rot);
+                Drawf.shadow(barrelRegions[i], bx, by, rot);
                 Draw.z(Layer.turret);
-                Draw.rect(barrelRegions[i], x + barrel.x, y + barrel.y, rot);
+                Draw.rect(barrelRegions[i], bx, by, rot);
                 if(heatRegions[i].found()) Drawf.additive(heatRegions[i], Tmp.c1.set(Pal.turretHeat).a(warmup), x, y, rot, Layer.turretHeat);
 
                 if(warmup == 0.0f) continue;
 
                 Draw.z(Layer.turretHeat + 0.5f);
                 Draw.blend(Blending.additive);
-                Draw.color(Tmp.c1.set(baseColor).lerp(boostColor, boostWarmup), warmup * (baseColor.a * (0.5f + Mathf.absin(7.0f, 0.3f))));
+                Draw.color(Tmp.c1.set(baseColor).lerp(boostColor, boostWarmup), warmup * barrel.laserOpacity * (baseColor.a * (0.5f + Mathf.absin(7.0f, 0.3f))));
                 Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion,
-                    x + barrel.x + Angles.trnsx(rot, 0.0f, barrel.shootY), y + barrel.y + Angles.trnsy(rot, 0.0f, barrel.shootY),
+                    bx + Angles.trnsx(rot, 0.0f, barrel.shootY), by + Angles.trnsy(rot, 0.0f, barrel.shootY),
                     beamX + Mathf.sin(Time.time, swingScl, swingMag), beamY + Mathf.sin(Time.time, swingScl + 2.0f, swingMag),
-                    0.75f
+                    0.75f * barrel.laserStrokeScale
                 );
                 Draw.blend();
             }
@@ -332,8 +360,12 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         @Override
+        public byte version(){
+            return 0;
+        }
+
+        @Override
         public void write(Writes write){
-            super.write(write);
             write.b(selected);
             write.f(drillTimer);
             write.f(warmup);
@@ -343,7 +375,8 @@ public class BeamExtractor extends mindustry.world.Block{
 
         @Override
         public void read(Reads read, byte revision){
-            super.read(read, revision);
+            if(revision != version()) return;
+
             selected = read.b();
             drillTimer = read.f();
             warmup = read.f();
@@ -356,7 +389,7 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         private boolean blocked(){
-            return mining == null || mining.block() != Blocks.air;
+            return mining == null || !mining.block().isAir();
         }
 
         private boolean valid(){
@@ -373,7 +406,25 @@ public class BeamExtractor extends mindustry.world.Block{
         }
     }
 
-    public record Barrel(String name, float x, float y, float shootY){}
+    public static class Barrel{
+        private final String name;
+        private final float x, y, shootY, laserOpacity, laserStrokeScale;
+        public Barrel(String name, float x, float y, float shootY, float laserOpacity, float laserStrokeScale){
+            this.name = name;
+            this.x = x;
+            this.y = y;
+            this.shootY = shootY;
+            this.laserOpacity = laserOpacity;
+            this.laserStrokeScale = laserStrokeScale;
+        }
+    }
 
-    private record Entry(byte item, Cons<Tile> cons){}
+    private static class Entry{
+        private final byte item;
+        private final Cons<Tile> cons;
+        private Entry(byte item, Cons<Tile> cons){
+            this.item = item;
+            this.cons = cons;
+        }
+    }
 }

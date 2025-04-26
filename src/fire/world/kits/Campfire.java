@@ -114,8 +114,8 @@ public class Campfire{
 
             @Override
             public void remove(){
-                ConsumePowerCustom.scaleMap.remove(this, 0.0f);
                 ConsumeCampfire.efficiencyMap.remove(this, 0.0f);
+                ConsumePowerCustom.scaleMap.remove(this, 0.0f);
                 super.remove();
             }
 
