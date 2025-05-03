@@ -13,6 +13,8 @@ public class FRStat{
         enemyStatusEffect = new Stat("enemyStatusEffect"),
         clearDebuffUponApply = new Stat("clearDebuffUponApply"),
         floorMultiplier = new Stat("floorMultiplier"),
+        neoHealthMultiplier = new Stat("neoHealthMultiplier"),
+        neoHealing = new Stat("neoHealing"),
 
         statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
         maxTargets = new Stat("maxTargets", StatCat.function),

@@ -1,24 +1,32 @@
 package fire.ai;
 
+import arc.Core;
+import arc.func.Func;
+import arc.input.KeyBind;
 import fire.ai.types.BuilderDashAI;
 import fire.ai.types.RepairDashAI;
 import fire.entities.abilities.DashAbility;
 import mindustry.ai.UnitCommand;
 import mindustry.entities.abilities.Ability;
+import mindustry.entities.units.AIController;
+import mindustry.gen.Unit;
 import mindustry.input.Binding;
 
-public class FRUnitCommand{
+public class FRUnitCommand extends UnitCommand{
 
     public static final UnitCommand
-        repairDashCommand = new UnitCommand("repair", "modeSurvival", Binding.unit_command_repair, u -> new RepairDashAI(find(u.abilities))),
-        rebuildDashCommand = new UnitCommand("rebuild", "hammer", Binding.unit_command_rebuild, u -> new BuilderDashAI(find(u.abilities))),
-        assistDashCommand = new UnitCommand("assist", "players", Binding.unit_command_assist, u -> {
-            var ai = new BuilderDashAI(find(u.abilities));
-            ai.onlyAssist = true;
-            return ai;
-        });
-        //commented: there's no unit that can both dash and mine, currently
-        //mineDashCommand = new UnitCommand("mine", "production", u -> new MinerDashAI(find(u.abilities)));
+        repairDashCommand = new FRUnitCommand("repair0", "modeSurvival", Binding.unitCommandRepair, u -> new RepairDashAI(find(u.abilities))),
+        rebuildDashCommand = new FRUnitCommand("rebuild0", "hammer", Binding.unitCommandRebuild, u -> new BuilderDashAI(find(u.abilities))),
+        assistDashCommand = new FRUnitCommand("assist0", "players", Binding.unitCommandAssist, u -> new BuilderDashAI(find(u.abilities), 0));
+
+    public FRUnitCommand(String name, String icon, KeyBind keybind, Func<Unit, AIController> controller){
+        super(name, icon, keybind, controller);
+    }
+
+    @Override
+    public String localized(){
+        return Core.bundle.get("command." + name.substring(0, name.length() - 1));
+    }
 
     private static DashAbility find(Ability[] abs){
         for(var ab : abs)

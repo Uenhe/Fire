@@ -135,7 +135,8 @@ public class FRPlanets{
             node(conductorPowerNode, with(new SectorComplete(frozenGround)), () -> {
                 node(hydroelectricGenerator, with(new SectorComplete(beachLanding)), () ->
                     node(hydroelectricGeneratorLarge, () -> {
-                }));
+                    })
+                );
                 
                 node(flameGenerator, with(new SectorComplete(chillyMountains)), () -> {
                 });
@@ -173,6 +174,8 @@ public class FRPlanets{
                         node(grudge, with(new SectorComplete(desolateFortification)), () -> {
                         });
                     });
+                    node(scab, with(new SectorComplete(stormyCoast)), () -> {
+                    });
                 });
 
                 node(ignition, with(new OnSector(scorchingVolcano)), () ->
@@ -199,8 +202,10 @@ public class FRPlanets{
 
                 node(firefly, () ->
                     node(candlight, with(new SectorComplete(frozenGround)), () ->
-                        node(lumiflame, with(new SectorComplete(chillyMountains)), () -> {
-                        })
+                        node(lampryo, with(new SectorComplete(chillyMountains)), () ->
+                            node(lumiflame, with(new SectorComplete(branchedRivers)), () -> {
+                            })
+                        )
                     )
                 );
 
@@ -239,10 +244,14 @@ public class FRPlanets{
                         });
                         node(stormyCoast, with(new SectorComplete(eteriverStronghold), new Research(biomassCultivator), new Research(seaquake), new Research(distance), new Research(grudge)), () -> {
                         });
-                        node(branchedRivers, with(new SectorComplete(eteriverStronghold), new SectorComplete(stormyCoast), new Research(hydroelectricGeneratorLarge)), () ->
-                            node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(magneticRingPump), new Research(hardenedLiquidTank)), () -> {
-                            })
-                        );
+                        node(branchedRivers, with(new SectorComplete(eteriverStronghold), new SectorComplete(stormyCoast), new Research(hydroelectricGenerator), new Research(hydroelectricGeneratorLarge)), () -> {
+                            node(rubbleRidge, with(
+                                new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticSphere), new Research(stackedCultivator), new Research(magneticRingPump),
+                                new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(javelinPad), new Research(javelin)
+                            ), () -> {});
+                            node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticRingPump), new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill)), () -> {
+                            });
+                        });
                     });
                 })
             );
@@ -276,6 +285,7 @@ public class FRPlanets{
 
             addResearch(UnitTypes.alpha, Blocks.airFactory);
             addResearch(UnitTypes.beta, UnitTypes.alpha);
+            addResearch(primaryInterplanetaryAccelerator, Blocks.landingPad);
 
             /* ======== InfoNodes below ======== */
 
@@ -307,8 +317,8 @@ public class FRPlanets{
                                         dnode(grudge);
                                         dnode(pioneer);
 
-                                        dnode(glaciatedPeaks, () -> {
-                                        });
+                                        dnode(glaciatedPeaks, () ->
+                                            dnode(magneticSphere));
                                     });
                                 });
                             });
@@ -321,8 +331,7 @@ public class FRPlanets{
                                 dnode(slagCooler);
                                 dnode(seaquake);
 
-                                dnode(lavaStronghold, () -> {
-                                });
+                                dnode(lavaStronghold, () -> {});
                             });
                         });
 
@@ -332,9 +341,11 @@ public class FRPlanets{
                             dnode(chillyMountains, () ->
                                 dnode(flameGenerator)
                             );
-                            dnode(stormyCoast, () ->
-                                dnode(flesh)
-                            );
+
+                            dnode(stormyCoast, () -> {
+                                dnode(flesh);
+                                dnode(scab);
+                            });
                         });
                     });
                 })
@@ -345,6 +356,7 @@ public class FRPlanets{
         lysetta.techTree.addPlanet(Planets.serpulo);
     }
 
+    /** From Creator Mod. */
     private static void addResearch(UnlockableContent content, UnlockableContent parent){
         var lastNode = TechTree.all.find(t -> t.content == content);
         if(lastNode != null) lastNode.remove();

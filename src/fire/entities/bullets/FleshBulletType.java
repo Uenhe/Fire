@@ -1,16 +1,17 @@
 package fire.entities.bullets;
 
+import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectFloatMap;
+import arc.util.Log;
 import arc.util.Time;
 import fire.content.FRItems;
 import fire.content.FRStatusEffects;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
-import mindustry.gen.Building;
-import mindustry.gen.Bullet;
-import mindustry.gen.Healthc;
-import mindustry.gen.Hitboxc;
+import mindustry.content.StatusEffects;
+import mindustry.game.EventType;
+import mindustry.gen.*;
 import mindustry.type.Item;
 
 public class FleshBulletType extends SpritesBulletType{
@@ -25,6 +26,10 @@ public class FleshBulletType extends SpritesBulletType{
 
     private static final ObjectFloatMap<Bullet> intensityMap = new ObjectFloatMap<>();
 
+    static{
+        Events.on(EventType.ResetEvent.class, e -> intensityMap.clear());
+    }
+
     public FleshBulletType(float speed, float damage, int size, float subDamage, float subLifetime){
         super(speed, damage, size, size, ITEM.frames, ITEM.frameTime, ITEM.name);
         hitSize = size;
@@ -38,6 +43,12 @@ public class FleshBulletType extends SpritesBulletType{
         type.pierceArmor = true;
         type.collidesTiles = type.collidesAir = type.collidesGround = type.collides = false;
         adhereType = type;
+    }
+
+    public void afterAssignment(){
+        adhereType.removeAmount = removeAmount;
+        adhereType.maxSpread = maxSpread;
+        adhereType.spreadIntensity = spreadIntensity;
     }
 
     private float intensity(Bullet b){
@@ -58,8 +69,7 @@ public class FleshBulletType extends SpritesBulletType{
 
     private void afterHit(Bullet b, Healthc entity){
         if(!Mathf.chance(adhereChancePercentage * 0.01)) return;
-        var bullet = adhereType.create(b, b.x, b.y, b.rotation());
-        bullet.stickTo(entity);
+        adhereType.create(b, b.x, b.y, b.rotation()).stickTo(entity);
     }
 
     @Override
@@ -76,10 +86,15 @@ public class FleshBulletType extends SpritesBulletType{
             if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > amount){
                 build.liquids.remove(Liquids.water, amount);
                 intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
-                b.time -= Time.delta;
+                b.time -= Time.delta * 0.95f;
             }
 
         }else{
+            if(intensity(b) < maxSpread && ((Unit)entity).hasEffect(StatusEffects.wet)){
+                ((Unit)entity).apply(StatusEffects.wet, ((Unit)entity).getDuration(StatusEffects.wet) - 10.0f);
+                intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
+                b.time -= Time.delta * 0.95f;
+            }
             entity.damageContinuousPierce(damage * intensity(b));
         }
     }

@@ -27,7 +27,7 @@ public class FRWaves{
             {flare, horizon, zenith, rand.chance(0.5) ? quad : antumbra, rand.chance(0.1) ? quad : eclipse},
             {flare, horizon, omicron, rand.chance(0.5) ? quad : pioneer, eclipse},
             {guarding, resisting, garrison, shelter, blessing},
-            {firefly, candlight, lumiflame, pioneer, eclipse}
+            {firefly, candlight, lampryo, pioneer, eclipse}
         };//sorry but there are no lakes on Lysetta:(
 
 

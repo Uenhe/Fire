@@ -19,7 +19,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
     public static final StatusEffect[] DE_BUFFS = {
         burning, freezing, unmoving, slow, wet, muddy, melting, sapped, electrified,
         sporeSlowed, tarred, shocked, blasted, corroded, disarmed,
-        frostbite, overgrown, disintegrated
+        frostbite, overgrown, disintegrated, magnetized
     };
 
     public final float range;
@@ -52,9 +52,9 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
             timer -= reload;
 
             Units.nearby(unit.team, unit.x, unit.y, range, u -> {
+                var DE_BUFFS = DebuffRemoveFieldAbility.DE_BUFFS;
                 for(var e : DE_BUFFS){
                     if(!u.hasEffect(e) || (u.type instanceof FleshUnitType && e != overgrown)) continue;
-
                     u.unapply(e);
                     removeEffect.at(unit);
                 }

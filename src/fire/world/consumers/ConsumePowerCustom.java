@@ -1,9 +1,11 @@
 package fire.world.consumers;
 
 import arc.Core;
+import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectFloatMap;
 import arc.util.Time;
+import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
@@ -14,11 +16,15 @@ public class ConsumePowerCustom extends mindustry.world.consumers.ConsumePower{
 
     public static final ObjectFloatMap<Building> scaleMap = new ObjectFloatMap<>();
 
+    static{
+        Events.on(EventType.ResetEvent.class, e -> scaleMap.clear());
+    }
+
     public ConsumePowerCustom(float usage, float capacity, boolean buffered, Block block){
         super(usage, capacity, buffered);
 
         //prevent adding this bar prior to others, TODO may look bad
-        Time.runTask(600.0f, () ->
+        Time.runTask(300.0f, () ->
             block.addBar("power0", build -> new Bar(
                 () -> Core.bundle.format("bar.powerscale", Math.round(scaleMap.get(build, 0.0f) * 100) + StatUnit.percent.localized()),
                 () -> Pal.accent,

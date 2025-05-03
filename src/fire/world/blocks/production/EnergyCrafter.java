@@ -120,18 +120,16 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         @Override
         public void craft(){
-            // equals to super.craft() except for craftEffect part
             consume();
             var items = outputItems;
             if(items != null)
                 for(var output : items)
-                    for(byte i = 0; i < output.amount; i++)
+                    for(byte i = 0, n = (byte)output.amount; i < n; i++)
                         offload(output.item);
                         
             if(wasVisible) craftEffect.at(x, y, 0.0f, circleColor[counter]);
             progress -= 1.0f;
 
-            // customized below
             counter = (byte)((counter + 1) % circleColor.length);
             targetAngle = (short)Mathf.random(360);
             createLightning();
@@ -182,7 +180,6 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
             if(instability > maxInstability * 0.3f && FRVars.displayRange){
                 float alpha = Mathf.absin(2.4f, 0.6f);
-
                 Draw.color(Pal.health, alpha);
                 Lines.stroke(1.0f);
                 Lines.circle(x, y, range());
@@ -240,7 +237,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         }
 
         private float scale(){
-            return (timeScale - 1.0f) * 0.25f + 1.0f;
+            return 1.0f + 0.25f * (timeScale - 1.0f);
         }
     }
 }

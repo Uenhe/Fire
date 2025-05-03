@@ -45,7 +45,7 @@ public class FRFx{
             float orbSize = 2.0f * e.fout() + 1.0f;
 
             for(byte i = 0; i < amount; i++){
-                float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * ((float)i / amount) / speed,
+                float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * (float)i / amount / speed,
                     mag = radius * e.fout(),
                     x = Mathf.cos(theta, 1.0f / speed, mag) + e.x,
                     y = Mathf.sin(theta, 1.0f / speed, mag) + e.y;
@@ -54,22 +54,6 @@ public class FRFx{
                 Lines.circle(x, y, orbSize);
                 Fill.circle(x, y, orbSize);
             }
-        });
-    }
-
-    public static Effect hitBulletSmall(Color color){
-        return new Effect(14f, e -> {
-            Draw.color(Color.white, color, e.fin());
-            e.scaled(7f, s -> {
-                Lines.stroke(0.5f + s.fout());
-                Lines.circle(e.x, e.y, s.fin() * 5f);
-            });
-
-            Lines.stroke(0.5f + e.fout());
-            Angles.randLenVectors(e.id, 5, e.fin() * 15f, (x, y) ->
-                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3f + 1f)
-            );
-            Drawf.light(e.x, e.y, 20f, color, 0.6f * e.fout());
         });
     }
 
@@ -103,16 +87,32 @@ public class FRFx{
         });
     }
 
+    /** @see Fx#hitBulletSmall */
+    public static Effect hitBulletSmall(Color color){
+        return new Effect(14.0f, e -> {
+            Draw.color(Color.white, color, e.fin());
+            e.scaled(7.0f, s -> {
+                Lines.stroke(0.5f + s.fout());
+                Lines.circle(e.x, e.y, s.fin() * 5.0f);
+            });
+
+            Lines.stroke(0.5f + e.fout());
+            Angles.randLenVectors(e.id, 5, e.fin() * 15.0f, (x, y) ->
+                Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fout() * 3.0f + 1.0f)
+            );
+            Drawf.light(e.x, e.y, 20.0f, color, 0.6f * e.fout());
+        });
+    }
+
     /** @see Fx#instTrail */
     public static final Effect instTrailPurple = new Effect(10.0f, e -> {
         for(byte i = 0; i < 2; i++){
             float m = i == 0 ? 1.0f : 0.5f;
             float w = 15.0f * e.fout() * m;
-            float rot = e.rotation + 180.0f;
 
             Draw.color(i == 0 ? Pal.reactorPurple2 : Pal.reactorPurple);
-            Drawf.tri(e.x, e.y, w, (30.0f + Mathf.randomSeedRange(e.id, 10.0f)) * m, rot);
-            Drawf.tri(e.x, e.y, w, 10.0f * m, rot + 180.0f);
+            Drawf.tri(e.x, e.y, w, (30.0f + Mathf.randomSeedRange(e.id, 10.0f)) * m, e.rotation + 180.0f);
+            Drawf.tri(e.x, e.y, w, 10.0f * m, e.rotation + 180.0f);
         }
 
         Drawf.light(e.x, e.y, 60.0f, Pal.reactorPurple2, 0.6f * e.fout());
@@ -154,7 +154,7 @@ public class FRFx{
         final float rangeBetweenPoints = 12.0f,
             tx = p.getX(), ty = p.getY(),
             dst = Mathf.dst(e.x, e.y, tx, ty);
-        int links = Mathf.ceil(dst / rangeBetweenPoints);
+        short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
 
         Tmp.v1.set(p).sub(e.x, e.y).nor();
@@ -184,22 +184,20 @@ public class FRFx{
     }).followParent(false);
 
     public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
-        float
-            intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
+        float intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
             baseLifetime = 25.0f + intensity * 11.0f;
+
         b.lifetime = 50.0f + intensity * 55.0f;
 
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
         for(byte i = 0; i < 4; i++){
             byte j = i;
-            float lenScl = Fx.rand.random(0.4f, 1.0f);
             Fx.rand.setSeed(b.id * 2L + j);
 
-            b.scaled(b.lifetime * lenScl, e ->
+            b.scaled(b.lifetime * Fx.rand.random(0.4f, 1.0f), e ->
                 Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22.0f * intensity, (x, y, in, out) -> {
-                    float
-                        fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
+                    float fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
                         rad = fout * ((2.0f + intensity) * 2.35f);
 
                     Fill.circle(e.x + x, e.y + y, rad);

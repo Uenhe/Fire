@@ -1,5 +1,7 @@
 package fire.content;
 
+import mindustry.mod.Mods;
+import mindustry.type.Planet;
 import mindustry.type.SectorPreset;
 
 public class FRSectorPresets{
@@ -8,10 +10,9 @@ public class FRSectorPresets{
         landingBase, darksandPlain,
         frozenGround, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
         sporeFiord, scorchingVolcano, lavaStronghold,
-        eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, taintedEstuary;
+        eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, rubbleRidge, taintedEstuary;
 
     public static void load(){
-
         landingBase = create("jljd", 0, 6, 0, false);
         darksandPlain = create("hspy", 94, 7, 50);
 
@@ -29,22 +30,38 @@ public class FRSectorPresets{
         chillyMountains = create("lfsm", 168, 9, 17);
         stormyCoast = create("stormy-coast", 81, 10, 60);
         branchedRivers = create("branched-rivers", 158, 10, 14);
+        rubbleRidge = create("rubble-ridge", 172, 10, 65);
         taintedEstuary = create("tainted-estuary", 116, 10);
     }
 
-    static SectorPreset create(String name, int sector, float difficulty){
+    private static SectorPreset create(String name, int sector, float difficulty){
         return create(name, sector, difficulty, 0, true);
     }
 
-    static SectorPreset create(String name, int sector, float difficulty, int captureWave){
+    private static SectorPreset create(String name, int sector, float difficulty, int captureWave){
         return create(name, sector, difficulty, captureWave, true);
     }
 
-    static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
+    private static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
         var s = new SectorPreset(name, FRPlanets.lysetta, sector);
         s.difficulty = difficulty;
         s.captureWave = captureWave;
         s.addStartingItems = addStartingItems;
         return s;
+    }
+
+    private static class FRSectorPreset extends SectorPreset{
+
+        public FRSectorPreset(String name, Planet planet, int sector){
+            super(name, planet, sector);
+        }
+
+        public FRSectorPreset(String name, Mods.LoadedMod mod){
+            super(name, mod);
+        }
+
+        public FRSectorPreset(String name){
+            super(name);
+        }
     }
 }

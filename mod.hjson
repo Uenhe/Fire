@@ -1,21 +1,24 @@
-name: "fire"
-displayName: "Fire"
-author: "飞雨a_ssylfyzgmz, KochiyaUeneh油苗子"
-version: "1.4.0a"
-minGameVersion: "25702"
-java: true
-main: "fire.FireMod"
-repo: "Uenhe/Fire"
+{
+  name: "fire"
+  displayName: "Fire"
+  author: "| 飞雨a_sszylfyzgmz\n| KochiyaUeneh油苗子"
+  version: "1.4.0b"
+  minGameVersion: "149"
+  java: true
+  main: "fire.FireMod"
+  repo: "Uenhe/Fire"
+  subtitle: "| v1.4.0b-149"
+  description:
+    '''
+    [#FFE9BF[]]A Mindustry Mod that adds many unique things...
+    Click the 'Repo' button below to skip to GitHub page.
+    Any feedback, GitHub issue, pull request or translation tweak is welcome.
+    Star us on GitHub if you suppose this mod awesome!
 
-subtitle: "v1.4.0a adapts 25702"
-description:
-"A Mindustry Mod that adds many unique things...
-Click the 'Repo' button below to skip to GitHub page.
-Any feedback, GitHub issue, pull request or translation tweak is welcome.
-Star us on GitHub if you suppose this mod awesome!
-
-模组QQ交流群: 711467227
-模组GitHub页面点击下方'查看'按钮即可跳转
-一个奇奇怪怪又十分核锂的mod...
-欢迎反映任何关于此模组的BUG和建议
-去GitHub star我们再好不过了!"
+    模组QQ交流群: 711467227
+    模组GitHub页面点击下方'查看'按钮即可跳转
+    一个奇奇怪怪又十分核锂的mod...
+    欢迎反映任何关于此模组的BUG和建议
+    去GitHub star我们再好不过了!
+    '''
+}

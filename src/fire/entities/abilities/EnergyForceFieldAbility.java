@@ -6,6 +6,7 @@ import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
 import arc.struct.IntIntMap;
+import arc.struct.ObjectSet;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.FRUtils;
@@ -14,6 +15,7 @@ import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
@@ -36,13 +38,15 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     public float ext_bearingFactor;
     public float ext_counterBulletSpeedFactor;
     public float ext_counterBulletDamageFactor;
-    public byte ext_counterBulletHomingChancePercentage;//a value of 50 -> 50%
+    public byte ext_counterBulletHomingChancePercentage; //a value of 50 -> 50%
+    /** Length = 4 -> Collect; Stop collecting; Charge; Homing fire; Random fire. */
+    public FRUtils.TimeNode ext_node;
 
-    private float timer, damageSum;
+    private float timer;
     private boolean regenable;
+    private ObjectSet<Bullet> bullets = new ObjectSet<>();
+
     private static final IntIntMap bulletMap = new IntIntMap();
-    /** Stop collecting; Charge; Fire; Cleanup. */
-    private static final FRUtils.TimeNode node = new FRUtils.TimeNode(180, 240, 300, 310);
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
@@ -69,9 +73,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar(
-            "stat.shieldhealth",
-            wasBroken ? Color.gray : Pal.accent,
+        bars.add(new Bar("stat.shieldhealth", wasBroken ? Color.gray : Pal.accent,
             () -> wasBroken ? 1.0f + unit.shield / (regen * cooldown) : unit.shield / max)
         ).row();
     }
@@ -114,7 +116,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                     }
 
                     bullet.absorb();
-                    u.shield -= collision ? bullet.damage : bullet.damage * 2.0f;
+                    u.shield -= bullet.type.shieldDamage(bullet) * (collision ? 1.0f : 2.0f);
                     alpha = 1.0f;
 
                     if(u.shield <= 0.0f){
@@ -132,20 +134,22 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             });
 
         }else if(extended && !regenable){
-            final boolean isOverloaded = damageSum >= u.maxHealth * ext_bearingFactor;
+            boolean isOverloaded = bullets.toSeq().sumf(b -> b.damage) >= u.maxHealth * ext_bearingFactor;
             timer += Time.delta * (isOverloaded ? 1.3f : 1.0f);
 
-            if(node.checkBelonging(timer, 0)){
+            if(!isOverloaded && ext_node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
                     if(
-                        !isOverloaded && Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y) && bullet.time > 15.0f
-                        && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable && !(bullet.type instanceof LiquidBulletType)
+                        Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
+                        && bullet.time > 15.0f && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable && !(bullet.type instanceof LiquidBulletType)
+                        && bullets.add(bullet)
                     ){
+                        final float tt = 40.01f;
                         bullet.owner = u;
                         bullet.team = u.team;
                         bullet.damage *= ext_counterBulletDamageFactor;
                         bullet.time = 0.0f;
-                        bullet.lifetime = node.last();
+                        bullet.lifetime = ext_node.last() + tt;
                         bullet.drag = 0.0f;
 
                         if(bulletMap.containsValue(bullet.type.id)){
@@ -164,7 +168,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             // handled by mover later
                             type.drag = 0.0f;
 
-                            // add a default trail to bullets that without a trail
+                            // add a default trail to bullets that doesn't have one
                             if(type.trailLength <= 0){
                                 if(type instanceof BasicBulletType bt){
                                     type.trailWidth = bt.width * 0.21f;
@@ -179,64 +183,69 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             bullet.type = type;
                         }
 
-                        damageSum += bullet.damage;
                         bullet.mover = b -> {
                             if(b.type == null) return;
-                            if(u.dead) b.remove();
+                            if(!u.isValid()){
+                                bullets.remove(b);
+                                b.remove();
+                                return;
+                            }
 
-                            if(node.checkBelonging(timer, 0, 2)){
-                                float
-                                    scale =
-                                        node.checkBelonging(timer, 0) ? timer / node.first()
-                                        : node.checkBelonging(timer, 1) ? 1.0f
-                                        : node.checkBelonging(timer, 2) ? 1.0f - (timer - node.get(1)) / node.getQuantum(2)
-                                        : 0.0f,
+                            if(ext_node.checkBelonging(b.time, 0, 2) && timer < ext_node.last() + 54.0f){
+                                float scale = ext_node.checkBelonging(timer, 0) ? timer / ext_node.first()
+                                            : ext_node.checkBelonging(timer, 1) ? 1.0f
+                                            : 1.0f - (timer - ext_node.get(1)) / ext_node.getQuantum(2),
                                     realrad = radius * scale,
                                     val = u.angleTo(b) + b.type.speed * Time.delta / realrad * Mathf.radDeg;
 
                                 b.vel.setLength(b.type.speed * scale * ext_counterBulletSpeedFactor);
                                 b.rotation(b.angleTo(u.x + Mathf.cosDeg(val) * realrad, u.y + Mathf.sinDeg(val) * realrad));
 
-                            }else if(b.lifetime != 60.01f){
-                                b.time = 0.0f;
-                                b.lifetime = 60.01f;
-                                b.vel.setLength(8.0f * ext_counterBulletSpeedFactor);
-                                b.set(u.x, u.y);
-
-                                var tgt =
-                                    b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
+                            }else{
+                                float mark = ext_node.last() + tt + 0.1f;
+                                if(b.lifetime != mark){
+                                    var target = b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
                                         ? b.aimTile.build
-                                        : Units.closestTarget(b.team, b.x, b.y, b.lifetime * b.vel.len(),
-                                            e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
-                                            t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
+                                        : Units.closestTarget(b.team, b.x, b.y, radius * 2.0f,
+                                        e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
+                                        t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
-                                boolean homing = tgt != null && Mathf.chance(ext_counterBulletHomingChancePercentage * 0.01);
-                                float theta = homing ? 0.0f : Mathf.random(Mathf.PI2);
-                                if(tgt != null && homing) b.rotation(b.angleTo(tgt));
-                                b.mover = bb -> bb.moveRelative(0.0f, Mathf.cos(
-                                    b.time,
-                                    (tgt != null
-                                        ? u.dst(homing ? tgt.x() : u.x + u.dst(tgt) * Mathf.cos(theta), homing ? tgt.y() : u.y + u.dst(tgt) * Mathf.sin(theta))
-                                        : radius
-                                    ) / b.vel.len() / Mathf.PI,
-                                    Mathf.sign(b.id % 2 == 0) * 5.0f
-                                ));
+                                    if(target != null && timer < ext_node.last() + 24.0f && ext_node.checkBelonging(b.time, 3)){
+                                        b.lifetime = mark;
+                                        b.vel.setLength(8.0f * ext_counterBulletSpeedFactor);
+                                        b.rotation(b.angleTo(target));
+                                        b.mover = bb -> bb.moveRelative(0.0f, Mathf.cos(b.time - ext_node.get(2), u.dst(target.x(), target.y()) / b.vel.len() / Mathf.PI, Mathf.sign(b.id % 2 == 0) * 5.0f));
 
-                                damageSum -= bullet.damage;
+                                    }else{
+                                        b.lifetime = mark;
+                                        b.drag = 0.025f;
+                                        b.vel.rnd(6.0f * ext_counterBulletSpeedFactor);
+                                    }
+                                }
                             }
                         };
                     }
                 });
 
-            }else if(timer > node.get(3)){
+            }else if(timer > ext_node.first() + ext_node.last()){
                 regenable = true;
                 timer = 0.0f;
-                damageSum = 0.0f;
+                bullets.clear();
             }
         }
     }
 
     private float realRad(){
         return radius * radiusScale;
+    }
+
+    private EnergyForceFieldAbility setBullets(ObjectSet<Bullet> set){
+        bullets = set;
+        return this;
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException{
+        return ((EnergyForceFieldAbility)super.clone()).setBullets(bullets);
     }
 }

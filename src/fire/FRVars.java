@@ -6,8 +6,7 @@ import arc.graphics.Color;
 import mindustry.game.EventType;
 import mindustry.graphics.Pal;
 
-import static fire.FRUtils.color;
-import static fire.FRUtils.colora;
+import static arc.graphics.Color.valueOf;
 import static mindustry.Vars.net;
 
 public final class FRVars{
@@ -19,22 +18,21 @@ public final class FRVars{
 
     /** Temporary colors. */
     public static final Color
-        _ff9900 = color(255, 153, 0), _ff9900_a04 = _ff9900.cpy().a(0.4f),
-        _ccccff = color(204, 204, 255), _ccccff_a04 = _ccccff.cpy().a(0.4f),
-        _33ccff = color(51, 204, 255), _33ccff_a04 = _33ccff.cpy().a(0.4f),
-        _404040 = color(64, 64, 64), _404040_a04 = _404040.cpy().a(0.4f),
-        _ea8878 = color(234, 136, 120), _ea8878_a07 = _ea8878.cpy().a(0.7f),
-        _ec7458 = color(236, 116, 88), _ec7458_a07 = _ec7458.cpy().a(0.7f),
-
-        _92f3fd = color(146, 243, 253), _6aa85e = color(106, 168, 94), _9e78dc = color(158, 120, 220),
-        _ffe099 = color(255, 224, 153), _ffcf99 = color(255, 207, 153), _e3ae6f = color(227, 174, 111),
-        _feb380 = color(254, 179, 128), _6e7080 = color(110, 112, 128), _8cfffb = color(140, 255, 251),
-        _f6efa1 = color(246, 239, 161), _f57946 = color(245, 121, 70), _f9a27a = color(249, 162, 122),
-        _ffd8e8 = color(255, 216, 232), _ff3300 = color(255, 51, 0), _990003 = color(153, 0, 3),
-        _b6c6fd = color(182, 198, 253), _fffac6 = color(255, 250, 198), _d8d97faa = colora(216, 217, 127, 170),
-        _989aa4 = color(152, 154, 164), _67474b = color(103, 71, 75), _ffef99 = color(255, 239, 153),
-        _ffa166 = Color.valueOf("ffa166"), _ffa16670 = Color.valueOf("ffa16670"),
-        _444444 = Color.valueOf("444444"), _44444488 = Color.valueOf("44444488"),
+        _ff9900 = valueOf("ff9900"), _ff9900_a04 = _ff9900.cpy().a(0.4f),
+        _ccccff = valueOf("ccccff"), _ccccff_a04 = _ccccff.cpy().a(0.4f),
+        _33ccff = valueOf("33ccff"), _33ccff_a04 = _33ccff.cpy().a(0.4f),
+        _404040 = valueOf("404040"), _404040_a04 = _404040.cpy().a(0.4f),
+        _ea8878 = valueOf("ea8878"), _ea8878_a07 = _ea8878.cpy().a(0.7f),
+        _ec7458 = valueOf("ec7458"), _ec7458_a07 = _ec7458.cpy().a(0.7f),
+        _92f3fd = valueOf("92f3fd"), _6aa85e = valueOf("6aa85e"), _9e78dc = valueOf("9e78dc"),
+        _ffe099 = valueOf("ffe099"), _ffcf99 = valueOf("ffcf99"), _e3ae6f = valueOf("e3ae6f"),
+        _feb380 = valueOf("feb380"), _6e7080 = valueOf("6e7080"), _8cfffb = valueOf("8cfffb"),
+        _f6efa1 = valueOf("f6efa1"), _f57946 = valueOf("f57946"), _f9a27a = valueOf("f9a27a"),
+        _ffd8e8 = valueOf("ffd8e8"), _ff3300 = valueOf("ff3300"), _990003 = valueOf("990003"),
+        _b6c6fd = valueOf("b6c6fd"), _fffac6 = valueOf("fffac6"), _d8d97faa = valueOf("d8d97faa"),
+        _989aa4 = valueOf("989aa4"), _67474b = valueOf("67474b"), _ffef99 = valueOf("ffef99"),
+        _ffa166 = valueOf("ffa166"), _ffa16670 = valueOf("ffa16670"),
+        _444444 = valueOf("444444"), _44444488 = valueOf("44444488"),
 
         _lancer_a04 = Pal.lancerLaser.cpy().a(0.4f);
 
@@ -51,7 +49,7 @@ public final class FRVars{
     public static void getSettings(){
         mineSand = Core.settings.getBool("minesand");
         displayRange = Core.settings.getBool("displayrange");
-        specialContent = Core.settings.getBool("specialcontent") || net.server();
+        specialContent = net.server() || Core.settings.getBool("specialcontent");
         showLog = Core.settings.getBool("showlog");
         noMultiMods = Core.settings.getBool("nomultimods");
     }

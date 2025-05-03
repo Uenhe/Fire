@@ -23,7 +23,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
     public final byte plusSize;
 
     private static final TextureRegion region = new TextureRegion();
-    /** In; Charge; Release; Out. */
+    /** Length = 4 -> In; Charge; Release; Out; End. */
     private static final FRUtils.TimeNode node = new FRUtils.TimeNode(30, 150, 300, 330);
 
     public LightningCloudBulletType(float dmg, int len, int chance, int bs, int ps, Color color){

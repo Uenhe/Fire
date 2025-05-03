@@ -126,8 +126,7 @@ public class BeamExtractor extends mindustry.world.Block{
             var names = new Seq<String>(barrelRegions.length);
 
             for(var region : barrelRegions){
-                if(names.contains(region.asAtlas().name))
-                    continue;
+                if(names.contains(region.asAtlas().name)) continue;
                 regions.add(region);
                 names.add(region.asAtlas().name);
             }
@@ -158,7 +157,6 @@ public class BeamExtractor extends mindustry.world.Block{
         packer.add(MultiPacker.PageType.editor, name + "-icon-editor", new PixmapRegion(pixmap));
 
         for(var pm : toDispose) pm.dispose();
-        toDispose.clear();
     }
 
     private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
@@ -224,8 +222,8 @@ public class BeamExtractor extends mindustry.world.Block{
         public void updateTile(){
             warmup = Mathf.lerpDelta(warmup, Mathf.num(valid()), warmupSpeed);
             boostWarmup = Mathf.lerpDelta(boostWarmup, optionalEfficiency, warmupSpeed);
-            if(warmup >= 0.999f) warmup = 1.0f;
-            if(boostWarmup >= 0.999f) boostWarmup = 1.0f;
+            if(Mathf.equal(warmup, 1.0f, 0.001f)) warmup = 1.0f;
+            if(Mathf.equal(boostWarmup, 1.0f, 0.001f)) boostWarmup = 1.0f;
             if(mining != null && valid()){
                 beamX = Mathf.lerpDelta(beamX, mining.worldx(), 0.25f);
                 beamY = Mathf.lerpDelta(beamY, mining.worldy(), 0.25f);

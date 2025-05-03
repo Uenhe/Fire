@@ -58,8 +58,8 @@ public class EnergyField{
                 Draw.color(type().lightningColor);
                 Lines.stroke(Lines.getStroke() * shootWarmup * 0.8f);
                 Drawf.light(x, y, range * 1.2f, type().lightningColor, shootWarmup * 0.6f);
-                for(byte i = 0, sectors = 6; i < sectors; i++)
-                    Lines.arc(x, y, range, 0.12f, i * 360.0f / sectors + Time.time * rotateSpeed * 0.5f);
+                for(byte i = 0, n = 6; i < n; i++)
+                    Lines.arc(x, y, range, 0.12f, i * 360.0f / n + Time.time * rotateSpeed * 0.5f);
 
                 Draw.reset();
             }
@@ -70,8 +70,6 @@ public class EnergyField{
 
         public final byte maxTargets;
 
-        private final Seq<Healthc> targets = new Seq<>();
-
         public EnergyFieldBulletType(float damage, int max){
             super(0.0f, damage);
             maxTargets = (byte)max;
@@ -81,6 +79,7 @@ public class EnergyField{
         @Override
         public void init(Bullet b){
             super.init(b);
+            var targets = new Seq<Healthc>();
 
             Units.nearby(null, b.x, b.y, homingRange, unit -> {
                 if(unit.checkTarget(collidesAir, collidesGround) && unit.targetable(b.team) && unit.team != b.team)
@@ -103,7 +102,7 @@ public class EnergyField{
                 if(absorber != null) target = absorber;
 
                 if(b.owner instanceof Building build)
-                    b.damage *= Mathf.pow(build.timeScale(), 0.5f);
+                    b.damage *= Mathf.sqrt(build.timeScale());
 
                 // target must be either unit or building
                 if(target instanceof Unit u)
@@ -114,7 +113,6 @@ public class EnergyField{
                 hitEffect.at(b.x, b.y, 0.0f, lightningColor, target);
             }
 
-            targets.clear();
             b.remove();
         }
     }

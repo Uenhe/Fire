@@ -1,44 +1,13 @@
 package fire.input;
 
-import arc.Core;
-import arc.input.InputDevice.*;
+import arc.input.KeyBind;
 import arc.input.KeyCode;
-import arc.util.Reflect;
 
-import static arc.KeyBinds.KeyBind;
-import static arc.KeyBinds.KeybindValue;
-import static mindustry.Vars.ui;
+public class FRBinding{
 
-public enum FRBinding implements KeyBind{
+    public static final KeyBind
+        unitAbility = KeyBind.add("unit_ability", KeyCode.g, "fire");
 
-    unit_ability(KeyCode.g, "fire");
-
-    private final KeybindValue defaultValue;
-    private final String category;
-
-    FRBinding(KeybindValue defaultValue, String cat){
-        this.defaultValue = defaultValue;
-        this.category = cat;
-    }
-
-    @Override
-    public KeybindValue defaultValue(DeviceType type){
-        return defaultValue;
-    }
-
-    @Override
-    public String category(){
-        return category;
-    }
-
-    /** See <a href="https://github.com/RICCJ/MinerTools">MinerTools</a> also. */
-    public static void load(){
-        KeyBind[] bindings = Reflect.get(Core.keybinds, "definitions");
-        KeyBind[] newBindings = new KeyBind[bindings.length + values().length];
-        System.arraycopy(bindings, 0, newBindings, 0, bindings.length);
-        System.arraycopy(values(), 0, newBindings, bindings.length, values().length);
-        Core.keybinds.setDefaults(newBindings);
-        Reflect.invoke(Core.keybinds, "load");
-        Reflect.invoke(ui.controls, "setup");
-    }
+    // dummy static class initializer too
+    public static void init(){}
 }

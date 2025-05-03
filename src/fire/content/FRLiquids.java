@@ -16,7 +16,7 @@ public class FRLiquids{
             viscosity = 0.4f;
             boilPoint = -1.7f;
             effect = FRStatusEffects.frostbite;
-            barColor = Color.valueOf("f0ffff");
+            barColor = color;
             gasColor = Color.valueOf("c1e8f5");
             lightColor = Color.valueOf("0097f532");
         }};

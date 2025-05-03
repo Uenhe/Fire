@@ -1,14 +1,15 @@
 package fire.entities.abilities;
 
-import arc.math.*;
-import arc.scene.ui.layout.*;
-import arc.util.*;
-import mindustry.entities.*;
-import mindustry.gen.*;
-import mindustry.type.*;
-import mindustry.world.meta.*;
+import arc.math.Mathf;
+import arc.scene.ui.layout.Table;
+import arc.util.Strings;
+import arc.util.Time;
+import mindustry.entities.Effect;
+import mindustry.gen.Unit;
+import mindustry.type.StatusEffect;
+import mindustry.world.meta.StatUnit;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class FirstAidAbility extends mindustry.entities.abilities.Ability{
 
@@ -91,7 +92,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
         }
     }
 
-    public FirstAidAbility setHealthArray(float[] array){
+    private FirstAidAbility setHealthArray(float[] array){
         healthArray = array;
         return this;
     }

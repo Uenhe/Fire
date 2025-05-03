@@ -8,9 +8,8 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.struct.Seq;
 import arc.util.Time;
-import fire.ai.FRUnitCommand;
+import fire.FRUtils;
 import fire.entities.abilities.*;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
@@ -55,7 +54,7 @@ public class FRUnitTypes{
         omicron, pioneer,
 
         //air kamikaze
-        firefly, candlight, lumiflame, flambent,
+        firefly, candlight, lampryo, lumiflame,
 
         //air
         javelin, apollo,
@@ -73,13 +72,12 @@ public class FRUnitTypes{
             health = 140;
             armor = 3;
             hitSize = 8;
-            speed = 0.6f;
+            speed = 0.72f;
             drag = 0.1f;
             rotateSpeed = 4f;
             buildSpeed = 1f;
             itemCapacity = 20;
             canAttack = false;
-            targetable = false;
 
             stepShake = 1f;
             shadowElevation = 0.1f;
@@ -99,7 +97,7 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new ForceFieldAbility(44.0f, 20.0f / 60.0f, 200.0f, 400.0f)
+                new ForceFieldAbility(44.0f, 0.5f, 200.0f, 400.0f)
             );
         }};
 
@@ -109,13 +107,12 @@ public class FRUnitTypes{
             health = 420;
             armor = 5;
             hitSize = 12;
-            speed = 0.54f;
+            speed = 0.65f;
             drag = 0.1f;
             rotateSpeed = 3.6f;
             buildSpeed = 1.2f;
             itemCapacity = 40;
             canAttack = false;
-            targetable = false;
 
             stepShake = 1f;
             shadowElevation = 0.1f;
@@ -136,7 +133,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new ForceFieldAbility(54f, 0.6f, 300.0f, 360.0f),
-                new RegenFieldAbility(1.0f, 40.0f, _8cfffb)
+                new RegenFieldAbility(1.5f, 40.0f, _8cfffb)
             );
         }};
 
@@ -146,13 +143,12 @@ public class FRUnitTypes{
             health = 930;
             armor = 6;
             hitSize = 16;
-            speed = 0.45f;
+            speed = 0.54f;
             drag = 0.3f;
             rotateSpeed = 2.7f;
             buildSpeed = 2f;
             itemCapacity = 50;
             canAttack = false;
-            targetable = false;
 
             stepShake = 1f;
             shadowElevation = 0.1f;
@@ -172,7 +168,7 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new ForceFieldAbility(72f, 1.0f, 400f, 300f, 4, 45f),
+                new ForceFieldAbility(72f, 1.5f, 400f, 300f, 4, 45f),
                 new StatusFieldAbility(StatusEffects.overclock, 360f, 360f, 80f)
             );
 
@@ -261,7 +257,7 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 32, 24, 25, 40.0f){{
+                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 32, 32, 30, 40.0f){{
                     sides = 24;
                     lightningColor.set(Pal.surge);
 
@@ -270,16 +266,17 @@ public class FRUnitTypes{
                     ext_counterBulletSpeedFactor = 1.2f;
                     ext_counterBulletDamageFactor = 0.8f;
                     ext_counterBulletHomingChancePercentage = 45;
+                    ext_node = new FRUtils.TimeNode(140, 180, 240, 300);
                 }},
 
-                new RegenFieldAbility(3f, 120f, _8cfffb),
+                new RegenFieldAbility(3.0f, 120.0f, _8cfffb),
 
-                new ExtinguishFieldAbility(120f, _8cfffb),
+                new ExtinguishFieldAbility(120.0f, _8cfffb),
 
-                new DebuffRemoveFieldAbility(120f, 120f, new Effect(30f, e -> {
+                new DebuffRemoveFieldAbility(120.0f, 120.0f, new Effect(30.0f, e -> {
                     Draw.color(_8cfffb, Color.lightGray, e.fin());
-                    Angles.randLenVectors(e.id, 3, 6f + e.finpow() * 20f, (x, y) ->
-                        Fill.square(e.x + x, e.y + y, e.fout() * 4f + 0.5f, 45f));
+                    Angles.randLenVectors(e.id, 3, 6.0f + e.finpow() * 20.0f, (x, y) ->
+                        Fill.square(e.x + x, e.y + y, e.fout() * 4.0f + 0.5f, 45.0f));
                 }))
             );
         }};
@@ -558,8 +555,7 @@ public class FRUnitTypes{
 
         pioneer = new UnitType("pioneer"){{
             constructor = PayloadUnit::create;
-            defaultCommand = FRUnitCommand.repairDashCommand;
-            commands = Seq.with(UnitCommand.moveCommand, UnitCommand.enterPayloadCommand, FRUnitCommand.repairDashCommand, FRUnitCommand.rebuildDashCommand, FRUnitCommand.assistDashCommand);
+            defaultCommand = UnitCommand.repairCommand;
             flying = true;
             health = 5600.0f;
             armor = 7.0f;
@@ -796,7 +792,7 @@ public class FRUnitTypes{
             );
         }};
 
-        lumiflame = new UnitType("lampflame"){{
+        lampryo = new UnitType("lampflame"){{
             constructor = UnitEntity::create;
             flying = true;
             health = 620.0f;
@@ -898,7 +894,7 @@ public class FRUnitTypes{
             );
         }};
 
-        flambent = new UnitType("flambent"){{
+        lumiflame = new UnitType("lumiflame"){{
             constructor = UnitEntity::create;
             flying = true;
             health = 4750.0f;
@@ -926,7 +922,7 @@ public class FRUnitTypes{
                 new Weapon(){{
                     alwaysShooting = true;
                     x = 8.0f;
-                    reload = 3.333f;
+                    reload = 10.0f / 3.0f;
                     baseRotation = 180.0f;
                     minShootVelocity = speed * 0.6f;
                     shootSound = Sounds.flame;
@@ -946,7 +942,7 @@ public class FRUnitTypes{
                 new Weapon(){{
                     alwaysShooting = true;
                     x = 5.0f;
-                    reload = 1.333f;
+                    reload = 4.0f / 3.0f;
                     baseRotation = 180.0f;
                     minShootVelocity = speed * 3.0f;
                     shootSound = Sounds.flame;
@@ -1328,6 +1324,7 @@ public class FRUnitTypes{
                         maxRange = 225.0f;
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
+                        shootSound = Sounds.spark;
                     }};
                 }}
             );
@@ -1672,7 +1669,7 @@ public class FRUnitTypes{
             new UnitType[]{UnitTypes.beta, FRUnitTypes.omicron},
             new UnitType[]{FRUnitTypes.resisting, FRUnitTypes.garrison},
             new UnitType[]{FRUnitTypes.hatchet, FRUnitTypes.castle},
-            new UnitType[]{FRUnitTypes.candlight, FRUnitTypes.lumiflame}
+            new UnitType[]{FRUnitTypes.candlight, FRUnitTypes.lampryo}
         );
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(

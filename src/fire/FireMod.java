@@ -35,6 +35,10 @@ public class FireMod extends mindustry.mod.Mod{
     private static boolean multiplied;
     private static byte counter;
 
+    public FireMod(){
+        if(!headless) FRBinding.init();
+    }
+
     @Override
     public void loadContent(){
         FIRE = mods.getMod(getClass());
@@ -61,7 +65,6 @@ public class FireMod extends mindustry.mod.Mod{
         loadSetting();
         loadDatabase();
         FROverride.load();
-        FRBinding.load();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
             showUpdate();
@@ -144,15 +147,15 @@ public class FireMod extends mindustry.mod.Mod{
                 }).size(256.0f, 64.0f);
                 t.row();
 
-            }else{
-                t.button(("@fire.linkgithub"), () -> {
-                    if(!Core.app.openURI(linkGit)){
-                        ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkGit);
-                    }
-                }).size(256.0f, 64.0f);
-                t.row();
             }
+            t.button(("@fire.linkgithub"), () -> {
+                if(!Core.app.openURI(linkGit)){
+                    ui.showErrorMessage("@linkfail");
+                    Core.app.setClipboardText(linkGit);
+                }
+            }).size(256.0f, 64.0f);
+            t.row();
+
         }).maxWidth(1024.0f);
 
         mainDialog.show();

@@ -1,14 +1,17 @@
 package fire.world.kits;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
+import arc.math.geom.Geometry;
 import arc.scene.style.TextureRegionDrawable;
 import arc.struct.ObjectFloatMap;
 import arc.util.Scaling;
+import arc.util.Time;
 import fire.FRVars;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.meta.FRStat;
@@ -16,6 +19,7 @@ import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
+import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -87,7 +91,7 @@ public class Campfire{
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
 
-                ConsumePowerCustom.scaleMap.put(this, optionalEfficiency);
+                ConsumePowerCustom.scaleMap.put(this, optionalEfficiency + 1.0f);
 
                 if(efficiency <= 0.0f) return;
 
@@ -130,6 +134,10 @@ public class Campfire{
 
         public final CampfireBlock block;
         public static final ObjectFloatMap<Building> efficiencyMap = new ObjectFloatMap<>();
+
+        static{
+            Events.on(EventType.ResetEvent.class, e -> efficiencyMap.clear());
+        }
 
         public ConsumeCampfire(CampfireBlock block){
             this.block = block;

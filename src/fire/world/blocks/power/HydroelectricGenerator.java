@@ -9,7 +9,8 @@ import mindustry.ui.Styles;
 import mindustry.world.Tile;
 import mindustry.world.meta.Stat;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
+import static mindustry.Vars.world;
 
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
 

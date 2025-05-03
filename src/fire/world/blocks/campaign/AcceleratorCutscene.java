@@ -11,7 +11,10 @@ import arc.scene.ui.Label;
 import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.*;
+import arc.util.Align;
+import arc.util.Reflect;
+import arc.util.Scaling;
+import arc.util.Time;
 import fire.FRUtils;
 import fire.content.FRPlanets;
 import mindustry.ctype.UnlockableContent;
@@ -110,13 +113,12 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
 
             sceneTimer += Time.delta;
             if(node.checkBelonging(sceneTimer, 1, 2)){
-                final float tr = 0.9f, tg = 0.1f, tb = 0.0f,
-                    scl = node.getQuantum(1, 2) / Mathf.PI / 36, time = sceneTimer - node.first() - scl * Mathf.PI;
+                float scl = node.getQuantum(1, 2) / Mathf.PI / 36.0f, time = sceneTimer - node.first() - scl * Mathf.PI;
                 ui.planet.state.planet.atmosphereColor.set(
                     //absin: initial phase = PI, period = 6PI
-                    originColor.r + Mathf.absin(time, scl, tr - originColor.r),
-                    originColor.g + Mathf.absin(time, scl, tg - originColor.g),
-                    originColor.b + Mathf.absin(time, scl, tb - originColor.b)
+                    originColor.r + Mathf.absin(time, scl, 0.9f - originColor.r),
+                    originColor.g + Mathf.absin(time, scl, 0.1f - originColor.g),
+                    originColor.b + Mathf.absin(time, scl, 0.0f - originColor.b)
                 );
             }else{
                 ui.planet.state.planet.atmosphereColor.set(originColor);

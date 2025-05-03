@@ -2,7 +2,6 @@ package fire.content;
 
 import arc.Core;
 import arc.Events;
-import arc.util.Reflect;
 import fire.ai.FRUnitCommand;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
@@ -34,9 +33,7 @@ public class FROverride{
 
         //region block environment
 
-        sandWater.itemDrop = Items.sand;
-        darksandWater.itemDrop = Items.sand;
-        darksandTaintedWater.itemDrop = Items.sand;
+        sandWater.itemDrop = darksandWater.itemDrop = darksandTaintedWater.itemDrop = Items.sand;
         sporePine.attributes.set(FRAttribute.tree, 1.5f);
         snowPine.attributes.set(FRAttribute.tree, 1.5f);
         pine.attributes.set(FRAttribute.tree, 1.5f);
@@ -46,13 +43,15 @@ public class FROverride{
 
         grass.asFloor().wall = shrubs;
 
+        Blocks.sand.playerUnmineable =
+            Blocks.darksand.playerUnmineable =
+                Blocks.sandWater.playerUnmineable =
+                    Blocks.darksandWater.playerUnmineable =
+                        Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+
         Events.run(EventType.Trigger.update, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0)
-                Blocks.sand.playerUnmineable =
-                    Blocks.darksand.playerUnmineable =
-                        Blocks.sandWater.playerUnmineable =
-                            Blocks.darksandWater.playerUnmineable =
-                                Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+            if(Core.graphics.getFrameId() % 60 == 0){}
+
         });
 
         //endregion
@@ -98,7 +97,6 @@ public class FROverride{
 
         ((Pump)mechanicalPump).pumpAmount += 0.2f / 60.0f;
         ((Pump)impulsePump).pumpAmount += 1.2f / 9.0f / 60.0f;
-        phaseConduit.liquidCapacity += 14.0f;
 
         //endregion
         //region block power
@@ -107,11 +105,6 @@ public class FROverride{
         //endregion
         //region block crafting
         phaseWeaver.itemCapacity += 10;
-
-        //endregion
-        //region block unit
-
-        //see FRUnitTypes
 
         //endregion
         //region block effect
@@ -129,29 +122,32 @@ public class FROverride{
         //region unit
 
         Events.on(EventType.UnitDrownEvent.class, e -> {
-            if(!e.unit.hasEffect(FRStatusEffects.overgrown)) return;
+            var old = e.unit;
+            if(!old.hasEffect(FRStatusEffects.overgrown)) return;
 
-            final UnitType type;
-            if(e.unit.type == dagger)
+            UnitType type;
+            if(old.type == dagger)
                 type = FRUnitTypes.blade;
-            else if(e.unit.type == mace)
+            else if(old.type == mace)
                 type = FRUnitTypes.hatchet;
-            else if(e.unit.type == fortress)
+            else if(old.type == fortress)
                 type = FRUnitTypes.castle;
             else
                 return;
 
-            Reflect.set(type.spawn(Team.crux, e.unit.x, e.unit.y), "statuses", Reflect.get(e.unit, "statuses"));
+            var spawned = type.spawn(Team.crux, old.x, old.y);
+            var effects = content.statusEffects();
+            for(var effect : effects){
+                if(!old.hasEffect(effect)) continue;
+                spawned.apply(effect, old.getDuration(effect));
+            }
         });
 
-        alpha.coreUnitDock = true;
-        beta.coreUnitDock = true;
-        gamma.coreUnitDock = true;
-        alpha.defaultCommand = UnitCommand.mineCommand;
-        beta.defaultCommand = UnitCommand.mineCommand;
+        alpha.coreUnitDock = beta.coreUnitDock = gamma.coreUnitDock = true;
+        alpha.defaultCommand = beta.defaultCommand = UnitCommand.mineCommand;
 
         flare.speed += 0.5f;
-        flare.trailLength = 3;
+        flare.trailLength += 3;
 
         // have to do this or can't control dash-able units with other units at the same time
         var units = content.units();

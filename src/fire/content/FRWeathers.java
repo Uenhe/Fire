@@ -21,8 +21,7 @@ public class FRWeathers{
     public static void load(){
 
         rainstorm = new RainWeather("rainstorm"){
-
-            final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
+            private final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
 
             @Override
             public void update(WeatherState state){
@@ -35,8 +34,7 @@ public class FRWeathers{
                         Mathf.random(world.height() * tilesize)
                     );
                 }
-            }
-            {
+            }{
                 attrs.set(Attribute.light, -0.35f);
                 attrs.set(Attribute.water, 0.35f);
                 status = StatusEffects.wet;

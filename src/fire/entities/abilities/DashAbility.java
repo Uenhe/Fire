@@ -29,11 +29,11 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
     private float timer;
 
-    public DashAbility(float speedMul, int invTime, int cd, int afterimage){
+    public DashAbility(float speedMul, int invTime, int cd, int image){
         speedMultiplier = speedMul;
         timer = invincibleTime = (short)invTime;
         cooldown = (short)cd;
-        this.afterimage = (byte)afterimage;
+        afterimage = (byte)image;
     }
 
     @Override
@@ -58,14 +58,15 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
     @Override
     public void draw(Unit unit){
-        if(timer > invincibleTime) return;
+        float t = timer * 0.6f;
+        if(t > invincibleTime) return;
 
         Draw.color(Color.white);
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
 
-        for(byte i = 0, images = afterimage; i < images; i++){
-            float offset = unit.type.engineOffset * 0.5f * (1.0f + (unit.type.useEngineElevation ? unit.elevation : 1.0f)) + (i * unit.speedMultiplier * 8.0f);
-            Draw.alpha(0.8f * (1.0f - (timer / invincibleTime)) * (1.0f - (float)i / images));
+        for(byte i = 0, afterimage = this.afterimage; i < afterimage; i++){
+            float offset = unit.type.engineOffset * 0.5f * (1.0f + (unit.type.useEngineElevation ? unit.elevation : 1.0f)) + (i * unit.speedMultiplier * 8.0f * (1.0f - t / invincibleTime));
+            Draw.alpha(0.8f * (1.0f - (t / invincibleTime)) * (1.0f - (float)i / afterimage));
             Draw.rect(unit.type.name,
                 unit.x + Angles.trnsx(unit.rotation + 180.0f, offset),
                 unit.y + Angles.trnsy(unit.rotation + 180.0f, offset),
@@ -81,11 +82,11 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
 
         timer -= cooldown;
         unit.apply(StatusEffects.invincible, invincibleTime);
-        unit.vel.setLength(unit.speed() * speedMultiplier);
+        unit.vel.scl(speedMultiplier);
     }
 
     private boolean dashable(Unit unit, @Nullable Position pos){
-        return (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(FRBinding.unit_ability)) || (Core.app.isMobile() && Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
+        return (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(FRBinding.unitAbility)) || (Core.app.isMobile() && Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
             || (unit.controller() instanceof CommandAI c && c.hasCommand() && correctDirection(unit, c.targetPos))
             || (pos != null && correctDirection(unit, pos));
     }
@@ -95,6 +96,6 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     private float dst(Unit unit){
-        return unit.speed() * speedMultiplier * tilesize * 2.0f;
+        return unit.speed() * speedMultiplier * tilesize * 1.8f;
     }
 }

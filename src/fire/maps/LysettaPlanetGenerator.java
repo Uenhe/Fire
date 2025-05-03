@@ -4,12 +4,13 @@ import arc.math.Rand;
 import arc.util.Reflect;
 import fire.game.FRWaves;
 import mindustry.content.Blocks;
+import mindustry.content.Items;
 import mindustry.maps.planet.SerpuloPlanetGenerator;
+import mindustry.type.ItemStack;
 import mindustry.type.Sector;
 import mindustry.world.Block;
 
-import static mindustry.Vars.spawner;
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
 
@@ -35,6 +36,16 @@ public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
     protected void generate(){
         super.generate();
         state.rules.spawns = FRWaves.generate(sector.threat, new Rand(sector.id), state.rules.attackMode && spawner.countGroundSpawns() == 0);
+        state.rules.loadout.addAll(ItemStack.with(
+            Items.copper, 4000,
+            Items.lead, 4000,
+            Items.graphite, 2000,
+            Items.silicon, 2500,
+            Items.metaglass, 2000,
+            Items.titanium, 2000,
+            Items.thorium, 1000,
+            Items.plastanium, 500
+        )); //TODO this doesn't require relevant items when launching
     }
 
     @Override

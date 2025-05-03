@@ -54,7 +54,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
     @Override
     public void init(){
-        Events.on(EventType.ResetEvent.class, e -> Arrays.fill(cores, (short)0)); //prevent added by editor
+        Events.on(EventType.ResetEvent.class, e -> Arrays.fill(cores, (short)0));
         updateClipRadius(radius + 3.0f);
         super.init();
     }
