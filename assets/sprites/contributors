@@ -8,7 +8,8 @@
     aim-shoot.png
 
   Saturation Power (饱和火力):
-    frag-back.png, frag-front.png (微调)
+    logo.png (字库, 经过调整)
+    frag-back.png, frag-front.png (均经过微调)
 
 
 感谢 NJSAAA
@@ -21,6 +22,7 @@
   绘制的:
     天火 (Aerolite)
     磁球 (Magnetic Sphere)
+    疮疤 (Scab)
     磁环泵 (Magnetic Ring Pump)
     硬化流体储罐 (Hardened Liquid Tank)
     磁聚轧钢机 (Magnetism-Concentrated Rolling Mill)
@@ -30,6 +32,7 @@
   重置的:
     击碎 (Smasher)
     硬化合金坩埚 (Hardened Alloy Crucible)
+    篝火 (Campfire)
     装甲核心 (Core: Bulwark)
     利刃 (Blade)
     灼阳 (Apollo)

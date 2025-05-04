@@ -165,7 +165,7 @@ public class FRBlocks{
         b.instantDisappear = true;
         b.splashDamage = dmg;
         b.despawnEffect = b.hitEffect = e;
-        e.lifetime = 15.0f;
+        e.lifetime = 30.0f;
         e.strokeFrom = 2.0f;
         e.sizeTo = rad;
         e.sizeFrom = e.strokeTo = 0.0f;
@@ -1005,7 +1005,7 @@ public class FRBlocks{
         }};
 
         magneticDomain = new EnergyField.EnergyFieldPowerTurret("magnetic-domain"){{
-            final byte r = 36;
+            final float r = range = 36.0f * tilesize;
 
             requirements(Category.turret, with(
                 Items.lead, 500,
@@ -1016,7 +1016,6 @@ public class FRBlocks{
             size = 3;
             hasLiquids = false;
             reload = 90.0f;
-            range = r * tilesize;
             recoil = 0.0f;
             rotateSpeed = 1.6f;
             shootCone = 360.0f;
@@ -1028,7 +1027,7 @@ public class FRBlocks{
             consumePower(n(600));
 
             shootType = new EnergyField.EnergyFieldBulletType(30.0f, 15){{
-                homingRange = r * tilesize;
+                homingRange = r;
                 knockback = 6.0f;
                 pierceArmor = true;
                 displayAmmoMultiplier = false;

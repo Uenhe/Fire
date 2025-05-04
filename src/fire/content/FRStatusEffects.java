@@ -20,6 +20,7 @@ import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.units.StatusEntry;
+import mindustry.gen.MechUnit;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -127,9 +128,14 @@ public class FRStatusEffects{
                 stats.add(Stat.affinities, status.emoji() + status.localizedName + Core.bundle.format("stat.reaction", damagePercent * 100.0f + FRStatUnit.percentPerSec.localized(), neo_extraRegenPercent * 100.0f + FRStatUnit.percentPerSec.localized()));
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             public void update(Unit unit, float time){
-                Seq<StatusEntry> entries = Reflect.get(unit, "statuses");
+                var clazz = unit.getClass();
+                while(clazz.getSuperclass() != Unit.class)
+                    clazz = (Class<? extends Unit>)clazz.getSuperclass();
+
+                Seq<StatusEntry> entries = Reflect.get(clazz, unit, "statuses");
                 boolean wet = entries.contains(e -> e.effect == status); //why hasEffect() is buggy
 
                 // check whether unit is neoplasm-about

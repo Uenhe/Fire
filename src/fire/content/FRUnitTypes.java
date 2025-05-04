@@ -1192,8 +1192,7 @@ public class FRUnitTypes{
                 }
             });
 
-            weapons.add(
-
+            weapons.addAll(
                 new Weapon("omura-cannon"){{
                     reload = 495.0f;
                     x = 0.0f;
@@ -1252,7 +1251,6 @@ public class FRUnitTypes{
                             fragBullets = 3;
                             fragBullet = new LaserBulletType(90.0f){{
                                 length = 230.0f;
-
                                 fragBullets = 3;
                                 fragBullet = new LightningBulletType(){{
                                     damage = 8.0f;
@@ -1286,9 +1284,10 @@ public class FRUnitTypes{
                 }},
 
                 new Weapon("large-artillery"){{
-                    reload = 8.0f;
-                    x = 18.0f;
+                    reload = 12.0f;
+                    x = -18.0f;
                     y = 18.0f;
+                    mirror = false;
                     inaccuracy = 2.2f;
                     shootY = 6.0f;
                     rotateSpeed = 4.0f;
@@ -1308,6 +1307,56 @@ public class FRUnitTypes{
                         pierceBuilding = true;
                         collidesGround = true;
                         status = StatusEffects.blasted;
+                    }};
+                }},
+
+                new Weapon("large-artillery"){{
+                    reload = 24.0f;
+                    x = 18.0f;
+                    y = 18.0f;
+                    mirror = false;
+                    inaccuracy = 1.2f;
+                    shootY = 6.0f;
+                    rotateSpeed = 3.0f;
+                    rotate = true;
+                    shootSound = Sounds.laser;
+                    bullet = new PointBulletType(){{
+                        damage = 35.0f;
+                        speed = 2.8f;
+                        splashDamage = 100.0f;
+                        splashDamageRadius = 30.0f;
+                        status = StatusEffects.melting;
+
+                        trailSpacing = 14.0f;
+                        trailEffect = new MultiEffect(
+                            new ParticleEffect(){{
+                                particles = 1;
+                                lifetime = 30.0f;
+                                randLength = false;
+                                line = true;
+                                baseLength = length = 0.1f;
+                                lenFrom = lenTo = 15.0f;
+                                strokeFrom = 5.0f;
+                                cone = 0.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }},
+                            new ParticleEffect(){{
+                                particles = 1;
+                                baseLength = length = 9.0f;
+                                sizeFrom = 5.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }}
+                        );
+                        hitEffect = new ParticleEffect(){{
+                            particles = 1;
+                            lifetime = 30.0f;
+                            length = 0.0f;
+                            sizeFrom = 8.0f;
+                            colorFrom.set(Pal.surge);
+                            colorTo.set(Color.white);
+                        }};
                     }};
                 }},
 

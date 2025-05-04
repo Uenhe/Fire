@@ -121,8 +121,8 @@ public class FireMod extends mindustry.mod.Mod{
             addContent(t,
                 FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
+                FRBlocks.stackedCultivator, FRBlocks.constraintExtractor,
                 FRBlocks.magneticRingPump, FRBlocks.hardenedLiquidTank, FRBlocks.hydroelectricGenerator,
-                FRBlocks.constraintExtractor,
                 FRBlocks.cryofluidMixerLarge, FRBlocks.magnetismConcentratedRollingMill, FRBlocks.magneticRingSynthesizer,
                 FRBlocks.primaryInterplanetaryAccelerator,
                 FRUnitTypes.hatchet, FRUnitTypes.castle, FRUnitTypes.mechanicalTide
