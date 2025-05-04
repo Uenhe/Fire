@@ -1,11 +1,16 @@
 package fire.world.blocks.environment;
 
-/** TODO reconstruct this if v147 is released, since it will be able to change weather in world processor... */
+import mindustry.type.Category;
+import mindustry.type.ItemStack;
+import mindustry.world.Tile;
+import mindustry.world.meta.BuildVisibility;
+
+/** Too lazy to set weather in world processor. */
 public class EnvBlock extends mindustry.world.Block{
 
     public EnvBlock(String name){
         super(name);
-        requirements(mindustry.type.Category.effect, mindustry.world.meta.BuildVisibility.hidden, mindustry.type.ItemStack.with());
+        requirements(Category.effect, BuildVisibility.debugOnly, ItemStack.with());
         update = true;
         targetable = false;
         forceDark = true;
@@ -15,7 +20,7 @@ public class EnvBlock extends mindustry.world.Block{
     }
 
     @Override
-    public boolean canBreak(mindustry.world.Tile tile){
+    public boolean canBreak(Tile tile){
         return false;
     }
 
@@ -24,18 +29,15 @@ public class EnvBlock extends mindustry.world.Block{
         @Override
         public void update(){
             super.update();
-
-            if(isStarter())
-                updateStart();
-            else
-                updateStop();
+            if(isStarter()) updateStart();
+            else updateStop();
         }
 
         protected void updateStart(){}
 
         protected void updateStop(){}
 
-        /** Use position to decide to start or to stop, preventing registering two blocks. */
+        /** Use position to decide to start or stop. */
         protected boolean isStarter(){
             return tileX() % 2 == 0;
         }

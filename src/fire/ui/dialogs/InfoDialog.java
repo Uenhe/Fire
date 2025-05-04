@@ -23,7 +23,8 @@ import arc.struct.Seq;
 import arc.util.Align;
 import arc.util.Nullable;
 import arc.util.Scaling;
-import fire.content.FBlocks;
+import fire.content.FRBlocks;
+import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -32,6 +33,7 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
+import mindustry.world.Block;
 
 import java.util.Arrays;
 
@@ -39,8 +41,7 @@ import static mindustry.Vars.*;
 
 /**
  * To show more details about contents.
- * See {@link mindustry.ui.dialogs.ResearchDialog}
- * TODO all english info is done by AI; human translation is required.
+ * @see mindustry.ui.dialogs.ResearchDialog
  */
 public class InfoDialog extends BaseDialog{
 
@@ -50,11 +51,11 @@ public class InfoDialog extends BaseDialog{
     private InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
     private InfoNode lastNode = root.node;
 
-    private static final float nodeSize = Scl.scl(70f);
-    private static final float nodeSpacing = 40f;
+    private static final float nodeSize = Scl.scl(70.0f);
+    private static final float nodeSpacing = 40.0f;
     public static final InfoDialog dialog = new InfoDialog();
 
-    private InfoDialog(){
+    public InfoDialog(){
         super("");
 
         titleTable.remove();
@@ -70,10 +71,10 @@ public class InfoDialog extends BaseDialog{
         }, () -> new BaseDialog("@techtree.select"){{
 
             cont.pane(t -> t.table(Tex.button, in -> {
-
                 in.defaults().width(300f).height(60f);
 
-                for(var node : InfoTree.roots){
+                var roots = InfoTree.roots;
+                for(var node : roots){
                     if(locked(node)) continue;
 
                     in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
@@ -151,7 +152,7 @@ public class InfoDialog extends BaseDialog{
         });
     }
 
-    public void switchTree(InfoNode node){
+    private void switchTree(InfoNode node){
         if(lastNode == node || node == null) return;
 
         nodes.clear();
@@ -160,7 +161,7 @@ public class InfoDialog extends BaseDialog{
         view.rebuildAll();
     }
 
-    public void rebuildTree(InfoNode node){
+    private void rebuildTree(InfoNode node){
         switchTree(node);
 
         view.panX = 0f;
@@ -180,7 +181,8 @@ public class InfoDialog extends BaseDialog{
 
         node.selectable = !locked(node.node);
 
-        for(var n : node.children){
+        var children = node.children;
+        for(var n : children){
             n.visible = !locked && n.parent.visible;
             checkNodes(n);
         }
@@ -220,6 +222,7 @@ public class InfoDialog extends BaseDialog{
         float minX = 0f, minY = 0f, maxX = 0f, maxY = 0f;
         copyInfo(node);
 
+        var nodes = this.nodes;
         for(var n : nodes){
             if(!n.visible) continue;
 
@@ -245,9 +248,11 @@ public class InfoDialog extends BaseDialog{
         node.node.x = node.x;
         node.node.y = node.y;
 
-        if(node.children != null)
-            for(var child : node.children)
+        if(node.children != null){
+            var children = node.children;
+            for(var child : children)
                 copyInfo(child);
+        }
     }
 
     private class View extends Group{
@@ -262,12 +267,12 @@ public class InfoDialog extends BaseDialog{
         }
 
         private void rebuildAll(){
-
             clear();
             hoverNode = null;
             infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
+            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
 
@@ -283,12 +288,10 @@ public class InfoDialog extends BaseDialog{
 
                         float right = infoTable.getRight();
                         if(right > Core.graphics.getWidth()){
-
-                            float moveBy = right - Core.graphics.getWidth();
                             addAction(new RelativeTemporalAction(){
                                 @Override
                                 protected void updateRelative(float percentDelta){
-                                    panX -= moveBy * percentDelta;
+                                    panX -= (right - Core.graphics.getWidth()) * percentDelta;
                                     setDuration(0.1f);
                                     setInterpolation(Interp.fade);
                                 }
@@ -367,11 +370,9 @@ public class InfoDialog extends BaseDialog{
             infoTable.remove();
             infoTable.clear();
             infoTable.update(null);
-
             if(button == null) return;
 
             var node = (InfoNode)button.userObject;
-
             infoTable.exited(() -> {
                 if(hoverNode == button && !infoTable.hasMouse() && !hoverNode.hasMouse()){
                     hoverNode = null;
@@ -380,12 +381,9 @@ public class InfoDialog extends BaseDialog{
             });
 
             infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
-
             infoTable.left();
             infoTable.background(Tex.button).margin(8f);
-
             infoTable.table(b -> {
-
                 b.margin(0).left().defaults().left();
                 b.add().grow();
 
@@ -395,9 +393,8 @@ public class InfoDialog extends BaseDialog{
                 }).growY().width(50f);
 
                 var t = b.table(desc -> {
-
                     desc.left().defaults().left();
-                    desc.add(locked(node) ? "@content.unlocked" : node.content.localizedName);
+                    desc.add(locked(node) ? "@fire.lockedcontent" : node.content.localizedName);
                     desc.row();
 
                     if(locked(node))
@@ -414,8 +411,8 @@ public class InfoDialog extends BaseDialog{
 
             if(!locked(node) && hasInfo(node))
                 infoTable.table(t -> t.margin(3f).left().labelWrap(
-                    FBlocks.compositeMap.containsKey(node.content)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FBlocks.compositeMap.get(node.content).localizedName)
+                    FRBlocks.compositeMap.containsKey(node.content.id)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", ((Block)content.getByID(ContentType.block, FRBlocks.compositeMap.get(node.content.id))).localizedName)
                     : Core.bundle.get(getKey(node))
                 ).color(Color.lightGray).growX()).fillX();
 
@@ -427,15 +424,16 @@ public class InfoDialog extends BaseDialog{
 
         @Override
         public void drawChildren(){
-
             clamp();
-            float offsetX = panX + width / 2f, offsetY = panY + height / 2f;
+            float offsetX = panX + width * 0.5f, offsetY = panY + height * 0.5f;
             Draw.sort(true);
 
+            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 if(!node.visible) continue;
 
-                for(var child : node.children){
+                var children = node.children;
+                for(var child : children){
                     if(!child.visible) continue;
 
                     boolean lock = locked(node.node) || locked(child.node);
@@ -486,7 +484,7 @@ public class InfoDialog extends BaseDialog{
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
-            for(int i = 0; i < children.length; i++)
+            for(byte i = 0, len = (byte)children.length; i < len; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
         }
     }
@@ -513,8 +511,9 @@ public class InfoDialog extends BaseDialog{
             InfoTree.all.add(this);
         }
 
-        public static void dnode(UnlockableContent content){
-            dnode(content, () -> {
+        public static InfoNode dnode(UnlockableContent content){
+            return dnode(content, () -> {
+
             });
         }
 

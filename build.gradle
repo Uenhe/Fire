@@ -11,49 +11,50 @@ repositories{
 }
 
 java{
-    targetCompatibility = 8
-    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = sourceCompatibility = JavaVersion.VERSION_17
 }
 
 ext{
     //the build number that this mod is made for
-    mindustryVersion = 'v146'
-    jabelVersion = "93fde537c7"
+    arcHash = 'fed4cd0caf'
+    mindustryHash = '5615182bc5' //adapts to 25902
+    jabelVersion = '93fde537c7'
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
-//java 8 backwards compatibility flag
 allprojects{
-    tasks.withType(JavaCompile){
-        options.compilerArgs.addAll(['--release', '8'])
+    tasks.withType(JavaCompile).tap{
+        configureEach{
+            options.compilerArgs.addAll(['--release', '17'])
+        }
     }
 }
 
 dependencies{
-    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Arc:arc-core:$arcHash"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryHash"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
 
 //force arc version
-configurations.all{
-    resolutionStrategy.eachDependency { details ->
-        if(details.requested.group == 'com.github.Anuken.Arc'){
-            details.useVersion "$mindustryVersion"
+configurations.configureEach{
+    resolutionStrategy.eachDependency{ details ->
+        if('com.github.Anuken.Arc' == details.requested.group){
+            details.useVersion "$arcHash"
         }
     }
 }
 
-task jarAndroid{
+tasks.register('jarAndroid'){
     dependsOn "jar"
 
     doLast{
-        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.");
+        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.")
 
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{ f -> new File(f, "android.jar").exists()}
+        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{f -> new File(f, "android.jar").exists()}
 
         if(!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
 
@@ -64,7 +65,7 @@ task jarAndroid{
 
         //dex and desugar files - this requires d8 in your PATH
         "$d8 $dependencies --min-api 14 --output ${project.archivesBaseName}Android.jar ${project.archivesBaseName}Desktop.jar"
-            .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
+                .execute(null, new File("$buildDir/libs")).waitForProcessOutput(System.out, System.err)
     }
 }
 
@@ -84,7 +85,7 @@ jar{
     }
 }
 
-task deploy(type: Jar){
+tasks.register('deploy', Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${base.archivesBaseName}.jar"

@@ -1,43 +1,46 @@
 # Mindustry Mod - Fire
 - [English](README.md) | [中文](README_zh.md)
 
-A Mindustry Mod that adds a lot of WEIRD things...
+A Mindustry Mod that adds many unique things...
 
-Notice: There are two author, FlyRain and KochiyaUeneh.
-
-[Here is FlyRain.](https://github.com/nuiFghY)
+There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me).
 
 ## Content
 
 ### Vanilla changes:
 
 - Slightly buffs some vanilla blocks & units
-- Sand Water, Dark Sand Water, Dark Sand Tainted Water now are mineable
-- Alpha & Beta now can be produced by Air Factory or Upgrading Alpha
+- Sand Water, Dark Sand Water, Dark Sand Tainted Water now are "mineable"
+- Alpha & Beta now can be produced by unit factory
 - Alpha, Beta, Gamma now "dock" to other units like Erekir core units
 
 ### Extensions beyond the vanilla:
 
 #### Campaign:
 
-- Adds new planet - Risetar, with 10+ preset sectors and its own tech tree
+- Adds a new planet - Lysetta, with its own tech tree and extra 16 sector presets
+- To learn how to begin your journey on Lysetta, why not first go checking out Serpulo...
 
 #### Blocks:
 
-- More powerful turrets
-- More cool factories
+- 12 new powerful turrets with their unique shoot patterns
+- 21 new cool factories with their special effects
+- Brand-new mender, overdrive projector, core, build tower
+- More practical drills, generators, walls and distribution facilities
 - More blocks as superior of some vanilla blocks
-- Cheaper and more efficient power generators
-- Adds Dam Wall that can be placed on deep water
-- Adds Hardened Alloy Wall that is extremely armored
-- Adds Flesh Wall that has the ability to repair itself
-- Advanced 5*5-sized buildable & destructible core, extremely well armored
 - Javelin Pad from Mindustry v5
+- Totally 60+ new blocks
 
 #### Units:
 
-- Adds 5 new ground supporting units, can step over most terrain
-- Adds 3 new Kamikaze air units, flying toward enemies and self-destructs
-- Adds 1 new flesh ground mech unit, basically similar to the vanilla
+- Adds new unit line: Air Kazekami, flying toward enemies and self-destructs
+- Adds new unit line: Ground Supporting, providing powerful supporting abilities
+- Adds new unit line: Ground Flesh, basically similar to the vanilla but mutated and strengthened
+- 3 new boss units
 - Javelin Ship from Mindustry v5
-- And more high-tier units
+- Totally 18 new units
+
+#### Others:
+
+- 12 new items and 1 new liquid
+- 7 new status effects

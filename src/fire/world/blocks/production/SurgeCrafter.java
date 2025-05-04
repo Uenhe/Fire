@@ -1,16 +1,21 @@
 package fire.world.blocks.production;
 
+import arc.audio.Sound;
 import arc.math.Mathf;
-import arc.struct.Seq;
+import arc.util.Nullable;
+import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
+import mindustry.gen.Sounds;
+
+import static fire.FRVars.specialContent;
 
 public class SurgeCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
     protected byte fragBullets;
-    protected mindustry.entities.bullet.BulletType fragBullet = mindustry.content.Bullets.placeholder;
-    /** Used for custom bullets behavior. */
-    protected Pattern pattern = (bullet, index, sign) -> {};
-    protected arc.audio.Sound craftSound = mindustry.gen.Sounds.none;
+    protected @Nullable BulletType fragBullet;
+    protected @Nullable SignPattern signs;
+    protected @Nullable BulletPattern bullets;
+    protected Sound craftSound = Sounds.none;
 
     public SurgeCrafter(String name){
         super(name);
@@ -20,39 +25,36 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
 
     public class SurgeCrafterBuild extends GenericCrafterBuild{
 
-        protected final Seq<mindustry.gen.Bullet> bullets = new Seq<>(fragBullets);
-        private byte sign;
+        private byte counter;
 
         @Override
         public void craft(){
             super.craft();
             craftSound.at(this, Mathf.random(0.9f, 1.1f));
-            bullets.clear();
+            if(!specialContent || fragBullets == 0) return;
 
-            //create bullet
-            float rand = Mathf.random(360.0f);
-            for(byte i = 0; i < fragBullets; i++)
-                bullets.add(fragBullet.create(this, x, y, 360.0f / fragBullets * i + rand));
+            int len = 0;
+            for(byte i = 0, bulletz = fragBullets; i < bulletz; i++){
+                var bullet = fragBullet.create(this, x, y, 360.0f / bulletz * i);
+                var ss = signs.apply(i);
+                if(i == 0) len = ss.length;
 
-            sign = (byte)Mathf.sign(bullets.get(0).id % 2 == 0);
-        }
+                bullet.lifetime /= Mathf.pow(timeScale, 0.99f);
+                bullet.vel.scl(timeScale);
+                bullet.mover = b -> bullets.accept(b, (byte)Mathf.sign(ss[counter]));
+            }
 
-        @Override
-        public void updateTile(){
-            super.updateTile();
-            if(bullets.isEmpty()) return;
-
-            bullets.each(b -> {
-                // use replace() so that the origin pattern won't be messed up
-                if(!b.isAdded()) bullets.replace(b, Bullet.create());
-
-                pattern.get(b, bullets.indexOf(b), sign);
-            });
+            if(++counter >= len) counter = 0;
         }
     }
 
-    /** {@link arc.func.Cons3} */
-    public interface Pattern{
-        void get(Bullet bullet, int index, byte sign);
+    @FunctionalInterface
+    public interface SignPattern{
+        boolean[] apply(byte index); //true -> "+", false -> "-"
+    }
+
+    @FunctionalInterface
+    public interface BulletPattern{
+        void accept(Bullet bullet, byte sign);
     }
 }

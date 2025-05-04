@@ -1,33 +1,30 @@
 package fire.entities.abilities;
 
+import arc.Core;
 import arc.scene.ui.layout.Table;
-import arc.struct.Seq;
 import arc.util.Strings;
+import arc.util.Time;
+import fire.type.FleshUnitType;
 import mindustry.entities.Effect;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
+import mindustry.entities.Units;
+import mindustry.gen.Unit;
+import mindustry.type.StatusEffect;
 
-import static fire.content.FStatusEffects.*;
+import static fire.content.FRStatusEffects.*;
+import static mindustry.Vars.tilesize;
 import static mindustry.content.StatusEffects.*;
 
 public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Ability{
 
-    /*
-    private static final Seq<StatusEffect> BUFFS = Seq.with(
-        fast, overdrive, overclock, shielded, boss, invincible,
-        inspired
-    );
-     */
+    public static final StatusEffect[] DE_BUFFS = {
+        burning, freezing, unmoving, slow, wet, muddy, melting, sapped, electrified,
+        sporeSlowed, tarred, shocked, blasted, corroded, disarmed,
+        frostbite, overgrown, disintegrated, magnetized
+    };
 
-    public static final Seq<mindustry.type.StatusEffect> DE_BUFFS = Seq.with(
-        burning, freezing, unmoving, slow, wet, muddy, melting, sapped,
-        electrified, sporeSlowed, tarred, shocked, blasted, corroded, disarmed,
-        frostbite, overgrown, disintegrated
-    );
-
-    private final float range;
-    private final float reload;
-    private final Effect removeEffect;
+    public final float range;
+    public final float reload;
+    public final Effect removeEffect;
 
     private float timer;
 
@@ -38,36 +35,30 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
     }
 
     @Override
-    public String localized(){
-        return arc.Core.bundle.get("ability.fire-debuffremovefield");
+    public String getBundle(){
+        return "ability.fire-debuffremovefield";
     }
 
     @Override
     public void addStats(Table t){
-        t.add("[lightgray]" + Stat.shootRange.localized() + ": [white]" +  Strings.autoFixed(range / mindustry.Vars.tilesize, 2) + " " + StatUnit.blocks.localized());
-        t.row();
-        t.add("[lightgray]" + Stat.cooldownTime.localized() + ": [white]" + Strings.autoFixed(reload / 60f, 2) + " " + StatUnit.seconds.localized());
+        super.addStats(t);
+        t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
+        t.add(abilityStat("cooldown", Strings.autoFixed(reload / 60.0f, 2)));
     }
 
     @Override
-    public void update(mindustry.gen.Unit unit){
-        if((timer += arc.util.Time.delta) >= reload){
-            timer %= reload;
+    public void update(Unit unit){
+        if((timer += Time.delta) >= reload){
+            timer -= reload;
 
-            boolean[] any = new boolean[]{false};
-            mindustry.entities.Units.nearby(unit.team, unit.x, unit.y, range, u -> {
-
+            Units.nearby(unit.team, unit.x, unit.y, range, u -> {
+                var DE_BUFFS = DebuffRemoveFieldAbility.DE_BUFFS;
                 for(var e : DE_BUFFS){
-                    if(!u.hasEffect(e)) continue;
-
-                    if(!(u.type instanceof fire.type.FleshUnitType && e == overgrown)){
-                        u.unapply(e);
-                        any[0] = true;
-                    }
+                    if(!u.hasEffect(e) || (u.type instanceof FleshUnitType && e != overgrown)) continue;
+                    u.unapply(e);
+                    removeEffect.at(unit);
                 }
             });
-
-            if(any[0]) removeEffect.at(unit);
         }
     }
 }

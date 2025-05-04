@@ -6,7 +6,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.util.Time;
-import fire.world.meta.FStat;
+import fire.world.meta.FRStat;
 import mindustry.content.Fx;
 import mindustry.entities.TargetPriority;
 import mindustry.gen.Bullet;
@@ -18,20 +18,15 @@ import static mindustry.Vars.tilesize;
 
 public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
 
-    /** Chance of wall to heal itself on collision. -1 to disable. */
-    protected float chanceHeal = -1f;
-    /** {@link mindustry.world.blocks.defense.Wall} */
-    protected float chanceDeflect = -1f;
+    /** Chance of wall to heal itself on collision. */
+    protected byte chanceHeal;
+    protected byte chanceDeflect;
     /** How much wall heals at collision. Based on bullet damage. */
     protected float regenPercent = 0.1f;
-    /** {@link mindustry.type.Item} */
-    protected float frameTime = 3f;
-    /** {@link mindustry.type.Item} */
-    protected byte frames = 0;
-    /** {@link mindustry.world.blocks.defense.Wall} */
-    protected boolean flashHit = false;
-    /** {@link mindustry.world.blocks.defense.Wall} */
-    protected Color flashColor = Color.white;
+    protected byte frameTime = 3;
+    protected byte frames;
+    protected boolean flashHit;
+    protected final Color flashColor = new Color();
 
     public RegenWall(String name){
         super(name);
@@ -52,10 +47,9 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
     @Override
     public void setStats(){
         super.setStats();
-
         stats.remove(Stat.range);
-        stats.addPercent(FStat.baseHealChance, chanceHeal);
-        if(chanceDeflect > 0f) stats.add(Stat.baseDeflectChance, chanceDeflect);
+        stats.addPercent(FRStat.baseHealChance, chanceHeal * 0.01f);
+        if(chanceDeflect > 0) stats.add(Stat.baseDeflectChance, chanceDeflect);
     }
 
     @Override
@@ -73,8 +67,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         public void updateTile(){
             super.updateTile();
 
-            hit = Mathf.clamp(hit - Time.delta / 10f);
-
+            hit = Mathf.clamp(hit - Time.delta / 10.0f);
             if(damaged() && heals){
                 heals = false;
                 heal(healAmount);
@@ -84,28 +77,25 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         @Override
         public boolean collision(Bullet bullet){
             super.collision(bullet);
-            hit = 1f;
+            hit = 1.0f;
 
-            if(Mathf.chance(chanceHeal)){
+            if(Mathf.chance(chanceHeal * 0.01)){
                 healAmount = bullet.damage * regenPercent;
                 heals = true;
             }
 
-            if(
-                chanceDeflect > 0f && bullet.vel.len() > 0.1f
-                && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)
-            ){
+            if(chanceDeflect > 0 && bullet.vel.len() > 0.1f && bullet.type.reflectable && Mathf.chance(chanceDeflect / bullet.damage)){
                 bullet.trns(-bullet.vel.x, -bullet.vel.y);
 
                 if(Math.abs(x - bullet.x) > Math.abs(y - bullet.y)){
-                    bullet.vel.x *= -1f;
+                    bullet.vel.x *= -1.0f;
                 }else{
-                    bullet.vel.y *= -1f;
+                    bullet.vel.y *= -1.0f;
                 }
 
                 bullet.owner = this;
                 bullet.team = team;
-                bullet.time += 1f;
+                bullet.time += 1.0f;
                 return false;
             }
 
@@ -120,7 +110,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         @Override
         public void draw(){
             super.draw();
-            Draw.rect(name + (byte)((Time.time / frameTime % frames) + 1), x, y);
+            Draw.rect(name + (int)((Time.time / frameTime % frames) + 1), x, y);
 
             if(flashHit && hit >= 0.0001f){
                 Draw.color(flashColor);

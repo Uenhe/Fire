@@ -1,9 +1,14 @@
 package fire.world.blocks.defense;
 
+import arc.Core;
 import arc.math.Interp;
-import fire.world.meta.FStat;
+import arc.math.Mathf;
+import fire.world.meta.FRStat;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.minArmorDamage;
+import static mindustry.Vars.state;
 
 public class ArmorWall extends mindustry.world.blocks.defense.Wall{
 
@@ -21,7 +26,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(FStat.maxArmorIncrease, armorIncrease);
+        stats.add(FRStat.maxArmorIncrease, armorIncrease);
     }
 
     @Override
@@ -29,9 +34,9 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         super.setBars();
 
         float max = armor + armorIncrease;
-        addBar("currentarmor", (ArmorWallBuild build) -> new mindustry.ui.Bar(
-            () -> arc.Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
-            () -> mindustry.graphics.Pal.accent,
+        addBar("currentarmor", (ArmorWallBuild build) -> new Bar(
+            () -> Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
+            () -> Pal.accent,
             () -> (armor + build.extraArmor) / max
         ));
     }
@@ -43,20 +48,21 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
-            if(arc.math.Mathf.zero(healthMul))
+            if(Mathf.zero(healthMul))
                 return health + 1.0f;
 
             float dmg = (damage - extraArmor) / healthMul;
             if(dmg < 1.0f)
                 return damage * minArmorDamage;
+
             return dmg;
         }
 
-        /** Might be a hacky way to update {@code extraArmor} without {@code updateTile()}... */
+        /** Might be a hacky way to update extraArmor without updating... */
         @Override
         public void draw(){
             super.draw();
-            extraArmor = armorIncrease * increasePattern.apply(Math.min((1f - health / maxHealth) / maxHealthLossPercentage, 1f));
+            extraArmor = armorIncrease * increasePattern.apply(Math.min((1.0f - health / maxHealth) / maxHealthLossPercentage * 100.0f, 1.0f));
         }
     }
 }
