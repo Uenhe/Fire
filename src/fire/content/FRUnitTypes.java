@@ -1674,7 +1674,8 @@ public class FRUnitTypes{
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(
             new UnitType[]{FRUnitTypes.omicron, FRUnitTypes.pioneer},
-            new UnitType[]{FRUnitTypes.garrison, FRUnitTypes.shelter}
+            new UnitType[]{FRUnitTypes.garrison, FRUnitTypes.shelter},
+            new UnitType[]{FRUnitTypes.lampryo, FRUnitTypes.lumiflame}
         );
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.addAll(
