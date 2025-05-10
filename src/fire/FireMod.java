@@ -8,7 +8,9 @@ import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
+import arc.util.OS;
 import arc.util.Scaling;
+import fire.ai.FRUnitCommand;
 import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
@@ -47,6 +49,7 @@ public class FireMod extends mindustry.mod.Mod{
 
         setRandTitle();
 
+        FRUnitCommand.loadAll();
         FRAttribute.load();
         FRStatusEffects.load();
         FRItems.load();
@@ -85,6 +88,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> {
                 showLog(true);
+                if(!"KochiyaUeneh".equals(OS.username)) return;
                 if(++counter == 5){
                     doSomethingPlayable();
                     ui.announce("Debug successfully.");

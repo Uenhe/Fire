@@ -9,7 +9,7 @@ import mindustry.type.Item;
 
 public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turrets.ItemTurret{
 
-    /** The first bullet to shoot should be placed in {@code ammoTypes}. */
+    /** Note that the first bullet to shoot should be placed in {@code ammoTypes}. */
     protected IntMap<Seq<BulletStack>> bulletStack;
 
     protected ItemBulletStackTurret(String name){

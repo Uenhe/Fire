@@ -41,10 +41,11 @@ public class DrawWeavePlus extends DrawWeave{
             Draw.color(Pal.accent, Color.white, 0.5f);
             Draw.alpha(build.warmup());
 
+            var rnd = rand;
             for(byte i = 0, lines = this.lines; i < lines; i++){
-                rand.setSeed(build.id * i * 2L);
+                rnd.setSeed(build.id * i * 2L);
 
-                float value = Mathf.sin(build.totalProgress() + rand.random(10.0f), 8.0f / rotateSpeed * rand.random(0.8f, 1.25f), build.block.size * tilesize * 0.33f),
+                float value = Mathf.sin(build.totalProgress() + rnd.random(10.0f), 8.0f / rotateSpeed * rnd.random(0.8f, 1.25f), build.block.size * tilesize * 0.33f),
                     x = build.x + (i % 2 == 0 ? value : 0.0f),
                     y = build.y + (i % 2 == 1 ? value : 0.0f),
                     angle = i % 2 == 0 ? 90.0f : 0.0f;

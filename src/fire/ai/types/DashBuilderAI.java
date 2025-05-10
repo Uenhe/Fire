@@ -4,7 +4,15 @@ import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import fire.entities.abilities.DashAbility;
 
-public class RepairDashAI extends mindustry.ai.types.RepairAI{
+public class DashBuilderAI extends mindustry.ai.types.BuilderAI{
+
+    public DashBuilderAI(){
+
+    }
+
+    public DashBuilderAI(int e){
+        onlyAssist = true;
+    }
 
     @Override
     public void circleAttack(float circleLength){

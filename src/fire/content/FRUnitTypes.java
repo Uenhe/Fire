@@ -257,15 +257,14 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 32, 32, 30, 40.0f){{
+                new EnergyForceFieldAbility(160.0f, 3.5f, 7200.0f, 600.0f, 32, 32, 30, 40.0f){{
                     sides = 24;
                     lightningColor.set(Pal.surge);
 
                     extended = true;
                     ext_bearingFactor = 0.4f;
                     ext_counterBulletSpeedFactor = 1.2f;
-                    ext_counterBulletDamageFactor = 0.8f;
-                    ext_counterBulletHomingChancePercentage = 45;
+                    ext_counterBulletDamageFactor = 1.0f;
                     ext_node = new FRUtils.TimeNode(140, 180, 240, 300);
                 }},
 
@@ -586,7 +585,6 @@ public class FRUnitTypes{
             );
 
             weapons.add(
-
                 new Weapon("emp-cannon-mount"){{
                     reload = 120.0f;
                     x = 0.0f;
@@ -599,8 +597,6 @@ public class FRUnitTypes{
                     shootSound = Sounds.laser;
 
                     bullet = new EmpBulletType(){{
-                        final float rad = 60.0f;
-
                         sprite = "circle-bullet";
                         speed = 6.0f;
                         damage = 80.0f;
@@ -608,7 +604,7 @@ public class FRUnitTypes{
                         width = 10.0f;
                         height = 10.0f;
                         splashDamage = 120.0f;
-                        splashDamageRadius = rad;
+                        splashDamageRadius = radius = 60.0f;
                         healPercent = 10.0f;
                         hitShake = 3.0f;
                         trailLength = 18;
@@ -621,7 +617,6 @@ public class FRUnitTypes{
                         statusDuration = 180.0f;
                         status = StatusEffects.electrified;
 
-                        radius = rad;
                         timeIncrease = 0.0f;
                         powerDamageScl = 2.0f;
                         powerSclDecrease = 0.5f;
@@ -645,22 +640,22 @@ public class FRUnitTypes{
                         hitEffect = new Effect(50f, 100f, e -> {
                             e.scaled(7f, b -> {
                                 Draw.color(Pal.heal, b.fout());
-                                Fill.circle(e.x, e.y, rad);
+                                Fill.circle(e.x, e.y, radius);
                             });
                             Draw.color(Pal.heal);
                             Lines.stroke(e.fout() * 3f);
-                            Lines.circle(e.x, e.y, rad);
+                            Lines.circle(e.x, e.y, radius);
 
                             float offset = Mathf.randomSeed(e.id, 360f);
                             for(byte i = 0, points = 8; i < points; i++){
                                 float angle = i * 360f / points + offset;
-                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4.0f, 30f * e.fout(), angle);
+                                Drawf.tri(e.x + Angles.trnsx(angle, radius), e.y + Angles.trnsy(angle, radius), 4.0f, 30f * e.fout(), angle);
                             }
 
                             Fill.circle(e.x, e.y, 12f * e.fout());
                             Draw.color();
                             Fill.circle(e.x, e.y, 6f * e.fout());
-                            Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+                            Drawf.light(e.x, e.y, radius * 1.6f, Pal.heal, e.fout());
                         });
                     }};
                 }},
@@ -1311,7 +1306,7 @@ public class FRUnitTypes{
                 }},
 
                 new Weapon("large-artillery"){{
-                    reload = 24.0f;
+                    reload = 18.0f;
                     x = 18.0f;
                     y = 18.0f;
                     mirror = false;
@@ -1321,10 +1316,10 @@ public class FRUnitTypes{
                     rotate = true;
                     shootSound = Sounds.laser;
                     bullet = new PointBulletType(){{
-                        damage = 35.0f;
-                        speed = 2.8f;
-                        splashDamage = 100.0f;
-                        splashDamageRadius = 30.0f;
+                        damage = 40.0f;
+                        speed = 3.0f;
+                        splashDamage = 115.0f;
+                        splashDamageRadius = 34.0f;
                         status = StatusEffects.melting;
 
                         trailSpacing = 14.0f;

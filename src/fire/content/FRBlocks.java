@@ -570,10 +570,10 @@ public class FRBlocks{
 
         blossom = new PowerTurret("blossom"){{
             requirements(Category.turret, with(
-                Items.lead, 140,
-                Items.graphite, 90,
-                Items.silicon, 105,
-                Items.plastanium, 45
+                Items.lead, 175,
+                Items.graphite, 100,
+                Items.silicon, 125,
+                Items.plastanium, 60
             ));
             health = 1650;
             size = 3;
@@ -604,8 +604,8 @@ public class FRBlocks{
                 drag = -0.003f;
                 homingRange = 80.0f;
                 explodeRange = 40.0f;
-                splashDamageRadius = 36.0f;
-                splashDamage = 60.0f;
+                splashDamageRadius = 34.0f;
+                splashDamage = 55.0f;
                 weaveScale = 10.0f;
                 weaveMag = 2.0f;
                 trailLength = 24;
@@ -616,7 +616,7 @@ public class FRBlocks{
                 buildingDamageMultiplier = 0.25f;
                 collidesGround = true;
                 makeFire = true;
-                statusDuration = 480.0f;
+                statusDuration = 360.0f;
                 status = StatusEffects.burning;
                 trailColor = lightColor = backColor = color;
                 frontColor = Color.white;
@@ -636,12 +636,12 @@ public class FRBlocks{
                     smokeColor = Color.white;
                 }};
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(4.0f, 25.0f){{
+                fragBullet = new BasicBulletType(4.0f, 20.0f){{
                     lifetime = 16.0f;
                     width = 5.0f;
                     height = 12.0f;
-                    splashDamageRadius = 32.0f;
-                    splashDamage = 35.0f;
+                    splashDamageRadius = 28.0f;
+                    splashDamage = 25.0f;
                     homingPower = 0.15f;
                     homingRange = 80.0f;
                     homingDelay = 8.0f;
@@ -1008,8 +1008,10 @@ public class FRBlocks{
             final float r = range = 36.0f * tilesize;
 
             requirements(Category.turret, with(
-                Items.lead, 500,
-                FRItems.magneticAlloy, 200
+                Items.lead, 450,
+                Items.surgeAlloy, 80,
+                FRItems.logicAlloy, 65,
+                FRItems.magneticAlloy, 125
             ));
             health = 1980;
             armor = 8.0f;
@@ -1034,6 +1036,7 @@ public class FRBlocks{
                 status = FRStatusEffects.magnetized;
                 statusDuration = 60.0f;
                 hitEffect = FRFx.chainLightningThin;
+                despawnEffect = Fx.none;
                 lightningColor = Pal.surge;
 
                 fragBullets = 1;
@@ -1066,6 +1069,7 @@ public class FRBlocks{
             maxAmmo = 60;
             recoil = 4.0f;
             recoilTime = 10.0f;
+            cooldownTime = 45.0f;
             shake = 2.2f;
             rotateSpeed = 6.5f;
             unitSort = FRUnitSorts.strongerPlus;
@@ -1627,6 +1631,7 @@ public class FRBlocks{
             inaccuracy = 1.0f;
             rotateSpeed = 4.0f;
             recoil = 2.5f;
+            shootSound = Sounds.blaster;
             shoot = new ShootBarrel(){{
                 shots = 3;
                 barrels = new float[]{
@@ -2406,7 +2411,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, n(12));
         }};
 
-        constraintExtractor = new BeamExtractor("constraint-extractor", 1){{
+        constraintExtractor = new BeamExtractor("constraint-extractor"){{
             requirements(Category.production, with(
                 Items.metaglass, 75,
                 FRItems.logicAlloy, 40,
@@ -2440,7 +2445,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.cryofluid, n(12)).boost();
         }};
 
-        focusingExtractor = new BeamExtractor("focusing-extractor", 5){{
+        focusingExtractor = new BeamExtractor("focusing-extractor"){{
             requirements(Category.production, with(
                 Items.graphite, 75,
                 FRItems.mirrorglass, 90,
@@ -2580,7 +2585,7 @@ public class FRBlocks{
                 Items.plastanium, 4
             ));
             hasPower = false;
-            liquidCapacity = 108.0f;
+            liquidCapacity = 114.0f;
             range = 8;
             pulse = true;
 

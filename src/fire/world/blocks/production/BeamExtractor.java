@@ -52,20 +52,18 @@ public class BeamExtractor extends mindustry.world.Block{
     protected final Color boostColor = new Color();
     protected Effect updateEffect = Fx.none;
     protected byte updateEffectChancePercentage; //a value of 50 -> 50%
-    protected Seq<Barrel> barrels = new Seq<>();
+    protected final Seq<Barrel> barrels = new Seq<>();
 
     private TextureRegion base = new TextureRegion();
-    private final TextureRegion[] barrelRegions;
-    private final TextureRegion[] heatRegions;
+    private TextureRegion[] barrelRegions;
+    private TextureRegion[] heatRegions;
 
-    public BeamExtractor(String name, int n){
+    public BeamExtractor(String name){
         super(name);
         update = true;
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
-        barrelRegions = new TextureRegion[n];
-        heatRegions = new TextureRegion[n];
         buildType = BeamExtractorBuild::new;
 
         config(Item.class, (BeamExtractorBuild build, Item item) -> build.selected = (byte)item.id);
@@ -75,7 +73,10 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     public void load(){
         super.load();
+        var barrels = this.barrels;
         base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite?
+        barrelRegions = new TextureRegion[barrels.size];
+        heatRegions = new TextureRegion[barrels.size];
 
         for(byte i = 0, len = (byte)barrels.size; i < len; i++){
             var barrel = barrels.get(i);
@@ -164,6 +165,7 @@ public class BeamExtractor extends mindustry.world.Block{
         Tile closest = null;
         float mr = Float.MAX_VALUE;
 
+        short range = this.range;
         int mx = Mathf.ceil((wp(x) + range) / tilesize), my = Mathf.ceil((wp(y) + range) / tilesize);
         for    (short tx = (short)((wp(x) - range) / tilesize); tx <= mx; tx++)
             for(short ty = (short)((wp(y) - range) / tilesize); ty <= my; ty++){

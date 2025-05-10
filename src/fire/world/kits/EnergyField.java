@@ -46,7 +46,7 @@ public class EnergyField{
             public void updateTile(){
                 super.updateTile();
                 unit.rotation(0.0f);
-                rotation += shootWarmup * rotateSpeed;
+                rotation += shootWarmup * rotateSpeed * edelta();
             }
 
             @Override
@@ -93,6 +93,9 @@ public class EnergyField{
 
             if(targets.isEmpty()) return;
 
+            if(b.owner instanceof Building build)
+                b.damage *= Mathf.sqrt(build.timeScale());
+
             targets.sort(h -> h.dst2(b.x, b.y));
             for(byte i = 0, len = (byte)Math.min(targets.size, maxTargets); i < len; i++){
                 var target = targets.get(i);
@@ -100,9 +103,6 @@ public class EnergyField{
                 // lightning gets absorbed by plastanium
                 var absorber = Damage.findAbsorber(b.team, b.x, b.y, target.x(), target.y());
                 if(absorber != null) target = absorber;
-
-                if(b.owner instanceof Building build)
-                    b.damage *= Mathf.sqrt(build.timeScale());
 
                 // target must be either unit or building
                 if(target instanceof Unit u)
