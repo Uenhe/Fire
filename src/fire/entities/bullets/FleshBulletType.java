@@ -34,7 +34,6 @@ public class FleshBulletType extends SpritesBulletType{
         super(speed, damage, size, size, ITEM.frames, ITEM.frameTime, ITEM.name);
         hitSize = size;
         status = FRStatusEffects.overgrown;
-        hitEffect = despawnEffect = Fx.none;
 
         var type = (FleshBulletType)copy();
         type.speed = 0.0f;

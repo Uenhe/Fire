@@ -1,8 +1,6 @@
 package fire.content;
 
-import arc.Core;
 import arc.Events;
-import fire.ai.FRUnitCommand;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Blocks;
@@ -49,11 +47,6 @@ public class FROverride{
                     Blocks.darksandWater.playerUnmineable =
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
 
-        Events.run(EventType.Trigger.update, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0){}
-
-        });
-
         //endregion
         //region block turret
 
@@ -97,6 +90,7 @@ public class FROverride{
 
         ((Pump)mechanicalPump).pumpAmount += 0.2f / 60.0f;
         ((Pump)impulsePump).pumpAmount += 1.2f / 9.0f / 60.0f;
+        phaseConduit.liquidCapacity += 28.0f;
 
         //endregion
         //region block power
@@ -148,17 +142,6 @@ public class FROverride{
 
         flare.speed += 0.5f;
         flare.trailLength += 3;
-
-        // have to do this or can't control dash-able units with other units at the same time
-        var units = content.units();
-        for(var type : units){
-            // the first two commands must be moveCommand and enterPayloadCommand, skip
-            if(type.commands.size <= 2) continue;
-
-            type.commands.replace(UnitCommand.repairCommand, FRUnitCommand.repairDashCommand);
-            type.commands.replace(UnitCommand.rebuildCommand, FRUnitCommand.rebuildDashCommand);
-            type.commands.replace(UnitCommand.assistCommand, FRUnitCommand.assistDashCommand);
-        }
 
         //endregion
         //region liquid

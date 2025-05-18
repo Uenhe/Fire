@@ -9,50 +9,48 @@ import arc.math.Mathf;
 import mindustry.gen.Building;
 import mindustry.graphics.Layer;
 import mindustry.world.Block;
-import mindustry.world.draw.DrawRegion;
 
 /** @see mindustry.world.blocks.production.BurstDrill.BurstDrillBuild#draw() */
-public class DrawArrows extends DrawRegion{
+public class DrawArrows extends mindustry.world.draw.DrawBlock{
 
     public final byte arrows;
     public final Color arrowColor, baseArrowColor;
 
-    private final TextureRegion[] arrowRegion, arrowBlurRegion;
+    private final TextureRegion[] arrowRegions, arrowBlurRegions;
 
     public DrawArrows(int n, Color c1, Color c2){
         arrows = (byte)n;
         arrowColor = c1;
         baseArrowColor = c2;
-        arrowRegion = new TextureRegion[n];
-        arrowBlurRegion = new TextureRegion[n];
+        arrowRegions = new TextureRegion[n];
+        arrowBlurRegions = new TextureRegion[n];
     }
 
     @Override
     public void load(Block block){
-        super.load(block);
         for(byte i = 0, arrows = this.arrows; i < arrows; i++){
-            arrowRegion[i] = Core.atlas.find(block.name + "-arrow" + (i + 1));
-            arrowBlurRegion[i] = Core.atlas.find(block.name + "-arrow-blur" + (i + 1));
+            arrowRegions[i] = Core.atlas.find(block.name + "-arrow" + (i + 1));
+            arrowBlurRegions[i] = Core.atlas.find(block.name + "-arrow-blur" + (i + 1));
         }
     }
 
     @Override
     public void draw(Building build){
-        super.draw(build);
-        if(!(build instanceof SmoothCrafter b)) return;
+        if(!(build instanceof SmoothCrafter)) return;
 
+        float sp = ((SmoothCrafter)build).smoothProgress();
         for(byte i = 0, arrows = this.arrows; i < arrows; i++){
-            float a = Mathf.clamp(b.smoothProgress() * (i + 1));
+            float a = Mathf.clamp(sp * (i + 1));
 
             Draw.z(Layer.blockAdditive);
             Draw.color(baseArrowColor, arrowColor, a);
-            Draw.rect(arrowRegion[i], build.x, build.y);
+            Draw.rect(arrowRegions[i], build.x, build.y);
 
             Draw.color(arrowColor);
             Draw.z(Layer.blockAdditive + 0.01f);
             Draw.blend(Blending.additive);
             Draw.alpha(Mathf.pow(a, 10.0f));
-            Draw.rect(arrowBlurRegion[i], build.x, build.y);
+            Draw.rect(arrowBlurRegions[i], build.x, build.y);
             Draw.blend();
         }
     }

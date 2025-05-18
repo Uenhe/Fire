@@ -39,7 +39,7 @@ import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
 
-    public static UnitType
+    public static final UnitType
 
         //legs support
         guarding, resisting, garrison, shelter, blessing,
@@ -62,8 +62,7 @@ public class FRUnitTypes{
         //naval
         mechanicalTide;
 
-    public static void load(){
-
+    static{
         //region legs support
 
         guarding = new UnitType("sh"){{
@@ -257,15 +256,14 @@ public class FRUnitTypes{
             allowLegStep = true;
 
             abilities.add(
-                new EnergyForceFieldAbility(160.0f, 4.0f, 7200.0f, 600.0f, 32, 32, 30, 40.0f){{
+                new EnergyForceFieldAbility(160.0f, 3.5f, 7200.0f, 600.0f, 32, 32, 30, 40.0f){{
                     sides = 24;
                     lightningColor.set(Pal.surge);
 
                     extended = true;
                     ext_bearingFactor = 0.4f;
                     ext_counterBulletSpeedFactor = 1.2f;
-                    ext_counterBulletDamageFactor = 0.8f;
-                    ext_counterBulletHomingChancePercentage = 45;
+                    ext_counterBulletDamageFactor = 1.0f;
                     ext_node = new FRUtils.TimeNode(140, 180, 240, 300);
                 }},
 
@@ -281,7 +279,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region mech mutated
 
         blade = new FleshUnitType("byjd"){{
@@ -417,7 +414,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region ground
 
         error = new FleshUnitType("error"){{
@@ -495,7 +491,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air support
 
         omicron = new UnitType("gnj"){{
@@ -586,7 +581,6 @@ public class FRUnitTypes{
             );
 
             weapons.add(
-
                 new Weapon("emp-cannon-mount"){{
                     reload = 120.0f;
                     x = 0.0f;
@@ -599,8 +593,6 @@ public class FRUnitTypes{
                     shootSound = Sounds.laser;
 
                     bullet = new EmpBulletType(){{
-                        final float rad = 60.0f;
-
                         sprite = "circle-bullet";
                         speed = 6.0f;
                         damage = 80.0f;
@@ -608,7 +600,7 @@ public class FRUnitTypes{
                         width = 10.0f;
                         height = 10.0f;
                         splashDamage = 120.0f;
-                        splashDamageRadius = rad;
+                        splashDamageRadius = radius = 60.0f;
                         healPercent = 10.0f;
                         hitShake = 3.0f;
                         trailLength = 18;
@@ -621,7 +613,6 @@ public class FRUnitTypes{
                         statusDuration = 180.0f;
                         status = StatusEffects.electrified;
 
-                        radius = rad;
                         timeIncrease = 0.0f;
                         powerDamageScl = 2.0f;
                         powerSclDecrease = 0.5f;
@@ -645,22 +636,22 @@ public class FRUnitTypes{
                         hitEffect = new Effect(50f, 100f, e -> {
                             e.scaled(7f, b -> {
                                 Draw.color(Pal.heal, b.fout());
-                                Fill.circle(e.x, e.y, rad);
+                                Fill.circle(e.x, e.y, radius);
                             });
                             Draw.color(Pal.heal);
                             Lines.stroke(e.fout() * 3f);
-                            Lines.circle(e.x, e.y, rad);
+                            Lines.circle(e.x, e.y, radius);
 
                             float offset = Mathf.randomSeed(e.id, 360f);
                             for(byte i = 0, points = 8; i < points; i++){
                                 float angle = i * 360f / points + offset;
-                                Drawf.tri(e.x + Angles.trnsx(angle, rad), e.y + Angles.trnsy(angle, rad), 4.0f, 30f * e.fout(), angle);
+                                Drawf.tri(e.x + Angles.trnsx(angle, radius), e.y + Angles.trnsy(angle, radius), 4.0f, 30f * e.fout(), angle);
                             }
 
                             Fill.circle(e.x, e.y, 12f * e.fout());
                             Draw.color();
                             Fill.circle(e.x, e.y, 6f * e.fout());
-                            Drawf.light(e.x, e.y, rad * 1.6f, Pal.heal, e.fout());
+                            Drawf.light(e.x, e.y, radius * 1.6f, Pal.heal, e.fout());
                         });
                     }};
                 }},
@@ -707,7 +698,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air kamikaze
 
         firefly = new UnitType("firefly"){{
@@ -797,7 +787,7 @@ public class FRUnitTypes{
             flying = true;
             health = 620.0f;
             armor = 9.0f;
-            hitSize = 20.0f;
+            hitSize = 17.0f;
             speed = 2.2f;
             drag = 0.03f;
             accel = 0.04f;
@@ -853,7 +843,7 @@ public class FRUnitTypes{
                         }};
 
                         fragBullets = 1;
-                        fragVelocityMin = fragVelocityMax = 1.0f;
+                        fragVelocityMin = 1.0f;
                         fragRandomSpread = 0.0f;
                         fragBullet = new BasicBulletType(0.0f, 250.0f){{
                             lifetime = 10.0f;
@@ -1114,7 +1104,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air
 
         javelin = new UnitType("javelin"){{
@@ -1192,8 +1181,7 @@ public class FRUnitTypes{
                 }
             });
 
-            weapons.add(
-
+            weapons.addAll(
                 new Weapon("omura-cannon"){{
                     reload = 495.0f;
                     x = 0.0f;
@@ -1252,7 +1240,6 @@ public class FRUnitTypes{
                             fragBullets = 3;
                             fragBullet = new LaserBulletType(90.0f){{
                                 length = 230.0f;
-
                                 fragBullets = 3;
                                 fragBullet = new LightningBulletType(){{
                                     damage = 8.0f;
@@ -1286,9 +1273,10 @@ public class FRUnitTypes{
                 }},
 
                 new Weapon("large-artillery"){{
-                    reload = 8.0f;
-                    x = 18.0f;
+                    reload = 12.0f;
+                    x = -18.0f;
                     y = 18.0f;
+                    mirror = false;
                     inaccuracy = 2.2f;
                     shootY = 6.0f;
                     rotateSpeed = 4.0f;
@@ -1311,6 +1299,56 @@ public class FRUnitTypes{
                     }};
                 }},
 
+                new Weapon("large-artillery"){{
+                    reload = 18.0f;
+                    x = 18.0f;
+                    y = 18.0f;
+                    mirror = false;
+                    inaccuracy = 1.2f;
+                    shootY = 6.0f;
+                    rotateSpeed = 3.0f;
+                    rotate = true;
+                    shootSound = Sounds.laser;
+                    bullet = new PointBulletType(){{
+                        damage = 40.0f;
+                        speed = 3.0f;
+                        splashDamage = 115.0f;
+                        splashDamageRadius = 34.0f;
+                        status = StatusEffects.melting;
+
+                        trailSpacing = 14.0f;
+                        trailEffect = new MultiEffect(
+                            new ParticleEffect(){{
+                                particles = 1;
+                                lifetime = 30.0f;
+                                randLength = false;
+                                line = true;
+                                baseLength = length = 0.1f;
+                                lenFrom = lenTo = 15.0f;
+                                strokeFrom = 5.0f;
+                                cone = 0.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }},
+                            new ParticleEffect(){{
+                                particles = 1;
+                                baseLength = length = 9.0f;
+                                sizeFrom = 5.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }}
+                        );
+                        hitEffect = new ParticleEffect(){{
+                            particles = 1;
+                            lifetime = 30.0f;
+                            length = 0.0f;
+                            sizeFrom = 8.0f;
+                            colorFrom.set(Pal.surge);
+                            colorTo.set(Color.white);
+                        }};
+                    }};
+                }},
+
                 new PointDefenseWeapon("fire-dk-point-defense-mount"){{
                     reload = 12.0f;
                     x = 23.0f;
@@ -1330,12 +1368,11 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region naval
 
         mechanicalTide = new UnitType("mechanical-tide"){{
             BulletType
-            laser = new LaserBulletType(200.0f){{
+                laser = new LaserBulletType(200.0f){{
                 lifetime = 30.0f;
                 hitSize = 4.0f;
                 length = 6.00f;
@@ -1344,27 +1381,27 @@ public class FRUnitTypes{
                 collidesAir = true;
             }},
 
-            type1 = new BasicBulletType(0f, 200f){{
-                width = height = 0.0f;
-                hitEffect = despawnEffect = Fx.none;
-                collides = false;
-                fragAngle = 90.0f;
-                lifetime = fragVelocityMin = 1.0f;
-                fragRandomSpread = 0;
-                fragBullets = 1;
-                fragBullet = laser;
-            }},
+                type1 = new BasicBulletType(0f, 200f){{
+                    width = height = 0.0f;
+                    hitEffect = despawnEffect = Fx.none;
+                    collides = false;
+                    fragAngle = 90.0f;
+                    lifetime = fragVelocityMin = 1.0f;
+                    fragRandomSpread = 0;
+                    fragBullets = 1;
+                    fragBullet = laser;
+                }},
 
-            type2 = new BasicBulletType(0f, 200f){{
-                width = height = 0.0f;
-                hitEffect = despawnEffect = Fx.none;
-                collides = false;
-                fragAngle = -90.0f;
-                lifetime = fragVelocityMin = 1.0f;
-                fragRandomSpread = 0;
-                fragBullets = 1;
-                fragBullet = laser;
-            }};
+                type2 = new BasicBulletType(0f, 200f){{
+                    width = height = 0.0f;
+                    hitEffect = despawnEffect = Fx.none;
+                    collides = false;
+                    fragAngle = -90.0f;
+                    lifetime = fragVelocityMin = 1.0f;
+                    fragRandomSpread = 0;
+                    fragBullets = 1;
+                    fragBullet = laser;
+                }};
 
             constructor = UnitWaterMove::create;
             flying = false;
@@ -1631,9 +1668,9 @@ public class FRUnitTypes{
                 }}
             );
         }};
+    }
 
-        //endregion
-
+    public static void load(){
         // put these there instead of FROverride or automatic unlocking
 
         ((UnitFactory)Blocks.groundFactory).plans.add(
@@ -1674,7 +1711,8 @@ public class FRUnitTypes{
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(
             new UnitType[]{FRUnitTypes.omicron, FRUnitTypes.pioneer},
-            new UnitType[]{FRUnitTypes.garrison, FRUnitTypes.shelter}
+            new UnitType[]{FRUnitTypes.garrison, FRUnitTypes.shelter},
+            new UnitType[]{FRUnitTypes.lampryo, FRUnitTypes.lumiflame}
         );
 
         ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.addAll(

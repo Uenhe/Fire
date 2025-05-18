@@ -120,15 +120,15 @@ public class FRFx{
 
     /** @see Fx#drillSteam */
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
-        Fx.rand.setSeed(e.id);
-
         float length = 4.0f + e.finpow() * 24.0f;
+        var rand = Fx.rand;
         for(byte i = 0; i < 16; i++){
-            Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(length));
+            rand.setSeed(e.id * 2L + i);
+            Fx.v.trns(rand.random(360.0f), rand.random(length));
 
-            e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), b -> {
+            e.scaled(e.lifetime * rand.random(0.5f, 1.0f), b -> {
                 Draw.color(Color.gray, b.fslope() * 0.93f);
-                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, Fx.rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
+                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
             });
         }
     });
@@ -156,50 +156,47 @@ public class FRFx{
             dst = Mathf.dst(e.x, e.y, tx, ty);
         short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
+        var v = Tmp.v1;
+        var rand = Fx.rand;
+        rand.setSeed(e.id * 2L);
 
-        Tmp.v1.set(p).sub(e.x, e.y).nor();
-        float nx = Tmp.v1.x, ny = Tmp.v1.y;
+        v.set(p).sub(e.x, e.y).nor();
+        float nx = v.x, ny = v.y;
 
         Lines.stroke(1.2f * e.fout());
         Draw.color(Color.white, e.color, e.fin());
         Lines.beginLine();
         Lines.linePoint(e.x, e.y);
 
-        Fx.rand.setSeed(e.id);
-
         for(short i = 0; i < links; i++){
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{
                 float len = (i + 1) * spacing;
-                Tmp.v1.setToRandomDirection(Fx.rand).scl(rangeBetweenPoints * 0.5f);
-                Lines.linePoint(
-                    e.x + nx * len + Tmp.v1.x,
-                    e.y + ny * len + Tmp.v1.y
-                );
+                v.setToRandomDirection(rand).scl(rangeBetweenPoints * 0.5f);
+                Lines.linePoint(e.x + nx * len + v.x, e.y + ny * len + v.y);
             }
         }
 
         Lines.endLine();
     }).followParent(false);
 
-    public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
+    public static final Effect reactorExplosionLarge = new Effect(0.0f, 500.0f, b -> {
         float intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
             baseLifetime = 25.0f + intensity * 11.0f;
 
-        b.lifetime = 50.0f + intensity * 55.0f;
+        b.lifetime = 40.0f + intensity * 45.0f;
 
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
+        var rand = Fx.rand;
         for(byte i = 0; i < 4; i++){
             byte j = i;
-            Fx.rand.setSeed(b.id * 2L + j);
+            rand.setSeed(b.id * 2L + j);
 
-            b.scaled(b.lifetime * Fx.rand.random(0.4f, 1.0f), e ->
-                Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22.0f * intensity, (x, y, in, out) -> {
-                    float fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
-                        rad = fout * ((2.0f + intensity) * 2.35f);
-
+            b.scaled(b.lifetime * rand.random(0.4f, 1.0f), e ->
+                Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.7f * intensity), 22.0f * intensity, (x, y, in, out) -> {
+                    float rad = e.fout(Interp.pow5Out) * rand.random(0.5f, 1.0f) * ((2.0f + intensity) * 2.3f);
                     Fill.circle(e.x + x, e.y + y, rad);
                     Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.reactorPurple, 0.5f);
             }));

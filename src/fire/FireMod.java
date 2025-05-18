@@ -8,8 +8,9 @@ import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
+import arc.util.OS;
 import arc.util.Scaling;
-import arc.util.Strings;
+import fire.ai.FRUnitCommand;
 import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
@@ -18,6 +19,7 @@ import fire.world.meta.FRAttribute;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
 import mindustry.mod.Mods;
+import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.meta.BuildVisibility;
@@ -34,6 +36,7 @@ public class FireMod extends mindustry.mod.Mod{
     private static Mods.LoadedMod FIRE;
     private static boolean multiplied;
     private static byte counter;
+    private static BaseDialog mainDialog;
 
     public FireMod(){
         if(!headless) FRBinding.init();
@@ -41,11 +44,12 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void loadContent(){
-        FIRE = mods.getMod(getClass());
+        FIRE = mods.getMod(FireMod.class);
         FIRE.meta.displayName = Core.bundle.get("fire.name");
 
         setRandTitle();
 
+        FRUnitCommand.loadAll();
         FRAttribute.load();
         FRStatusEffects.load();
         FRItems.load();
@@ -84,6 +88,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> {
                 showLog(true);
+                if(!"KochiyaUeneh".equals(OS.username)) return;
                 if(++counter == 5){
                     doSomethingPlayable();
                     ui.announce("Debug successfully.");
@@ -103,31 +108,32 @@ public class FireMod extends mindustry.mod.Mod{
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
         historyDialog.cont.pane(t ->
-            t.add("@fire.history").left().maxWidth(1280.0f).pad(4.0f)
+            t.add("@fire.history").left().maxWidth(width()).pad(4.0f)
         );
 
-        var mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
-        setupDialog(mainDialog);
-        mainDialog.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
-        mainDialog.cont.pane(t -> {
+        var main = mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
+        setupDialog(main);
+        main.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
+        main.cont.pane(t -> {
 
-            t.image(FRUtils.find("logo")).height(107.0f).width(359.0f).pad(3.0f);
+            t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f);
             t.row();
 
-            t.add(Core.bundle.format("fire.content1", FIRE.meta.version)).left().maxWidth(1024.0f).pad(4.0f);
+            t.add(Core.bundle.format("fire.content1", FIRE.meta.version)).left().maxWidth(width()).pad(4.0f);
             t.row();
 
             addContent(t,
+                FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
+                FRBlocks.stackedCultivator, FRBlocks.constraintExtractor,
                 FRBlocks.magneticRingPump, FRBlocks.hardenedLiquidTank, FRBlocks.hydroelectricGenerator,
-                FRBlocks.constraintExtractor,
                 FRBlocks.cryofluidMixerLarge, FRBlocks.magnetismConcentratedRollingMill, FRBlocks.magneticRingSynthesizer,
                 FRBlocks.primaryInterplanetaryAccelerator,
                 FRUnitTypes.hatchet, FRUnitTypes.castle, FRUnitTypes.mechanicalTide
             );
             t.row();
 
-            t.add("@fire.content2").left().maxWidth(1024.0f).pad(4.0f);
+            t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
             t.row();
 
             if("zh_CN".equals(Core.settings.getString("locale"))){
@@ -156,26 +162,20 @@ public class FireMod extends mindustry.mod.Mod{
             }).size(256.0f, 64.0f);
             t.row();
 
-        }).maxWidth(1024.0f);
+        }).maxWidth(width());
 
-        mainDialog.show();
+        main.show();
     }
 
     private static void showNoMultipleMods(){
-        if(mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) && noMultiMods){
-            new DelayClosableDialog("Warning", 300.0f){{
+        if(!noMultiMods || !mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
 
-                multiplied = true;
-                cont.add("@fire.nomultimods");
-                buttons.button("", this::hide).update(b -> {
-                    b.setDisabled(!closable);
-                    b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
-                }).size(210.0f, 64.0f);
+        multiplied = true;
+        doSomethingUnplayable();
 
-                doSomethingUnplayable();
-                show();
-            }};
-        }
+        var dialog = new DelayClosableDialog("Warning", 300.0f);
+        dialog.cont.add("@fire.nomultimods");
+        dialog.show();
     }
 
     private static void showUpdate(){
@@ -186,24 +186,19 @@ public class FireMod extends mindustry.mod.Mod{
             Core.settings.put("mod-fire-version", "");
         }
 
-        new DelayClosableDialog("Update", 300.0f){{
-            cont.pane(t -> {
-                t.table(tt -> {
-                    try{
-                        tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).height(720.0f).width(720.0f).padRight(120.0f);
-                    }catch(Throwable e){
-                        Log.err("Failed to load preview for mod Fire", e);
-                    }
-                });
-                t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(1024.0f).padRight(200.0f);
+        if(mainDialog == null || !mainDialog.isShown()) showLog(true);
+        var dialog = new DelayClosableDialog("Update Notice", 300.0f);
+        dialog.cont.pane(t -> {
+            t.table(tt -> {
+                try{
+                    tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).size(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) * 0.33f).padRight(120.0f);
+                }catch(Throwable e){
+                    Log.err("Failed to load preview for mod Fire", e);
+                }
             });
-            buttons.button("", this::hide).update(b -> {
-                b.setDisabled(!closable);
-                b.setText(closable ? "@close" : String.format("%s(%ss)", Core.bundle.get("close"), Strings.fixed(time / 60.0f, 1)));
-            }).size(210.0f, 64.0f);
-
-            show();
-        }};
+            t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(width()).padRight(200.0f);
+        });
+        dialog.show();
     }
 
     /** See ExtraUtilities also.<p></p>
@@ -236,8 +231,8 @@ public class FireMod extends mindustry.mod.Mod{
 
                     info.left().add("[accent]" + c.localizedName).left().row();
                     try{
-                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend"))));
-                    }catch(Throwable ignored){
+                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend"))) + (c instanceof SectorPreset ? "..." : ""));
+                    }catch(Throwable e){
                         info.left().add(c.description);
                     }finally{
                         info.left();
@@ -247,25 +242,26 @@ public class FireMod extends mindustry.mod.Mod{
             }).growX().pad(5.0f).row();
     }
 
+    private static float width(){
+        return Core.graphics.getWidth() * 0.8f;
+    }
+
     /** ??? */
     private static void doSomethingUnplayable(){
-        var units = content.units();
-        for(var unit : units)
+        for(var unit : content.units())
             unit.health -= 10000.0f;
     }
 
     /** !!! */
     private static void doSomethingPlayable(){
-        var blocks = content.blocks();
-        for(var block : blocks)
+        for(var block : content.blocks())
             if(block.buildVisibility == BuildVisibility.debugOnly)
                 block.buildVisibility = BuildVisibility.shown;
 
         if(multiplied){
             multiplied = false;
 
-            var units = content.units();
-            for(var unit : units)
+            for(var unit : content.units())
                 unit.health += 10000.0f;
         }
     }

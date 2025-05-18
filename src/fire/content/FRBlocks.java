@@ -65,6 +65,7 @@ import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
+import mindustry.gen.WeatherState;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -109,73 +110,54 @@ public class FRBlocks{
 
     /** Component itself -> its inferior. */
     public static final IntIntMap compositeMap = new IntIntMap(5);
-    public static Block
+    public static final Block
+    //environment
+    neoplasm, bloodyDirt, hardenedCovering,
 
-        //environment
-        neoplasm, bloodyDirt, hardenedCovering,
+    //sandbox & misc
+    adaptiveSource, fireCompany,
 
-        //sandbox & misc
-        adaptiveSource, fireCompany,
+    //turret
+    smasher, nightmare,
+    ignition, blossom, gambler, seaquake, distance, magneticDomain,
+    grudge, aerolite, magneticSphere, scab,
+    magneticRail,
 
-        //turret
-        smasher, nightmare,
-        ignition, blossom, gambler, seaquake, distance, magneticDomain,
-        grudge, aerolite, magneticSphere, scab,
-        magneticRail,
+    //production
+    chopper, treeFarm, vapourCondenser, biomassCultivator, stackedCultivator, fissionDrill, constraintExtractor, focusingExtractor,
 
-        //production
-        chopper, treeFarm, vapourCondenser, biomassCultivator, stackedCultivator, fissionDrill, constraintExtractor, constraintExtractorLarge,
+    //distribution
+    compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
 
-        //distribution
-        compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
+    //liquid
+    magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit,
 
-        //liquid
-        magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit,
+    //power
+    conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, burstReactor,
 
-        //power
-        conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, burstReactor,
+    //defense
+    damWall, damWallLarge, hardenedWall, hardenedWallLarge, fleshWall,
 
-        //defense
-        damWall, damWallLarge, hardenedWall, hardenedWallLarge, fleshWall,
+    //crafting
+    thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
+    electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
+    cryofluidMixerLarge,
+    magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
+    hardenedAlloyCrucible,
 
-        //crafting
-        thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
-        electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
-        cryofluidMixerLarge,
-        magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
-        hardenedAlloyCrucible,
+    //units
+    fleshReconstructor,
 
-        //units
-        fleshReconstructor,
+    //effect
+    buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
 
-        //effect
-        buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
+    //env
+    envEteriverStronghold, envStormyCoast1, envStormyCoast2, envGlaciatedPeaks,
 
-        //env
-        envEteriverStronghold, envStormyCoast1, envStormyCoast2, envGlaciatedPeaks,
+    //DEBUG
+    DEBUG_TURRET, DEBUG_MEND;
 
-        //DEBUG
-        DEBUG_TURRET, DEBUG_MEND;
-
-    private static BulletType destroyBullet(float dmg, float rad){
-        var b = new BulletType(1.0f, 0.0f);
-        var e = new WaveEffect();
-
-        b.splashDamageRadius = e.sizeTo = rad;
-        b.instantDisappear = true;
-        b.splashDamage = dmg;
-        b.despawnEffect = b.hitEffect = e;
-        e.lifetime = 15.0f;
-        e.strokeFrom = 2.0f;
-        e.sizeTo = rad;
-        e.sizeFrom = e.strokeTo = 0.0f;
-        e.interp = Interp.pow3Out;
-
-        return b;
-    }
-
-    public static void load(){
-
+    static{
         //region environment
 
         neoplasm = new Floor("pooled-neoplasm", 0){{
@@ -187,15 +169,12 @@ public class FRBlocks{
             liquidDrop = Liquids.neoplasm;
         }};
 
-        bloodyDirt = new Floor("bloody-dirt", 8){{
-            attributes.set(FRAttribute.flesh, 1.0f / 9.0f);
-        }};
+        bloodyDirt = new Floor("bloody-dirt", 8);
+        bloodyDirt.attributes.set(FRAttribute.flesh, 1.0f / 9.0f);
 
-        hardenedCovering = new OverlayFloor("hardened-covering"){{
-            variants = 8;
-        }};
+        hardenedCovering = new OverlayFloor("hardened-covering");
+        hardenedCovering.variants = 8;
 
-        //endregion
         //region sandbox & misc
 
         adaptiveSource = new AdaptiveSource("adaptive-source"){{
@@ -212,7 +191,6 @@ public class FRBlocks{
             size = 2;
         }};
 
-        //endregion
         //region turret
 
         smasher = new ItemTurret("js"){{
@@ -237,10 +215,9 @@ public class FRBlocks{
             targetAir = false;
             shootSound = Sounds.bang;
 
-            consumeCoolant(0.2f);
+            consumeCoolant(n(12));
 
             ammo(
-
                 Items.copper, new ArtilleryBulletType(6f, 20f){{
                     lifetime = 130f;
                     knockback = 1.6f;
@@ -349,16 +326,15 @@ public class FRBlocks{
             size = 2;
             reload = 21.6f;
             range = 24 * tilesize;
-            shootCone = 30.0f;
+            shootCone = 20.0f;
             inaccuracy = 2.0f;
             rotateSpeed = 10.0f;
             shootSound = Sounds.shootBig;
-            coolantMultiplier = 2.0f;
 
-            consumeCoolant(0.2f);
+            coolantMultiplier = 2.0f;
+            consumeCoolant(n(12));
 
             ammo(
-
                 Items.copper, new LaserBulletType(50.0f){{
                     length = 196.0f;
                     colors(colors, _ff9900_a04, _ff9900, Color.white);
@@ -420,7 +396,7 @@ public class FRBlocks{
                     length = 196.0f;
                     width = 20.0f;
                     hitSize = 5.0f;
-                    colors = new Color[]{Pal.thoriumPink.cpy().a(0.4f), Pal.thoriumPink, Color.white};
+                    colors(colors, Pal.thoriumPink.cpy().a(0.4f), Pal.thoriumPink, Color.white);
                     status = StatusEffects.melting;
                     statusDuration = 240.0f;
                     reloadMultiplier = 0.75f;
@@ -446,11 +422,11 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.surgeAlloy, new LaserBulletType(80.0f){{
+                Items.surgeAlloy, new LaserBulletType(70.0f){{
                     length = 231.0f;
                     width = 18.0f;
                     hitSize = 4.5f;
-                    colors = new Color[]{Pal.surge.cpy().a(0.4f), Pal.surge, Color.white};
+                    colors(colors, Pal.surge.cpy().a(0.4f), Pal.surge, Color.white);
                     rangeChange = 35.0f;
                     pierceArmor = true;
                     status = StatusEffects.shocked;
@@ -487,6 +463,22 @@ public class FRBlocks{
                     ammoMultiplier = 4.0f;
                     reloadMultiplier = 0.6f;
                     buildingDamageMultiplier = 0.5f;
+                }},
+
+                FRItems.hardenedAlloy, new LaserBulletType(85.0f){{
+                    length = 271.0f;
+                    width = 22.0f;
+                    hitSize = 5.5f;
+                    colors(colors, Pal.reactorPurple.cpy().a(0.4f), Pal.reactorPurple, Color.white);
+                    rangeChange = 75.0f;
+                    knockback = 1.4f;
+                    pierceArmor = true;
+                    status = FRStatusEffects.disintegrated;
+                    statusDuration = 90.0f;
+                    ammoMultiplier = 1.0f;
+                    reloadMultiplier = 0.6f;
+                    buildingDamageMultiplier = 0.5f;
+                    pierceCap = 6;
                 }}
             );
         }};
@@ -518,20 +510,17 @@ public class FRBlocks{
                 var heatP = DrawPart.PartProgress.warmup.blend(p -> Mathf.absin(2.0f, 1.0f) * p.warmup, 0.2f);
 
                 parts.add(
-
                     new RegionPart("-main"){{
                         progress = PartProgress.warmup;
                         heatProgress = heatP;
                         under = true;
                     }},
-
                     new RegionPart("-blade"){{
                         progress = PartProgress.warmup;
                         heatProgress = heatP;
                         mirror = true;
                         moves.add(new PartMove(PartProgress.warmup, 1.6f, 2.0f, -15.0f));
                     }},
-
                     new RegionPart("-barrel"){{
                         progress = PartProgress.warmup;
                         heatProgress = heatP;
@@ -555,10 +544,10 @@ public class FRBlocks{
 
         blossom = new PowerTurret("blossom"){{
             requirements(Category.turret, with(
-                Items.lead, 140,
-                Items.graphite, 90,
-                Items.silicon, 105,
-                Items.plastanium, 45
+                Items.lead, 175,
+                Items.graphite, 100,
+                Items.silicon, 125,
+                Items.plastanium, 60
             ));
             health = 1650;
             size = 3;
@@ -589,8 +578,8 @@ public class FRBlocks{
                 drag = -0.003f;
                 homingRange = 80.0f;
                 explodeRange = 40.0f;
-                splashDamageRadius = 36.0f;
-                splashDamage = 60.0f;
+                splashDamageRadius = 34.0f;
+                splashDamage = 55.0f;
                 weaveScale = 10.0f;
                 weaveMag = 2.0f;
                 trailLength = 24;
@@ -601,7 +590,7 @@ public class FRBlocks{
                 buildingDamageMultiplier = 0.25f;
                 collidesGround = true;
                 makeFire = true;
-                statusDuration = 480.0f;
+                statusDuration = 360.0f;
                 status = StatusEffects.burning;
                 trailColor = lightColor = backColor = color;
                 frontColor = Color.white;
@@ -621,12 +610,12 @@ public class FRBlocks{
                     smokeColor = Color.white;
                 }};
                 fragBullets = 6;
-                fragBullet = new BasicBulletType(4.0f, 25.0f){{
+                fragBullet = new BasicBulletType(4.0f, 20.0f){{
                     lifetime = 16.0f;
                     width = 5.0f;
                     height = 12.0f;
-                    splashDamageRadius = 32.0f;
-                    splashDamage = 35.0f;
+                    splashDamageRadius = 28.0f;
+                    splashDamage = 25.0f;
                     homingPower = 0.15f;
                     homingRange = 80.0f;
                     homingDelay = 8.0f;
@@ -667,7 +656,6 @@ public class FRBlocks{
             shootSound = Sounds.shotgun;
 
             jackpotAmmo.add(
-
                 new JackpotAmmo(Items.copper, 50,
                     new ShootAlternate(4.0f){{
                         shots = barrels = 3;
@@ -807,7 +795,7 @@ public class FRBlocks{
                 }},
 
                 Liquids.slag, new LiquidBulletType(Liquids.slag){{
-                    speed = 12.0f;
+                    speed = 6.0f;
                     damage = 14.0f;
                     lifetime = 54.0f;
                     knockback = 1.2f;
@@ -960,7 +948,7 @@ public class FRBlocks{
 
                                 Fill.circle(f.x + x, f.y + y, rad);
                                 Drawf.light(f.x + x, f.y + y, rad * 2.0f, f.color, 0.5f);
-                        }));
+                            }));
 
                     }).layer(Layer.bullet - 1.0f);
 
@@ -990,18 +978,19 @@ public class FRBlocks{
         }};
 
         magneticDomain = new EnergyField.EnergyFieldPowerTurret("magnetic-domain"){{
-            final byte r = 36;
+            final float r = range = 36.0f * tilesize;
 
             requirements(Category.turret, with(
-                Items.lead, 500,
-                FRItems.magneticAlloy, 200
+                Items.lead, 450,
+                Items.surgeAlloy, 80,
+                FRItems.logicAlloy, 65,
+                FRItems.magneticAlloy, 125
             ));
             health = 1980;
             armor = 8.0f;
             size = 3;
             hasLiquids = false;
             reload = 90.0f;
-            range = r * tilesize;
             recoil = 0.0f;
             rotateSpeed = 1.6f;
             shootCone = 360.0f;
@@ -1013,13 +1002,14 @@ public class FRBlocks{
             consumePower(n(600));
 
             shootType = new EnergyField.EnergyFieldBulletType(30.0f, 15){{
-                homingRange = r * tilesize;
+                homingRange = r;
                 knockback = 6.0f;
                 pierceArmor = true;
                 displayAmmoMultiplier = false;
-                status = StatusEffects.slow;
-                statusDuration = 180.0f;
+                status = FRStatusEffects.magnetized;
+                statusDuration = 60.0f;
                 hitEffect = FRFx.chainLightningThin;
+                despawnEffect = Fx.none;
                 lightningColor = Pal.surge;
 
                 fragBullets = 1;
@@ -1027,7 +1017,7 @@ public class FRBlocks{
                     instantDisappear = true;
                     splashDamageRadius = homingRange;
                     status = StatusEffects.electrified;
-                    statusDuration = 60.0f;
+                    statusDuration = 30.0f;
                 }};
             }};
         }};
@@ -1052,6 +1042,7 @@ public class FRBlocks{
             maxAmmo = 60;
             recoil = 4.0f;
             recoilTime = 10.0f;
+            cooldownTime = 45.0f;
             shake = 2.2f;
             rotateSpeed = 6.5f;
             unitSort = FRUnitSorts.strongerPlus;
@@ -1613,20 +1604,21 @@ public class FRBlocks{
             inaccuracy = 1.0f;
             rotateSpeed = 4.0f;
             recoil = 2.5f;
+            shootSound = Sounds.blaster;
             shoot = new ShootBarrel(){{
                 shots = 3;
                 barrels = new float[]{
                     -8.0f, -4.0f, 335.0f,
-                    0.0f, -4.0f, 0.0f,
+                    0.0f, -6.0f, 0.0f,
                     8.0f, -4.0f, 25.0f
                 };
             }};
 
-            coolantMultiplier = 2.0f;
-            coolant = consumeLiquid(Liquids.cryofluid, n(18));
+            coolantMultiplier = 5.0f;
+            coolant = consumeLiquid(Liquids.neoplasm, n(18));
 
             ammo(
-                FRItems.flesh, new FleshBulletType(15.6f, 75.0f, 12, 6, 120.0f){{
+                FRItems.flesh, new FleshBulletType(15.8f, 75.0f, 12, 6, 120.0f){{
                     lifetime = 125.0f;
                     drag = 0.05f;
                     homingDelay = 10.0f;
@@ -1639,6 +1631,7 @@ public class FRBlocks{
                     trailColor = _f57946;
                     trailEffect = FRStatusEffects.overgrown.effect;
                     trailChance = 0.15f;
+                    despawnEffect = hitEffect = FRFx.hitBulletSmall(_f57946);
 
                     adhereChancePercentage = 40;
                     removeAmount = 10;
@@ -2207,7 +2200,6 @@ public class FRBlocks{
             );
         }};
 
-        //endregion
         //region production
 
         chopper = new WallCrafter("fmj"){{
@@ -2391,7 +2383,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, n(12));
         }};
 
-        constraintExtractor = new BeamExtractor("constraint-extractor", 1){{
+        constraintExtractor = new BeamExtractor("constraint-extractor"){{
             requirements(Category.production, with(
                 Items.metaglass, 75,
                 FRItems.logicAlloy, 40,
@@ -2425,7 +2417,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.cryofluid, n(12)).boost();
         }};
 
-        constraintExtractorLarge = new BeamExtractor("constraint-extractor-large", 5){{
+        focusingExtractor = new BeamExtractor("focusing-extractor"){{
             requirements(Category.production, with(
                 Items.graphite, 75,
                 FRItems.mirrorglass, 90,
@@ -2445,27 +2437,26 @@ public class FRBlocks{
             tier = 4;
             range = 35 * tilesize;
             drillTime = 10;
-            hardnessDrillMultiplier = 4;
+            hardnessDrillMultiplier = 2;
             warmupSpeed = 0.04f;
             boostScale = 3.2f;
             baseColor.set(Pal.accent);
             boostColor.set(((BeamDrill)Blocks.plasmaBore).boostHeatColor); //lazy
             updateEffect = Fx.pulverizeSmall;
-            updateEffectChancePercentage = 2;
+            updateEffectChancePercentage = 10;
             ambientSound = Sounds.drill;
-            ambientSoundVolume = 0.02f;
+            ambientSoundVolume = 0.025f;
 
             barrels.add(new BeamExtractor.Barrel(
-                "-pri", 0.0f, 0.0f, 4.0f, 1.1f, 1.1f
+                "-pri", 0.0f, 3.0f, 4.0f, 1.0f, 1.1f
             ));
             for(var p : Geometry.d8edge)
-                barrels.add(new BeamExtractor.Barrel("-sec", p.x * 8.0f, p.y * 8.0f, 1.0f, 0.7f, 0.7f));
+                barrels.add(new BeamExtractor.Barrel("-sec", p.x * 9.0f, p.y * 9.0f, 1.2f, 0.6f, 0.6f));
 
-            consumePower(n(150));
+            consumePower(n(1200));
             consumeLiquid(FRLiquids.liquidNitrogen, n(9)).boost();
         }};
 
-        //endregion
         //region distribution
 
         compositeConveyor = new Conveyor("fhcsd"){{
@@ -2489,7 +2480,7 @@ public class FRBlocks{
             ));
             health = 240;
             armor = 12.0f;
-            speed = 0.1167f; // 7/60
+            speed = 7.0f / 60.0f;
             itemCapacity = 20;
             placeableLiquid = true;
         }};
@@ -2512,7 +2503,6 @@ public class FRBlocks{
             compositeMap.put(id, Blocks.itemBridge.id);
         }};
 
-        //endregion
         //region liquid
 
         magneticRingPump = new Pump("magnetic-ring-pump"){{
@@ -2565,14 +2555,13 @@ public class FRBlocks{
                 Items.plastanium, 4
             ));
             hasPower = false;
-            liquidCapacity = 108.0f;
+            liquidCapacity = 114.0f;
             range = 8;
             pulse = true;
 
             compositeMap.put(id, Blocks.bridgeConduit.id);
         }};
 
-        //endregion
         //region power
 
         conductorPowerNode = new BatteryNode("zjjd"){{
@@ -2693,7 +2682,6 @@ public class FRBlocks{
             consumeLiquid(FRLiquids.liquidNitrogen, n(50));
         }};
 
-        //endregion
         //region defense
 
         damWall = new Wall("sbq"){{
@@ -2767,7 +2755,6 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, 0.0076f).boost();
         }};
 
-        //endregion
         //region crafting
 
         thermalKiln = new AttributeCrafter("rnyl"){{
@@ -3516,7 +3503,6 @@ public class FRBlocks{
             consumeLiquid(Liquids.water, n(120));
         }};
 
-        //endregion
         //region units
 
         fleshReconstructor = new UnitFactory("flesh-reconstructor"){
@@ -3546,7 +3532,6 @@ public class FRBlocks{
             }
         };
 
-        //endregion
         //region effect
 
         buildingHealer = new RegenProjector("buildingHealer"){{
@@ -3596,13 +3581,16 @@ public class FRBlocks{
                 Fx.blastsmoke,
                 Fx.generatespark
             );
+            drawArrows = new DrawArrows(2, Pal.lightishOrange, Color.valueOf("c75807"));
+            arrowMaxBoost = 3.38f;
 
-            reload = 60.0f;
+            reload = 30.0f;
             range = 20 * tilesize;
             useTime = 240.0f;
             speedBoost = 1.5f;
             speedBoostPhase = 0.25f;
             phaseRangeBoost = 32.0f;
+            statusDuration = 180.0f;
             allyStatus = FRStatusEffects.inspired;
             enemyStatus = StatusEffects.sapped;
 
@@ -3739,7 +3727,6 @@ public class FRBlocks{
             consumePower(10.0f);
         }};
 
-        //endregion
         //region env
 
         envEteriverStronghold = new EnvBlock("env-eteriver-stronghold"){{
@@ -3749,17 +3736,17 @@ public class FRBlocks{
                 @Override
                 public void add(){
                     super.add();
-                    if(!Groups.weather.contains(w -> w.weather == Weathers.rain)){
-                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
-                        Weathers.rain.create();
-                    }
+                    if(Weathers.rain.isActive()) return;
+                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                    Weathers.rain.create(1.2f);
                 }
 
                 /** Apollo death. */
                 @Override
                 public void onRemoved(){
                     super.onRemoved();
-                    Groups.weather.clear();
+                    if(Weathers.rain.isActive())
+                        Weathers.rain.instance().life = WeatherState.fadeTime;
                 }
             };
         }};
@@ -3768,36 +3755,19 @@ public class FRBlocks{
             buildType = () -> new EnvBlockBuild(){
 
                 /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-                final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                final Color specificColor = new Color(0.1f, 0.1f, 0.1f);
-                float alpha;
+                private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+                private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
 
                 /** Wave 41-47 / 60. */
                 @Override
                 protected void updateStart(){
-                    if(alpha == 0.0f){
-                        if(!renderer.drawWeather){
-                            Core.settings.put("showweather", true);
-                            ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
-                        }
-                        if(!renderer.drawLight){
-                            Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
-                        }
-                    }
-
-                    state.rules.lighting = true;
-                    state.rules.ambientLight = specificColor;
-                    alpha = Mathf.lerpDelta(alpha, 0.4f, 0.003f);
-                    state.rules.ambientLight.a = alpha;
-
-                    if(!Groups.weather.contains(w -> w.weather == Weathers.rain)){
-                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
-                        Weathers.rain.create();
-                    }
+                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.4f, 0.003f);
+                    if(Weathers.rain.isActive()) return;
+                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                    Weathers.rain.create(1.3f);
                 }
 
-                /** When wave 47 is half. */
+                /** When wave 47 is in half. */
                 @Override
                 protected void updateStop(){
                     state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.003f);
@@ -3808,19 +3778,26 @@ public class FRBlocks{
                         else
                             state.rules.ambientLight = Color.clear; //might be buggy if default light is customized
 
+                        if(Weathers.rain.isActive())
+                            Weathers.rain.instance().life = WeatherState.fadeTime;
+
                         kill();
                     }
                 }
 
                 @Override
-                public void onRemoved(){
-                    if(isStarter()) return;
-
-                    Groups.weather.clear();
-                    if(state.isCampaign())
-                        state.rules.ambientLight = defaultColor;
-                    else
-                        state.rules.ambientLight = Color.clear;
+                public void add(){
+                    super.add();
+                    state.rules.lighting = true;
+                    state.rules.ambientLight = specificColor;
+                    if(!renderer.drawWeather){
+                        Core.settings.put("showweather", true);
+                        ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
+                    }
+                    if(!renderer.drawLight){
+                        Core.settings.put("drawlight", true);
+                        Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
+                    }
                 }
             };
         }};
@@ -3829,33 +3806,16 @@ public class FRBlocks{
             buildType = () -> new EnvBlockBuild(){
 
                 /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-                final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                final Color specificColor = new Color(0.1f, 0.1f, 0.1f);
-                float alpha;
+                private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+                private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
 
                 /** Wave 59 / 60. */
                 @Override
                 protected void updateStart(){
-                    if(alpha == 0.0f){
-                        if(!renderer.drawWeather){
-                            Core.settings.put("showweather", true);
-                            ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
-                        }
-                        if(!renderer.drawLight){
-                            Core.settings.put("drawlight", true);
-                            Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
-                        }
-                    }
-
-                    state.rules.lighting = true;
-                    state.rules.ambientLight = specificColor;
-                    alpha = Mathf.lerpDelta(alpha, 0.8f, 0.004f);
-                    state.rules.ambientLight.a = alpha;
-
-                    if(!Groups.weather.contains(w -> w.weather == FRWeathers.rainstorm)){
-                        if(!Groups.weather.isEmpty()) Groups.weather.clear();
-                        FRWeathers.rainstorm.create();
-                    }
+                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.8f, 0.004f);
+                    if(FRWeathers.rainstorm.isActive()) return;
+                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                    FRWeathers.rainstorm.create(1.5f);
                 }
 
                 /** After all the apollos are destructed. */
@@ -3869,19 +3829,26 @@ public class FRBlocks{
                         else
                             state.rules.ambientLight = Color.clear;
 
+                        if(FRWeathers.rainstorm.isActive())
+                            FRWeathers.rainstorm.instance().life = WeatherState.fadeTime;
+
                         kill();
                     }
                 }
 
                 @Override
-                public void onRemoved(){
-                    if(isStarter()) return;
-
-                    Groups.weather.clear();
-                    if(state.isCampaign())
-                        state.rules.ambientLight = defaultColor;
-                    else
-                        state.rules.ambientLight = Color.clear; //might be buggy if default light is customized
+                public void add(){
+                    super.add();
+                    state.rules.lighting = true;
+                    state.rules.ambientLight = specificColor;
+                    if(!renderer.drawWeather){
+                        Core.settings.put("showweather", true);
+                        ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
+                    }
+                    if(!renderer.drawLight){
+                        Core.settings.put("drawlight", true);
+                        Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
+                    }
                 }
             };
         }};
@@ -3901,7 +3868,7 @@ public class FRBlocks{
                     int n = Mathf.random(4, 6);
                     var sectors = state.getPlanet().sectors;
                     for(var s : sectors)
-                        if(counter++ < n && s.hasBase())
+                        if(s.hasBase() && counter++ < n)
                             Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
 
                     kill();
@@ -3909,17 +3876,36 @@ public class FRBlocks{
             };
         }};
 
-        //endregion
         //region DEBUG
 
         DEBUG_TURRET = new DEBUG.DEBUG_Turret("DEBUG_TURRET");
         DEBUG_MEND = new DEBUG.DEBUG_Mend("DEBUG_MEND");
-
-        //endregion
-
     }
 
-    /** Divide numbers by 60. */
+    public static void load(){}
+
+    private static BulletType destroyBullet(float dmg, float rad){
+        var b = new BulletType(0.0f, 0.0f);
+        var f = new BulletType(0.0f, 0.0f);
+        var e = new WaveEffect();
+        b.lifetime = 15.0f;
+        b.fragBullets = 1;
+        b.fragBullet = f;
+
+        f.instantDisappear = true;
+        f.splashDamageRadius = e.sizeTo = rad;
+        f.splashDamage = dmg;
+        f.despawnEffect = f.hitEffect = e;
+
+        e.lifetime = 30.0f;
+        e.strokeFrom = 2.0f;
+        e.sizeTo = rad;
+        e.sizeFrom = e.strokeTo = 0.0f;
+        e.interp = Interp.pow3Out;
+
+        return b;
+    }
+
     private static float n(int amountPerSec){
         return amountPerSec / 60.0f;
     }

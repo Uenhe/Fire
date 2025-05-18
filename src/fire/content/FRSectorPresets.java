@@ -1,67 +1,49 @@
 package fire.content;
 
-import mindustry.mod.Mods;
-import mindustry.type.Planet;
 import mindustry.type.SectorPreset;
 
 public class FRSectorPresets{
 
-    public static SectorPreset
+    public static final SectorPreset
         landingBase, darksandPlain,
         frozenGround, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
         sporeFiord, scorchingVolcano, lavaStronghold,
         eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, rubbleRidge, taintedEstuary;
 
-    public static void load(){
-        landingBase = create("jljd", 0, 6, 0, false);
-        darksandPlain = create("hspy", 94, 7, 50);
+    static{
+        landingBase = create("jljd", 0, 6.0f);
+        darksandPlain = create("hspy", 94, 7.0f, 50);
 
-        frozenGround = create("lhyj", 15, 6, 35);
-        beachLanding = create("htdl", 183, 6);
-        darkWorkshop = create("hacj", 186, 8);
-        desolateFortification = create("urgent-support", 119, 9, 60);
-        glaciatedPeaks = create("glaciated-peaks", 118, 10);
+        frozenGround = create("lhyj", 15, 6.0f, 35);
+        beachLanding = create("htdl", 183, 6.0f);
+        darkWorkshop = create("hacj", 186, 8.0f);
+        desolateFortification = create("urgent-support", 119, 9.0f, 60);
+        glaciatedPeaks = create("glaciated-peaks", 118, 10.0f);
 
-        sporeFiord = create("bzxw", 199, 8, 40);
-        scorchingVolcano = create("zrhs", 180, 8, 50);
-        lavaStronghold = create("lava-stronghold", 232, 9);
+        sporeFiord = create("bzxw", 199, 8.0f, 40);
+        scorchingVolcano = create("zrhs", 180, 8.0f, 50);
+        lavaStronghold = create("lava-stronghold", 232, 9.0f);
 
-        eteriverStronghold = create("hhys", 34, 8);
-        chillyMountains = create("lfsm", 168, 9, 17);
-        stormyCoast = create("stormy-coast", 81, 10, 60);
-        branchedRivers = create("branched-rivers", 158, 10, 14);
-        rubbleRidge = create("rubble-ridge", 172, 10, 65);
-        taintedEstuary = create("tainted-estuary", 116, 10);
+        eteriverStronghold = create("hhys", 34, 8.0f);
+        chillyMountains = create("lfsm", 168, 9.0f, 17);
+        stormyCoast = create("stormy-coast", 81, 10.0f, 60);
+        branchedRivers = create("branched-rivers", 158, 10.0f, 14);
+        rubbleRidge = create("rubble-ridge", 172, 10.0f, 65);
+        taintedEstuary = create("tainted-estuary", 116, 10.0f);
     }
-
-    private static SectorPreset create(String name, int sector, float difficulty){
-        return create(name, sector, difficulty, 0, true);
-    }
+    
+    public static void load(){}
 
     private static SectorPreset create(String name, int sector, float difficulty, int captureWave){
-        return create(name, sector, difficulty, captureWave, true);
-    }
-
-    private static SectorPreset create(String name, int sector, float difficulty, int captureWave, boolean addStartingItems){
         var s = new SectorPreset(name, FRPlanets.lysetta, sector);
         s.difficulty = difficulty;
         s.captureWave = captureWave;
-        s.addStartingItems = addStartingItems;
         return s;
     }
 
-    private static class FRSectorPreset extends SectorPreset{
-
-        public FRSectorPreset(String name, Planet planet, int sector){
-            super(name, planet, sector);
-        }
-
-        public FRSectorPreset(String name, Mods.LoadedMod mod){
-            super(name, mod);
-        }
-
-        public FRSectorPreset(String name){
-            super(name);
-        }
+    private static SectorPreset create(String name, int sector, float difficulty){
+        var s = new SectorPreset(name, FRPlanets.lysetta, sector);
+        s.difficulty = difficulty;
+        return s;
     }
 }

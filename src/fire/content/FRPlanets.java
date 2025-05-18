@@ -21,9 +21,10 @@ import static mindustry.game.Objectives.*;
 
 public class FRPlanets{
 
-    public static Planet lysetta;
+    public static final Planet
+        lysetta;
 
-    public static void load(){
+    static{
         lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
             meshLoader = () -> new HexMesh(this, 8);
             cloudMeshLoader = () -> new MultiMesh(
@@ -47,6 +48,8 @@ public class FRPlanets{
             };
         }};
     }
+
+    public static void load(){}
 
     public static void loadTree(){
         lysetta.techTree = nodeRoot("lysetta", lysetta, () -> {
@@ -86,10 +89,13 @@ public class FRPlanets{
                     node(treeFarm, with(new OnSector(beachLanding)), () -> {
                     });
                 });
+                node(fissionDrill, with(new OnSector(darkWorkshop)), () ->
+                    node(constraintExtractor, with(new OnSector(rubbleRidge)), () ->
+                        node(focusingExtractor, with(new SectorComplete(rubbleRidge)), () -> {
+                        })
+                ));
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {
-                    });
-                    node(fissionDrill, with(new OnSector(darkWorkshop)), () -> {
                     });
                     node(fleshSynthesizer, with(new SectorComplete(stormyCoast)), () -> {
                     });
@@ -285,6 +291,7 @@ public class FRPlanets{
 
             addResearch(UnitTypes.alpha, Blocks.airFactory);
             addResearch(UnitTypes.beta, UnitTypes.alpha);
+            addResearch(Liquids.neoplasm, flesh);
             addResearch(primaryInterplanetaryAccelerator, Blocks.landingPad);
 
             /* ======== InfoNodes below ======== */

@@ -7,13 +7,12 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
-import arc.math.geom.Geometry;
 import arc.scene.style.TextureRegionDrawable;
 import arc.struct.ObjectFloatMap;
+import arc.util.Log;
 import arc.util.Scaling;
-import arc.util.Time;
-import fire.FRVars;
 import fire.world.consumers.ConsumePowerCustom;
+import fire.world.draw.DrawArrows;
 import fire.world.meta.FRStat;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
@@ -27,6 +26,7 @@ import mindustry.ui.Styles;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 
+import static fire.FRVars.displayRange;
 import static mindustry.Vars.*;
 
 public class Campfire{
@@ -36,12 +36,21 @@ public class Campfire{
         public StatusEffect
             allyStatus = StatusEffects.overclock,
             enemyStatus = StatusEffects.sapped;
+        public float statusDuration;
         public float updateEffectChance;
         public Effect updateEffect = Fx.none;
+        public DrawArrows drawArrows;
+        public float arrowMaxBoost;
 
         public CampfireBlock(String name){
             super(name);
             buildType = CampfireBuild::new;
+        }
+
+        @Override
+        public void load(){
+            super.load();
+            drawArrows.load(this);
         }
 
         @Override
@@ -56,7 +65,7 @@ public class Campfire{
                     table.table(Styles.grayPanel, t -> {
                         t.left().button(new TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
-                            var detail = s == allyStatus
+                            String detail = s == allyStatus
                             ? FRStat.allyStatusEffect.localized()
                             : FRStat.enemyStatusEffect.localized();
 
@@ -69,12 +78,14 @@ public class Campfire{
             });
         }
 
-        public class CampfireBuild extends OverdriveBuild{
+        public class CampfireBuild extends OverdriveBuild implements fire.world.draw.DrawArrows.SmoothCrafter{
+
+            private float smoothProgress, smoothOffset;
 
             /** Now only affects {@code optionalEfficiency}. */
             @Override
             public void updateEfficiencyMultiplier(){
-                optionalEfficiency *= getEfficiency();
+                optionalEfficiency *= items.sum(((item, amount) -> item.flammability));
             }
 
             @Override
@@ -91,12 +102,16 @@ public class Campfire{
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
 
-                ConsumePowerCustom.scaleMap.put(this, optionalEfficiency + 1.0f);
+                ConsumeCampfire.efficiencyMap.put(this, phaseHeat);
+                ConsumePowerCustom.scaleMap.put(this, phaseHeat + 1.0f);
+
+                smoothProgress = Mathf.lerpDelta(smoothProgress, (realBoost() - 1.0f) / arrowMaxBoost, 0.1f);
+                smoothOffset = Mathf.sin(totalProgress(), 12.0f, 0.3f);
 
                 if(efficiency <= 0.0f) return;
 
                 Units.nearby(null, x, y, range(), unit ->
-                    unit.apply(unit.team == team ? allyStatus : enemyStatus, reload));
+                    unit.apply(unit.team == team ? allyStatus : enemyStatus, statusDuration));
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance))
                     updateEffect.at(x + Mathf.range(size * 4.0f), y + Mathf.range(size * 4.0f));
@@ -105,14 +120,14 @@ public class Campfire{
             @Override
             public void draw(){
                 super.draw();
-                if(!FRVars.displayRange) return;
+                if(drawArrows != null) drawArrows.draw(this);
 
+                if(!displayRange) return;
                 Draw.color(efficiency > 0.0f ? Pal.redLight : Color.black, 0.8f);
                 Lines.stroke(1.2f);
                 Lines.circle(x, y, range());
                 Draw.alpha(0.15f);
                 Fill.circle(x, y, range());
-
                 Draw.reset();
             }
 
@@ -123,8 +138,9 @@ public class Campfire{
                 super.remove();
             }
 
-            private float getEfficiency(){
-                return consumeBuilder.find(c -> c instanceof ConsumeCampfire).efficiencyMultiplier(this);
+            @Override
+            public float smoothProgress(){
+                return Mathf.clamp(smoothProgress + smoothOffset);
             }
         }
     }
@@ -132,7 +148,7 @@ public class Campfire{
     /** Accepts every item, but only consume those which has flammability. */
     public static class ConsumeCampfire extends mindustry.world.consumers.ConsumeItemFilter{
 
-        public final CampfireBlock block;
+        private final CampfireBlock block;
         public static final ObjectFloatMap<Building> efficiencyMap = new ObjectFloatMap<>();
 
         static{
@@ -152,11 +168,6 @@ public class Campfire{
                 if(item.flammability > 0.0f)
                     build.items.remove(item, 1);
             });
-        }
-
-        @Override
-        public void update(Building build){
-            efficiencyMap.put(build, build.items.sum(((item, amount) -> item.flammability)));
         }
 
         @Override

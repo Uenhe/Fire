@@ -428,7 +428,6 @@ public class InfoDialog extends BaseDialog{
             float offsetX = panX + width * 0.5f, offsetY = panY + height * 0.5f;
             Draw.sort(true);
 
-            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 if(!node.visible) continue;
 

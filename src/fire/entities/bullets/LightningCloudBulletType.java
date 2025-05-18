@@ -33,7 +33,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
         baseSize = (byte)bs;
         plusSize = (byte)ps;
         lightningColor = color;
-        collides = false;
+        collides = hittable = reflectable = absorbable = false;
         hitEffect = despawnEffect = Fx.none;
     }
 

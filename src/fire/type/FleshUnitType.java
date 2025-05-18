@@ -14,7 +14,6 @@ public class FleshUnitType extends mindustry.type.UnitType{
 
     @Override
     public void update(Unit unit){
-        super.update(unit);
         if(Mathf.chanceDelta(0.04))
             FRStatusEffects.overgrown.effect.at(unit.x, unit.y, 0.0f, unit);
     }

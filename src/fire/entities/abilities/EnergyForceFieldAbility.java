@@ -6,10 +6,11 @@ import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
 import arc.struct.IntIntMap;
-import arc.struct.ObjectSet;
+import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
 import fire.FRUtils;
+import mindustry.ai.types.CommandAI;
 import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
@@ -38,13 +39,12 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     public float ext_bearingFactor;
     public float ext_counterBulletSpeedFactor;
     public float ext_counterBulletDamageFactor;
-    public byte ext_counterBulletHomingChancePercentage; //a value of 50 -> 50%
     /** Length = 4 -> Collect; Stop collecting; Charge; Homing fire; Random fire. */
     public FRUtils.TimeNode ext_node;
 
     private float timer;
     private boolean regenable;
-    private ObjectSet<Bullet> bullets = new ObjectSet<>();
+    private Seq<Bullet> bullets = new Seq<>(false);
 
     private static final IntIntMap bulletMap = new IntIntMap();
 
@@ -134,17 +134,26 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             });
 
         }else if(extended && !regenable){
-            boolean isOverloaded = bullets.toSeq().sumf(b -> b.damage) >= u.maxHealth * ext_bearingFactor;
-            timer += Time.delta * (isOverloaded ? 1.3f : 1.0f);
+            float sum = 0.0f;
+            boolean isOverloaded = false;
+            var bullets = this.bullets;
+            for(var b : bullets){
+                if(b.type == null) continue;
+                sum += b.type.shieldDamage(b);
+                if(sum < u.maxHealth * ext_bearingFactor) continue;
+                isOverloaded = true;
+                break;
+            }
+
+            timer += Time.delta * (isOverloaded ? 1.2f : 1.0f);
 
             if(!isOverloaded && ext_node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
-                    if(
-                        Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
+                    if(Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
                         && bullet.time > 15.0f && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable && !(bullet.type instanceof LiquidBulletType)
-                        && bullets.add(bullet)
+                        && !bullets.contains(bullet)
                     ){
-                        final float tt = 40.01f;
+                        final float tt = 36.01f;
                         bullet.owner = u;
                         bullet.team = u.team;
                         bullet.damage *= ext_counterBulletDamageFactor;
@@ -160,7 +169,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                             // make artillery collides building
                             type.collidesTiles = type.collides = true;
-                            type.buildingDamageMultiplier *= 1.5f;
+                            type.buildingDamageMultiplier *= 1.6f;
 
                             // pierce here is just annoying
                             type.pierce = type.pierceBuilding = false;
@@ -181,6 +190,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                             bulletMap.put(bullet.type.id, type.id);
                             bullet.type = type;
+                            bullets.add(bullet);
                         }
 
                         bullet.mover = b -> {
@@ -204,21 +214,23 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             }else{
                                 float mark = ext_node.last() + tt + 0.1f;
                                 if(b.lifetime != mark){
-                                    var target = b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
-                                        ? b.aimTile.build
-                                        : Units.closestTarget(b.team, b.x, b.y, radius * 2.0f,
-                                        e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
-                                        t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
+                                    var target = u.controller() instanceof CommandAI c && c.attackTarget != null
+                                        ? c.attackTarget
+                                        : b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
+                                            ? b.aimTile.build
+                                            : Units.closestTarget(b.team, b.x, b.y, radius * 2.0f,
+                                                e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
+                                                t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
                                     if(target != null && timer < ext_node.last() + 24.0f && ext_node.checkBelonging(b.time, 3)){
                                         b.lifetime = mark;
                                         b.vel.setLength(8.0f * ext_counterBulletSpeedFactor);
                                         b.rotation(b.angleTo(target));
-                                        b.mover = bb -> bb.moveRelative(0.0f, Mathf.cos(b.time - ext_node.get(2), u.dst(target.x(), target.y()) / b.vel.len() / Mathf.PI, Mathf.sign(b.id % 2 == 0) * 5.0f));
+                                        b.mover = bb -> bb.moveRelative(0.0f, Mathf.cos(b.time - ext_node.get(2), u.dst(target.getX(), target.getY()) / b.vel.len() / Mathf.PI, Mathf.sign(b.id % 2 == 0) * 5.0f));
 
                                     }else{
                                         b.lifetime = mark;
-                                        b.drag = 0.025f;
+                                        b.drag = 0.024f;
                                         b.vel.rnd(6.0f * ext_counterBulletSpeedFactor);
                                     }
                                 }
@@ -239,7 +251,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         return radius * radiusScale;
     }
 
-    private EnergyForceFieldAbility setBullets(ObjectSet<Bullet> set){
+    private EnergyForceFieldAbility setBullets(Seq<Bullet> set){
         bullets = set;
         return this;
     }

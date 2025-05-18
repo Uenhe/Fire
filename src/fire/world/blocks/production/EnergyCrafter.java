@@ -91,7 +91,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
     public class EnergyCrafterBuild extends GenericCrafterBuild implements Ranged, SmoothCrafter{
 
-        private float instability, fraction, flash, angle, smoothProgress;
+        public float instability, fraction, flash, angle, smoothProgress;
         private byte counter;
         private short targetAngle;
 
@@ -102,7 +102,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             angle = Mathf.lerpDelta(angle, targetAngle, 0.2f);
             smoothProgress = Mathf.lerpDelta(smoothProgress, progress / (1.0f - 20.0f / craftTime), 0.1f);
 
-            if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != null && b != this && b.efficiency > 0.0f && b.block == block, e -> {})){
+            if(efficiency > 0.0f && indexer.eachBlock(this, explosionRadius, b -> b != this && b.block == block && b.efficiency > 0.0f, e -> {})){
                 instability += delta();
                 if(instability >= maxInstability) kill();
             }
@@ -138,7 +138,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Override
         public void onDestroyed(){
             super.onDestroyed();
-            if(!(state.rules.reactorExplosions && efficiency > 0.0f)) return;
+            if(!state.rules.reactorExplosions || efficiency <= 0.0f) return;
 
             Damage.damage(x, y, range(), explosionDamage * scale());
             Effect.shake(explosionShake * scale(), explosionShakeDuration * scale(), this);

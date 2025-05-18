@@ -36,8 +36,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         float max = armor + armorIncrease;
         addBar("currentarmor", (ArmorWallBuild build) -> new Bar(
             () -> Core.bundle.format("bar.currentarmor", (int)(armor + build.extraArmor), (int)max),
-            () -> Pal.accent,
-            () -> (armor + build.extraArmor) / max
+            () -> Pal.accent, () -> (armor + build.extraArmor) / max
         ));
     }
 
@@ -46,23 +45,21 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
         private float extraArmor;
 
         @Override
+        public void healthChanged(){
+            super.healthChanged();
+            extraArmor = armorIncrease * increasePattern.apply(Math.min((1.0f - health / maxHealth) / maxHealthLossPercentage * 100.0f, 1.0f));
+        }
+
+        @Override
         public float handleDamage(float damage){
             float healthMul = state.rules.blockHealth(team);
-            if(Mathf.zero(healthMul))
-                return health + 1.0f;
+            if(Mathf.zero(healthMul)) return health + 1.0f;
 
             float dmg = (damage - extraArmor) / healthMul;
             if(dmg < 1.0f)
                 return damage * minArmorDamage;
 
             return dmg;
-        }
-
-        /** Might be a hacky way to update extraArmor without updating... */
-        @Override
-        public void draw(){
-            super.draw();
-            extraArmor = armorIncrease * increasePattern.apply(Math.min((1.0f - health / maxHealth) / maxHealthLossPercentage * 100.0f, 1.0f));
         }
     }
 }

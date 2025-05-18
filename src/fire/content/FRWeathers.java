@@ -15,13 +15,12 @@ import static mindustry.Vars.world;
 
 public class FRWeathers{
 
-    public static Weather
+    public static final Weather
         rainstorm;
 
-    public static void load(){
-
+    static{
         rainstorm = new RainWeather("rainstorm"){
-            private final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
+            private static final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
 
             @Override
             public void update(WeatherState state){
@@ -49,4 +48,6 @@ public class FRWeathers{
             }
         };
     }
+
+    public static void load(){}
 }

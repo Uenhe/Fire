@@ -19,6 +19,7 @@ import mindustry.graphics.Layer;
 
 import static mindustry.Vars.tilesize;
 
+/** @implSpec Ensure this is the first to be added to unit's abilities. */
 public class DashAbility extends mindustry.entities.abilities.Ability{
 
     public final float speedMultiplier;
@@ -86,16 +87,16 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
     }
 
     private boolean dashable(Unit unit, @Nullable Position pos){
-        return (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(FRBinding.unitAbility)) || (Core.app.isMobile() && Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
-            || (unit.controller() instanceof CommandAI c && c.hasCommand() && correctDirection(unit, c.targetPos))
-            || (pos != null && correctDirection(unit, pos));
+        return (pos != null && correctDirection(unit, pos))
+            || (unit.controller() instanceof Player && ((Core.app.isDesktop() && Core.input.keyDown(FRBinding.unitAbility)) || (Core.app.isMobile() && Mathf.dst(unit.x, unit.y, Core.camera.position.x, Core.camera.position.y) >= dst(unit))))
+            || (unit.controller() instanceof CommandAI c && c.hasCommand() && correctDirection(unit, c.targetPos));
     }
 
     private boolean correctDirection(Unit unit, Position pos){
-        return !unit.within(pos, dst(unit)) && Angles.near(unit.rotation, unit.angleTo(pos), 15.0f);
+        return !unit.within(pos, dst(unit)) && Angles.near(unit.rotation, unit.angleTo(pos), 10.0f);
     }
 
     private float dst(Unit unit){
-        return unit.speed() * speedMultiplier * tilesize * 1.8f;
+        return unit.speed() * speedMultiplier * tilesize * 1.6f;
     }
 }
