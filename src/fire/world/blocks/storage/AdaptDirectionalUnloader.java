@@ -19,17 +19,16 @@ public class AdaptDirectionalUnloader extends mindustry.world.blocks.distributio
 
     public class AdaptDirectionalUnloaderBuild extends DirectionalUnloaderBuild{
 
-        private float counter;
+        private float dumpTimer;
 
         @Override
         public void updateTile(){
-            counter += edelta();
             float limit = 60.0f / speed;
-
-            while(counter >= limit){
+            dumpTimer += edelta();
+            while(dumpTimer >= limit){
                 unloadTimer = speed;
                 super.updateTile();
-                counter -= limit;
+                dumpTimer -= limit;
             }
         }
     }

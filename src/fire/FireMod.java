@@ -173,22 +173,19 @@ public class FireMod extends mindustry.mod.Mod{
         multiplied = true;
         doSomethingUnplayable();
 
-        var dialog = new DelayClosableDialog("Warning", 300.0f);
-        dialog.cont.add("@fire.nomultimods");
-        dialog.show();
+        new DelayClosableDialog("Warning", 300.0f).show().cont.add("@fire.nomultimods");
     }
 
     private static void showUpdate(){
         try{
             if(FIRE.meta.version.equals(Core.settings.getString("mod-fire-version"))) return;
             Core.settings.put("mod-fire-version", FIRE.meta.version);
-        }catch(Throwable ignored){
+        }catch(Throwable e){
             Core.settings.put("mod-fire-version", "");
         }
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
-        var dialog = new DelayClosableDialog("Update Notice", 300.0f);
-        dialog.cont.pane(t -> {
+        new DelayClosableDialog("Update Notice", 300.0f).show().cont.pane(t -> {
             t.table(tt -> {
                 try{
                     tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).size(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) * 0.33f).padRight(120.0f);
@@ -198,7 +195,6 @@ public class FireMod extends mindustry.mod.Mod{
             });
             t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(width()).padRight(200.0f);
         });
-        dialog.show();
     }
 
     /** See ExtraUtilities also.<p></p>
@@ -228,17 +224,13 @@ public class FireMod extends mindustry.mod.Mod{
 
                 t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
                 t.table(info -> {
-
                     info.left().add("[accent]" + c.localizedName).left().row();
-                    try{
-                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend"))) + (c instanceof SectorPreset ? "..." : ""));
-                    }catch(Throwable e){
-                        info.left().add(c.description);
-                    }finally{
-                        info.left();
-                    }
-                });
 
+                    int index = c.description.indexOf(Core.bundle.get("fire.strend"));
+                    String desc = index == -1 ? c.description : c.description.substring(0, index);
+                    if(c instanceof SectorPreset) desc += "...";
+                    info.left().add(desc).left();
+                });
             }).growX().pad(5.0f).row();
     }
 

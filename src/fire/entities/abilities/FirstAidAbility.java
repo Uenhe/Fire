@@ -60,9 +60,13 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     }
 
     @Override
+    public void created(Unit unit){
+        Arrays.fill(healthArray, unit.health);
+    }
+
+    @Override
     public void update(Unit unit){
         if(!unit.isValid()) return;
-        if(healthArray[0] == 0.0f) Arrays.fill(healthArray, unit.health);
 
         if(cooldownTimer == 0.0f){
             detectTimer += Time.delta;

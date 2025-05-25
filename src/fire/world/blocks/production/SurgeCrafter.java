@@ -17,10 +17,18 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
     protected @Nullable BulletPattern bullets;
     protected Sound craftSound = Sounds.none;
 
+    private byte len;
+
     public SurgeCrafter(String name){
         super(name);
         baseExplosiveness = 5.0f;
         buildType = SurgeCrafterBuild::new;
+    }
+
+    @Override
+    public void init(){
+        super.init();
+        len = (byte)signs.apply((byte)0).length;
     }
 
     public class SurgeCrafterBuild extends GenericCrafterBuild{
@@ -30,14 +38,13 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         @Override
         public void craft(){
             super.craft();
+            byte n = fragBullets;
             craftSound.at(this, Mathf.random(0.9f, 1.1f));
-            if(!specialContent || fragBullets == 0) return;
+            if(!specialContent || n == 0) return;
 
-            int len = 0;
-            for(byte i = 0, bulletz = fragBullets; i < bulletz; i++){
-                var bullet = fragBullet.create(this, x, y, 360.0f / bulletz * i);
+            for(byte i = 0; i < n; i++){
+                var bullet = fragBullet.create(this, x, y, 360.0f / n * i);
                 var ss = signs.apply(i);
-                if(i == 0) len = ss.length;
 
                 bullet.lifetime /= Mathf.pow(timeScale, 0.99f);
                 bullet.vel.scl(timeScale);

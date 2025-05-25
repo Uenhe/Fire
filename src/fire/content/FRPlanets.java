@@ -21,8 +21,7 @@ import static mindustry.game.Objectives.*;
 
 public class FRPlanets{
 
-    public static final Planet
-        lysetta;
+    public static final Planet lysetta;
 
     static{
         lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
@@ -36,6 +35,7 @@ public class FRPlanets{
             rotateTime = 7200.0f;
             clearSectorOnLose = true;
             prebuildBase = false;
+            allowCampaignRules = true;
             atmosphereColor = Color.valueOf("1a3db1");
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
@@ -57,8 +57,10 @@ public class FRPlanets{
             node(compositeConveyor, with(new OnSector(frozenGround)), () -> {
                 node(compositeUnloader, with(new SectorComplete(darkWorkshop)), () -> {
                 });
-                node(compositeBridgeConveyor, with(new SectorComplete(darkWorkshop)), () -> {
-                });
+                node(compositeBridgeConveyor, with(new SectorComplete(darkWorkshop)), () ->
+                    node(compositeRouter, with(new SectorComplete(darkWorkshop)), () -> {
+                    })
+                );
                 node(hardenedAlloyConveyor, with(new SectorComplete(desolateFortification)), () -> {
                 });
                 node(compositeLiquidRouter, with(new SectorComplete(darkWorkshop)), () ->
@@ -97,12 +99,14 @@ public class FRPlanets{
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {
                     });
+                    node(stackedCultivator, with(new SectorComplete(scorchingVolcano)), () -> {
+                    });
                     node(fleshSynthesizer, with(new SectorComplete(stormyCoast)), () -> {
                     });
                 });
                 node(metaglassPlater, () ->
                     node(mirrorglassPolisher, () ->
-                        node(conductorFormer, () -> {
+                        node(conductorFormer, with(new SectorComplete(frozenGround)), () -> {
                         })
                     )
                 );
@@ -315,6 +319,7 @@ public class FRPlanets{
                                 dnode(darkWorkshop, () -> {
                                     dnode(compositeUnloader);
                                     dnode(compositeBridgeConveyor);
+                                    dnode(compositeRouter);
                                     dnode(compositeLiquidRouter);
                                     dnode(compositeBridgeConduit);
                                     dnode(gambler);

@@ -15,21 +15,21 @@ public class DashBuilderAI extends mindustry.ai.types.BuilderAI{
     @Override
     public void circleAttack(float circleLength){
         super.circleAttack(circleLength);
-        if(!(unit.abilities[0] instanceof DashAbility dab)) return;
+        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
         dab.dash(unit, target);
     }
 
     @Override
     public void circle(Position target, float circleLength, float speed){
         super.circle(target, circleLength, speed);
-        if(!(unit.abilities[0] instanceof DashAbility dab)) return;
+        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
         dab.dash(unit, target);
     }
 
     @Override
     public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, Vec2 offset, boolean arrive){
         super.moveTo(target, circleLength, smooth, keepDistance, offset, arrive);
-        if(!(unit.abilities[0] instanceof DashAbility dab)) return;
+        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
         dab.dash(unit, target);
     }
 }

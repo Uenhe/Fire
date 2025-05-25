@@ -16,7 +16,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         update = true;
         displayFlow = false;
         canOverdrive = true;
-        powerProduction = Float.POSITIVE_INFINITY;
+        powerProduction = Float.MAX_VALUE;
         buildType = AdaptiveSourceBuild::new;
     }
 
@@ -51,10 +51,8 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
             var liquids = this.liquids;
 
             dumpTimer += delta();
-
             while(dumpTimer >= limit){
-                var itemz = content.items();
-                for(var item : itemz){
+                for(var item : content.items()){
                     items.set(item, 1);
                     dump(item);
                     items.set(item, 0);
@@ -62,23 +60,21 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
                 }
             }
 
-            liquids.clear();
-            var liquidz = content.liquids();
-            for(var liquid: liquidz){
+            for(var liquid: content.liquids()){
                 if(liquid instanceof CellLiquid) continue;
-                liquids.add(liquid, liquidCapacity);
+                liquids.set(liquid, liquidCapacity);
                 dumpLiquid(liquid);
             }
         }
 
         @Override
         public float heat(){
-            return Float.POSITIVE_INFINITY;
+            return Float.MAX_VALUE;
         }
 
         @Override
         public float heatFrac(){
-            return Float.POSITIVE_INFINITY;
+            return Float.MAX_VALUE;
         }
     }
 }

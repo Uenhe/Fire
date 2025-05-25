@@ -22,7 +22,7 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
     protected byte chanceHeal;
     protected byte chanceDeflect;
     /** How much wall heals at collision. Based on bullet damage. */
-    protected float regenPercent = 0.1f;
+    protected float regenPercent;
     protected byte frameTime = 3;
     protected byte frames;
     protected boolean flashHit;
@@ -32,8 +32,8 @@ public class RegenWall extends mindustry.world.blocks.defense.RegenProjector{
         super(name);
         group = BlockGroup.walls;
         priority = TargetPriority.wall;
-        buildCostMultiplier = 6f;
-        crushDamageMultiplier = 5f;
+        buildCostMultiplier = 6.0f;
+        crushDamageMultiplier = 5.0f;
         update = true;
         hasPower = false;
         hasItems = false;

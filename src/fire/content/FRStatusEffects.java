@@ -132,11 +132,10 @@ public class FRStatusEffects{
                 boolean wet = entries.contains(e -> e.effect == status); //hasEffect() here is buggy
 
                 if(unit.type instanceof FleshUnitType){
-                    float perc = (neo_regenPercent + (wet ? neo_extraRegenPercent : 0.0f)) / 60.0f * Time.delta;
+                    float perc = (neo_regenPercent + (wet ? neo_extraRegenPercent : 0.0f)) / 60.0f * Time.delta, maxShield = 0.6f * unit.maxHealth + 600.0f;
                     unit.healthMultiplier *= neo_healthMultiplier / healthMultiplier;
                     unit.heal(perc * unit.maxHealth);
 
-                    final float maxShield = 1200.0f;
                     if(unit.shield < maxShield)
                         unit.shield = Math.min(unit.shield + perc * maxShield, maxShield);
 

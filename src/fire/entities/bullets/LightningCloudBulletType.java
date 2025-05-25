@@ -109,8 +109,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
         }
 
         private float size(){
-            float
-                base = type().baseSize, plus = type().plusSize,
+            float base = type().baseSize, plus = type().plusSize,
                 scl = plus * 0.3f, mag = plus * 0.4f;
 
             return node.checkBelonging(time, 0) ? base + plus * (time / node.first())

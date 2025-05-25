@@ -26,6 +26,7 @@ import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.RegenWall;
 import fire.world.blocks.defense.turrets.ItemBulletStackTurret;
 import fire.world.blocks.defense.turrets.JackpotTurret;
+import fire.world.blocks.distribution.AdaptRouter;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.HydroelectricGenerator;
@@ -109,7 +110,7 @@ import static mindustry.type.ItemStack.with;
 public class FRBlocks{
 
     /** Component itself -> its inferior. */
-    public static final IntIntMap compositeMap = new IntIntMap(5);
+    public static final IntIntMap compositeMap = new IntIntMap(6);
     public static final Block
     //environment
     neoplasm, bloodyDirt, hardenedCovering,
@@ -127,7 +128,7 @@ public class FRBlocks{
     chopper, treeFarm, vapourCondenser, biomassCultivator, stackedCultivator, fissionDrill, constraintExtractor, focusingExtractor,
 
     //distribution
-    compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor,
+    compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor, compositeRouter,
 
     //liquid
     magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit,
@@ -2503,6 +2504,17 @@ public class FRBlocks{
             compositeMap.put(id, Blocks.itemBridge.id);
         }};
 
+        compositeRouter = new AdaptRouter("composite-router"){{
+            requirements(Category.distribution, with(
+                Items.metaglass, 4,
+                Items.thorium, 8,
+                Items.plastanium, 8
+            ));
+            health = 85;
+
+            compositeMap.put(id, Blocks.router.id);
+        }};
+
         //region liquid
 
         magneticRingPump = new Pump("magnetic-ring-pump"){{
@@ -3336,17 +3348,17 @@ public class FRBlocks{
 
             fragBullets = 6;
             fragBullet = new BasicBulletType(4.0f, 250.0f){
-
                 /** I am disgusted. */
                 @Override
                 public void updateTrail(Bullet b){
                     if(!headless){
-                        byte length = (byte)(trailLength * Mathf.pow(speed / b.vel.len(), 0.6f));
+                        byte length = (byte)(trailLength * Mathf.sqrt(speed / b.vel.len()));
                         if(b.trail == null) b.trail = new Trail(length);
                         b.trail.length = length;
                         b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
                     }
-                }{
+                }
+                {
                     lifetime = craftTime - 0.1f;
                     width = 8.0f;
                     height = 8.0f;
@@ -3372,6 +3384,7 @@ public class FRBlocks{
             bullets = (b, sign) -> {
                 if(Units.closestTarget(b.team, b.x, b.y, b.type.homingRange, e -> e != null && !b.hasCollided(e.id)) != null)
                     return; //checks whether there's any target first
+
                 b.rotation(b.rotation() + 720.0f*sign * Time.delta / b.lifetime);
             };
 
@@ -3546,9 +3559,7 @@ public class FRBlocks{
             baseColor = Pal.heal;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawPulseShape(false){{
-                    color = Pal.heal;
-                }},
+                new DrawPulseShape(false){{color=Pal.heal;}},
                 new DrawShape(){{
                     layer = Layer.effect;
                     color = Pal.heal;
@@ -3753,7 +3764,6 @@ public class FRBlocks{
 
         envStormyCoast1 = new EnvBlock("env-stormy-coast1"){{
             buildType = () -> new EnvBlockBuild(){
-
                 /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
                 private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
                 private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
@@ -3764,7 +3774,7 @@ public class FRBlocks{
                     state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.4f, 0.003f);
                     if(Weathers.rain.isActive()) return;
                     for(var state : Groups.weather) state.life = WeatherState.fadeTime;
-                    Weathers.rain.create(1.3f);
+                    Weathers.rain.create(1.25f);
                 }
 
                 /** When wave 47 is in half. */
@@ -3774,9 +3784,9 @@ public class FRBlocks{
 
                     if(state.rules.ambientLight.a <= 0.01f){
                         if(state.isCampaign())
-                            state.rules.ambientLight = defaultColor;
+                            state.rules.ambientLight.set(defaultColor);
                         else
-                            state.rules.ambientLight = Color.clear; //might be buggy if default light is customized
+                            state.rules.ambientLight.set(Color.clear); //might be buggy if default light is customized
 
                         if(Weathers.rain.isActive())
                             Weathers.rain.instance().life = WeatherState.fadeTime;
@@ -3789,14 +3799,14 @@ public class FRBlocks{
                 public void add(){
                     super.add();
                     state.rules.lighting = true;
-                    state.rules.ambientLight = specificColor;
+                    state.rules.ambientLight.set(specificColor);
                     if(!renderer.drawWeather){
                         Core.settings.put("showweather", true);
                         ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
                     }
                     if(!renderer.drawLight){
                         Core.settings.put("drawlight", true);
-                        Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
+                        Time.run(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                     }
                 }
             };
@@ -3804,7 +3814,6 @@ public class FRBlocks{
 
         envStormyCoast2 = new EnvBlock("env-stormy-coast2"){{
             buildType = () -> new EnvBlockBuild(){
-
                 /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
                 private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
                 private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
@@ -3825,9 +3834,9 @@ public class FRBlocks{
 
                     if(state.rules.ambientLight.a <= 0.01f){
                         if(state.isCampaign())
-                            state.rules.ambientLight = defaultColor;
+                            state.rules.ambientLight.set(defaultColor);
                         else
-                            state.rules.ambientLight = Color.clear;
+                            state.rules.ambientLight.set(Color.clear);
 
                         if(FRWeathers.rainstorm.isActive())
                             FRWeathers.rainstorm.instance().life = WeatherState.fadeTime;
@@ -3840,14 +3849,14 @@ public class FRBlocks{
                 public void add(){
                     super.add();
                     state.rules.lighting = true;
-                    state.rules.ambientLight = specificColor;
+                    state.rules.ambientLight.set(specificColor);
                     if(!renderer.drawWeather){
                         Core.settings.put("showweather", true);
                         ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
                     }
                     if(!renderer.drawLight){
                         Core.settings.put("drawlight", true);
-                        Time.runTask(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
+                        Time.run(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                     }
                 }
             };
@@ -3855,8 +3864,6 @@ public class FRBlocks{
 
         envGlaciatedPeaks = new EnvBlock("env-glaciated-peaks"){{
             buildType = () -> new EnvBlockBuild(){
-
-                /** Limits invasion times. */
                 private byte counter;
 
                 /** Landing. */
@@ -3866,8 +3873,7 @@ public class FRBlocks{
                     if(!state.isCampaign()) return;
 
                     int n = Mathf.random(4, 6);
-                    var sectors = state.getPlanet().sectors;
-                    for(var s : sectors)
+                    for(var s : state.getPlanet().sectors)
                         if(s.hasBase() && counter++ < n)
                             Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
 

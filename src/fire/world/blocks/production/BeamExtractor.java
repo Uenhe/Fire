@@ -403,7 +403,7 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         private float getDrillTime(){
-            if(selected == -1) return Float.POSITIVE_INFINITY;
+            if(selected == -1) return Float.MAX_VALUE;
             return drillTime + hardnessDrillMultiplier * config().hardness;
         }
     }

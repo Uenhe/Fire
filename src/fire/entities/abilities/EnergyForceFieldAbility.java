@@ -145,7 +145,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 break;
             }
 
-            timer += Time.delta * (isOverloaded ? 1.2f : 1.0f);
+            float delta = Time.delta * (isOverloaded ? 1.2f : 1.0f);
+            timer += delta;
 
             if(!isOverloaded && ext_node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
@@ -177,7 +178,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             // handled by mover later
                             type.drag = 0.0f;
 
-                            // add a default trail to bullets that doesn't have one
+                            // add a default trail to bullet that doesn't have one
                             if(type.trailLength <= 0){
                                 if(type instanceof BasicBulletType bt){
                                     type.trailWidth = bt.width * 0.21f;
