@@ -4,7 +4,7 @@ import arc.Core;
 import arc.util.Strings;
 import arc.util.Time;
 
-/** See ExtraUtilities also. */
+/** See Extra Utilities also. */
 public class DelayClosableDialog extends mindustry.ui.dialogs.BaseDialog{
 
     public float time;

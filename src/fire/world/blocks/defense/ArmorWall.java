@@ -56,8 +56,7 @@ public class ArmorWall extends mindustry.world.blocks.defense.Wall{
             if(Mathf.zero(healthMul)) return health + 1.0f;
 
             float dmg = (damage - extraArmor) / healthMul;
-            if(dmg < 1.0f)
-                return damage * minArmorDamage;
+            if(dmg < 1.0f) return damage * minArmorDamage;
 
             return dmg;
         }

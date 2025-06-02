@@ -8,6 +8,7 @@ import arc.input.KeyCode;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Rect;
+import arc.scene.Element;
 import arc.scene.Group;
 import arc.scene.actions.RelativeTemporalAction;
 import arc.scene.event.ElementGestureListener;
@@ -16,15 +17,16 @@ import arc.scene.event.InputListener;
 import arc.scene.event.Touchable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.ImageButton;
+import arc.scene.ui.Label;
+import arc.scene.ui.Slider;
+import arc.scene.ui.Tooltip;
+import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.struct.OrderedSet;
 import arc.struct.Seq;
-import arc.util.Align;
-import arc.util.Nullable;
-import arc.util.Scaling;
+import arc.util.*;
 import fire.content.FRBlocks;
-import mindustry.ctype.ContentType;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
@@ -33,23 +35,21 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
-import mindustry.world.Block;
 
 import java.util.Arrays;
 
 import static mindustry.Vars.*;
 
-/**
- * To show more details about contents.
- * @see mindustry.ui.dialogs.ResearchDialog
- */
+/** To show more details about contents.
+ * @see mindustry.ui.dialogs.ResearchDialog */
 public class InfoDialog extends BaseDialog{
 
     private final View view;
     private Rect bounds = new Rect();
     private final OrderedSet<InfoTreeNode> nodes = new OrderedSet<>();
-    private InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
-    private InfoNode lastNode = root.node;
+    private final InfoTreeNode root = new InfoTreeNode(InfoTree.roots.first(), null);
+    private float fontScale = 1.0f;
+    private Cell tooltip = Cell.defaults();
 
     private static final float nodeSize = Scl.scl(70.0f);
     private static final float nodeSpacing = 40.0f;
@@ -60,36 +60,47 @@ public class InfoDialog extends BaseDialog{
 
         titleTable.remove();
         titleTable.clear();
-        titleTable.top();
-        titleTable.button(b -> {
+        titleTable.top().button(b -> {
             b.imageDraw(() -> new TextureRegionDrawable(root.node.content.uiIcon)).padRight(8).size(iconMed);
             b.add().growX();
             b.label(() -> root.node.content.localizedName).color(Pal.accent);
             b.add().growX();
             b.add().size(iconMed);
+        }, () -> {}).minWidth(300.0f);
 
-        }, () -> new BaseDialog("@techtree.select"){{
+        margin(0.0f).marginBottom(8.0f);
 
-            cont.pane(t -> t.table(Tex.button, in -> {
-                in.defaults().width(300f).height(60f);
+        var slider = new Slider(1.0f, 2.0f, 0.1f, false);
+        var value = new Label("", Styles.outlineLabel);
+        Table sliderTable = new Table(), content = new Table();
+        content.add("@fire.fontsizescale", Styles.outlineLabel).left().growX().wrap();
+        content.add(value).padLeft(10.0f).right();
+        content.margin(3.0f, 33.0f, 3.0f, 33.0f);
+        content.touchable = Touchable.disabled;
 
-                var roots = InfoTree.roots;
-                for(var node : roots){
-                    if(locked(node)) continue;
+        slider.changed(() -> {
+            tooltip.fontScale(fontScale = slider.getValue());
+            value.setText(String.format("%sx", Strings.fixed(fontScale, 1)));
+        });
+        slider.change();
 
-                    in.button(node.content.localizedName, new TextureRegionDrawable(root.node.content.uiIcon), Styles.flatTogglet, iconMed, () -> {
-                        if(node == lastNode) return;
-
-                        rebuildTree(node);
-                        hide();
-                    }).marginLeft(12f).checked(node == lastNode).row();
+        //see Vars.ui.addDescTooltipui.addDescTooltip(); custom font scale based on the origin one
+        sliderTable.stack(slider, content).width(Math.min(Core.graphics.getWidth() * 0.8f, 400.0f)).padTop(4.0f).get()
+            .addListener(new Tooltip(t -> tooltip = t.background(Styles.black8).margin(4.0f).add("@fire.fontsizescale.desc").fontScale(fontScale).color(Color.lightGray)){
+                @Override
+                protected void setContainerPosition(Element element, float x, float y){
+                    targetActor = element;
+                    var pos = element.localToStageCoordinates(Tmp.v6.setZero());
+                    container.pack();
+                    container.setPosition(pos.x, pos.y, Align.topLeft);
+                    container.setOrigin(0.0f, element.getHeight());
                 }
-            }));
+                {allowMobile = true;}
+            });
 
-            addCloseButton();
-        }}.show()).minWidth(300f);
+        titleTable.add(sliderTable);
+        titleTable.row();
 
-        margin(0f).marginBottom(8);
         cont.stack(titleTable, view = new View()).grow();
 
         titleTable.toFront();
@@ -110,7 +121,7 @@ public class InfoDialog extends BaseDialog{
 
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
-                view.setScale(Mathf.clamp(view.scaleX - amountY / 10f * view.scaleX, 0.25f, 1f));
+                view.setScale(Mathf.clamp(view.scaleX - 0.1f * amountY * view.scaleX, 0.25f, 1.0f));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
                 return true;
@@ -129,10 +140,10 @@ public class InfoDialog extends BaseDialog{
 
             @Override
             public void zoom(InputEvent event, float initialDistance, float distance){
-                if(view.lastZoom < 0)
+                if(view.lastZoom < 0.0f)
                     view.lastZoom = view.scaleX;
 
-                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1f));
+                view.setScale(Mathf.clamp(distance / initialDistance * view.lastZoom, 0.25f, 1.0f));
                 view.setOrigin(Align.center);
                 view.setTransform(true);
             }
@@ -150,29 +161,6 @@ public class InfoDialog extends BaseDialog{
                 view.clamp();
             }
         });
-    }
-
-    private void switchTree(InfoNode node){
-        if(lastNode == node || node == null) return;
-
-        nodes.clear();
-        root = new InfoTreeNode(node, null);
-        lastNode = node;
-        view.rebuildAll();
-    }
-
-    private void rebuildTree(InfoNode node){
-        switchTree(node);
-
-        view.panX = 0f;
-        view.panY = -200f;
-        view.setScale(1f);
-        view.hoverNode = null;
-        view.infoTable.remove();
-        view.infoTable.clear();
-
-        checkNodes(root);
-        treeLayout();
     }
 
     private void checkNodes(InfoTreeNode node){
@@ -195,8 +183,8 @@ public class InfoDialog extends BaseDialog{
     private void treeLayout(){
         var node = new LayoutNode(root, null);
         var children = node.children;
-        var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length / 2f));
-        var rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length / 2f), node.children.length);
+        var leftHalf = Arrays.copyOfRange(node.children, 0, Mathf.ceil(node.children.length * 0.5f));
+        var rightHalf = Arrays.copyOfRange(node.children, Mathf.ceil(node.children.length * 0.5f), node.children.length);
 
         node.children = leftHalf;
         new BranchTreeLayout(){{
@@ -226,10 +214,10 @@ public class InfoDialog extends BaseDialog{
         for(var n : nodes){
             if(!n.visible) continue;
 
-            minX = Math.min(n.x - n.width / 2f, minX);
-            maxX = Math.max(n.x + n.width / 2f, maxX);
-            minY = Math.min(n.y - n.height / 2f, minY);
-            maxY = Math.max(n.y + n.height / 2f, maxY);
+            minX = Math.min(n.x - n.width * 0.5f, minX);
+            maxX = Math.max(n.x + n.width * 0.5f, maxX);
+            minY = Math.min(n.y - n.height * 0.5f, minY);
+            maxY = Math.max(n.y + n.height * 0.5f, maxY);
         }
         bounds = new Rect(minX, minY, maxX - minX, maxY - minY);
         bounds.y += nodeSize * 1.5f;
@@ -319,8 +307,8 @@ public class InfoDialog extends BaseDialog{
                 button.setSize(nodeSize);
 
                 button.update(() -> {
-                    float offset = (Core.graphics.getHeight() % 2f) / 2f;
-                    button.setPosition(node.x + panX + width / 2f, node.y + panY + height / 2f + offset, Align.center);
+                    float offset = (Core.graphics.getHeight() % 2f) * 0.5f;
+                    button.setPosition(node.x + panX + width * 0.5f, node.y + panY + height * 0.5f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : locked(node.node) || !locked(node.node) ? Tex.buttonRed : Tex.button;
 
                     ((TextureRegionDrawable)button.getStyle().imageUp).setRegion(node.selectable ? node.node.content.uiIcon : Icon.lock.getRegion());
@@ -345,13 +333,11 @@ public class InfoDialog extends BaseDialog{
 
         private void clamp(){
             float pad = nodeSize;
-            float ox = width / 2.0f, oy = height / 2.0f;
-            float rw = bounds.width, rh = bounds.height;
-
+            float ox = width * 0.5f, oy = height * 0.5f;
             float rx = bounds.x + panX + ox, ry = panY + oy + bounds.y;
 
-            rx = Mathf.clamp(rx, -rw + pad, Core.graphics.getWidth() - pad);
-            ry = Mathf.clamp(ry, -rh + pad, Core.graphics.getHeight() - pad);
+            rx = Mathf.clamp(rx, -bounds.width + pad, Core.graphics.getWidth() - pad);
+            ry = Mathf.clamp(ry, -bounds.height + pad, Core.graphics.getHeight() - pad);
             panX = rx - bounds.x - ox;
             panY = ry - bounds.y - oy;
         }
@@ -382,15 +368,15 @@ public class InfoDialog extends BaseDialog{
 
             infoTable.update(() -> infoTable.setPosition(button.x + button.getWidth(), button.y + button.getHeight(), Align.topLeft));
             infoTable.left();
-            infoTable.background(Tex.button).margin(8f);
+            infoTable.background(Tex.button).margin(8.0f);
             infoTable.table(b -> {
-                b.margin(0).left().defaults().left();
+                b.margin(0.0f).left().defaults().left();
                 b.add().grow();
 
                 if(!locked(node)) b.button(Icon.info, Styles.flati, () -> {
                     ui.content.show(node.content);
                     hide();
-                }).growY().width(50f);
+                }).growY().width(50.0f);
 
                 var t = b.table(desc -> {
                     desc.left().defaults().left();
@@ -402,19 +388,19 @@ public class InfoDialog extends BaseDialog{
                     else
                         desc.add("@completed");
 
-                }).pad(9f);
+                }).pad(9.0f);
 
-                if(hasInfo(node)) t.minWidth(480f);
+                if(hasInfo(node)) t.minWidth(480.0f);
             });
 
             infoTable.row();
 
             if(!locked(node) && hasInfo(node))
-                infoTable.table(t -> t.margin(3f).left().labelWrap(
+                infoTable.table(t -> t.margin(3.0f).left().labelWrap(
                     FRBlocks.compositeMap.containsKey(node.content.id)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", ((Block)content.getByID(ContentType.block, FRBlocks.compositeMap.get(node.content.id))).localizedName)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", content.block(FRBlocks.compositeMap.get(node.content.id)).localizedName)
                     : Core.bundle.get(getKey(node))
-                ).color(Color.lightGray).growX()).fillX();
+                ).fontScale(fontScale).color(Color.lightGray).growX()).fillX();
 
             addChild(infoTable);
 
@@ -436,12 +422,12 @@ public class InfoDialog extends BaseDialog{
                     if(!child.visible) continue;
 
                     boolean lock = locked(node.node) || locked(child.node);
-                    Draw.z(lock ? 1f : 2f);
+                    Draw.z(lock ? 1.0f : 2.0f);
 
-                    Lines.stroke(Scl.scl(4f), lock ? Pal.gray : Pal.accent);
+                    Lines.stroke(Scl.scl(4.0f), lock ? Pal.gray : Pal.accent);
                     Draw.alpha(parentAlpha);
 
-                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3f){
+                    if(Mathf.equal(Math.abs(node.y - child.y), Math.abs(node.x - child.x), 1.0f) && Mathf.dstm(node.x, node.y, child.x, child.y) <= node.width * 3.0f){
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, child.y + offsetY);
                     }else{
                         Lines.line(node.x + offsetX, node.y + offsetY, child.x + offsetX, node.y + offsetY);

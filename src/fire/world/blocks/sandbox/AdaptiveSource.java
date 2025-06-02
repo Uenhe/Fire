@@ -1,21 +1,26 @@
 package fire.world.blocks.sandbox;
 
-import mindustry.type.CellLiquid;
+import arc.struct.IntIntMap;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
 
 import static mindustry.Vars.content;
 
 public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
-    protected short itemPerSec;
+    public static final IntIntMap turretItemMap = new IntIntMap(); //TurretBlock ID -> Item ID
 
     protected AdaptiveSource(String name){
         super(name);
-        hasItems = true;
-        hasLiquids = true;
+        hasItems  = true;
+        hasLiquids = outputsLiquid = true;
         update = true;
         displayFlow = false;
         canOverdrive = true;
+        swapDiagonalPlacement = false;
+        autolink = drawRange = false;
+        group = BlockGroup.transportation;
         powerProduction = Float.MAX_VALUE;
         buildType = AdaptiveSourceBuild::new;
     }
@@ -31,7 +36,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
     public void setBars(){
         super.setBars();
         removeBar("items");
-        removeBar("liquids");
+        removeBar("liquid");
         removeBar("connections");
     }
 
@@ -42,28 +47,30 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
     public class AdaptiveSourceBuild extends PowerSourceBuild implements mindustry.world.blocks.heat.HeatBlock{
 
-        private float dumpTimer;
-
         @Override
         public void updateTile(){
-            float limit = 60.0f / itemPerSec;
-            var items = this.items;
-            var liquids = this.liquids;
+            for(var other : proximity){
+                if(other instanceof ItemTurret.ItemTurretBuild){
+                    var item = content.item(turretItemMap.get(other.block.id));
+                    if(other.acceptItem(this, item)) other.handleItem(this, item);
 
-            dumpTimer += delta();
-            while(dumpTimer >= limit){
-                for(var item : content.items()){
-                    items.set(item, 1);
-                    dump(item);
-                    items.set(item, 0);
-                    dumpTimer -= limit;
+                }else{
+                    var oit = other.items;
+                    for(var item : content.items()){
+                        if(other.acceptItem(this, item)){
+                            other.handleItem(this, item);
+                            if(other.items != null)
+                                oit.set(item, other.getMaximumAccepted(item));
+                        }
+                    }
                 }
-            }
 
-            for(var liquid: content.liquids()){
-                if(liquid instanceof CellLiquid) continue;
-                liquids.set(liquid, liquidCapacity);
-                dumpLiquid(liquid);
+                var oli = other.liquids;
+                for(var liquid : content.liquids()){
+                    if(other.acceptLiquid(this, liquid)){
+                        oli.set(liquid, other.block.liquidCapacity);
+                    }
+                }
             }
         }
 

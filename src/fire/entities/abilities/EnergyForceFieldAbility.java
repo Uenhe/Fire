@@ -84,7 +84,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             rotation += rotateSpeed * Time.delta;
 
         if(u.shield < max && timer == 0.0f){
-            // regen shield to full after cooldown
+            //regen shield to full after cooldown
             if(u.shield < 0.0f && u.shield + regen * Time.delta > 0.0f)
                 u.shield = max;
             else
@@ -168,21 +168,21 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         }else{
                             var type = bullet.type.copy();
 
-                            // make artillery collides building
+                            //make artillery collides building
                             type.collidesTiles = type.collides = true;
                             type.buildingDamageMultiplier *= 1.6f;
 
-                            // pierce here is just annoying
+                            //pierce here is just annoying
                             type.pierce = type.pierceBuilding = false;
 
-                            // handled by mover later
+                            //handled by mover later
                             type.drag = 0.0f;
 
-                            // add a default trail to bullet that doesn't have one
+                            //add a default trail to bullet that doesn't have one
                             if(type.trailLength <= 0){
                                 if(type instanceof BasicBulletType bt){
                                     type.trailWidth = bt.width * 0.21f;
-                                    type.trailLength = (int)(bt.height / 2);
+                                    type.trailLength = (int)(bt.height * 0.5f);
                                     type.trailColor = bt.backColor;
                                 }else{
                                     type.trailLength = 11;

@@ -23,13 +23,14 @@ public class AdaptDirectionalUnloader extends mindustry.world.blocks.distributio
 
         @Override
         public void updateTile(){
-            float limit = 60.0f / speed;
-            dumpTimer += edelta();
-            while(dumpTimer >= limit){
-                unloadTimer = speed;
+            float spd = speed, limit = 60.0f / spd, ut = unloadTimer, t = dumpTimer + edelta();
+            while(t >= limit){
+                ut = spd;
                 super.updateTile();
-                dumpTimer -= limit;
+                t -= limit;
             }
+            unloadTimer = ut;
+            dumpTimer = t;
         }
     }
 }

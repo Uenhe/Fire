@@ -32,7 +32,7 @@ public class FRPlanets{
             );
             generator = new LysettaPlanetGenerator();
             sectorSeed = 3;
-            rotateTime = 7200.0f;
+            rotateTime = 6600.0f;
             clearSectorOnLose = true;
             prebuildBase = false;
             allowCampaignRules = true;
@@ -99,9 +99,9 @@ public class FRPlanets{
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {
                     });
-                    node(stackedCultivator, with(new SectorComplete(scorchingVolcano)), () -> {
-                    });
                     node(fleshSynthesizer, with(new SectorComplete(stormyCoast)), () -> {
+                    });
+                    node(stackedCultivator, with(new OnSector(rubbleRidge)), () -> {
                     });
                 });
                 node(metaglassPlater, () ->
@@ -256,8 +256,8 @@ public class FRPlanets{
                         });
                         node(branchedRivers, with(new SectorComplete(eteriverStronghold), new SectorComplete(stormyCoast), new Research(hydroelectricGenerator), new Research(hydroelectricGeneratorLarge)), () -> {
                             node(rubbleRidge, with(
-                                new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticSphere), new Research(stackedCultivator), new Research(magneticRingPump),
-                                new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(javelinPad), new Research(javelin)
+                                new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticSphere), new Research(magneticRingPump), new Research(hardenedLiquidTank),
+                                new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(javelinPad), new Research(javelin)
                             ), () -> {});
                             node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticRingPump), new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill)), () -> {
                             });
@@ -348,6 +348,7 @@ public class FRPlanets{
                         });
 
                         dnode(eteriverStronghold, () -> {
+                            dnode(hardenedAlloy);
                             dnode(distance);
 
                             dnode(chillyMountains, () ->
@@ -369,11 +370,11 @@ public class FRPlanets{
     }
 
     /** From Creator Mod. */
-    private static void addResearch(UnlockableContent content, UnlockableContent parent){
-        var lastNode = TechTree.all.find(t -> t.content == content);
+    private static void addResearch(UnlockableContent added, UnlockableContent parent){
+        var lastNode = TechTree.all.find(t -> t.content == added);
         if(lastNode != null) lastNode.remove();
 
-        var node = new TechTree.TechNode(null, content, content.researchRequirements());
+        var node = new TechTree.TechNode(null, added, added.researchRequirements());
         if(node.parent != null) node.parent.children.remove(node);
 
         var p = TechTree.all.find(t -> t.content == parent);

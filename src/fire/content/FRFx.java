@@ -28,15 +28,76 @@ public class FRFx{
             Draw.color(color);
 
             for(short i = 0, interval = (short)(range / spacing); i <= interval; i++){
-                Tmp.v1.trns(e.rotation, i * spacing);
+                Tmp.v6.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
-                Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
+                Draw.rect("fire-aim-shoot", e.x + Tmp.v6.x, e.y + Tmp.v6.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
             }
 
-            Tmp.v1.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
+            Tmp.v6.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
             Lines.stroke(track * 2.0f);
             for(int i : Mathf.signs)
-                Lines.lineAngle(e.x + Tmp.v1.x * i, e.y + Tmp.v1.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
+                Lines.lineAngle(e.x + Tmp.v6.x * i, e.y + Tmp.v6.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
+        });
+    }
+
+    /** Special thanks to New Horizon mod. */
+    public static Effect scanEffect(float lifetime, Color color, float range){
+        return new Effect(lifetime, range * 2.5f, e -> {
+            var rand = Fx.rand;
+            rand.setSeed(e.id);
+            Draw.color(color);
+
+            float f = Interp.pow4Out.apply(Mathf.curve(e.fin(), 0.0f, 0.3f)), rad = range * f,
+            stroke = Mathf.clamp(range * 0.0125f, 3.0f, 8.0f);
+
+            Lines.stroke(2.0f * e.fout());
+            Lines.circle(e.x, e.y, rad * 0.125f);
+
+            Lines.stroke(stroke * e.fout() + e.fout(Interp.pow5In));
+            Lines.circle(e.x, e.y, rad);
+
+            Lines.stroke(stroke * Mathf.curve(e.fin(), 0.0f, 0.1f) * Mathf.curve(e.fout(), 0.05f, 0.15f));
+            float angle = 360.0f * e.fin(Interp.pow5);
+            Lines.lineAngle(e.x, e.y, angle, rad - Lines.getStroke() * 0.5f);
+            Lines.stroke(stroke * Mathf.curve(e.fin(), 0.0f, 0.1f) * e.fout(0.05f));
+
+            Draw.z(Layer.bullet - 1.0f);
+
+            //DrawFunc.fillCirclePercentFade(e.x, e.y, e.x, e.y, e.rotation * f, e.fin(Interp.pow5), 0, Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f, 0.6f + 0.35f * Interp.pow2InInverse.apply(Mathf.curve(e.fin(), 0, 0.8f)), 1f);
+            //float centerX, float centerY, float x, float y, float rad, float percent, float angle, float aScl, float start , float end
+            float p = Mathf.clamp(e.fin(Interp.pow5));
+
+            int sides = Lines.circleVertices(rad), i = 0;
+
+            float space = 360.0f / sides, len = 2.0f * rad * Mathf.sinDeg(space * 0.5f);
+
+            //Tmp.v6.set(rad, 0.0f);
+
+            for(; i < sides * p - 1; i++){
+                float a = space * i;
+                Draw.alpha(Mathf.curve(i / (sides * p), 0.6f + 0.35f * Interp.pow2InInverse.apply(Mathf.curve(e.fin(), 0, 0.8f)), 1) * Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f);
+                Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space), e.y + rad * Mathf.sinDeg(a + space), e.x, e.y);
+            }
+
+            float a = space * i;
+            Tmp.v6.trns(a, 0.0f, len * (sides * p - i - 1));
+            Draw.alpha(Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f);
+            Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space) + Tmp.v6.x, e.y + rad * Mathf.sinDeg(a + space) + Tmp.v6.y, e.x, e.y);
+
+
+            Draw.z(Layer.effect);
+
+            Angles.randLenVectors(e.id, (int)(e.rotation * 0.025f), e.rotation * 0.85f * f, angle, 0.0f, (x, y) ->
+                Lines.lineAngle(e.x + x, e.y + y, angle, e.rotation * rand.random(0.05f, 0.15f) * e.fout(0.15f))
+            );
+
+            Draw.color(color);
+            Lines.stroke(stroke * 1.25f * e.fout(0.2f));
+            Fill.circle(e.x, e.y, Lines.getStroke());
+            Draw.color(Color.white, color, e.fin());
+            Fill.circle(e.x, e.y, Lines.getStroke() * 0.5f);
+
+            Drawf.light(e.x, e.y, rad * 1.35f * e.fout(0.15f), color, 0.6f);
         });
     }
 
@@ -156,7 +217,7 @@ public class FRFx{
             dst = Mathf.dst(e.x, e.y, tx, ty);
         short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
-        var v = Tmp.v1;
+        var v = Tmp.v6;
         var rand = Fx.rand;
         rand.setSeed(e.id * 2L);
 

@@ -10,7 +10,8 @@ import mindustry.type.ItemStack;
 import mindustry.type.Sector;
 import mindustry.world.Block;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.spawner;
+import static mindustry.Vars.state;
 
 public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
 

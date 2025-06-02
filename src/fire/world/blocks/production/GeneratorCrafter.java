@@ -10,7 +10,7 @@ import mindustry.world.meta.StatUnit;
 
 public class GeneratorCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    public final float powerProduction;
+    protected final float powerProduction;
 
     public GeneratorCrafter(String name, float pwr){
         super(name);
@@ -30,7 +30,6 @@ public class GeneratorCrafter extends mindustry.world.blocks.production.GenericC
     @Override
     public void setBars(){
         super.setBars();
-
         addBar("power", (GeneratorCrafterBuild build) -> new Bar(
             () -> Core.bundle.format("bar.poweroutput", Strings.fixed(build.getPowerProduction() * 60.0f * build.timeScale(), 1)),
             () -> Pal.powerBar,

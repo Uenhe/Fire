@@ -7,7 +7,6 @@ public class FRStat{
 
     public static final Stat
     armorPierce = new Stat("armorPierce"),
-    baseHealChance = new Stat("baseHealChance"),
     maxArmorIncrease = new Stat("maxArmorIncrease"),
     allyStatusEffect = new Stat("allyStatusEffect"),
     enemyStatusEffect = new Stat("enemyStatusEffect"),

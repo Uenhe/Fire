@@ -15,13 +15,19 @@ import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.InfoDialog;
+import fire.world.blocks.power.HydroelectricGenerator;
+import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
+import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
 import mindustry.mod.Mods;
+import mindustry.type.Item;
 import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
 import java.time.LocalDate;
@@ -64,8 +70,28 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        if(headless) return;
+        //all iterations in one for performance
+        for(var block : content.blocks()){
+            if(block.isFloor()){
+                var drop = block.asFloor().liquidDrop;
+                if(drop != null){
+                    HydroelectricGenerator.liquidFloors.add(block.asFloor());
+                    if(drop == Liquids.water){
+                        float a = block.attributes.get(Attribute.spores);
+                        if(a > 0.0f) block.attributes.set(FRAttribute.sporesWater, a);
+                    }
+                }
 
+            }else if(block instanceof ItemTurret){
+                Item item = null;
+                var keys = ((ItemTurret)block).ammoTypes.keys();
+                while(keys.hasNext()) item = keys.next();
+                assert item != null;
+                AdaptiveSource.turretItemMap.put(block.id, item.id);
+            }
+        }
+
+        if(headless) return;
         loadSetting();
         loadDatabase();
         FROverride.load();
@@ -123,6 +149,9 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             addContent(t,
+                "[#F4BA6E]v1.4.2:",
+                FRBlocks.compositeRouter,
+                "[#F4BA6E]v1.4.0:",
                 FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
                 FRBlocks.stackedCultivator, FRBlocks.constraintExtractor,
@@ -197,7 +226,7 @@ public class FireMod extends mindustry.mod.Mod{
         });
     }
 
-    /** See ExtraUtilities also.<p></p>
+    /** See Extra Utilities also.<p></p>
      * Clashes with MindustryX. */
     private static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
@@ -206,7 +235,7 @@ public class FireMod extends mindustry.mod.Mod{
         int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
-        // "Today is the %th Day of God's Creation of Planet Lysetta" picked
+        //"Today is the %th Day of God's Creation of Planet Lysetta" picked
         if(index == 0)
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
 
@@ -218,20 +247,27 @@ public class FireMod extends mindustry.mod.Mod{
         dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, UnlockableContent... content){
-        for(var c : content)
-            table.table(Styles.grayPanel, t -> {
+    private static void addContent(Table table, Object... objects){ //content or string
+        for(var obj : objects){
+            if(obj instanceof UnlockableContent c){
 
-                t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
-                t.table(info -> {
-                    info.left().add("[accent]" + c.localizedName).left().row();
+                table.table(Styles.grayPanel, t -> {
+                    t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
+                    t.table(info -> {
+                        info.left().add("[accent]" + c.localizedName).left().row();
+                        short index = (short)c.description.indexOf(Core.bundle.get("fire.strend"));
+                        String desc = index == -1 ? c.description : c.description.substring(0, index);
+                        if(c instanceof SectorPreset) desc += "...";
+                        info.left().add(desc).left();
+                    });
+                }).growX().pad(5.0f);
 
-                    int index = c.description.indexOf(Core.bundle.get("fire.strend"));
-                    String desc = index == -1 ? c.description : c.description.substring(0, index);
-                    if(c instanceof SectorPreset) desc += "...";
-                    info.left().add(desc).left();
-                });
-            }).growX().pad(5.0f).row();
+            }else{
+                assert obj instanceof String;
+                table.add((String)obj).left();
+            }
+            table.row();
+        }
     }
 
     private static float width(){
@@ -240,8 +276,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** ??? */
     private static void doSomethingUnplayable(){
-        for(var unit : content.units())
-            unit.health -= 10000.0f;
+        for(var unit : content.units()) unit.health -= 10000.0f;
     }
 
     /** !!! */
@@ -252,9 +287,7 @@ public class FireMod extends mindustry.mod.Mod{
 
         if(multiplied){
             multiplied = false;
-
-            for(var unit : content.units())
-                unit.health += 10000.0f;
+            for(var unit : content.units()) unit.health += 10000.0f;
         }
     }
 }

@@ -100,15 +100,17 @@ public class EnergyField{
             for(byte i = 0, len = (byte)Math.min(targets.size, maxTargets); i < len; i++){
                 var target = targets.get(i);
 
-                // lightning gets absorbed by plastanium
+                //lightning gets absorbed by plastanium
                 var absorber = Damage.findAbsorber(b.team, b.x, b.y, target.x(), target.y());
                 if(absorber != null) target = absorber;
 
-                // target must be either unit or building
-                if(target instanceof Unit u)
+                //target must be either unit or building
+                if(target instanceof Unit u){
                     b.collision(u, u.x, u.y);
-                else
+                }else{
+                    assert target instanceof Building;
                     ((Building)target).collision(b);
+                }
 
                 hitEffect.at(b.x, b.y, 0.0f, lightningColor, target);
             }

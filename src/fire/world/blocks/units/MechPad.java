@@ -84,7 +84,7 @@ public class MechPad extends mindustry.world.Block{
             pl.clearUnit();
             pl.deathTimer = Player.deathDelay + 1.0f;
 
-            // do not try to respawn in unsupported environments at all
+            //do not try to respawn in unsupported environments at all
             if(!unitType.supportsEnv(state.rules.env)) return;
             FRCall.playerSpawn(tile, pl);
         }

@@ -9,7 +9,6 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.struct.ObjectFloatMap;
-import arc.util.Log;
 import arc.util.Scaling;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;

@@ -82,10 +82,10 @@ public class LightningBranch{
         Fx.lightning.at(x, y, angle, color, lines);
 
         if(branchLeft <= 0) return;
-        float xx = x, yy = y, aangle = angle;
-        Time.run(1.0f, () -> {
+        float X = x, Y = y, Angle = angle;
+        Time.run(1.5f, () -> {
             for(byte i = 0; i < branchAmount; i++)
-                createLightningInternal(null, lastSeed++, team, color, damage, xx, yy, aangle + random.range(15.0f), length, branchAmount, branchLeft - 1);
+                createLightningInternal(null, lastSeed++, team, color, damage, X, Y, Angle + random.range(15.0f), length, branchAmount, branchLeft - 1);
         });
     }
 }

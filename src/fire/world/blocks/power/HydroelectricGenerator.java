@@ -1,18 +1,21 @@
 package fire.world.blocks.power;
 
 import arc.Core;
+import arc.struct.Seq;
 import arc.util.Scaling;
 import arc.util.Strings;
 import fire.world.meta.FRStat;
 import mindustry.game.Team;
 import mindustry.ui.Styles;
 import mindustry.world.Tile;
+import mindustry.world.blocks.environment.Floor;
 import mindustry.world.meta.Stat;
 
-import static mindustry.Vars.content;
 import static mindustry.Vars.world;
 
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
+
+    public static Seq<Floor> liquidFloors = new Seq<>();
 
     public HydroelectricGenerator(String name){
         super(name);
@@ -25,14 +28,12 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         super.setStats();
         stats.add(Stat.tiles, table -> {
             table.row();
-            for(var b : content.blocks()){
-                if(!b.isFloor() || b.asFloor().liquidDrop == null) continue;
-
+            for(var floor : liquidFloors){
                 table.table(Styles.grayPanel, t -> {
-                    t.left().image(b.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
+                    t.left().image(floor.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                     t.left().table(info -> {
-                        info.left().add(b.localizedName).left().row();
-                        info.left().add("[accent]" + FRStat.floorMultiplier.localized() + Strings.fixed(b.asFloor().liquidMultiplier * (1.0f - b.asFloor().liquidDrop.viscosity) * b.asFloor().liquidDrop.temperature * 4.0f, 2));
+                        info.left().add(floor.localizedName).left().row();
+                        info.left().add("[accent]" + FRStat.floorMultiplier.localized() + Strings.fixed(floor.liquidMultiplier * (1.0f - floor.liquidDrop.viscosity) * floor.liquidDrop.temperature * 4.0f, 2));
                     });
                 }).growX().pad(5.0f).row();
             }

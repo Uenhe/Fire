@@ -39,11 +39,9 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         shieldRotation;
     protected byte sides = 6;
 
-    /**
-     * Number of registered cores, according to {@link mindustry.game.Team#all}.<p>
-     * Index -> Team ID, Value -> Core number<p>
-     * And also see those JS files in mod Creator.
-     */
+    /** Number of registered cores, according to {@link mindustry.game.Team#all}.<p>
+     * Team ID -> Core number<p>
+     * Also see those JS files in mod Creator. */
     public final short[] cores = new short[256];
 
     protected ForceCoreBlock(String name){
@@ -156,7 +154,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
                         bullet.absorb();
                         Fx.absorb.at(bullet);
                         hit = 1.0f;
-                        buildup += bullet.damage;
+                        buildup += bullet.type.shieldDamage(bullet);
                     }
                 });
         }

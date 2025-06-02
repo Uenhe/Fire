@@ -8,7 +8,9 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.struct.Seq;
-import arc.util.*;
+import arc.util.Reflect;
+import arc.util.Time;
+import arc.util.Tmp;
 import fire.entities.abilities.DebuffRemoveFieldAbility;
 import fire.type.FleshUnitType;
 import fire.world.meta.FRStat;
@@ -146,8 +148,8 @@ public class FRStatusEffects{
                 if(wet) entries.find(e -> e.effect == this).time += 2.0f * Time.delta;
 
                 if(Mathf.chanceDelta(effectChance)){
-                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.5f));
-                    effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0.0f, color, unit);
+                    Tmp.v6.rnd(Mathf.range(unit.type.hitSize * 0.5f));
+                    effect.at(unit.x + Tmp.v6.x, unit.y + Tmp.v6.y, 0.0f, color, unit);
                 }
             }
 
@@ -189,11 +191,11 @@ public class FRStatusEffects{
                 super.update(unit, time);
 
                 if(time >= 60.0f)
-                    // linearly reduces armor in 1s
+                    //linearly reduces armor in 1s
                     unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f, unit.type.armor - maxArmorReduction);
 
                 else
-                    // linearly puts armor back in 1s
+                    //linearly puts armor back in 1s
                     unit.armor += maxArmorReduction / 60.0f * Time.delta;
             }
 
@@ -215,11 +217,10 @@ public class FRStatusEffects{
             @Override
             public void update(Unit unit, float time){
                 super.update(unit, time);
-                if(unit.dead){
+                if(unit.dead)
                     unit.vel.scl(1.0f - 0.05f * Time.delta);
-                }else if(unit.moving() && Mathf.chanceDelta(0.06)){
+                else if(unit.moving() && Mathf.chanceDelta(0.06))
                     unit.vel.scl(Mathf.random(0.1f, 1.5f));
-                }
             }
             {
                 color = Color.valueOf("98ffa8");

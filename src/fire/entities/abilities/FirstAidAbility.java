@@ -85,7 +85,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             unit.apply(status, statusDuration);
             effect.at(unit);
 
-            // enter cooldown
+            //enter cooldown
             cooldownTimer = Mathf.FLOAT_ROUNDING_ERROR;
 
         }else if(cooldownTimer >= cooldown){

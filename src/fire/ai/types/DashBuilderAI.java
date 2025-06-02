@@ -2,9 +2,14 @@ package fire.ai.types;
 
 import arc.math.geom.Position;
 import arc.math.geom.Vec2;
+import arc.util.Structs;
 import fire.entities.abilities.DashAbility;
+import mindustry.ai.types.GroundAI;
+import mindustry.entities.units.AIController;
 
 public class DashBuilderAI extends mindustry.ai.types.BuilderAI{
+
+    private DashAbility dash;
 
     public DashBuilderAI(){}
 
@@ -13,23 +18,18 @@ public class DashBuilderAI extends mindustry.ai.types.BuilderAI{
     }
 
     @Override
-    public void circleAttack(float circleLength){
-        super.circleAttack(circleLength);
-        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
-        dab.dash(unit, target);
-    }
-
-    @Override
-    public void circle(Position target, float circleLength, float speed){
-        super.circle(target, circleLength, speed);
-        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
-        dab.dash(unit, target);
+    public void init(){
+        dash = (DashAbility)Structs.find(unit.abilities, ab -> ab instanceof DashAbility);
     }
 
     @Override
     public void moveTo(Position target, float circleLength, float smooth, boolean keepDistance, Vec2 offset, boolean arrive){
         super.moveTo(target, circleLength, smooth, keepDistance, offset, arrive);
-        if(unit.abilities.length == 0 || !(unit.abilities[0] instanceof DashAbility dab)) return;
-        dab.dash(unit, target);
+        if(dash != null) dash.dash(unit, target);
+    }
+
+    @Override
+    public AIController fallback(){
+        return unit.type.flying ? new DashFlyingAI() : new GroundAI();
     }
 }

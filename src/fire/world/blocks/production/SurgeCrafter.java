@@ -39,16 +39,15 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         public void craft(){
             super.craft();
             byte n = fragBullets;
-            craftSound.at(this, Mathf.random(0.9f, 1.1f));
-            if(!specialContent || n == 0) return;
+            craftSound.at(tile, Mathf.random(0.9f, 1.1f));
+            if(n == 0 || !specialContent) return;
 
             for(byte i = 0; i < n; i++){
-                var bullet = fragBullet.create(this, x, y, 360.0f / n * i);
-                var ss = signs.apply(i);
-
+                var bullet = fragBullet.create(this, x, y, 360.0f * i / n);
+                boolean s = signs.apply(i)[counter];
                 bullet.lifetime /= Mathf.pow(timeScale, 0.99f);
                 bullet.vel.scl(timeScale);
-                bullet.mover = b -> bullets.accept(b, (byte)Mathf.sign(ss[counter]));
+                bullet.mover = b -> bullets.accept(b, (byte)Mathf.sign(s));
             }
 
             if(++counter >= len) counter = 0;
