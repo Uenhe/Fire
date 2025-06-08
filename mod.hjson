@@ -2,16 +2,14 @@
   name: "fire"
   displayName: "Fire"
   author: "飞雨a_sszylfyzgmz\nKochiyaUeneh油苗子"
-  version: "1.4.2b"
+  version: "1.4.2"
   minGameVersion: "149"
   java: true
   main: "fire.FireMod"
   repo: "Uenhe/Fire"
-  subtitle: "v1.4.2b-149"
+  subtitle: "v1.4.2-149"
   description:
     '''
-    [scarlet[]]Beta Version Warning: English translation has not been completed yet.
-
     [#FFE9BF[]]A Mindustry Mod that adds many unique things...
     Click the 'Repo' button below to skip to GitHub page.
     Any feedback, GitHub issue, pull request or translation tweak is welcome.

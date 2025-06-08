@@ -32,7 +32,6 @@ import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
 import mindustry.ui.Styles;
-import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
 
@@ -42,7 +41,7 @@ import static mindustry.Vars.*;
 
 /** To show more details about contents.
  * @see mindustry.ui.dialogs.ResearchDialog */
-public class InfoDialog extends BaseDialog{
+public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
 
     private final View view;
     private Rect bounds = new Rect();
@@ -53,6 +52,7 @@ public class InfoDialog extends BaseDialog{
 
     private static final float nodeSize = Scl.scl(70.0f);
     private static final float nodeSpacing = 40.0f;
+
     public static final InfoDialog dialog = new InfoDialog();
 
     public InfoDialog(){
@@ -70,36 +70,36 @@ public class InfoDialog extends BaseDialog{
 
         margin(0.0f).marginBottom(8.0f);
 
-        var slider = new Slider(1.0f, 2.0f, 0.1f, false);
-        var value = new Label("", Styles.outlineLabel);
-        Table sliderTable = new Table(), content = new Table();
-        content.add("@fire.fontsizescale", Styles.outlineLabel).left().growX().wrap();
-        content.add(value).padLeft(10.0f).right();
-        content.margin(3.0f, 33.0f, 3.0f, 33.0f);
-        content.touchable = Touchable.disabled;
+        titleTable.table(t -> {
+            var slider = new Slider(1.0f, 2.0f, 0.1f, false);
+            var value = new Label("", Styles.outlineLabel);
 
-        slider.changed(() -> {
-            tooltip.fontScale(fontScale = slider.getValue());
-            value.setText(String.format("%sx", Strings.fixed(fontScale, 1)));
-        });
-        slider.change();
+            var content = new Table();
+            content.add("@fire.fontsizescale", Styles.outlineLabel).left().growX().wrap();
+            content.add(value).padLeft(10.0f).right();
+            content.margin(3.0f, 33.0f, 3.0f, 33.0f);
+            content.touchable = Touchable.disabled;
 
-        //see Vars.ui.addDescTooltipui.addDescTooltip(); custom font scale based on the origin one
-        sliderTable.stack(slider, content).width(Math.min(Core.graphics.getWidth() * 0.8f, 400.0f)).padTop(4.0f).get()
-            .addListener(new Tooltip(t -> tooltip = t.background(Styles.black8).margin(4.0f).add("@fire.fontsizescale.desc").fontScale(fontScale).color(Color.lightGray)){
-                @Override
-                protected void setContainerPosition(Element element, float x, float y){
-                    targetActor = element;
-                    var pos = element.localToStageCoordinates(Tmp.v6.setZero());
-                    container.pack();
-                    container.setPosition(pos.x, pos.y, Align.topLeft);
-                    container.setOrigin(0.0f, element.getHeight());
-                }
-                {allowMobile = true;}
+            slider.changed(() -> {
+                tooltip.fontScale(fontScale = slider.getValue());
+                value.setText(String.format("%sx", Strings.fixed(fontScale, 1)));
             });
+            slider.change();
 
-        titleTable.add(sliderTable);
-        titleTable.row();
+            //see Vars.ui.addDescTooltipui.addDescTooltip(); custom font scale based on the origin one
+            t.stack(slider, content).width(Math.min(Core.graphics.getWidth() * 0.8f, 400.0f)).padTop(4.0f).get()
+                .addListener(new Tooltip(tt -> tooltip = tt.background(Styles.black8).margin(4.0f).add("@fire.fontsizescale.desc").fontScale(fontScale).color(Color.lightGray)){
+                    @Override
+                    protected void setContainerPosition(Element element, float x, float y){
+                        targetActor = element;
+                        var pos = element.localToStageCoordinates(Tmp.v6.setZero());
+                        container.pack();
+                        container.setPosition(pos.x, pos.y, Align.topLeft);
+                        container.setOrigin(0.0f, element.getHeight());
+                    }
+                    {allowMobile = true;}
+                });
+        }).row();
 
         cont.stack(titleTable, view = new View()).grow();
 
@@ -118,7 +118,6 @@ public class InfoDialog extends BaseDialog{
         addCloseButton();
 
         addListener(new InputListener(){
-
             @Override
             public boolean scrolled(InputEvent event, float x, float y, float amountX, float amountY){
                 view.setScale(Mathf.clamp(view.scaleX - 0.1f * amountY * view.scaleX, 0.25f, 1.0f));
@@ -250,9 +249,7 @@ public class InfoDialog extends BaseDialog{
         private ImageButton hoverNode;
         private final Table infoTable = new Table();
 
-        {
-            rebuildAll();
-        }
+        {rebuildAll();}
 
         private void rebuildAll(){
             clear();
@@ -307,7 +304,7 @@ public class InfoDialog extends BaseDialog{
                 button.setSize(nodeSize);
 
                 button.update(() -> {
-                    float offset = (Core.graphics.getHeight() % 2f) * 0.5f;
+                    float offset = (Core.graphics.getHeight() % 2.0f) * 0.5f;
                     button.setPosition(node.x + panX + width * 0.5f, node.y + panY + height * 0.5f + offset, Align.center);
                     button.getStyle().up = !locked(node.node) ? Tex.buttonOver : locked(node.node) || !locked(node.node) ? Tex.buttonRed : Tex.button;
 
@@ -389,16 +386,18 @@ public class InfoDialog extends BaseDialog{
                         desc.add("@completed");
 
                 }).pad(9.0f);
-
-                if(hasInfo(node)) t.minWidth(480.0f);
+                if(locked(node))
+                    t.minWidth(120.0f);
+                else if(hasInfo(node))
+                    t.minWidth(360.0f);
             });
 
             infoTable.row();
 
             if(!locked(node) && hasInfo(node))
                 infoTable.table(t -> t.margin(3.0f).left().labelWrap(
-                    FRBlocks.compositeMap.containsKey(node.content.id)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", content.block(FRBlocks.compositeMap.get(node.content.id)).localizedName)
+                    FRBlocks.compositeMap.containsKey(node.content)
+                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FRBlocks.compositeMap.get(node.content).localizedName)
                     : Core.bundle.get(getKey(node))
                 ).fontScale(fontScale).color(Color.lightGray).growX()).fillX();
 

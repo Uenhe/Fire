@@ -46,13 +46,13 @@ public class FRWaves{
 
         float[] scaling = {1, 1.6f, 2f, 3.1f, 4.4f};
 
-        UnitType[][] finalSpecies = species;
+        var finalSpecies = species;
         Intc createProgression = start -> {
             //main sequence
             int tier;
             int type;
 
-            for(short i = (short)start; i < cap; ){
+            for(short i = (short)start; i < cap;){
                 float f = i;
 
                 if(f < 10){
@@ -72,7 +72,7 @@ public class FRWaves{
                 }
                 tier -= 1;
                 //basicEnemies
-                int counts = rand.random(6);
+                int counts = rand.random(finalSpecies.length - 1);
                 StatusEffect ChosenEffect;
                 if(f < 15){
                     ChosenEffect = StatusEffects.none;
@@ -86,11 +86,11 @@ public class FRWaves{
                     ChosenEffect = rand.random(2) <= 1 ? StatusEffects.shielded : FRStatusEffects.inspired;
                 }
                 for(int j = 0; j < counts; j++){
-                    type = rand.random(6);
+                    type = rand.random(finalSpecies.length - 1);
                     int finalTier = tier;
                     int finalJ = j;
                     if(tier >= 1){
-                        out.add(new SpawnGroup(finalSpecies[type][Math.min(finalTier, 5) - 1]){{
+                        out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
                             unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier] * 2;
                             begin = (int)(f + finalJ);
                             end = (int)(f + f >= cap ? never : 10 + f * 2);
@@ -102,7 +102,7 @@ public class FRWaves{
                             effect = ChosenEffect;
                         }});
                     }
-                    out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, 5)]){{
+                    out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
                         unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier];
                         begin = (int)(f + finalJ);
                         end = (int)(f + f >= cap ? never : 10 + f * 2);

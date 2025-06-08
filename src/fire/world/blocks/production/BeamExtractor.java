@@ -165,14 +165,14 @@ public class BeamExtractor extends mindustry.world.Block{
     private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
         if(set != null) set.clear();
         Tile closest = null;
-        float mr = Float.MAX_VALUE;
+        float min = Float.MAX_VALUE;
 
-        short range = this.range;
-        int mx = Mathf.ceil((wp(x) + range) / tilesize), my = Mathf.ceil((wp(y) + range) / tilesize);
-        for    (short tx = (short)((wp(x) - range) / tilesize); tx <= mx; tx++)
-            for(short ty = (short)((wp(y) - range) / tilesize); ty <= my; ty++){
+        short r = range;
+        short mx = (short)Mathf.ceil((wp(x) + r) / tilesize), my = (short)Mathf.ceil((wp(y) + r) / tilesize);
+        for    (short tx = (short)((wp(x) - r) / tilesize); tx <= mx; tx++)
+            for(short ty = (short)((wp(y) - r) / tilesize); ty <= my; ty++){
                 float dst = Mathf.dst(wp(x), wp(y), tx * tilesize, ty * tilesize);
-                if(dst > range || dst <= closeDst()) continue;
+                if(dst > r || dst <= closeDst()) continue;
                 var tile = world.tile(tx, ty);
                 if(tile == null || !tile.block().isAir() || tile.drop() == null || tile.drop().hardness > tier) continue;
 
@@ -186,9 +186,9 @@ public class BeamExtractor extends mindustry.world.Block{
                     set.add(tile.drop().id);
 
                 if(entry != null)
-                    if(tile.drop().id == entry.item && mr > dst){
+                    if(tile.drop().id == entry.item && min > dst){
                         closest = tile;
-                        mr = dst;
+                        min = dst;
                     }
         }
 

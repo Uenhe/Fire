@@ -46,7 +46,7 @@ public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
             Items.titanium, 2000,
             Items.thorium, 1000,
             Items.plastanium, 500
-        )); //TODO this doesn't require relevant items when launching
+        )); //FIXME this doesn't require relevant items when launching
     }
 
     @Override

@@ -15,17 +15,15 @@ import static mindustry.Vars.world;
 
 public class FRWeathers{
 
-    public static final Weather
-        rainstorm;
+    public static final Weather rainstorm;
 
     static{
         rainstorm = new RainWeather("rainstorm"){
-            private static final LightningCloudBulletType type = new LightningCloudBulletType(12.0f, 12, 11, 20, 20, Pal.lancerLaser);
+            private static final LightningCloudBulletType type = new LightningCloudBulletType(5.0f, 12, 10, 20, 20, Pal.lancerLaser);
 
             @Override
             public void update(WeatherState state){
                 super.update(state);
-
                 if(Mathf.chanceDelta(world.width() * world.height() * 0.000002f)){
                     type.create(
                         state, //????
@@ -33,7 +31,8 @@ public class FRWeathers{
                         Mathf.random(world.height() * tilesize)
                     );
                 }
-            }{
+            }
+            {
                 attrs.set(Attribute.light, -0.35f);
                 attrs.set(Attribute.water, 0.35f);
                 status = StatusEffects.wet;

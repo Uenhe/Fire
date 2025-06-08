@@ -202,6 +202,16 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         }
 
         @Override
+        public float range(){
+            return explosionRadius * scale();
+        }
+
+        @Override
+        public float smoothProgress(){
+            return smoothProgress;
+        }
+
+        @Override
         public void write(Writes write){
             super.write(write);
             write.f(instability);
@@ -211,16 +221,6 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         public void read(Reads read, byte revision){
             super.read(read, revision);
             instability = read.f();
-        }
-
-        @Override
-        public float range(){
-            return explosionRadius * scale();
-        }
-
-        @Override
-        public float smoothProgress(){
-            return smoothProgress;
         }
 
         private void createLightning(){
@@ -233,7 +233,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                     Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
             }else{
                 for(byte i = 0; i < amount; i++)
-                    LightningBranch.create(null, team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size + instability * 0.024f), 2, 2);
+                    LightningBranch.create(this, circleColor[counter], lightningDamage, i * (360.0f / amount), (int)(size + instability * 0.024f), 2, 2);
             }
         }
 

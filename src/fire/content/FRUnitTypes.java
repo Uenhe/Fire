@@ -244,7 +244,7 @@ public class FRUnitTypes{
             shadowElevation = 0.8f;
             groundLayer = Layer.legUnit;
             legCount = 8;
-            legLength = 60f;
+            legLength = 70.0f;
             legSpeed = 0.2f;
             legExtension = -15f;
             legBaseOffset = -8f;
@@ -283,7 +283,7 @@ public class FRUnitTypes{
 
         //region mech mutated
 
-        blade = new FleshUnitType("byjd"){{
+        blade = new FleshUnitType("byjd", UnitTypes.dagger){{
             constructor = MechUnit::create;
             health = 630.0f;
             armor = 5.0f;
@@ -318,7 +318,7 @@ public class FRUnitTypes{
             );
         }};
 
-        hatchet = new FleshUnitType("hatchet"){{
+        hatchet = new FleshUnitType("hatchet", UnitTypes.mace){{
             constructor = MechUnit::create;
             health = 960.0f;
             armor = 8.0f;
@@ -362,7 +362,7 @@ public class FRUnitTypes{
             );
         }};
 
-        castle = new FleshUnitType("bybl"){{
+        castle = new FleshUnitType("bybl", UnitTypes.fortress){{
             constructor = MechUnit::create;
             health = 8200.0f;
             armor = 9.0f;
@@ -552,7 +552,7 @@ public class FRUnitTypes{
 
         pioneer = new UnitType("pioneer"){{
             constructor = PayloadUnit::create;
-            aiController = DashBuilderAI::new;
+            aiController = () -> new DashBuilderAI(false);
             defaultCommand = UnitCommand.repairCommand;
             flying = true;
             health = 5600.0f;

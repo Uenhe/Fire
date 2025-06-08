@@ -10,8 +10,10 @@ import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Nullable;
 import arc.util.Tmp;
+import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -100,6 +102,35 @@ public class FRFx{
             Drawf.light(e.x, e.y, rad * 1.35f * e.fout(0.15f), color, 0.6f);
         });
     }
+
+    /** Special thanks to Testing Utilities mod. */
+    public static Effect fleshTeleportEffect = new Effect(80.0f, e -> {
+        if(!(e.data instanceof TpFxData data)) return;
+
+        var oldType = ((FleshUnitType)data.spawned.type).origin;
+        float scl = e.fout(Interp.pow2Out), p = Draw.scl, z = Draw.z();
+
+        Draw.z(Layer.effect + 0.1f);
+        Draw.scl *= scl;
+        Draw.mixcol(data.spawned.team.color, 1.0f);
+        Draw.rect(oldType.fullIcon, e.x, e.y, e.rotation);
+        Draw.rect(data.spawned.type.fullIcon, data.x, data.y, e.rotation);
+        Draw.reset();
+        Draw.scl = p;
+        Draw.z(z);
+
+        Draw.color(data.spawned.team.color);
+        float stroke = (oldType.hitSize + data.spawned.type.hitSize) * 0.5f * scl,
+        cos = Mathf.cosDeg(e.rotation) * stroke,
+        sin = Mathf.sinDeg(e.rotation) * stroke;
+
+        Fill.quad(
+            e.x + cos * 0.25f, e.y + sin * 0.25f,
+            data.x + cos, data.y + sin,
+            data.x - cos, data.y - sin,
+            e.x - cos * 0.25f, e.y - sin * 0.25f
+        );
+    });
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
@@ -209,7 +240,7 @@ public class FRFx{
     });
 
     /** @see Fx#chainLightning */
-    public static final Effect chainLightningThin = new Effect(20.0f, 300.0f, e -> {
+    public static final Effect chainLightningThin = new Effect(24.0f, 300.0f, e -> {
         if(!(e.data instanceof Position p)) return;
 
         final float rangeBetweenPoints = 12.0f,
@@ -242,7 +273,8 @@ public class FRFx{
         Lines.endLine();
     }).followParent(false);
 
-    public static final Effect reactorExplosionLarge = new Effect(0.0f, 500.0f, b -> {
+    /** @see Fx#reactorExplosion */
+    public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
         float intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
             baseLifetime = 25.0f + intensity * 11.0f;
 
@@ -266,7 +298,7 @@ public class FRFx{
         b.scaled(baseLifetime, e -> {
             Draw.color();
             e.scaled(5.0f + intensity * 2.0f, i -> {
-                Lines.stroke((3.1f + intensity / 5.0f) * i.fout());
+                Lines.stroke((3.1f + intensity  * 0.2f) * i.fout());
                 Lines.circle(e.x, e.y, (3.0f + i.fin() * 14.0f) * intensity);
                 Drawf.light(e.x, e.y, i.fin() * 14.0f * 2.0f * intensity, Color.white, 0.9f * e.fout());
             });
@@ -281,4 +313,15 @@ public class FRFx{
             });
         });
     });
+
+    public static class TpFxData{
+        public final Unit spawned;
+        public final float x;
+        public final float y;
+        public TpFxData(Unit spawned, float x, float y){
+            this.spawned = spawned;
+            this.x = x;
+            this.y = y;
+        }
+    }
 }

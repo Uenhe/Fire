@@ -131,7 +131,7 @@ public class FRStatusEffects{
                     clazz = (Class<? extends Unit>)clazz.getSuperclass();
 
                 Seq<StatusEntry> entries = Reflect.get(clazz, unit, "statuses");
-                boolean wet = entries.contains(e -> e.effect == status); //hasEffect() here is buggy
+                boolean wet = entries.contains(e -> e.effect == status); //hasEffect() here is buggy but why???
 
                 if(unit.type instanceof FleshUnitType){
                     float perc = (neo_regenPercent + (wet ? neo_extraRegenPercent : 0.0f)) / 60.0f * Time.delta, maxShield = 0.6f * unit.maxHealth + 600.0f;
@@ -168,7 +168,7 @@ public class FRStatusEffects{
                 effect = new Effect(40.0f, e -> {
                     Draw.color(color);
                     Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.2f, (x, y) ->
-                        Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * 1.4f * (e.data instanceof Unit u ? Mathf.sqrt(u.type.hitSize) * 0.6f : 1.0f))
+                        Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * 1.4f * (e.data instanceof Float hitSize ? Mathf.sqrt(hitSize) * 0.6f : 1.0f))
                     );
                 });
                 init(() -> affinity(status, (unit, result, time) -> {})); //handled in update()

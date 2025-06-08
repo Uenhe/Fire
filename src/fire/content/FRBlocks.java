@@ -11,15 +11,12 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
-import arc.struct.IntIntMap;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.entities.FRUnitSorts;
-import fire.entities.bullets.FleshBulletType;
-import fire.entities.bullets.FoldingBulletType;
-import fire.entities.bullets.LightningPointBulletType;
-import fire.entities.bullets.SpriteBulletType;
+import fire.entities.bullets.*;
 import fire.world.DEBUG;
 import fire.world.blocks.campaign.AcceleratorCutscene;
 import fire.world.blocks.defense.ArmorWall;
@@ -46,6 +43,7 @@ import fire.world.kits.Campfire;
 import fire.world.kits.EnergyField;
 import fire.world.meta.FRAttribute;
 import mindustry.content.*;
+import mindustry.ctype.UnlockableContent;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
@@ -63,7 +61,6 @@ import mindustry.entities.pattern.ShootBarrel;
 import mindustry.entities.pattern.ShootMulti;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.game.EventType;
-import mindustry.game.Team;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
 import mindustry.gen.Sounds;
@@ -77,7 +74,6 @@ import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.type.LiquidStack;
 import mindustry.world.Block;
-import mindustry.world.Tile;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.ForceProjector;
 import mindustry.world.blocks.defense.RegenProjector;
@@ -93,9 +89,12 @@ import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.environment.OverlayFloor;
 import mindustry.world.blocks.liquid.LiquidBridge;
 import mindustry.world.blocks.liquid.LiquidRouter;
+import mindustry.world.blocks.payloads.PayloadConveyor;
+import mindustry.world.blocks.payloads.PayloadRouter;
 import mindustry.world.blocks.power.ConsumeGenerator;
 import mindustry.world.blocks.power.ImpactReactor;
 import mindustry.world.blocks.production.*;
+import mindustry.world.blocks.units.RepairTower;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.consumers.ConsumeItemFlammable;
 import mindustry.world.draw.*;
@@ -110,8 +109,7 @@ import static mindustry.type.ItemStack.with;
 
 public class FRBlocks{
 
-    /** Component itself -> its inferior. */
-    public static final IntIntMap compositeMap = new IntIntMap(6);
+    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(6); //composite one -> its inferior
     public static final Block
     //environment
     neoplasm, bloodyDirt, hardenedCovering,
@@ -120,7 +118,7 @@ public class FRBlocks{
     adaptiveSource, fireCompany,
 
     //turret
-    smasher, nightmare,
+    smasher, nightmare, fulmination,
     ignition, blossom, gambler, seaquake, distance, magneticDomain,
     grudge, aerolite, magneticSphere, scab,
     magneticRail,
@@ -148,7 +146,7 @@ public class FRBlocks{
     hardenedAlloyCrucible,
 
     //units
-    fleshReconstructor,
+    fleshReconstructor, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
     buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
@@ -163,12 +161,14 @@ public class FRBlocks{
         //region environment
 
         neoplasm = new Floor("pooled-neoplasm", 0){{
-            drownTime = 230.0f;
             speedMultiplier = 0.5f;
-            statusDuration = 240.0f;
-            status = FRStatusEffects.overgrown;
-            isLiquid = true;
             liquidDrop = Liquids.neoplasm;
+            isLiquid = true;
+            status = FRStatusEffects.overgrown;
+            statusDuration = 240.0f;
+            drownTime = 230.0f;
+            albedo = 0.9f;
+            supportsOverlay = true;
         }};
 
         bloodyDirt = new Floor("bloody-dirt", 8);
@@ -337,6 +337,7 @@ public class FRBlocks{
             ammo(
                 Items.copper, new LaserBulletType(50.0f){{
                     length = 196.0f;
+                    width = 12.0f;
                     colors(colors, Pal.copperAmmoFront, Pal.copperAmmoBack, Color.white);
                     reloadMultiplier = 0.8f;
                     buildingDamageMultiplier = 0.5f;
@@ -344,6 +345,7 @@ public class FRBlocks{
 
                 Items.lead, new LaserBulletType(45.0f){{
                     length = 196.0f;
+                    width = 12.0f;
                     colors(colors, Pal.glassAmmoFront, Pal.glassAmmoBack, Color.white);
                     reloadMultiplier = 1.1f;
                     buildingDamageMultiplier = 0.5f;
@@ -351,7 +353,7 @@ public class FRBlocks{
 
                 Items.metaglass, new LaserBulletType(55.0f){{
                     length = 241.0f;
-                    width = 12.5f;
+                    width = 9.0f;
                     hitSize = 3.5f;
                     colors(colors, Pal.glassAmmoFront, Pal.glassAmmoBack, Color.white);
                     rangeChange = 45.0f;
@@ -362,6 +364,7 @@ public class FRBlocks{
 
                 Items.graphite, new LaserBulletType(40.0f){{
                     length = 196.0f;
+                    width = 12.0f;
                     colors(colors, Pal.graphiteAmmoFront, Pal.graphiteAmmoBack, Color.white);
                     status = StatusEffects.freezing;
                     statusDuration = 150f;
@@ -373,7 +376,7 @@ public class FRBlocks{
 
                 Items.sand, new LaserBulletType(15.0f){{
                     length = 346.0f;
-                    width = 10.0f;
+                    width = 8.0f;
                     hitSize = 3.0f;
                     colors(colors, Pal.siliconAmmoFront, Pal.siliconAmmoBack, Color.white);
                     rangeChange = 150f;
@@ -384,6 +387,7 @@ public class FRBlocks{
 
                 Items.titanium, new LaserBulletType(50.0f){{
                     length = 196.0f;
+                    width = 12.0f;
                     colors(colors, _ccccff_a04, _ccccff, Color.white);
                     status = StatusEffects.corroded;
                     statusDuration = 240.0f;
@@ -394,7 +398,6 @@ public class FRBlocks{
 
                 Items.thorium, new LaserBulletType(60.0f){{
                     length = 196.0f;
-                    width = 20.0f;
                     hitSize = 5.0f;
                     colors(colors, Pal.thoriumAmmoFront, Pal.thoriumAmmoBack, Color.white);
                     status = StatusEffects.melting;
@@ -406,7 +409,7 @@ public class FRBlocks{
 
                 Items.scrap, new LaserBulletType(25.0f){{
                     length = 366.0f;
-                    width = 10.0f;
+                    width = 8.0f;
                     hitSize = 3.0f;
                     colors(colors, Pal.siliconAmmoFront, Pal.siliconAmmoBack, Color.white);
                     rangeChange = 170.0f;
@@ -417,6 +420,7 @@ public class FRBlocks{
 
                 Items.silicon, new LaserBulletType(65.0f){{
                     length = 196.0f;
+                    width = 12.0f;
                     colors(colors, _404040_a04, _404040, Color.white);
                     colors(colors, Pal.siliconAmmoFront, Pal.siliconAmmoBack, Color.white);
                     ammoMultiplier = 3.0f;
@@ -425,7 +429,6 @@ public class FRBlocks{
 
                 Items.surgeAlloy, new LaserBulletType(70.0f){{
                     length = 231.0f;
-                    width = 18.0f;
                     hitSize = 4.5f;
                     colors(colors, Pal.surgeAmmoFront, Pal.surgeAmmoBack, Color.white);
                     rangeChange = 35.0f;
@@ -446,7 +449,7 @@ public class FRBlocks{
 
                 FRItems.glass, new LaserBulletType(25.0f){{
                     length = 281.0f;
-                    width = 10.0f;
+                    width = 8.0f;
                     hitSize = 3.0f;
                     colors(colors, Pal.graphiteAmmoFront, Pal.graphiteAmmoBack, Color.white);
                     rangeChange = 85.0f;
@@ -457,7 +460,7 @@ public class FRBlocks{
 
                 FRItems.mirrorglass, new LaserBulletType(75.0f){{
                     length = 356.0f;
-                    width = 10.0f;
+                    width = 8.0f;
                     hitSize = 3.0f;
                     colors(colors, Pal.graphiteAmmoFront, Pal.graphiteAmmoBack, Color.white);
                     rangeChange = 160.0f;
@@ -468,7 +471,7 @@ public class FRBlocks{
 
                 FRItems.hardenedAlloy, new LaserBulletType(85.0f){{
                     length = 271.0f;
-                    width = 22.0f;
+                    width = 18.0f;
                     hitSize = 5.5f;
                     colors(colors, Pal.reactorPurple.cpy().a(0.4f), Pal.reactorPurple, Color.white);
                     rangeChange = 75.0f;
@@ -482,6 +485,62 @@ public class FRBlocks{
                     pierceCap = 6;
                 }}
             );
+        }};
+
+        fulmination = new PowerTurret("fulmination"){{
+            requirements(Category.turret, with(
+                Items.copper, 75,
+                Items.metaglass, 40,
+                Items.silicon, 60,
+                Items.titanium, 40
+            ));
+            researchCostMultiplier = 0.5f;
+            health = 1200;
+            size = 2;
+            liquidCapacity = 20.0f;
+            reload = 54.0f;
+            range = 25 * tilesize;
+            shootCone = 45.0f;
+            inaccuracy = 2.0f;
+            rotateSpeed = 4.0f;
+            recoil = 1.0f;
+            shake = 2.0f;
+            shoot.firstShotDelay = 25.0f;
+            moveWhileCharging = false;
+            targetAir = false;
+            shootSound = Sounds.laser;
+            shootEffect = Fx.lightningShoot;
+            smokeEffect = Fx.none;
+            heatColor = Color.red;
+
+            coolant = consumeCoolant(n(12));
+            consumePower(n(400));
+
+            shootType = new LightningBranchBulletType(20.0f, 2, 3){{
+                lightningLength = 14;
+                chargeEffect = new Effect(24.0f, e -> {
+                    Draw.color(Pal.lancerLaser);
+                    Angles.randLenVectors(e.id, 12, 1.0f + 14.0f * e.foutpowdown(), e.rotation, 120.0f, (x, y) ->
+                        Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), e.fslope() * 2.4f + 1.0f)
+                    );
+                });
+
+                hittable = false;
+                collidesAir = false;
+                displayAmmoMultiplier = false;
+                buildingDamageMultiplier = 0.25f;
+
+                lightningType = new BulletType(0.0001f, 0.0f){{
+                    lifetime = Fx.lightning.lifetime;
+                    hitEffect = Fx.hitLancer;
+                    despawnEffect = Fx.none;
+                    lightColor = Color.white;
+
+                    hittable = false;
+                    collidesAir = false;
+                    buildingDamageMultiplier = 0.25f;
+                }};
+            }};
         }};
 
         ignition = new ContinuousTurret("dr"){{
@@ -859,22 +918,21 @@ public class FRBlocks{
             armor = 8.0f;
             size = 3;
             liquidCapacity = 45.0f;
-            reload = 600.0f;
+            reload = 550.0f;
             range = 500.0f;
             shootCone = 10.0f;
-            rotateSpeed = 1.2f;
+            rotateSpeed = 1.3f;
             recoil = 2.0f;
             shake = 4.0f;
             coolantMultiplier = 3.0f;
-            ammoPerShot = 4;
+            ammoPerShot = 3;
             shootSound = Sounds.missileLaunch;
 
             consumeCoolant(0.5f);
 
             ammo(
-
-                FRItems.logicAlloy, new SpriteBulletType(3.0f, 300.0f, 18.0f, 30.0f, "fire-missile"){{
-                    lifetime = 167.0f;
+                FRItems.logicAlloy, new SpriteBulletType(4.5f, 300.0f, 18.0f, 30.0f, "fire-missile"){{
+                    lifetime = 112.0f;
                     splashDamageRadius = 30.0f;
                     splashDamage = 75.0f;
                     homingPower = 0.16f;
@@ -904,8 +962,8 @@ public class FRBlocks{
                     }).layer(Layer.bullet - 1.0f);
                 }},
 
-                FRItems.detonationCompound, new SpriteBulletType(4.0f, 210.0f, 18.0f, 30.0f, "fire-missile"){{
-                    lifetime = 193.0f;
+                FRItems.detonationCompound, new SpriteBulletType(6.0f, 210.0f, 18.0f, 30.0f, "fire-missile"){{
+                    lifetime = 129.0f;
                     splashDamage = 330.0f;
                     splashDamageRadius = 64.0f;
                     rangeChange = 270.0f;
@@ -930,7 +988,6 @@ public class FRBlocks{
                             float angle = Fx.rand.random(360.0f);
                             float lenRand = Fx.rand.random(0.5f, 1f);
                             Tmp.v6.trns(angle, circleRad);
-
                             for(int s : Mathf.signs)
                                 Drawf.tri(e.x + Tmp.v6.x, e.y + Tmp.v6.y, e.foutpow() * 30.0f, e.fout() * 24.0f * lenRand + 6.0f, angle + 90.0f + s * 90.0f);
                         }
@@ -946,7 +1003,6 @@ public class FRBlocks{
                         e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), f ->
                             Angles.randLenVectors(f.id, f.fin(Interp.pow10Out), (int)(2.4f * intensity), 10.0f * intensity, (x, y, in, out) -> {
                                 float rad = f.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f) * (2.0f + intensity) * 2.35f;
-
                                 Fill.circle(f.x + x, f.y + y, rad);
                                 Drawf.light(f.x + x, f.y + y, rad * 2.0f, f.color, 0.5f);
                             }));
@@ -1588,7 +1644,7 @@ public class FRBlocks{
         }};
 
         scab = new ItemTurret("scab"){{
-            requirements(Category.turret, BuildVisibility.shown, with(
+            requirements(Category.turret, with(
                 Items.titanium, 300,
                 FRItems.logicAlloy, 125,
                 FRItems.flesh, 40
@@ -2455,7 +2511,7 @@ public class FRBlocks{
             displayedSpeed = 25.0f;
             junctionReplacement = Blocks.invertedSorter;
 
-            compositeMap.put(id, Blocks.titaniumConveyor.id);
+            compositeMap.put(this, Blocks.titaniumConveyor);
         }};
 
         hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
@@ -2486,7 +2542,7 @@ public class FRBlocks{
             pulse = true;
             ((Conveyor)compositeConveyor).bridgeReplacement = this;
 
-            compositeMap.put(id, Blocks.itemBridge.id);
+            compositeMap.put(this, Blocks.itemBridge);
         }};
 
         compositeRouter = new AdaptRouter("composite-router"){{
@@ -2497,7 +2553,7 @@ public class FRBlocks{
             ));
             health = 85;
 
-            compositeMap.put(id, Blocks.router.id);
+            compositeMap.put(this, Blocks.router);
         }};
 
         //region liquid
@@ -2529,7 +2585,7 @@ public class FRBlocks{
             solid = false;
             underBullets = true;
 
-            compositeMap.put(id, Blocks.liquidRouter.id);
+            compositeMap.put(this, Blocks.liquidRouter);
         }};
 
         hardenedLiquidTank = new LiquidRouter("hardened-liquid-tank"){{
@@ -2556,7 +2612,7 @@ public class FRBlocks{
             range = 8;
             pulse = true;
 
-            compositeMap.put(id, Blocks.bridgeConduit.id);
+            compositeMap.put(this, Blocks.bridgeConduit);
         }};
 
         //region power
@@ -3502,32 +3558,65 @@ public class FRBlocks{
 
         //region units
 
-        fleshReconstructor = new UnitFactory("flesh-reconstructor"){
-            @Override
-            public boolean canPlaceOn(Tile tile, Team team, int rotation){
-                return state.rules.infiniteResources || tile.getLinkedTilesAs(this, tempTiles).sumf(o -> o.floor().attributes.get(FRAttribute.flesh)) >= 1.0f;
-            }
-            {
-                requirements(Category.units, with(
-                    Items.titanium, 400,
-                    FRItems.logicAlloy, 250,
-                    FRItems.flesh, 100
-                ));
-                size = 3;
-                hasLiquids = true;
-                liquidCapacity = 30.0f;
+        fleshReconstructor = new UnitFactory("flesh-reconstructor"){{
+            requirements(Category.units, with(
+                Items.titanium, 400,
+                FRItems.logicAlloy, 250,
+                FRItems.flesh, 100
+            ));
+            size = 3;
+            hasLiquids = true;
+            liquidCapacity = 30.0f;
 
-                plans.add(
-                    new UnitFactory.UnitPlan(FRUnitTypes.blade, 2700.0f, with(
-                        FRItems.flesh, 55,
-                        FRItems.logicAlloy, 65
-                    ))
-                );
+            plans.add(
+                new UnitFactory.UnitPlan(FRUnitTypes.blade, 2700.0f, with(
+                    FRItems.flesh, 55,
+                    FRItems.logicAlloy, 65
+                ))
+            );
 
-                consumePower(n(270));
-                consumeLiquid(Liquids.neoplasm, n(48));
-            }
-        };
+            consumePower(n(270));
+            consumeLiquid(Liquids.neoplasm, n(48));
+        }};
+
+        unitHealer = new RepairTower("unit-healer"){{
+            requirements(Category.units, with(
+                Items.copper, 45,
+                Items.titanium, 35,
+                Items.silicon, 30
+            ));
+            size = 2;
+            range = 96.0f;
+            healAmount = 1.0f;
+            circleSpeed = 180.0f;
+            circleStroke = 2.0f;
+
+            consumePower(n(72));
+        }};
+
+        payloadConveyorLarge = new PayloadConveyor("payload-conveyor-large"){{
+            requirements(Category.units, with(
+                Items.graphite, 80,
+                FRItems.hardenedAlloy, 40
+            ));
+            armor = 14.0f;
+            payloadLimit = size = 7;
+            canOverdrive = false;
+            moveTime = 80.0f;
+            moveForce = 300.0f;
+        }};
+
+        payloadRouterLarge = new PayloadRouter("payload-router-large"){{
+            requirements(Category.units, with(
+                Items.graphite, 120,
+                FRItems.hardenedAlloy, 50
+            ));
+            armor = 14.0f;
+            payloadLimit = size = 7;
+            canOverdrive = false;
+            moveTime = 80.0f;
+            moveForce = 300.0f;
+        }};
 
         //region effect
 
@@ -3577,7 +3666,7 @@ public class FRBlocks{
                 Fx.generatespark
             );
             drawArrows = new DrawArrows(2, Pal.lightishOrange, Color.valueOf("c75807"));
-            arrowMaxBoost = 3.38f;
+            arrowMaxBoost = 3.38f; //hardcode
 
             reload = 30.0f;
             range = 20 * tilesize;
@@ -3641,8 +3730,8 @@ public class FRBlocks{
                 Items.silicon, 6000,
                 Items.plastanium, 1750
             ));
-            researchCostMultiplier = 0.4f;
-            buildCostMultiplier = 0.4f;
+            researchCostMultiplier = 0.25f;
+            buildCostMultiplier = 0.5f;
             health = 12000;
             armor = 8;
             size = 5;
@@ -3665,9 +3754,9 @@ public class FRBlocks{
                 FRItems.hardenedAlloy, 175,
                 FRItems.magneticAlloy, 120
             ));
-            health = 840;
+            health = 1640;
             armor = 22.0f;
-            size = 3;
+            size = 4;
             itemCapacity = 3000;
         }};
 
@@ -3698,7 +3787,7 @@ public class FRBlocks{
             allowCoreUnload = true;
             speed = 25.0f;
 
-            compositeMap.put(id, Blocks.unloader.id);
+            compositeMap.put(this, Blocks.unloader);
         }};
 
         primaryInterplanetaryAccelerator = new AcceleratorCutscene(

@@ -23,7 +23,7 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 
 #### Blocks:
 
-- 12 new powerful turrets with their unique shoot patterns
+- 13 new powerful turrets with their unique shoot patterns
 - 21 new cool factories with their special effects
 - Brand-new mender, overdrive projector, core, build tower
 - More practical drills, generators, walls and distribution facilities

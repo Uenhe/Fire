@@ -14,6 +14,7 @@ import fire.ai.FRUnitCommand;
 import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
+import fire.ui.dialogs.FRAboutDialog;
 import fire.ui.dialogs.InfoDialog;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
@@ -21,6 +22,7 @@ import fire.world.meta.FRAttribute;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
+import mindustry.gen.Icon;
 import mindustry.mod.Mods;
 import mindustry.type.Item;
 import mindustry.type.SectorPreset;
@@ -85,7 +87,8 @@ public class FireMod extends mindustry.mod.Mod{
             }else if(block instanceof ItemTurret){
                 Item item = null;
                 var keys = ((ItemTurret)block).ammoTypes.keys();
-                while(keys.hasNext()) item = keys.next();
+                while(keys.hasNext())
+                    item = keys.next();
                 assert item != null;
                 AdaptiveSource.turretItemMap.put(block.id, item.id);
             }
@@ -117,7 +120,7 @@ public class FireMod extends mindustry.mod.Mod{
                 if(!"KochiyaUeneh".equals(OS.username)) return;
                 if(++counter == 5){
                     doSomethingPlayable();
-                    ui.announce("Debug successfully.");
+                    ui.announce("ovo!");
                 }
             }).size(240.0f, 80.0f);
         });
@@ -133,15 +136,15 @@ public class FireMod extends mindustry.mod.Mod{
 
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
-        historyDialog.cont.pane(t ->
-            t.add("@fire.history").left().maxWidth(width()).pad(4.0f)
-        );
+        historyDialog.cont.pane(t -> t.add("@fire.history").width(Core.graphics.getWidth() * 0.25f));
 
         var main = mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
         setupDialog(main);
-        main.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
-        main.cont.pane(t -> {
 
+        main.buttons.button(Core.bundle.format("fire.historytitle", ""), Icon.list, historyDialog::show).size(210.0f, 64.0f);
+        main.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
+
+        main.cont.pane(t -> {
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f);
             t.row();
 
@@ -163,33 +166,6 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
-            t.row();
-
-            if("zh_CN".equals(Core.settings.getString("locale"))){
-                t.button(("@fire.linkfy"), () -> {
-                    if(!Core.app.openURI(linkFy)){
-                        ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkFy);
-                    }
-                }).size(256.0f, 64.0f);
-                t.row();
-
-                t.button(("@fire.linkue"), () -> {
-                    if(!Core.app.openURI(linkUe)){
-                        ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkUe);
-                    }
-                }).size(256.0f, 64.0f);
-                t.row();
-
-            }
-            t.button(("@fire.linkgithub"), () -> {
-                if(!Core.app.openURI(linkGit)){
-                    ui.showErrorMessage("@linkfail");
-                    Core.app.setClipboardText(linkGit);
-                }
-            }).size(256.0f, 64.0f);
-            t.row();
 
         }).maxWidth(width());
 

@@ -11,10 +11,8 @@ public class DashBuilderAI extends mindustry.ai.types.BuilderAI{
 
     private DashAbility dash;
 
-    public DashBuilderAI(){}
-
-    public DashBuilderAI(int e){
-        onlyAssist = true;
+    public DashBuilderAI(boolean e){
+        onlyAssist = e;
     }
 
     @Override

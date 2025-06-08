@@ -3,6 +3,7 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
+import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.graphics.Pal;
 
@@ -10,11 +11,6 @@ import static arc.graphics.Color.valueOf;
 import static mindustry.Vars.net;
 
 public final class FRVars{
-
-    public static final String
-        linkFy = "https://space.bilibili.com/516898377",
-        linkUe = "https://space.bilibili.com/327502129",
-        linkGit = "https://github.com/Uenhe/Fire";
 
     /** Temporary colors. */
     public static final Color
@@ -42,7 +38,14 @@ public final class FRVars{
 
     static{
         Events.run(EventType.Trigger.update, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0) getSettings();
+            if(Core.graphics.getFrameId() % 60 == 0){
+                getSettings();
+                Blocks.sand.playerUnmineable =
+                    Blocks.darksand.playerUnmineable =
+                        Blocks.sandWater.playerUnmineable =
+                            Blocks.darksandWater.playerUnmineable =
+                                Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+            }
         });
     }
 
