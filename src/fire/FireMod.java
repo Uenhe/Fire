@@ -14,14 +14,22 @@ import fire.ai.FRUnitCommand;
 import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
+import fire.ui.dialogs.FRAboutDialog;
 import fire.ui.dialogs.InfoDialog;
+import fire.world.blocks.power.HydroelectricGenerator;
+import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
+import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
+import mindustry.gen.Icon;
 import mindustry.mod.Mods;
+import mindustry.type.Item;
 import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
 import java.time.LocalDate;
@@ -44,7 +52,7 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void loadContent(){
-        FIRE = mods.getMod(getClass());
+        FIRE = mods.getMod(FireMod.class);
         FIRE.meta.displayName = Core.bundle.get("fire.name");
 
         setRandTitle();
@@ -64,8 +72,29 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
-        if(headless) return;
+        //all iterations in one for performance
+        for(var block : content.blocks()){
+            if(block.isFloor()){
+                var drop = block.asFloor().liquidDrop;
+                if(drop != null){
+                    HydroelectricGenerator.liquidFloors.add(block.asFloor());
+                    if(drop == Liquids.water){
+                        float a = block.attributes.get(Attribute.spores);
+                        if(a > 0.0f) block.attributes.set(FRAttribute.sporesWater, a);
+                    }
+                }
 
+            }else if(block instanceof ItemTurret){
+                Item item = null;
+                var keys = ((ItemTurret)block).ammoTypes.keys();
+                while(keys.hasNext())
+                    item = keys.next();
+                assert item != null;
+                AdaptiveSource.turretItemMap.put(block.id, item.id);
+            }
+        }
+
+        if(headless) return;
         loadSetting();
         loadDatabase();
         FROverride.load();
@@ -91,7 +120,7 @@ public class FireMod extends mindustry.mod.Mod{
                 if(!"KochiyaUeneh".equals(OS.username)) return;
                 if(++counter == 5){
                     doSomethingPlayable();
-                    ui.announce("Debug successfully.");
+                    ui.announce("ovo!");
                 }
             }).size(240.0f, 80.0f);
         });
@@ -107,15 +136,15 @@ public class FireMod extends mindustry.mod.Mod{
 
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
-        historyDialog.cont.pane(t ->
-            t.add("@fire.history").left().maxWidth(width()).pad(4.0f)
-        );
+        historyDialog.cont.pane(t -> t.add("@fire.history").width(Core.graphics.getWidth() * 0.25f));
 
         var main = mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
         setupDialog(main);
-        main.buttons.button(Core.bundle.format("fire.historytitle", ""), historyDialog::show).size(210.0f, 64.0f);
-        main.cont.pane(t -> {
 
+        main.buttons.button(Core.bundle.format("fire.historytitle", ""), Icon.list, historyDialog::show).size(210.0f, 64.0f);
+        main.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
+
+        main.cont.pane(t -> {
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f);
             t.row();
 
@@ -123,6 +152,9 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             addContent(t,
+                "[#F4BA6E]v1.4.2:",
+                FRBlocks.compositeRouter,
+                "[#F4BA6E]v1.4.0:",
                 FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
                 FRBlocks.stackedCultivator, FRBlocks.constraintExtractor,
@@ -134,33 +166,6 @@ public class FireMod extends mindustry.mod.Mod{
             t.row();
 
             t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
-            t.row();
-
-            if("zh_CN".equals(Core.settings.getString("locale"))){
-                t.button(("@fire.linkfy"), () -> {
-                    if(!Core.app.openURI(linkFy)){
-                        ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkFy);
-                    }
-                }).size(256.0f, 64.0f);
-                t.row();
-
-                t.button(("@fire.linkue"), () -> {
-                    if(!Core.app.openURI(linkUe)){
-                        ui.showErrorMessage("@linkfail");
-                        Core.app.setClipboardText(linkUe);
-                    }
-                }).size(256.0f, 64.0f);
-                t.row();
-
-            }
-            t.button(("@fire.linkgithub"), () -> {
-                if(!Core.app.openURI(linkGit)){
-                    ui.showErrorMessage("@linkfail");
-                    Core.app.setClipboardText(linkGit);
-                }
-            }).size(256.0f, 64.0f);
-            t.row();
 
         }).maxWidth(width());
 
@@ -173,22 +178,19 @@ public class FireMod extends mindustry.mod.Mod{
         multiplied = true;
         doSomethingUnplayable();
 
-        var dialog = new DelayClosableDialog("Warning", 300.0f);
-        dialog.cont.add("@fire.nomultimods");
-        dialog.show();
+        new DelayClosableDialog("Warning", 300.0f).show().cont.add("@fire.nomultimods");
     }
 
     private static void showUpdate(){
         try{
             if(FIRE.meta.version.equals(Core.settings.getString("mod-fire-version"))) return;
             Core.settings.put("mod-fire-version", FIRE.meta.version);
-        }catch(Throwable ignored){
+        }catch(Throwable e){
             Core.settings.put("mod-fire-version", "");
         }
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
-        var dialog = new DelayClosableDialog("Update Notice", 300.0f);
-        dialog.cont.pane(t -> {
+        new DelayClosableDialog("Update Notice", 300.0f).show().cont.pane(t -> {
             t.table(tt -> {
                 try{
                     tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).size(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) * 0.33f).padRight(120.0f);
@@ -198,10 +200,9 @@ public class FireMod extends mindustry.mod.Mod{
             });
             t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(width()).padRight(200.0f);
         });
-        dialog.show();
     }
 
-    /** See ExtraUtilities also.<p></p>
+    /** See Extra Utilities also.<p></p>
      * Clashes with MindustryX. */
     private static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
@@ -210,7 +211,7 @@ public class FireMod extends mindustry.mod.Mod{
         int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
-        // "Today is the %th Day of God's Creation of Planet Lysetta" picked
+        //"Today is the %th Day of God's Creation of Planet Lysetta" picked
         if(index == 0)
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
 
@@ -222,24 +223,27 @@ public class FireMod extends mindustry.mod.Mod{
         dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, UnlockableContent... content){
-        for(var c : content)
-            table.table(Styles.grayPanel, t -> {
+    private static void addContent(Table table, Object... objects){ //content or string
+        for(var obj : objects){
+            if(obj instanceof UnlockableContent c){
 
-                t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
-                t.table(info -> {
+                table.table(Styles.grayPanel, t -> {
+                    t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
+                    t.table(info -> {
+                        info.left().add("[accent]" + c.localizedName).left().row();
+                        short index = (short)c.description.indexOf(Core.bundle.get("fire.strend"));
+                        String desc = index == -1 ? c.description : c.description.substring(0, index);
+                        if(c instanceof SectorPreset) desc += "...";
+                        info.left().add(desc).left();
+                    });
+                }).growX().pad(5.0f);
 
-                    info.left().add("[accent]" + c.localizedName).left().row();
-                    try{
-                        info.left().add(c.description.substring(0, c.description.indexOf(Core.bundle.get("fire.strend"))) + (c instanceof SectorPreset ? "..." : ""));
-                    }catch(Throwable e){
-                        info.left().add(c.description);
-                    }finally{
-                        info.left();
-                    }
-                });
-
-            }).growX().pad(5.0f).row();
+            }else{
+                assert obj instanceof String;
+                table.add((String)obj).left();
+            }
+            table.row();
+        }
     }
 
     private static float width(){
@@ -248,24 +252,18 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** ??? */
     private static void doSomethingUnplayable(){
-        var units = content.units();
-        for(var unit : units)
-            unit.health -= 10000.0f;
+        for(var unit : content.units()) unit.health -= 10000.0f;
     }
 
     /** !!! */
     private static void doSomethingPlayable(){
-        var blocks = content.blocks();
-        for(var block : blocks)
+        for(var block : content.blocks())
             if(block.buildVisibility == BuildVisibility.debugOnly)
                 block.buildVisibility = BuildVisibility.shown;
 
         if(multiplied){
             multiplied = false;
-
-            var units = content.units();
-            for(var unit : units)
-                unit.health += 10000.0f;
+            for(var unit : content.units()) unit.health += 10000.0f;
         }
     }
 }

@@ -10,6 +10,7 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
 import fire.FRUtils;
+import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
@@ -32,6 +33,7 @@ import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
+import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
 import static fire.FRVars.*;
@@ -39,7 +41,7 @@ import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
 
-    public static UnitType
+    public static final UnitType
 
         //legs support
         guarding, resisting, garrison, shelter, blessing,
@@ -62,8 +64,7 @@ public class FRUnitTypes{
         //naval
         mechanicalTide;
 
-    public static void load(){
-
+    static{
         //region legs support
 
         guarding = new UnitType("sh"){{
@@ -243,7 +244,7 @@ public class FRUnitTypes{
             shadowElevation = 0.8f;
             groundLayer = Layer.legUnit;
             legCount = 8;
-            legLength = 60f;
+            legLength = 70.0f;
             legSpeed = 0.2f;
             legExtension = -15f;
             legBaseOffset = -8f;
@@ -280,10 +281,9 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region mech mutated
 
-        blade = new FleshUnitType("byjd"){{
+        blade = new FleshUnitType("byjd", UnitTypes.dagger){{
             constructor = MechUnit::create;
             health = 630.0f;
             armor = 5.0f;
@@ -318,7 +318,7 @@ public class FRUnitTypes{
             );
         }};
 
-        hatchet = new FleshUnitType("hatchet"){{
+        hatchet = new FleshUnitType("hatchet", UnitTypes.mace){{
             constructor = MechUnit::create;
             health = 960.0f;
             armor = 8.0f;
@@ -362,7 +362,7 @@ public class FRUnitTypes{
             );
         }};
 
-        castle = new FleshUnitType("bybl"){{
+        castle = new FleshUnitType("bybl", UnitTypes.fortress){{
             constructor = MechUnit::create;
             health = 8200.0f;
             armor = 9.0f;
@@ -416,7 +416,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region ground
 
         error = new FleshUnitType("error"){{
@@ -494,7 +493,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air support
 
         omicron = new UnitType("gnj"){{
@@ -554,6 +552,7 @@ public class FRUnitTypes{
 
         pioneer = new UnitType("pioneer"){{
             constructor = PayloadUnit::create;
+            aiController = () -> new DashBuilderAI(false);
             defaultCommand = UnitCommand.repairCommand;
             flying = true;
             health = 5600.0f;
@@ -702,7 +701,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air kamikaze
 
         firefly = new UnitType("firefly"){{
@@ -792,7 +790,7 @@ public class FRUnitTypes{
             flying = true;
             health = 620.0f;
             armor = 9.0f;
-            hitSize = 20.0f;
+            hitSize = 17.0f;
             speed = 2.2f;
             drag = 0.03f;
             accel = 0.04f;
@@ -848,7 +846,7 @@ public class FRUnitTypes{
                         }};
 
                         fragBullets = 1;
-                        fragVelocityMin = fragVelocityMax = 1.0f;
+                        fragVelocityMin = 1.0f;
                         fragRandomSpread = 0.0f;
                         fragBullet = new BasicBulletType(0.0f, 250.0f){{
                             lifetime = 10.0f;
@@ -1109,7 +1107,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region air
 
         javelin = new UnitType("javelin"){{
@@ -1175,11 +1172,12 @@ public class FRUnitTypes{
             engineOffset = 6.0f;
             lowAltitude = true;
             faceTarget = false;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(new ForceFieldAbility(120.0f, 4.0f, 2000.0f, 480.0f){
                 @Override
                 public void update(Unit unit){
-                    // doubles regen when health below the half
+                    //doubles regen when health below the half
                     if(unit.shield < max && unit.health < unit.maxHealth * 0.5f)
                         unit.shield += Time.delta * regen;
 
@@ -1374,7 +1372,6 @@ public class FRUnitTypes{
             );
         }};
 
-        //endregion
         //region naval
 
         mechanicalTide = new UnitType("mechanical-tide"){{
@@ -1387,7 +1384,6 @@ public class FRUnitTypes{
                 colors(colors, Pal.heal, Pal.heal, Color.white);
                 collidesAir = true;
             }},
-
             type1 = new BasicBulletType(0f, 200f){{
                 width = height = 0.0f;
                 hitEffect = despawnEffect = Fx.none;
@@ -1398,7 +1394,6 @@ public class FRUnitTypes{
                 fragBullets = 1;
                 fragBullet = laser;
             }},
-
             type2 = new BasicBulletType(0f, 200f){{
                 width = height = 0.0f;
                 hitEffect = despawnEffect = Fx.none;
@@ -1502,23 +1497,72 @@ public class FRUnitTypes{
                 new Weapon("fire-mechanical-tide-laser-large"){{
                     reload = 300.0f;
                     x = 0.0f;
-                    y = 1.0f;
-                    recoil = 1.5f;
+                    y = 4.0f;
+                    shootY = 12.0f;
+                    recoil = 4.5f;
                     rotate = true;
                     mirror = false;
                     rotateSpeed = 1.2f;
                     inaccuracy = 0.1f;
                     shootSound = Sounds.laser;
+                    shootStatusDuration = 56.0f;
+                    shoot.firstShotDelay = 50.0f;
+                    shootStatus = StatusEffects.unmoving;
 
-                    bullet = new BasicBulletType(10f, 3240){{
+                    bullet = new BasicBulletType(10.0f, 3240.0f){{
                         width = height = 0.0f;
-                        hitEffect = despawnEffect = Fx.none;
+                        lifetime = 60.0f;
                         buildingDamageMultiplier = 0.8f;
-                        lifetime = 60f;
-                        knockback = 16;
+                        knockback = 16.0f;
                         pierceCap = 4;
-                        pierce = true;
-                        pierceBuilding = true;
+                        recoil = 3.0f;
+                        pierce = pierceBuilding = true;
+
+                        hitEffect = despawnEffect = Fx.none;
+                        chargeEffect = new MultiEffect(
+                            new Effect(shoot.firstShotDelay, e -> {
+                                Draw.color(Pal.heal);
+                                Lines.stroke(e.fin() * 3.0f);
+                                Lines.circle(e.x, e.y, 6.0f + e.fout() * 30.0f);
+                                Fill.circle(e.x, e.y, e.fin() * 24.0f);
+                                Angles.randLenVectors(e.id, 32, 48.0f * e.fout(), (x, y) -> {
+                                    Fill.circle(e.x + x, e.y + y, e.fin() * 6.0f);
+                                    Drawf.light(e.x + x, e.y + y, e.fin() * 18.0f, Pal.heal, 0.8f);
+                                });
+                                Draw.color();
+                                Fill.circle(e.x, e.y, e.fin() * 12.0f);
+                                Drawf.light(e.x, e.y, e.fin() * 24.0f, Pal.heal, 0.8f);
+                            }).followParent(true).rotWithParent(true),
+                            new WaveEffect(){{
+                                lifetime = 30.0f;
+                                sizeFrom = 220.0f;
+                                sizeTo = 0.0f;
+                                strokeFrom = 3.0f;
+                                interp = Interp.pow10In;
+                                colorFrom.set(Pal.heal);
+                                colorTo.set(Color.white);
+                            }},
+                            new WaveEffect(){{
+                                lifetime = 30.0f;
+                                sizeFrom = 210.0f;
+                                sizeTo = 0.0f;
+                                strokeFrom = 2.7f;
+                                interp = Interp.pow5In;
+                                colorFrom.set(Pal.heal);
+                                colorTo.set(Color.white);
+                                startDelay = 10.0f;
+                            }},
+                            new WaveEffect(){{
+                                lifetime = 30.0f;
+                                sizeFrom = 200.0f;
+                                sizeTo = 0.0f;
+                                strokeFrom = 2.4f;
+                                interp = Interp.pow4In;
+                                colorFrom.set(Pal.heal);
+                                colorTo.set(Color.white);
+                                startDelay = 20.0f;
+                            }}
+                        );
 
                         spawnBullets.add(new LaserBulletType(6400.0f){{
                             buildingDamageMultiplier = 0.8f;
@@ -1534,15 +1578,15 @@ public class FRUnitTypes{
                             colors(colors, Pal.heal, Pal.heal, Color.white);
                         }});
 
-                        for(byte j = 0; j < 12; j++){
-                            byte s = j;
-                            spawnBullets.add(new FlakBulletType(20.0f - s * 1.2f, 100.0f + s * 6.0f){{
+                        for(byte i = 0; i < 12; i++){
+                            byte j = i;
+                            spawnBullets.add(new FlakBulletType(20.0f - j * 1.2f, 100.0f + j * 6.0f){{
                                 sprite = "missile-large";
                                 collidesGround = collidesAir = true;
-                                explodeRange = 20f + s;
-                                width = height = 12f + s * 0.5f;
+                                explodeRange = 20f + j;
+                                width = height = 12f + j * 0.5f;
                                 shrinkY = 0f;
-                                drag = 0.01f + s * 0.001f;
+                                drag = 0.01f + j * 0.001f;
                                 homingRange = 240f;
                                 keepVelocity = false;
                                 lightRadius = 60f;
@@ -1550,20 +1594,20 @@ public class FRUnitTypes{
                                 lightColor = Pal.heal;
 
                                 buildingDamageMultiplier = 2f;
-                                splashDamageRadius = 40f + s * 2;
+                                splashDamageRadius = 40f + j * 2;
                                 splashDamage = damage * 2;
                                 pierceCap = 4;
                                 pierce = true;
                                 pierceBuilding = false;
 
-                                lifetime = 60f + s * 5f;
+                                lifetime = 60f + j * 5f;
                                 backColor = Pal.heal;
                                 frontColor = Color.white;
 
                                 hitEffect = new ExplosionEffect(){{
-                                    lifetime = 24f + s * 0.4f;
+                                    lifetime = 24f + j * 0.4f;
                                     waveStroke = 6f;
-                                    waveLife = 10f + s * 0.2f;
+                                    waveLife = 10f + j * 0.2f;
                                     waveRadBase = 7f;
                                     waveColor = Pal.heal;
                                     waveRad = 30f;
@@ -1572,16 +1616,16 @@ public class FRUnitTypes{
                                     sparkColor = Pal.heal;
                                     sparks = 6;
                                     sparkRad = 35f;
-                                    sparkStroke = 1.5f + s * 0.05f;
+                                    sparkStroke = 1.5f + j * 0.05f;
                                     sparkLen = 4f;
                                 }};
 
-                                weaveScale = 6f + s * 0.25f;
-                                weaveMag = 3f - s * 0.14f;
+                                weaveScale = 6f + j * 0.25f;
+                                weaveMag = 3f - j * 0.14f;
 
                                 trailColor = Pal.heal;
-                                trailWidth = 4.5f - s * 0.1f;
-                                trailLength = 29 - s;
+                                trailWidth = 4.5f - j * 0.1f;
+                                trailLength = 29 - j;
                             }});
                         }
                     }};
@@ -1675,10 +1719,10 @@ public class FRUnitTypes{
                 }}
             );
         }};
+    }
 
-        //endregion
-
-        // put these there instead of FROverride or automatic unlocking
+    public static void load(){
+        //put these there instead of FROverride or automatic unlocking
 
         ((UnitFactory)Blocks.groundFactory).plans.add(
             new UnitFactory.UnitPlan(FRUnitTypes.guarding, 1500.0f, ItemStack.with(

@@ -84,7 +84,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
             rotation += rotateSpeed * Time.delta;
 
         if(u.shield < max && timer == 0.0f){
-            // regen shield to full after cooldown
+            //regen shield to full after cooldown
             if(u.shield < 0.0f && u.shield + regen * Time.delta > 0.0f)
                 u.shield = max;
             else
@@ -145,16 +145,16 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 break;
             }
 
-            timer += Time.delta * (isOverloaded ? 1.2f : 1.0f);
+            float delta = Time.delta * (isOverloaded ? 1.2f : 1.0f);
+            timer += delta;
 
             if(!isOverloaded && ext_node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
-                    if(
-                        Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
+                    if(Intersector.isInRegularPolygon(sides, u.x, u.y, radius, rotation, bullet.x, bullet.y)
                         && bullet.time > 15.0f && bullet.team != u.team && bullet.type.absorbable && bullet.type.hittable && !(bullet.type instanceof LiquidBulletType)
                         && !bullets.contains(bullet)
                     ){
-                        final float tt = 40.01f;
+                        final float tt = 36.01f;
                         bullet.owner = u;
                         bullet.team = u.team;
                         bullet.damage *= ext_counterBulletDamageFactor;
@@ -168,21 +168,21 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         }else{
                             var type = bullet.type.copy();
 
-                            // make artillery collides building
+                            //make artillery collides building
                             type.collidesTiles = type.collides = true;
                             type.buildingDamageMultiplier *= 1.6f;
 
-                            // pierce here is just annoying
+                            //pierce here is just annoying
                             type.pierce = type.pierceBuilding = false;
 
-                            // handled by mover later
+                            //handled by mover later
                             type.drag = 0.0f;
 
-                            // add a default trail to bullets that doesn't have one
+                            //add a default trail to bullet that doesn't have one
                             if(type.trailLength <= 0){
                                 if(type instanceof BasicBulletType bt){
                                     type.trailWidth = bt.width * 0.21f;
-                                    type.trailLength = (int)(bt.height / 2);
+                                    type.trailLength = (int)(bt.height * 0.5f);
                                     type.trailColor = bt.backColor;
                                 }else{
                                     type.trailLength = 11;
@@ -215,14 +215,13 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                             }else{
                                 float mark = ext_node.last() + tt + 0.1f;
                                 if(b.lifetime != mark){
-                                    var target =
-                                        u.controller() instanceof CommandAI c && c.attackTarget != null
-                                            ? c.attackTarget
-                                            : b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
-                                                ? b.aimTile.build
-                                                : Units.closestTarget(b.team, b.x, b.y, radius * 2.0f,
-                                                    e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
-                                                    t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
+                                    var target = u.controller() instanceof CommandAI c && c.attackTarget != null
+                                        ? c.attackTarget
+                                        : b.aimTile != null && b.aimTile.build != null && b.aimTile.build.team != b.team && b.type.collidesGround && !b.hasCollided(b.aimTile.build.id)
+                                            ? b.aimTile.build
+                                            : Units.closestTarget(b.team, b.x, b.y, radius * 2.0f,
+                                                e -> e != null && e.checkTarget(b.type.collidesAir, b.type.collidesGround) && !b.hasCollided(e.id),
+                                                t -> t != null && b.type.collidesGround && !b.hasCollided(t.id));
 
                                     if(target != null && timer < ext_node.last() + 24.0f && ext_node.checkBelonging(b.time, 3)){
                                         b.lifetime = mark;

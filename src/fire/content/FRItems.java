@@ -6,13 +6,12 @@ import mindustry.type.Item;
 
 public class FRItems{
     
-    public static Item
+    public static final Item
         glass, mirrorglass, sulflameAlloy, kindlingAlloy,
         conductor, logicAlloy, detonationCompound, flamefluidCrystal,
         timber, flesh, hardenedAlloy, magneticAlloy;
 
-    public static void load(){
-
+    static{
         glass = new FRItem("bl", Color.white);
 
         mirrorglass = new FRItem("jmbl", Color.white);
@@ -24,7 +23,6 @@ public class FRItems{
         kindlingAlloy = new FRItem("hhhj", "ec1c24")
             .explosiveness(0.1f)
             .flammability(2.8f);
-
 
         conductor = new FRItem("dt", "c78872")
             .charge(1.2f)
@@ -41,7 +39,6 @@ public class FRItems{
             .explosiveness(0.25f)
             .flammability(1.2f);
 
-
         timber = new FRItem("mc", "a14b08")
             .flammability(0.85f);
 
@@ -56,6 +53,8 @@ public class FRItems{
             .charge(2.1f)
             .setupAnimation(22, 2.0f);
     }
+
+    public static void load(){}
 
     private static class FRItem extends Item{
 

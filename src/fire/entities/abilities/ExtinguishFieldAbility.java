@@ -61,7 +61,7 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
     public void draw(Unit unit){
         if(warmup <= 0.4f) return;
 
-        // uses 24-sided polygon instead circle, since circle looks strange
+        //uses 24-sided polygon instead circle, since circle looks strange
         if(renderer.animateShields){
             Draw.z(Layer.shields - 0.001f);
             Draw.color(Color.clear, color, Mathf.clamp(warmup));

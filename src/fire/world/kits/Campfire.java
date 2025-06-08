@@ -1,15 +1,12 @@
 package fire.world.kits;
 
 import arc.Core;
-import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
-import arc.struct.ObjectFloatMap;
-import arc.util.Log;
 import arc.util.Scaling;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
@@ -18,7 +15,6 @@ import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
-import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -50,7 +46,7 @@ public class Campfire{
         @Override
         public void load(){
             super.load();
-            drawArrows.load(this);
+            if(drawArrows != null) drawArrows.load(this);
         }
 
         @Override
@@ -78,7 +74,7 @@ public class Campfire{
             });
         }
 
-        public class CampfireBuild extends OverdriveBuild implements fire.world.draw.DrawArrows.SmoothCrafter{
+        public class CampfireBuild extends OverdriveBuild implements fire.world.draw.DrawArrows.SmoothCrafter, ConsumeCampfire.CampfireConsume, ConsumePowerCustom.CustomPowerConsumer{
 
             private float smoothProgress, smoothOffset;
 
@@ -94,6 +90,21 @@ public class Campfire{
             }
 
             @Override
+            public float smoothProgress(){
+                return Mathf.clamp(smoothProgress + smoothOffset);
+            }
+
+            @Override
+            public float boostScale(){
+                return phaseHeat;
+            }
+
+            @Override
+            public float consPowerScale(){
+                return phaseHeat + 1.0f;
+            }
+
+            @Override
             public void updateTile(){
                 super.updateTile();
 
@@ -101,9 +112,6 @@ public class Campfire{
                     phaseHeat = 0.0f;
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
-
-                ConsumeCampfire.efficiencyMap.put(this, phaseHeat);
-                ConsumePowerCustom.scaleMap.put(this, phaseHeat + 1.0f);
 
                 smoothProgress = Mathf.lerpDelta(smoothProgress, (realBoost() - 1.0f) / arrowMaxBoost, 0.1f);
                 smoothOffset = Mathf.sin(totalProgress(), 12.0f, 0.3f);
@@ -114,12 +122,13 @@ public class Campfire{
                     unit.apply(unit.team == team ? allyStatus : enemyStatus, statusDuration));
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance))
-                    updateEffect.at(x + Mathf.range(size * 4.0f), y + Mathf.range(size * 4.0f));
+                    updateEffect.at(x + Mathf.range(size * tilesize / 2), y + Mathf.range(size * tilesize / 2));
             }
 
             @Override
             public void draw(){
                 super.draw();
+
                 if(drawArrows != null) drawArrows.draw(this);
 
                 if(!displayRange) return;
@@ -130,35 +139,19 @@ public class Campfire{
                 Fill.circle(x, y, range());
                 Draw.reset();
             }
-
-            @Override
-            public void remove(){
-                ConsumeCampfire.efficiencyMap.remove(this, 0.0f);
-                ConsumePowerCustom.scaleMap.remove(this, 0.0f);
-                super.remove();
-            }
-
-            @Override
-            public float smoothProgress(){
-                return Mathf.clamp(smoothProgress + smoothOffset);
-            }
         }
     }
 
-    /** Accepts every item, but only consume those which has flammability. */
+    /** Accepts every item, but only consume those which has flammability.
+     * @implSpec Implement {@link CampfireConsume} in building class. */
     public static class ConsumeCampfire extends mindustry.world.consumers.ConsumeItemFilter{
 
         private final CampfireBlock block;
-        public static final ObjectFloatMap<Building> efficiencyMap = new ObjectFloatMap<>();
-
-        static{
-            Events.on(EventType.ResetEvent.class, e -> efficiencyMap.clear());
-        }
 
         public ConsumeCampfire(CampfireBlock block){
             this.block = block;
             filter = i -> true; //accepts every item
-            optional(true, true);
+            boost();
         }
 
         /** Only support consumes 1 item each time, currently. Multiple items need extra judgment. */
@@ -172,7 +165,8 @@ public class Campfire{
 
         @Override
         public float efficiencyMultiplier(Building build){
-            return efficiencyMap.get(build, 1.0f);
+            assert build instanceof CampfireConsume;
+            return ((CampfireConsume)build).boostScale();
         }
 
         @Override
@@ -185,8 +179,7 @@ public class Campfire{
                     ).growX().pad(5.0f));
 
                 byte i = 0;
-                var items = content.items();
-                for(var item : items){
+                for(var item : content.items()){
                     if(item.flammability <= 0.0f || item.isHidden()) continue;
 
                     c.row().table(Styles.grayPanel, t ->
@@ -199,6 +192,10 @@ public class Campfire{
                     if(++i % 2 == 0) c.row();
                 }
             });
+        }
+
+        public interface CampfireConsume{
+            float boostScale();
         }
     }
 }

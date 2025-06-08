@@ -7,7 +7,7 @@ import arc.graphics.g2d.TextureAtlas;
 public final class FRUtils{
 
     public static void colors(Color[] colors, Color... color){
-        System.arraycopy(color, 0, colors, 0, 3);
+        System.arraycopy(color, 0, colors, 0, colors.length);
     }
 
     public static TextureAtlas.AtlasRegion find(String name){

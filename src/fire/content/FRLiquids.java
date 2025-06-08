@@ -5,12 +5,11 @@ import mindustry.type.Liquid;
 
 public class FRLiquids{
 
-    public static Liquid
+    public static final Liquid
         liquidNitrogen;
-    
-    public static void load(){
-        
-        liquidNitrogen = new Liquid("liquid-nitrogen", Color.valueOf("f0ffff")){{
+
+    static{
+         liquidNitrogen = new Liquid("liquid-nitrogen", Color.valueOf("f0ffff")){{
             heatCapacity = 2.5f;
             temperature = -2.1f;
             viscosity = 0.4f;
@@ -21,4 +20,6 @@ public class FRLiquids{
             lightColor = Color.valueOf("0097f532");
         }};
     }
+
+    public static void load(){}
 }

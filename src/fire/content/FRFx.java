@@ -10,8 +10,10 @@ import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Nullable;
 import arc.util.Tmp;
+import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
@@ -28,17 +30,107 @@ public class FRFx{
             Draw.color(color);
 
             for(short i = 0, interval = (short)(range / spacing); i <= interval; i++){
-                Tmp.v1.trns(e.rotation, i * spacing);
+                Tmp.v6.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
-                Draw.rect("fire-aim-shoot", e.x + Tmp.v1.x, e.y + Tmp.v1.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
+                Draw.rect("fire-aim-shoot", e.x + Tmp.v6.x, e.y + Tmp.v6.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
             }
 
-            Tmp.v1.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
+            Tmp.v6.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
             Lines.stroke(track * 2.0f);
             for(int i : Mathf.signs)
-                Lines.lineAngle(e.x + Tmp.v1.x * i, e.y + Tmp.v1.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
+                Lines.lineAngle(e.x + Tmp.v6.x * i, e.y + Tmp.v6.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
         });
     }
+
+    /** Special thanks to New Horizon mod. */
+    public static Effect scanEffect(float lifetime, Color color, float range){
+        return new Effect(lifetime, range * 2.5f, e -> {
+            var rand = Fx.rand;
+            rand.setSeed(e.id);
+            Draw.color(color);
+
+            float f = Interp.pow4Out.apply(Mathf.curve(e.fin(), 0.0f, 0.3f)), rad = range * f,
+            stroke = Mathf.clamp(range * 0.0125f, 3.0f, 8.0f);
+
+            Lines.stroke(2.0f * e.fout());
+            Lines.circle(e.x, e.y, rad * 0.125f);
+
+            Lines.stroke(stroke * e.fout() + e.fout(Interp.pow5In));
+            Lines.circle(e.x, e.y, rad);
+
+            Lines.stroke(stroke * Mathf.curve(e.fin(), 0.0f, 0.1f) * Mathf.curve(e.fout(), 0.05f, 0.15f));
+            float angle = 360.0f * e.fin(Interp.pow5);
+            Lines.lineAngle(e.x, e.y, angle, rad - Lines.getStroke() * 0.5f);
+            Lines.stroke(stroke * Mathf.curve(e.fin(), 0.0f, 0.1f) * e.fout(0.05f));
+
+            Draw.z(Layer.bullet - 1.0f);
+
+            //DrawFunc.fillCirclePercentFade(e.x, e.y, e.x, e.y, e.rotation * f, e.fin(Interp.pow5), 0, Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f, 0.6f + 0.35f * Interp.pow2InInverse.apply(Mathf.curve(e.fin(), 0, 0.8f)), 1f);
+            //float centerX, float centerY, float x, float y, float rad, float percent, float angle, float aScl, float start , float end
+            float p = Mathf.clamp(e.fin(Interp.pow5));
+
+            int sides = Lines.circleVertices(rad), i = 0;
+
+            float space = 360.0f / sides, len = 2.0f * rad * Mathf.sinDeg(space * 0.5f);
+
+            //Tmp.v6.set(rad, 0.0f);
+
+            for(; i < sides * p - 1; i++){
+                float a = space * i;
+                Draw.alpha(Mathf.curve(i / (sides * p), 0.6f + 0.35f * Interp.pow2InInverse.apply(Mathf.curve(e.fin(), 0, 0.8f)), 1) * Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f);
+                Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space), e.y + rad * Mathf.sinDeg(a + space), e.x, e.y);
+            }
+
+            float a = space * i;
+            Tmp.v6.trns(a, 0.0f, len * (sides * p - i - 1));
+            Draw.alpha(Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f);
+            Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space) + Tmp.v6.x, e.y + rad * Mathf.sinDeg(a + space) + Tmp.v6.y, e.x, e.y);
+
+
+            Draw.z(Layer.effect);
+
+            Angles.randLenVectors(e.id, (int)(e.rotation * 0.025f), e.rotation * 0.85f * f, angle, 0.0f, (x, y) ->
+                Lines.lineAngle(e.x + x, e.y + y, angle, e.rotation * rand.random(0.05f, 0.15f) * e.fout(0.15f))
+            );
+
+            Draw.color(color);
+            Lines.stroke(stroke * 1.25f * e.fout(0.2f));
+            Fill.circle(e.x, e.y, Lines.getStroke());
+            Draw.color(Color.white, color, e.fin());
+            Fill.circle(e.x, e.y, Lines.getStroke() * 0.5f);
+
+            Drawf.light(e.x, e.y, rad * 1.35f * e.fout(0.15f), color, 0.6f);
+        });
+    }
+
+    /** Special thanks to Testing Utilities mod. */
+    public static Effect fleshTeleportEffect = new Effect(80.0f, e -> {
+        if(!(e.data instanceof TpFxData data)) return;
+
+        var oldType = ((FleshUnitType)data.spawned.type).origin;
+        float scl = e.fout(Interp.pow2Out), p = Draw.scl, z = Draw.z();
+
+        Draw.z(Layer.effect + 0.1f);
+        Draw.scl *= scl;
+        Draw.mixcol(data.spawned.team.color, 1.0f);
+        Draw.rect(oldType.fullIcon, e.x, e.y, e.rotation);
+        Draw.rect(data.spawned.type.fullIcon, data.x, data.y, e.rotation);
+        Draw.reset();
+        Draw.scl = p;
+        Draw.z(z);
+
+        Draw.color(data.spawned.team.color);
+        float stroke = (oldType.hitSize + data.spawned.type.hitSize) * 0.5f * scl,
+        cos = Mathf.cosDeg(e.rotation) * stroke,
+        sin = Mathf.sinDeg(e.rotation) * stroke;
+
+        Fill.quad(
+            e.x + cos * 0.25f, e.y + sin * 0.25f,
+            data.x + cos, data.y + sin,
+            data.x - cos, data.y - sin,
+            e.x - cos * 0.25f, e.y - sin * 0.25f
+        );
+    });
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
@@ -120,15 +212,15 @@ public class FRFx{
 
     /** @see Fx#drillSteam */
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
-        Fx.rand.setSeed(e.id);
-
         float length = 4.0f + e.finpow() * 24.0f;
+        var rand = Fx.rand;
         for(byte i = 0; i < 16; i++){
-            Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(length));
+            rand.setSeed(e.id * 2L + i);
+            Fx.v.trns(rand.random(360.0f), rand.random(length));
 
-            e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), b -> {
+            e.scaled(e.lifetime * rand.random(0.5f, 1.0f), b -> {
                 Draw.color(Color.gray, b.fslope() * 0.93f);
-                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, Fx.rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
+                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
             });
         }
     });
@@ -148,7 +240,7 @@ public class FRFx{
     });
 
     /** @see Fx#chainLightning */
-    public static final Effect chainLightningThin = new Effect(20.0f, 300.0f, e -> {
+    public static final Effect chainLightningThin = new Effect(24.0f, 300.0f, e -> {
         if(!(e.data instanceof Position p)) return;
 
         final float rangeBetweenPoints = 12.0f,
@@ -156,50 +248,48 @@ public class FRFx{
             dst = Mathf.dst(e.x, e.y, tx, ty);
         short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
+        var v = Tmp.v6;
+        var rand = Fx.rand;
+        rand.setSeed(e.id * 2L);
 
-        Tmp.v1.set(p).sub(e.x, e.y).nor();
-        float nx = Tmp.v1.x, ny = Tmp.v1.y;
+        v.set(p).sub(e.x, e.y).nor();
+        float nx = v.x, ny = v.y;
 
         Lines.stroke(1.2f * e.fout());
         Draw.color(Color.white, e.color, e.fin());
         Lines.beginLine();
         Lines.linePoint(e.x, e.y);
 
-        Fx.rand.setSeed(e.id);
-
         for(short i = 0; i < links; i++){
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{
                 float len = (i + 1) * spacing;
-                Tmp.v1.setToRandomDirection(Fx.rand).scl(rangeBetweenPoints * 0.5f);
-                Lines.linePoint(
-                    e.x + nx * len + Tmp.v1.x,
-                    e.y + ny * len + Tmp.v1.y
-                );
+                v.setToRandomDirection(rand).scl(rangeBetweenPoints * 0.5f);
+                Lines.linePoint(e.x + nx * len + v.x, e.y + ny * len + v.y);
             }
         }
 
         Lines.endLine();
     }).followParent(false);
 
+    /** @see Fx#reactorExplosion */
     public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {
         float intensity = 6.8f * (b.data instanceof Float f ? f : 1.0f),
             baseLifetime = 25.0f + intensity * 11.0f;
 
-        b.lifetime = 50.0f + intensity * 55.0f;
+        b.lifetime = 40.0f + intensity * 45.0f;
 
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
+        var rand = Fx.rand;
         for(byte i = 0; i < 4; i++){
             byte j = i;
-            Fx.rand.setSeed(b.id * 2L + j);
+            rand.setSeed(b.id * 2L + j);
 
-            b.scaled(b.lifetime * Fx.rand.random(0.4f, 1.0f), e ->
-                Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.9f * intensity), 22.0f * intensity, (x, y, in, out) -> {
-                    float fout = e.fout(Interp.pow5Out) * Fx.rand.random(0.5f, 1.0f),
-                        rad = fout * ((2.0f + intensity) * 2.35f);
-
+            b.scaled(b.lifetime * rand.random(0.4f, 1.0f), e ->
+                Angles.randLenVectors(e.id + j - 1, e.fin(Interp.pow10Out), (int)(2.7f * intensity), 22.0f * intensity, (x, y, in, out) -> {
+                    float rad = e.fout(Interp.pow5Out) * rand.random(0.5f, 1.0f) * ((2.0f + intensity) * 2.3f);
                     Fill.circle(e.x + x, e.y + y, rad);
                     Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.reactorPurple, 0.5f);
             }));
@@ -208,7 +298,7 @@ public class FRFx{
         b.scaled(baseLifetime, e -> {
             Draw.color();
             e.scaled(5.0f + intensity * 2.0f, i -> {
-                Lines.stroke((3.1f + intensity / 5.0f) * i.fout());
+                Lines.stroke((3.1f + intensity  * 0.2f) * i.fout());
                 Lines.circle(e.x, e.y, (3.0f + i.fin() * 14.0f) * intensity);
                 Drawf.light(e.x, e.y, i.fin() * 14.0f * 2.0f * intensity, Color.white, 0.9f * e.fout());
             });
@@ -223,4 +313,15 @@ public class FRFx{
             });
         });
     });
+
+    public static class TpFxData{
+        public final Unit spawned;
+        public final float x;
+        public final float y;
+        public TpFxData(Unit spawned, float x, float y){
+            this.spawned = spawned;
+            this.x = x;
+            this.y = y;
+        }
+    }
 }

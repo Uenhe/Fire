@@ -4,74 +4,46 @@ import mindustry.type.SectorPreset;
 
 public class FRSectorPresets{
 
-    public static SectorPreset
-        landingBase, darksandPlain,
+    public static final SectorPreset
+        landingBase, darksandPeakforest,
         frozenGround, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
         sporeFiord, scorchingVolcano, lavaStronghold,
         eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, rubbleRidge, taintedEstuary;
 
-    public static void load(){
-        landingBase = new FRSectorPreset("jljd", 0)
-            .difficulty(6.0f);
-        darksandPlain = new FRSectorPreset("hspy", 94)
-            .difficulty(7.0f)
-            .captureWave(50);
+    static{
+        landingBase = create("jljd", 0, 6.0f);
+        darksandPeakforest = create("hspy", 94, 7.0f, 50);
 
-        frozenGround = new FRSectorPreset("lhyj", 15)
-            .difficulty(6.0f)
-            .captureWave(35);
-        beachLanding = new FRSectorPreset("htdl", 183)
-            .difficulty(6.0f);
-        darkWorkshop = new FRSectorPreset("hacj", 186)
-            .difficulty(8.0f);
-        desolateFortification = new FRSectorPreset("urgent-support", 119)
-            .difficulty(9.0f)
-            .captureWave(60);
-        glaciatedPeaks = new FRSectorPreset("glaciated-peaks", 118)
-            .difficulty(10.0f);
+        frozenGround = create("lhyj", 15, 6.0f, 35);
+        beachLanding = create("htdl", 183, 6.0f);
+        darkWorkshop = create("hacj", 186, 8.0f);
+        desolateFortification = create("urgent-support", 119, 9.0f, 60);
+        glaciatedPeaks = create("glaciated-peaks", 118, 10.0f);
 
-        sporeFiord = new FRSectorPreset("bzxw", 199)
-            .difficulty(8.0f)
-            .captureWave(40);
-        scorchingVolcano = new FRSectorPreset("zrhs", 180)
-            .difficulty(8.0f)
-            .captureWave(50);
-        lavaStronghold = new FRSectorPreset("lava-stronghold", 232)
-            .difficulty(9.0f);
+        sporeFiord = create("bzxw", 199, 8.0f, 40);
+        scorchingVolcano = create("zrhs", 180, 8.0f, 50);
+        lavaStronghold = create("lava-stronghold", 232, 9.0f);
 
-        eteriverStronghold = new FRSectorPreset("hhys", 34)
-            .difficulty(8.0f);
-        chillyMountains = new FRSectorPreset("lfsm", 168)
-            .difficulty(9.0f)
-            .captureWave(17);
-        stormyCoast = new FRSectorPreset("stormy-coast", 81)
-            .difficulty(10.0f)
-            .captureWave(60);
-        branchedRivers = new FRSectorPreset("branched-rivers", 158)
-            .difficulty(10.0f)
-            .captureWave(14);
-        rubbleRidge = new FRSectorPreset("rubble-ridge", 172)
-            .difficulty(10.0f)
-            .captureWave(65);
-        taintedEstuary = new FRSectorPreset("tainted-estuary", 116)
-            .difficulty(10.0f);
+        eteriverStronghold = create("hhys", 34, 8.0f);
+        chillyMountains = create("lfsm", 168, 9.0f, 17);
+        stormyCoast = create("stormy-coast", 81, 10.0f, 60);
+        branchedRivers = create("branched-rivers", 158, 10.0f, 14);
+        rubbleRidge = create("rubble-ridge", 172, 10.0f, 65);
+        taintedEstuary = create("tainted-estuary", 116, 10.0f);
+    }
+    
+    public static void load(){}
+
+    private static SectorPreset create(String name, int sector, float difficulty, int captureWave){
+        var s = new SectorPreset(name, FRPlanets.lysetta, sector);
+        s.difficulty = difficulty;
+        s.captureWave = captureWave;
+        return s;
     }
 
-    private static class FRSectorPreset extends SectorPreset{
-
-        private FRSectorPreset(String name, int sector){
-            super(name, FRPlanets.lysetta, sector);
-            addStartingItems = true;
-        }
-
-        private FRSectorPreset captureWave(int n){
-            captureWave = n;
-            return this;
-        }
-
-        private FRSectorPreset difficulty(float v){
-            difficulty = v;
-            return this;
-        }
+    private static SectorPreset create(String name, int sector, float difficulty){
+        var s = new SectorPreset(name, FRPlanets.lysetta, sector);
+        s.difficulty = difficulty;
+        return s;
     }
 }

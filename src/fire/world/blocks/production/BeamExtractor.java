@@ -64,6 +64,7 @@ public class BeamExtractor extends mindustry.world.Block{
         configurable = true;
         saveConfig = true;
         clearOnDoubleTap = true;
+        logicConfigurable = true;
         buildType = BeamExtractorBuild::new;
 
         config(Item.class, (BeamExtractorBuild build, Item item) -> build.selected = (byte)item.id);
@@ -74,11 +75,12 @@ public class BeamExtractor extends mindustry.world.Block{
     public void load(){
         super.load();
         var barrels = this.barrels;
+        byte len = (byte)barrels.size;
         base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite?
-        barrelRegions = new TextureRegion[barrels.size];
-        heatRegions = new TextureRegion[barrels.size];
+        barrelRegions = new TextureRegion[len];
+        heatRegions = new TextureRegion[len];
 
-        for(byte i = 0, len = (byte)barrels.size; i < len; i++){
+        for(byte i = 0; i < len; i++){
             var barrel = barrels.get(i);
             barrelRegions[i] = Core.atlas.find(name + barrel.name);
             heatRegions[i] = Core.atlas.find(name + barrel.name + "-heat");
@@ -163,14 +165,14 @@ public class BeamExtractor extends mindustry.world.Block{
     private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
         if(set != null) set.clear();
         Tile closest = null;
-        float mr = Float.MAX_VALUE;
+        float min = Float.MAX_VALUE;
 
-        short range = this.range;
-        int mx = Mathf.ceil((wp(x) + range) / tilesize), my = Mathf.ceil((wp(y) + range) / tilesize);
-        for    (short tx = (short)((wp(x) - range) / tilesize); tx <= mx; tx++)
-            for(short ty = (short)((wp(y) - range) / tilesize); ty <= my; ty++){
+        short r = range;
+        short mx = (short)Mathf.ceil((wp(x) + r) / tilesize), my = (short)Mathf.ceil((wp(y) + r) / tilesize);
+        for    (short tx = (short)((wp(x) - r) / tilesize); tx <= mx; tx++)
+            for(short ty = (short)((wp(y) - r) / tilesize); ty <= my; ty++){
                 float dst = Mathf.dst(wp(x), wp(y), tx * tilesize, ty * tilesize);
-                if(dst > range || dst <= closeDst()) continue;
+                if(dst > r || dst <= closeDst()) continue;
                 var tile = world.tile(tx, ty);
                 if(tile == null || !tile.block().isAir() || tile.drop() == null || tile.drop().hardness > tier) continue;
 
@@ -184,9 +186,9 @@ public class BeamExtractor extends mindustry.world.Block{
                     set.add(tile.drop().id);
 
                 if(entry != null)
-                    if(tile.drop().id == entry.item && mr > dst){
+                    if(tile.drop().id == entry.item && min > dst){
                         closest = tile;
-                        mr = dst;
+                        min = dst;
                     }
         }
 
@@ -401,7 +403,7 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         private float getDrillTime(){
-            if(selected == -1) return Float.POSITIVE_INFINITY;
+            if(selected == -1) return Float.MAX_VALUE;
             return drillTime + hardnessDrillMultiplier * config().hardness;
         }
     }

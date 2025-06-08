@@ -51,8 +51,8 @@ public class RegenFieldAbility extends mindustry.entities.abilities.Ability{
                 any[0] = true;
             }
         });
-        totalProgress += Time.delta / spd;
 
+        totalProgress += Time.delta / spd;
         warmup = Mathf.lerpDelta(warmup, Mathf.num(any[0]), 0.08f);
     }
 

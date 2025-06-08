@@ -9,6 +9,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.util.Time;
+import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
 import fire.world.consumers.ConsumePowerCustom;
@@ -39,11 +40,9 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         shieldRotation;
     protected byte sides = 6;
 
-    /**
-     * Number of registered cores, according to {@link mindustry.game.Team#all}.<p>
-     * Index -> Team ID, Value -> Core number<p>
-     * And also see those JS files in mod Creator.
-     */
+    /** Number of registered cores, according to {@link mindustry.game.Team#all}.<p>
+     * Team ID -> Core number<p>
+     * Also see those JS files in Creator mod. */
     public final short[] cores = new short[256];
 
     protected ForceCoreBlock(String name){
@@ -102,14 +101,19 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         Draw.reset();
     }
 
-    public class ForceCoreBuild extends CoreBuild implements mindustry.logic.Ranged{
+    public class ForceCoreBuild extends CoreBuild implements mindustry.logic.Ranged, ConsumePowerCustom.CustomPowerConsumer{
 
-        private float buildup, scl, hit, warmup;
-        private boolean broken;
+        private float buildup, scl, hit, warmup, colorWarmup, consPowerScale;
+        private boolean broken, damaging;
 
         @Override
         public float range(){
             return radius * scl;
+        }
+
+        @Override
+        public float consPowerScale(){
+            return consPowerScale;
         }
 
         @Override
@@ -123,15 +127,22 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
             super.updateTile();
 
             if(team == state.rules.waveTeam){
-                ConsumePowerCustom.scaleMap.put(this, 0.0f); //won't damage enemy cores
+                consPowerScale = 0.0f; //doesn't damage enemy cores
             }else{
-                ConsumePowerCustom.scaleMap.put(this, cores[team.id]);
-                if(power.graph.getPowerBalance() < 0.0f && power.graph.getBatteryStored() <= 0.0f && cores[team.id] > 2) //allowing to place 2 cores without damage
+                consPowerScale = cores[team.id];
+                if(power.graph.getPowerBalance() < 0.0f && power.graph.getBatteryStored() <= 0.0f && cores[team.id] > 2){ //allowing to place 2 cores without damage
                     damage(Mathf.sqrt(-power.graph.getPowerBalance() + consPower.requestedPower(this)) * delta());
+                    damaging = true;
+                }else{
+                    damaging = false;
+                }
             }
 
+            if(damaging && Mathf.chanceDelta(0.03)) scl *= Mathf.random(0.5f, 1.5f);
             scl = Mathf.lerpDelta(scl, broken ? 0.0f : warmup, 0.08f);
-            warmup = Mathf.lerpDelta(warmup, 1.0f, 0.14f);
+
+            warmup = Mathf.lerpDelta(warmup, 1.0f, 0.15f);
+            colorWarmup = Mathf.lerpDelta(colorWarmup, damaging ? 1.0f : 0.0f, 0.15f);
 
             if(Mathf.chanceDelta(buildup / shieldHealth * 0.1f))
                 Fx.reactorsmoke.at(x + Mathf.range(tilesize / 2), y + Mathf.range(tilesize / 2));
@@ -141,22 +152,23 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
 
             if(broken && buildup <= 0.0f) broken = false;
 
+            float range = range();
             if(buildup >= shieldHealth && !broken){
                 broken = true;
                 buildup = shieldHealth;
-                Fx.shieldBreak.at(x, y, range(), team.color);
+                Fx.shieldBreak.at(x, y, range, team.color);
             }
 
             if(hit > 0.0f)
                 hit -= 0.2f * Time.delta;
 
-            if(range() > 0.0f && !broken)
-                Groups.bullet.intersect(x - range(), y - range(), range() * 2.0f, range() * 2.0f, bullet -> {
-                    if(bullet.team != team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, range(), rotation, bullet.x, bullet.y)){
+            if(range > 0.0f && !broken)
+                Groups.bullet.intersect(x - range, y - range, range * 2.0f, range * 2.0f, bullet -> {
+                    if(bullet.team != team && bullet.type.absorbable && Intersector.isInRegularPolygon(sides, x, y, range, rotation, bullet.x, bullet.y)){
                         bullet.absorb();
                         Fx.absorb.at(bullet);
                         hit = 1.0f;
-                        buildup += bullet.damage;
+                        buildup += bullet.type.shieldDamage(bullet);
                     }
                 });
         }
@@ -172,7 +184,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
             super.draw();
 
             if(!broken){
-                Draw.color(team.color, Color.white, Mathf.clamp(hit));
+                Draw.color(Tmp.c4.set(team.color).mul(1.0f + colorWarmup * 0.5f, 1.0f - colorWarmup * 0.5f, 1.0f - colorWarmup * 0.5f, 1.0f), Color.white, Mathf.clamp(hit));
 
                 if(renderer.animateShields){
                     Draw.z(Layer.shields + 0.001f * hit);
@@ -208,7 +220,6 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         @Override
         public void remove(){
             if(added) cores[team.id]--;
-            ConsumePowerCustom.scaleMap.remove(this, 0.0f);
             super.remove();
         }
 

@@ -99,7 +99,7 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
                 if(t.getCells().any()) ((Cell<Label>)t.getCells().first()).with(label -> {
                     var texts = label.getText();
 
-                    if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ // avoids side effect but doesn't work entirely
+                    if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ //avoids side effect but doesn't work entirely
                         t.visible = false;
                     }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
                         t.update(() -> {
@@ -134,7 +134,7 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
         private void setup(){
             Reflect.set(BaseDialog.class, ui.planet, "shouldPause", false);
 
-            // without announcement since it will be covered by PlanetDialog
+            //without announcement since it will be covered by PlanetDialog
             Core.settings.put("skipcoreanimation", false);
             Core.settings.put("atmosphere", true);
 

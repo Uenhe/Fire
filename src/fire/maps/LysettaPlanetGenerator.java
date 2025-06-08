@@ -10,7 +10,8 @@ import mindustry.type.ItemStack;
 import mindustry.type.Sector;
 import mindustry.world.Block;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.spawner;
+import static mindustry.Vars.state;
 
 public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
 
@@ -45,7 +46,7 @@ public class LysettaPlanetGenerator extends SerpuloPlanetGenerator{
             Items.titanium, 2000,
             Items.thorium, 1000,
             Items.plastanium, 500
-        )); //TODO this doesn't require relevant items when launching
+        )); //FIXME this doesn't require relevant items when launching
     }
 
     @Override

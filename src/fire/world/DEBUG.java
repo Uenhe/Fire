@@ -88,36 +88,25 @@ public class DEBUG{
         }
     }
 
-    public static class DEBUG_Mend extends mindustry.world.blocks.defense.MendProjector{
+    public static class DEBUG_Mend extends mindustry.world.Block{
 
         public DEBUG_Mend(String name){
             super(name);
             requirements(Category.logic, BuildVisibility.debugOnly, ItemStack.empty);
+            solid = destructible = true;
             buildType = DEBUG_MendBuild::new;
         }
 
         @Override
         public void setStats(){}
 
-        @Override
-        public void drawPlace(int x, int y, int rotation, boolean valid){}
-
-        public class DEBUG_MendBuild extends MendBuild{
+        public static class DEBUG_MendBuild extends Building{
 
             @Override
             public void placed(){
                 indexer.allBuildings(world.width() * tilesize * 0.5f, world.height() * tilesize * 0.5f, Mathf.dst(world.width(), world.height()) * tilesize * 0.5f, Building::heal);
                 killed();
             }
-
-            @Override
-            public void drawSelect(){}
-
-            @Override
-            public void draw(){}
-
-            @Override
-            public void drawLight(){}
         }
     }
 }

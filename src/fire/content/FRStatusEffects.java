@@ -20,7 +20,6 @@ import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.units.StatusEntry;
-import mindustry.gen.MechUnit;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -29,11 +28,10 @@ import mindustry.world.meta.StatUnit;
 
 public class FRStatusEffects{
 
-    public static StatusEffect
+    public static final StatusEffect
         frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated, magnetized;
 
-    public static void load(){
-
+    static{
         frostbite = new StatusEffect("frostbite"){{
             color = Color.valueOf("ff0000");
             damage = 8.0f / 60.0f;
@@ -41,7 +39,7 @@ public class FRStatusEffects{
             healthMultiplier = 0.75f;
             transitionDamage = 22.0f;
             effect = new Effect(40.0f, e -> {
-                Draw.color(frostbite.color);
+                Draw.color(color);
                 Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.0f, (x, y) ->
                     Fill.circle(e.x + x, e.y + y, e.fout() * 1.2f)
                 );
@@ -79,21 +77,17 @@ public class FRStatusEffects{
                 super.update(unit, time);
 
                 if(!added){
-                    Fx.healWave.at(unit);
-
-                    var debuffs = DebuffRemoveFieldAbility.DE_BUFFS;
-                    for(var e : debuffs)
-                        if(!(unit.type instanceof FleshUnitType && e == overgrown))
-                            unit.unapply(e);
-
                     added = true;
+                    DebuffRemoveFieldAbility.removeDebuff(unit);
+                    Fx.healWave.at(unit);
                 }
             }
 
             @Override
             public void onRemoved(Unit unit){
                 unit.heal(0.05f * unit.maxHealth);
-            }{
+            }
+            {
                 color = Pal.accent;
                 damage = -2.4f;
                 healthMultiplier = 2.25f;
@@ -101,6 +95,7 @@ public class FRStatusEffects{
         };
 
         mu = new StatusEffect("mu"){{
+            color = Pal.accent;
             damageMultiplier = 0.4f;
             speedMultiplier = 3.0f;
         }};
@@ -132,32 +127,29 @@ public class FRStatusEffects{
             @Override
             public void update(Unit unit, float time){
                 var clazz = unit.getClass();
-                while(clazz.getSuperclass() != Unit.class)
+                while(Unit.class != clazz.getSuperclass())
                     clazz = (Class<? extends Unit>)clazz.getSuperclass();
 
                 Seq<StatusEntry> entries = Reflect.get(clazz, unit, "statuses");
-                boolean wet = entries.contains(e -> e.effect == status); //why hasEffect() is buggy
+                boolean wet = entries.contains(e -> e.effect == status); //hasEffect() here is buggy but why???
 
-                // check whether unit is neoplasm-about
                 if(unit.type instanceof FleshUnitType){
-                    unit.healthMultiplier *= neo_healthMultiplier;
-                    unit.heal((neo_regenPercent + (wet ? neo_extraRegenPercent : 0.0f)) / 60.0f * unit.maxHealth * Time.delta);
+                    float perc = (neo_regenPercent + (wet ? neo_extraRegenPercent : 0.0f)) / 60.0f * Time.delta, maxShield = 0.6f * unit.maxHealth + 600.0f;
+                    unit.healthMultiplier *= neo_healthMultiplier / healthMultiplier;
+                    unit.heal(perc * unit.maxHealth);
 
-                    final float maxShield = 1200.0f;
                     if(unit.shield < maxShield)
-                        unit.shield = Math.min(unit.shield + neo_regenPercent / 60.0f * Time.delta * maxShield, maxShield);
+                        unit.shield = Math.min(unit.shield + perc * maxShield, maxShield);
 
                 }else{
-                    // nerf otherwise
-                    unit.healthMultiplier *= healthMultiplier;
                     unit.damageContinuousPierce(damage + (wet ? damagePercent / 60.0f * unit.maxHealth : 0.0f));
                 }
 
                 if(wet) entries.find(e -> e.effect == this).time += 2.0f * Time.delta;
 
                 if(Mathf.chanceDelta(effectChance)){
-                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize * 0.5f));
-                    effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0.0f, color, unit);
+                    Tmp.v6.rnd(Mathf.range(unit.type.hitSize * 0.5f));
+                    effect.at(unit.x + Tmp.v6.x, unit.y + Tmp.v6.y, 0.0f, color, unit);
                 }
             }
 
@@ -174,12 +166,12 @@ public class FRStatusEffects{
                 effectChance = 0.1f;
                 healthMultiplier = 0.9f;
                 effect = new Effect(40.0f, e -> {
-                    Draw.color(overgrown.color);
+                    Draw.color(color);
                     Angles.randLenVectors(e.id, 2, 1.0f + e.fin() * 2.2f, (x, y) ->
-                        Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * 1.4f * (e.data instanceof Unit u ? Mathf.sqrt(u.type.hitSize) * 0.6f : 1.0f))
+                        Fill.circle(e.x + x, e.y + y, 1.0f + e.fout() * 1.4f * (e.data instanceof Float hitSize ? Mathf.sqrt(hitSize) * 0.6f : 1.0f))
                     );
                 });
-                init(() -> affinity(StatusEffects.wet, (unit, result, time) -> {})); //handled in update()
+                init(() -> affinity(status, (unit, result, time) -> {})); //handled in update()
             }
         };
 
@@ -199,11 +191,11 @@ public class FRStatusEffects{
                 super.update(unit, time);
 
                 if(time >= 60.0f)
-                    // linearly reduces armor in 1s
+                    //linearly reduces armor in 1s
                     unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f, unit.type.armor - maxArmorReduction);
 
                 else
-                    // linearly puts armor back in 1s
+                    //linearly puts armor back in 1s
                     unit.armor += maxArmorReduction / 60.0f * Time.delta;
             }
 
@@ -212,7 +204,8 @@ public class FRStatusEffects{
                 unit.armor = unit.type.armor;
             }
             {
-                damage = 4.0f;
+                color = Color.valueOf("989aa4");
+                damage = 3.5f;
                 speedMultiplier = 0.6f;
                 effectChance = 0.15f;
                 parentizeEffect = true;
@@ -224,11 +217,10 @@ public class FRStatusEffects{
             @Override
             public void update(Unit unit, float time){
                 super.update(unit, time);
-                if(unit.dead){
+                if(unit.dead)
                     unit.vel.scl(1.0f - 0.05f * Time.delta);
-                }else if(unit.moving() && Mathf.chanceDelta(0.06)){
+                else if(unit.moving() && Mathf.chanceDelta(0.06))
                     unit.vel.scl(Mathf.random(0.1f, 1.5f));
-                }
             }
             {
                 color = Color.valueOf("98ffa8");
@@ -248,4 +240,6 @@ public class FRStatusEffects{
             }
         };
     }
+
+    public static void load(){}
 }

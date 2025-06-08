@@ -1,8 +1,16 @@
 package fire.world.blocks.production;
 
+import arc.Core;
+import arc.math.Mathf;
+import arc.util.Strings;
+import mindustry.graphics.Pal;
+import mindustry.ui.Bar;
+import mindustry.world.meta.Stat;
+import mindustry.world.meta.StatUnit;
+
 public class GeneratorCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
-    public final float powerProduction;
+    protected final float powerProduction;
 
     public GeneratorCrafter(String name, float pwr){
         super(name);
@@ -16,17 +24,16 @@ public class GeneratorCrafter extends mindustry.world.blocks.production.GenericC
     @Override
     public void setStats(){
         super.setStats();
-        stats.add(mindustry.world.meta.Stat.basePowerGeneration, powerProduction * 60.0f, mindustry.world.meta.StatUnit.powerSecond);
+        stats.add(Stat.basePowerGeneration, powerProduction * 60.0f, StatUnit.powerSecond);
     }
 
     @Override
     public void setBars(){
         super.setBars();
-
-        addBar("power", (GeneratorCrafterBuild build) -> new mindustry.ui.Bar(
-            () -> arc.Core.bundle.format("bar.poweroutput", arc.util.Strings.fixed(build.getPowerProduction() * 60.0f * build.timeScale(), 1)),
-            () -> mindustry.graphics.Pal.powerBar,
-            () -> arc.math.Mathf.num(build.efficiency > 0.0f)
+        addBar("power", (GeneratorCrafterBuild build) -> new Bar(
+            () -> Core.bundle.format("bar.poweroutput", Strings.fixed(build.getPowerProduction() * 60.0f * build.timeScale(), 1)),
+            () -> Pal.powerBar,
+            () -> Mathf.num(build.efficiency > 0.0f)
         ));
     }
 

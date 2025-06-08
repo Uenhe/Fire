@@ -35,11 +35,13 @@ public class LightningPointBulletType extends mindustry.entities.bullet.BulletTy
         if(target != null){
             Fx.chainLightning.at(b.x, b.y, 0f, lightningColor, target);
 
-            // target is either unit or building
-            if(target instanceof Unit u)
+            //target must be either unit or building
+            if(target instanceof Unit u){
                 b.collision(u, u.x, u.y);
-            else
+            }else{
+                assert target instanceof Building;
                 ((Building)target).collision(b);
+            }
         }
 
         b.remove();

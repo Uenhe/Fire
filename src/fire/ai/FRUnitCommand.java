@@ -2,7 +2,7 @@ package fire.ai;
 
 import arc.func.Func;
 import fire.ai.types.DashBuilderAI;
-import fire.ai.types.RepairDashAI;
+import fire.ai.types.DashRepairAI;
 import mindustry.ai.UnitCommand;
 import mindustry.entities.units.AIController;
 import mindustry.gen.Unit;
@@ -15,8 +15,8 @@ public class FRUnitCommand extends UnitCommand{
     }
 
     public static void loadAll(){
-        repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unitCommandRepair, u -> new RepairDashAI());
-        rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unitCommandRebuild, u -> new DashBuilderAI());
-        assistCommand = new UnitCommand("assist", "players", Binding.unitCommandAssist, u -> new DashBuilderAI(0));
+        repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unitCommandRepair, u -> new DashRepairAI());
+        rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unitCommandRebuild, u -> new DashBuilderAI(false));
+        assistCommand = new UnitCommand("assist", "players", Binding.unitCommandAssist, u -> new DashBuilderAI(true));
     }
 }

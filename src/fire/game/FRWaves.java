@@ -15,8 +15,10 @@ import static arc.math.Mathf.sqrt;
 import static fire.content.FRUnitTypes.*;
 import static mindustry.content.UnitTypes.*;
 
-/** @author fy
- * @see mindustry.game.Waves */
+/**
+ * @author fy
+ * @see mindustry.game.Waves
+ */
 public class FRWaves{
 
     public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean airOnly){
@@ -28,8 +30,7 @@ public class FRWaves{
             {flare, horizon, omicron, rand.chance(0.5) ? quad : pioneer, eclipse},
             {guarding, resisting, garrison, shelter, blessing},
             {firefly, candlight, lampryo, pioneer, eclipse}
-        };//sorry but there are no lakes on Lysetta:(
-
+        }; //sorry but there are no lakes on Lysetta:(
 
         if(airOnly){
             species = Structs.filter(UnitType[].class, species, v -> v[0].flying);
@@ -45,7 +46,7 @@ public class FRWaves{
 
         float[] scaling = {1, 1.6f, 2f, 3.1f, 4.4f};
 
-        UnitType[][] finalSpecies = species;
+        var finalSpecies = species;
         Intc createProgression = start -> {
             //main sequence
             int tier;
@@ -69,9 +70,9 @@ public class FRWaves{
                 }else{
                     tier = 5;
                 }
-                tier = tier - 1;
+                tier -= 1;
                 //basicEnemies
-                int counts = rand.random(6);
+                int counts = rand.random(finalSpecies.length - 1);
                 StatusEffect ChosenEffect;
                 if(f < 15){
                     ChosenEffect = StatusEffects.none;
@@ -85,14 +86,14 @@ public class FRWaves{
                     ChosenEffect = rand.random(2) <= 1 ? StatusEffects.shielded : FRStatusEffects.inspired;
                 }
                 for(int j = 0; j < counts; j++){
-                    type = rand.random(6);
+                    type = rand.random(finalSpecies.length - 1);
                     int finalTier = tier;
                     int finalJ = j;
                     if(tier >= 1){
-                        out.add(new SpawnGroup(finalSpecies[type][Math.min(finalTier, 5) - 1]){{
-                            unitAmount = (int) (6 + sqrt(f / 10 + difficulty)) / (int) scaling[finalTier] * 2;
-                            begin = (int) (f + finalJ);
-                            end = (int) (f + f >= cap ? never : 10 + f * 2);
+                        out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
+                            unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier] * 2;
+                            begin = (int)(f + finalJ);
+                            end = (int)(f + f >= cap ? never : 10 + f * 2);
                             max = unitAmount * 8;
                             unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[finalTier] * 2;
                             shieldScaling = (sqrt(f * f * f) / 2 + 8 + difficulty * 10) * counts;
@@ -101,10 +102,10 @@ public class FRWaves{
                             effect = ChosenEffect;
                         }});
                     }
-                    out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, 5)]){{
-                        unitAmount = (int) (6 + sqrt(f / 10 + difficulty)) / (int) scaling[finalTier];
-                        begin = (int) (f + finalJ);
-                        end = (int) (f + f >= cap ? never : 10 + f * 2);
+                    out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
+                        unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier];
+                        begin = (int)(f + finalJ);
+                        end = (int)(f + f >= cap ? never : 10 + f * 2);
                         max = unitAmount * 4;
                         unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[finalTier];
                         shieldScaling = (sqrt(f * f * f) + 15 + difficulty * 20) * counts;
@@ -123,7 +124,7 @@ public class FRWaves{
 
         while(step <= cap){
             createProgression.get(step);
-            step += (int) (rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
+            step += (int)(rand.random(15, 30) * Mathf.lerp(1f, 0.5f, difficulty));
         }
 
         return out;

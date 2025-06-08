@@ -15,8 +15,10 @@ import mindustry.content.Bullets;
 import mindustry.content.Fx;
 import mindustry.core.World;
 import mindustry.entities.Units;
+import mindustry.entities.bullet.BulletType;
 import mindustry.game.Team;
 import mindustry.gen.Bullet;
+import mindustry.gen.Teamc;
 import mindustry.gen.Unitc;
 
 import static mindustry.Vars.tilesize;
@@ -29,32 +31,37 @@ public class LightningBranch{
     private static final Rect rect = new Rect();
     private static final Seq<Unitc> entities = new Seq<>();
     private static final IntSet hit = new IntSet();
-    private static final int maxChain = 8;
-    private static final float hitRange = 30.0f;
+    private static final byte maxChain = 8;
+    private static final byte hitRange = 30;
     private static boolean bhit;
     private static int lastSeed;
 
-    public static void create(@Nullable Bullet hitter, Team team, Color color, float damage, float x, float y, float angle, int length, int branchAmount, int branchTimes){
-        createLightningInternal(hitter, lastSeed++, team, color, damage, x, y, angle, length, branchAmount, branchTimes);
+    public static void create(Teamc owner, Color color, float damage, float angle, int length, int branchAmount, int branchLeft){
+        createInternal(null, null, lastSeed++, owner.team(), color, damage, owner.x(), owner.y(), angle, length, branchAmount, branchLeft);
     }
 
-    private static void createLightningInternal(@Nullable Bullet hitter, int seed, Team team, Color color, float damage, float x, float y, float angle, int length, int branchAmount, int branchLeft){
+    public static void create(Bullet hitter, BulletType type, Color color, float damage, float angle, int length, int branchAmount, int branchLeft){
+        createInternal(hitter, type, lastSeed++, hitter.team, color, damage, hitter.x, hitter.y, angle, length, branchAmount, branchLeft);
+    }
+
+    private static void createInternal(@Nullable Bullet hitter, @Nullable BulletType type, int seed, Team team, Color color, float damage, float x, float y, float angle, int length, int branchAmount, int branchLeft){
         random.setSeed(seed);
         hit.clear();
         bhit = false;
-        var hitCreate = hitter == null || hitter.type.lightningType == null ? Bullets.damageLightning : hitter.type.lightningType;
+        if(type == null) type = Bullets.damageLightning;
+        var Type = type;
         var lines = new Seq<Vec2>();
         for(short i = 0; i < length / 2; i++){
-            hitCreate.create(null, team, x, y, angle, damage * (hitter == null ? 1.0f : hitter.damageMultiplier()), 1.0f, 1.0f, hitter);
+            type.create(null, team, x, y, angle, damage * (hitter == null ? 1.0f : Type.damageMultiplier(hitter)), 1.0f, 1.0f, hitter);
             lines.add(new Vec2(x + Mathf.range(3.0f), y + Mathf.range(3.0f)));
             if(lines.size > 1){
                 bhit = false;
-                Vec2 from = lines.get(lines.size - 2), to = lines.get(lines.size - 1);
-                World.raycastEach(World.toTile(from.getX()), World.toTile(from.getY()), World.toTile(to.getX()), World.toTile(to.getY()), (wx, wy) -> {
-                    var tile = world.tile(wx, wy);
+                Vec2 from = lines.get(lines.size - 2), to = lines.peek();
+                World.raycastEach(World.toTile(from.x), World.toTile(from.y), World.toTile(to.x), World.toTile(to.y), (tx, ty) -> {
+                    var tile = world.tile(tx, ty);
                     if(tile != null && (tile.build != null && tile.build.isInsulated()) && tile.team() != team){
                         bhit = true;
-                        lines.get(lines.size - 1).set(wx * tilesize, wy * tilesize);
+                        lines.peek().set(tx * tilesize, ty * tilesize);
                         return true;
                     }
                     return false;
@@ -63,11 +70,12 @@ public class LightningBranch{
             }
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
-            if(hit.size < maxChain)
+            if(hit.size < maxChain){
                 Units.nearbyEnemies(team, rect, u -> {
-                    if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(hitter.type.collidesAir, hitter.type.collidesGround)))
+                    if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(Type.collidesAir, Type.collidesGround)))
                         entities.add(u);
                 });
+            }
             var furthest = Geometry.findFurthest(x, y, entities);
             if(furthest != null){
                 hit.add(furthest.id());
@@ -82,10 +90,11 @@ public class LightningBranch{
         Fx.lightning.at(x, y, angle, color, lines);
 
         if(branchLeft <= 0) return;
-        float xx = x, yy = y, aangle = angle;
-        Time.run(1.0f, () -> {
-            for(byte i = 0; i < branchAmount; i++)
-                createLightningInternal(null, lastSeed++, team, color, damage, xx, yy, aangle + random.range(15.0f), length, branchAmount, branchLeft - 1);
+        float X = x, Y = y, Angle = angle;
+        Time.run(1.5f, () -> {
+            for(byte i = 0; i < branchAmount; i++){
+                createInternal(hitter, Type, lastSeed++, team, color, damage, X, Y, Angle + random.range(15.0f), length, branchAmount, branchLeft - 1);
+            }
         });
     }
 }

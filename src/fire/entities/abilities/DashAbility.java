@@ -19,7 +19,7 @@ import mindustry.graphics.Layer;
 
 import static mindustry.Vars.tilesize;
 
-/** Ensure this is the first to be added to unit's abilities. */
+/** @implSpec Ensure this is the first to be added to unit's abilities. */
 public class DashAbility extends mindustry.entities.abilities.Ability{
 
     public final float speedMultiplier;
