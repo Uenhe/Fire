@@ -14,7 +14,6 @@ import static mindustry.Vars.*;
 /** @see mindustry.ui.dialogs.AboutDialog AboutDialog */
 public class FRAboutDialog extends mindustry.ui.dialogs.BaseDialog{
 
-    /** @see Links */
     private static final Links.LinkEntry[] links;
 
     public static final FRAboutDialog dialog = new FRAboutDialog();
@@ -30,7 +29,8 @@ public class FRAboutDialog extends mindustry.ui.dialogs.BaseDialog{
             new Links.LinkEntry("changelog", "https://github.com/Uenhe/Fire/releases", changelog.icon, changelog.color),
             new Links.LinkEntry("githubmod", "https://github.com/Uenhe/Fire", github.icon, github.color),
             new Links.LinkEntry("bilify", "https://space.bilibili.com/516898377", biliicon, bilicol),
-            new Links.LinkEntry("biliue", "https://space.bilibili.com/327502129", biliicon, bilicol)
+            new Links.LinkEntry("biliue", "https://space.bilibili.com/327502129", biliicon, bilicol),
+            new Links.LinkEntry("qqgroup", "https://qm.qq.com/q/rVoc1MqbRI", Core.atlas.drawable("fire-qq"), Color.valueOf("ff000e"))
         };
     }
 
@@ -52,6 +52,8 @@ public class FRAboutDialog extends mindustry.ui.dialogs.BaseDialog{
         var pane = new ScrollPane(in);
 
         for(var link : links){
+            if(link == links[4] && "ch_CN".equals(Core.settings.getString("locale"))) continue; //skip QQGroup if not CN player
+
             var table = new Table(Styles.grayPanel);
             table.margin(0.0f);
             table.table(img -> {

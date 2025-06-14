@@ -153,7 +153,7 @@ public class FireMod extends mindustry.mod.Mod{
 
             addContent(t,
                 "[#F4BA6E]v1.4.2:",
-                FRBlocks.compositeRouter,
+                FRBlocks.fulmination, FRBlocks.compositeRouter, FRBlocks.unitHealer, FRBlocks.payloadConveyorLarge,
                 "[#F4BA6E]v1.4.0:",
                 FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
@@ -220,10 +220,10 @@ public class FireMod extends mindustry.mod.Mod{
 
     private static void setupDialog(BaseDialog dialog){
         dialog.closeOnBack();
-        dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
+        dialog.buttons.button("@close", Icon.cancel, dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, Object... objects){ //content or string
+    private static void addContent(Table table, Object... objects){
         for(var obj : objects){
             if(obj instanceof UnlockableContent c){
 
