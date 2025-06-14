@@ -16,7 +16,7 @@ java{
 
 ext{
     //the build number that this mod is made for
-    arcHash = '23264f9514'
+    arcHash = '7c091c5e33'
     mindustryHash = '5615182bc5' //adapts to 25902
     jabelVersion = '93fde537c7'
     //windows sucks
