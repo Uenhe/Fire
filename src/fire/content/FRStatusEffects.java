@@ -26,6 +26,8 @@ import mindustry.type.StatusEffect;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import static fire.FRVars.find;
+
 public class FRStatusEffects{
 
     public static final StatusEffect
@@ -33,7 +35,7 @@ public class FRStatusEffects{
 
     static{
         frostbite = new StatusEffect("frostbite"){{
-            color = Color.valueOf("ff0000");
+            color = find("ff0000");
             damage = 8.0f / 60.0f;
             speedMultiplier = 0.55f;
             healthMultiplier = 0.75f;
@@ -204,10 +206,10 @@ public class FRStatusEffects{
                 unit.armor = unit.type.armor;
             }
             {
-                color = Color.valueOf("989aa4");
+                color = find("989aa4");
                 damage = 3.5f;
-                speedMultiplier = 0.6f;
-                effectChance = 0.15f;
+                healthMultiplier = 0.85f;
+                effectChance = 0.14f;
                 parentizeEffect = true;
                 effect = Fx.unitShieldBreak;
             }
@@ -223,7 +225,7 @@ public class FRStatusEffects{
                     unit.vel.scl(Mathf.random(0.1f, 1.5f));
             }
             {
-                color = Color.valueOf("98ffa8");
+                color = find("98ffa8");
                 damage = 2.0f;
                 transitionDamage = 10.0f;
                 speedMultiplier = dragMultiplier = 0.95f;

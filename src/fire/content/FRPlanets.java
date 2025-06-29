@@ -10,6 +10,7 @@ import mindustry.graphics.g3d.MultiMesh;
 import mindustry.type.Planet;
 
 import static arc.struct.Seq.with;
+import static fire.FRVars.find;
 import static fire.content.FRBlocks.*;
 import static fire.content.FRItems.*;
 import static fire.content.FRLiquids.liquidNitrogen;
@@ -27,8 +28,8 @@ public class FRPlanets{
         lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
             meshLoader = () -> new HexMesh(this, 8);
             cloudMeshLoader = () -> new MultiMesh(
-                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, Color.valueOf("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
-                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(Color.valueOf("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
+                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, find("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
+                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(find("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
             );
             generator = new LysettaPlanetGenerator();
             sectorSeed = 3;
@@ -36,10 +37,10 @@ public class FRPlanets{
             clearSectorOnLose = true;
             prebuildBase = false;
             allowCampaignRules = true;
-            atmosphereColor = Color.valueOf("1a3db1");
+            atmosphereColor = find("1a3db1");
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
-            iconColor = Color.valueOf("5b6fff");
+            iconColor = find("5b6fff");
 
             unlockedOnLand.add(fireCompany);
             ruleSetter = r -> {

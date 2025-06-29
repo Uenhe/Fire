@@ -28,6 +28,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
         super.setStats();
         stats.add(Stat.tiles, table -> {
             table.row();
+
             for(var floor : liquidFloors){
                 table.table(Styles.grayPanel, t -> {
                     t.left().image(floor.uiIcon).size(40.0f).pad(10.0f).scaling(Scaling.fit);

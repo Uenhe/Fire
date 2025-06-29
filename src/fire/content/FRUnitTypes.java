@@ -134,7 +134,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new ForceFieldAbility(54f, 0.6f, 300.0f, 360.0f),
-                new RegenFieldAbility(1.5f, 40.0f, _8cfffb)
+                new RegenFieldAbility(1.5f, 40.0f, find("8cfffb"))
             );
         }};
 
@@ -222,7 +222,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new EnergyForceFieldAbility(80f, 2.5f, 1080f, 270f, 20, 16, 10, 10.0f),
-                new RegenFieldAbility(2.5f, 120f, _8cfffb)
+                new RegenFieldAbility(2.5f, 120f, find("8cfffb"))
             );
         }};
 
@@ -269,12 +269,12 @@ public class FRUnitTypes{
                     ext_node = new FRUtils.TimeNode(140, 180, 240, 300);
                 }},
 
-                new RegenFieldAbility(3.0f, 120.0f, _8cfffb),
+                new RegenFieldAbility(3.0f, 120.0f, find("8cfffb")),
 
-                new ExtinguishFieldAbility(120.0f, _8cfffb),
+                new ExtinguishFieldAbility(120.0f, find("8cfffb")),
 
                 new DebuffRemoveFieldAbility(120.0f, 120.0f, new Effect(30.0f, e -> {
-                    Draw.color(_8cfffb, Color.lightGray, e.fin());
+                    Draw.color(find("8cfffb"), Color.lightGray, e.fin());
                     Angles.randLenVectors(e.id, 3, 6.0f + e.finpow() * 20.0f, (x, y) ->
                         Fill.square(e.x + x, e.y + y, e.fout() * 4.0f + 0.5f, 45.0f));
                 }))
@@ -311,8 +311,8 @@ public class FRUnitTypes{
                         width = 5.4f;
                         height = 10.8f;
 
-                        backColor = _f9a27a;
-                        frontColor = _ffd8e8;
+                        backColor = find("f9a27a");
+                        frontColor = find("ffd8e8");
                     }};
                 }}
             );
@@ -334,7 +334,7 @@ public class FRUnitTypes{
                     reload = 10.0f;
                     recoil = 2.0f;
                     x = 0.0f;
-                    shootX = 9.6f;
+                    shootX = 10.0f;
                     shootY = 4.0f;
                     top = false;
                     shootSound = Sounds.flame;
@@ -381,7 +381,7 @@ public class FRUnitTypes{
                     statusDuration = 40.0f;
                     status = StatusEffects.burning;
 
-                    color = _ff3300;
+                    color = find("ff3300");
                 }}
             );
 
@@ -409,8 +409,8 @@ public class FRUnitTypes{
                         splashDamageRadius = 40.0f;
 
                         hitEffect = Fx.blastExplosion;
-                        backColor = _f9a27a;
-                        frontColor = _ffd8e8;
+                        backColor = find("f9a27a");
+                        frontColor = find("ffd8e8");
                     }};
                 }}
             );
@@ -464,7 +464,7 @@ public class FRUnitTypes{
                         knockback = -1.0f;
                         sapStrength = 0.6f;
 
-                        color = hitColor = _990003;
+                        color = hitColor = find("990003");
                         shootEffect = Fx.shootSmall;
                     }};
                 }},
@@ -487,7 +487,7 @@ public class FRUnitTypes{
                         damage = 525f;
                         length = 320f;
                         width = 20f;
-                        toColor = _990003;
+                        toColor = find("990003");
                     }};
                 }}
             );
@@ -541,7 +541,7 @@ public class FRUnitTypes{
                         height = 5.4f;
                         buildingDamageMultiplier = 0.2f;
                         collidesTeam = true;
-                        backColor = _8cfffb;
+                        backColor = find("8cfffb");
                         frontColor = Color.white;
                         status = StatusEffects.electrified;
                         statusDuration = 150.0f;
@@ -865,7 +865,7 @@ public class FRUnitTypes{
                                     particles = 8;
                                     length = 80.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom.set(colorTo.set(_lancer_a04));
+                                    colorFrom.set(colorTo.set(lancer_a04));
                                     sizeFrom = 16.0f;
                                     sizeTo = 0.0f;
                                     sizeInterp = Interp.pow5In;
@@ -875,7 +875,7 @@ public class FRUnitTypes{
                                     particles = 6;
                                     length = 60.0f;
                                     interp = Interp.pow10Out;
-                                    colorFrom.set(colorTo.set(_lancer_a04));
+                                    colorFrom.set(colorTo.set(lancer_a04));
                                     sizeFrom = 20.0f;
                                     sizeTo = 0.0f;
                                     sizeInterp = Interp.pow5In;
@@ -979,7 +979,7 @@ public class FRUnitTypes{
                                 sizeTo = 80.0f;
                                 strokeFrom = 8.0f;
                                 strokeTo = 4.0f;
-                                colorFrom.set(colorTo.set(_ffa166));
+                                colorFrom.set(colorTo.set(find("ffa166")));
                             }},
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -987,7 +987,7 @@ public class FRUnitTypes{
                                 sizeTo = 120.0f;
                                 strokeFrom = 4.0f;
                                 strokeTo = 3.0f;
-                                colorFrom.set(colorTo.set(_ffa166));
+                                colorFrom.set(colorTo.set(find("ffa166")));
                             }}.startDelay(15.0f),
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -995,7 +995,7 @@ public class FRUnitTypes{
                                 sizeTo = 140.0f;
                                 strokeFrom = 3.0f;
                                 strokeTo = 2.0f;
-                                colorFrom.set(colorTo.set(_ffa166));
+                                colorFrom.set(colorTo.set(find("ffa166")));
                             }}.startDelay(30.0f),
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -1003,7 +1003,7 @@ public class FRUnitTypes{
                                 sizeTo = 150.0f;
                                 strokeFrom = 2.0f;
                                 strokeTo = 0.0f;
-                                colorFrom.set(colorTo.set(_ffa166));
+                                colorFrom.set(colorTo.set(find("ffa166")));
                             }}.startDelay(45.0f),
                             new ParticleEffect(){{
                                 particles = 10;
@@ -1013,9 +1013,8 @@ public class FRUnitTypes{
                                 sizeTo = 0.0f;
                                 interp = Interp.pow10Out;
                                 sizeInterp = Interp.pow5In;
-                                colorFrom = _ffa166;
-                                colorFrom.set(_ffa166);
-                                colorTo.set(_ffa16670);
+                                Color.valueOf(colorFrom, "ffa166");
+                                Color.valueOf(colorTo, "ffa16670");
                             }},
                             new ParticleEffect(){{
                                 particles = 6;
@@ -1025,8 +1024,8 @@ public class FRUnitTypes{
                                 sizeTo = 0.0f;
                                 interp = Interp.pow10Out;
                                 sizeInterp = Interp.pow5In;
-                                colorFrom.set(_ffa166);
-                                colorTo.set(_ffa16670);
+                                Color.valueOf(colorFrom, "ffa166");
+                                Color.valueOf(colorTo, "ffa16670");
                             }},
                             new ParticleEffect(){{
                                 particles = 4;
@@ -1036,8 +1035,8 @@ public class FRUnitTypes{
                                 sizeTo = 0.0f;
                                 interp = Interp.pow10Out;
                                 sizeInterp = Interp.pow5In;
-                                colorFrom.set(_ffa166);
-                                colorTo.set(_ffa16670);
+                                Color.valueOf(colorFrom, "ffa166");
+                                Color.valueOf(colorTo, "ffa16670");
                             }}
                         );
 
@@ -1050,7 +1049,7 @@ public class FRUnitTypes{
                             splashDamage = 85.0f;
                             buildingDamageMultiplier = 2.5f;
 
-                            frontColor = backColor = _ffa166;
+                            frontColor = backColor = find("ffa166");
                             status = StatusEffects.burning;
                             statusDuration = 600.0f;
 
@@ -1064,8 +1063,8 @@ public class FRUnitTypes{
                                 sizeTo = 0.0f;
                                 interp = Interp.pow3Out;
                                 sizeInterp = Interp.pow3In;
-                                colorFrom.set(_444444);
-                                colorTo.set(_44444488);
+                                Color.valueOf(colorFrom, "444444");
+                                Color.valueOf(colorTo, "44444488");
                             }};
 
                             hitEffect = despawnEffect = new MultiEffect(
@@ -1076,7 +1075,7 @@ public class FRUnitTypes{
                                     strokeFrom = 8.0f;
                                     strokeTo = 0.0f;
                                     interp = Interp.pow3Out;
-                                    colorFrom.set(_ffa166);
+                                    Color.valueOf(colorFrom, "ffa166");
                                 }},
                                 new ParticleEffect(){{
                                     particles = 6;
@@ -1086,8 +1085,8 @@ public class FRUnitTypes{
                                     sizeTo = 0.0f;
                                     interp = Interp.pow5Out;
                                     sizeInterp = Interp.pow5In;
-                                    colorFrom.set(_ffa166);
-                                    colorTo.set(_ffa16670);
+                                    Color.valueOf(colorFrom, "ffa166");
+                                    Color.valueOf(colorTo, "ffa16670");
                                 }},
                                 new ParticleEffect(){{
                                     particles = 3;
@@ -1097,8 +1096,8 @@ public class FRUnitTypes{
                                     sizeTo = 0.0f;
                                     interp = Interp.pow5Out;
                                     sizeInterp = Interp.pow5In;
-                                    colorFrom.set(_ffa166);
-                                    colorTo.set(_ffa16670);
+                                    Color.valueOf(colorFrom, "ffa166");
+                                    Color.valueOf(colorTo, "ffa16670");
                                 }}
                             );
                         }};
@@ -1147,7 +1146,7 @@ public class FRUnitTypes{
                         splashDamageRadius = 20f;
                         weaveScale = 8f;
                         weaveMag = 2f;
-                        trailColor = _b6c6fd;
+                        trailColor = find("b6c6fd");
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
                         backColor = Pal.bulletYellowBack;
@@ -1266,7 +1265,7 @@ public class FRUnitTypes{
                     bullet = new LaserBulletType(288.0f){{
                         length = 288.0f;
                         width = 12.0f;
-                        colors(colors, _f6efa1, _f6efa1, Color.white);
+                        colors(colors, find("f6efa1"), find("f6efa1"), Color.white);
                         lightningSpacing = 20.0f;
                         lightningLength = 2;
                         lightningLengthRand = 2;

@@ -50,7 +50,8 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
             if(!bullet.type.pierceArmor) dmg = Damage.applyArmor(dmg, armor);
             damage(bullet, bullet.team, dmg);
 
-            if(health <= 0.0f && !wasDead) Events.fire(new EventType.BuildingBulletDestroyEvent(this, bullet));
+            if(health <= 0.0f && !wasDead)
+                Events.fire(new EventType.BuildingBulletDestroyEvent(this, bullet));
 
             hit = 1.0f;
 

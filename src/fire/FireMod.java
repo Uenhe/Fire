@@ -8,7 +8,6 @@ import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
 import arc.util.Log;
-import arc.util.OS;
 import arc.util.Scaling;
 import fire.ai.FRUnitCommand;
 import fire.content.*;
@@ -16,6 +15,7 @@ import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.FRAboutDialog;
 import fire.ui.dialogs.InfoDialog;
+import fire.world.DEBUG;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
@@ -30,7 +30,6 @@ import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.Attribute;
-import mindustry.world.meta.BuildVisibility;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -117,7 +116,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> {
                 showLog(true);
-                if(!"KochiyaUeneh".equals(OS.username)) return;
+                if(!DEBUG.isDeveloper()) return;
                 if(++counter == 5){
                     doSomethingPlayable();
                     ui.announce("ovo!");
@@ -145,15 +144,11 @@ public class FireMod extends mindustry.mod.Mod{
         main.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
 
         main.cont.pane(t -> {
-            t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f);
-            t.row();
-
-            t.add(Core.bundle.format("fire.content1", FIRE.meta.version)).left().maxWidth(width()).pad(4.0f);
-            t.row();
+            t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
                 "[#F4BA6E]v1.4.2:",
-                FRBlocks.compositeRouter,
+                FRBlocks.fulmination, FRBlocks.compositeRouter, FRBlocks.unitHealer, FRBlocks.payloadConveyorLarge,
                 "[#F4BA6E]v1.4.0:",
                 FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
                 FRBlocks.magneticDomain, FRBlocks.aerolite,
@@ -165,8 +160,7 @@ public class FireMod extends mindustry.mod.Mod{
             );
             t.row();
 
-            t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
-
+            t.add("@fire.content1").left().maxWidth(width()).pad(4.0f);
         }).maxWidth(width());
 
         main.show();
@@ -220,10 +214,10 @@ public class FireMod extends mindustry.mod.Mod{
 
     private static void setupDialog(BaseDialog dialog){
         dialog.closeOnBack();
-        dialog.buttons.button("@close", dialog::hide).size(210.0f, 64.0f);
+        dialog.buttons.button("@close", Icon.cancel, dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, Object... objects){ //content or string
+    private static void addContent(Table table, Object... objects){
         for(var obj : objects){
             if(obj instanceof UnlockableContent c){
 
@@ -257,10 +251,6 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** !!! */
     private static void doSomethingPlayable(){
-        for(var block : content.blocks())
-            if(block.buildVisibility == BuildVisibility.debugOnly)
-                block.buildVisibility = BuildVisibility.shown;
-
         if(multiplied){
             multiplied = false;
             for(var unit : content.units()) unit.health += 10000.0f;
