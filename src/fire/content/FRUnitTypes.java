@@ -42,7 +42,6 @@ import static mindustry.Vars.tilePayload;
 public class FRUnitTypes{
 
     public static final UnitType
-
         //legs support
         guarding, resisting, garrison, shelter, blessing,
 
@@ -73,7 +72,7 @@ public class FRUnitTypes{
             health = 140;
             armor = 3;
             hitSize = 8;
-            speed = 0.72f;
+            speed = 0.75f;
             drag = 0.1f;
             rotateSpeed = 4f;
             buildSpeed = 1f;
@@ -105,10 +104,10 @@ public class FRUnitTypes{
         resisting = new UnitType("ky"){{
             constructor = LegsUnit::create;
             hovering = true;
-            health = 420;
-            armor = 5;
-            hitSize = 12;
-            speed = 0.65f;
+            health = 420.0f;
+            armor = 5.0f;
+            hitSize = 11.0f;
+            speed = 0.7f;
             drag = 0.1f;
             rotateSpeed = 3.6f;
             buildSpeed = 1.2f;
@@ -134,7 +133,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new ForceFieldAbility(54f, 0.6f, 300.0f, 360.0f),
-                new RegenFieldAbility(1.5f, 40.0f, find("8cfffb"))
+                new RegenFieldAbility(0.75f, 40.0f, find("8cfffb"))
             );
         }};
 

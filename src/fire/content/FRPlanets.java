@@ -150,7 +150,7 @@ public class FRPlanets{
                 node(nightmare, with(new OnSector(landingBase)), () -> {
                     node(gambler, with(new SectorComplete(darkWorkshop)), () -> {
                         node(distance, with(new SectorComplete(eteriverStronghold)), () ->
-                            node(aerolite, () -> {})
+                            node(aerolite, with(new SectorComplete(desolateFortification)), () -> {})
                         );
                         node(grudge, with(new SectorComplete(desolateFortification)), () -> {});
                     });

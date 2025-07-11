@@ -22,6 +22,7 @@ import fire.world.blocks.campaign.AcceleratorCutscene;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.FleshWall;
 import fire.world.blocks.defense.turrets.ItemBulletStackTurret;
+import fire.world.blocks.defense.turrets.ItemDefenseTurret;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import fire.world.blocks.distribution.AdaptRouter;
 import fire.world.blocks.environment.EnvBlock;
@@ -56,10 +57,7 @@ import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.HaloPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.part.ShapePart;
-import mindustry.entities.pattern.ShootAlternate;
-import mindustry.entities.pattern.ShootBarrel;
-import mindustry.entities.pattern.ShootMulti;
-import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.pattern.*;
 import mindustry.game.EventType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
@@ -87,6 +85,7 @@ import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.StackConveyor;
 import mindustry.world.blocks.environment.Floor;
 import mindustry.world.blocks.environment.OverlayFloor;
+import mindustry.world.blocks.environment.StaticWall;
 import mindustry.world.blocks.liquid.LiquidBridge;
 import mindustry.world.blocks.liquid.LiquidRouter;
 import mindustry.world.blocks.payloads.PayloadConveyor;
@@ -112,7 +111,7 @@ public class FRBlocks{
     public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(6); //composite one -> its inferior
     public static final Block
     //environment
-    neoplasm, bloodyDirt, hardenedCovering,
+    neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, hardenedCovering,
 
     //sandbox & misc
     adaptiveSource, fireCompany,
@@ -121,6 +120,7 @@ public class FRBlocks{
     smasher, nightmare, fulmination,
     ignition, blossom, gambler, seaquake, distance, magneticDomain,
     grudge, aerolite, magneticSphere, scab,
+    obstruction,
     magneticRail,
 
     //production
@@ -149,13 +149,7 @@ public class FRBlocks{
     fleshReconstructor, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
-    buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator,
-
-    //env
-    envEteriverStronghold, envStormyCoast1, envStormyCoast2, envGlaciatedPeaks,
-
-    //DEBUG
-    DEBUG_TURRET, DEBUG_MEND, DEBUG_SUPPLIER;
+    buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator;
 
     static{
         //region environment
@@ -173,6 +167,16 @@ public class FRBlocks{
 
         bloodyDirt = new Floor("bloody-dirt", 8);
         bloodyDirt.attributes.set(FRAttribute.flesh, 1.0f / 9.0f);
+
+        bloodyWall = new StaticWall("bloody-wall");
+        bloodyWall.variants = 3;
+        bloodyDirt.asFloor().wall = bloodyWall;
+
+        granite = new Floor("granite", 3);
+
+        graniteWall = new StaticWall("granite-wall");
+        graniteWall.variants = 3;
+        granite.asFloor().wall = graniteWall;
 
         hardenedCovering = new OverlayFloor("hardened-covering");
         hardenedCovering.variants = 8;
@@ -986,7 +990,7 @@ public class FRBlocks{
                         Fx.rand.setSeed(e.id);
                         for(byte i = 0; i < 12; i++){
                             float angle = Fx.rand.random(360.0f);
-                            float lenRand = Fx.rand.random(0.5f, 1f);
+                            float lenRand = Fx.rand.random(0.5f, 1.0f);
                             Tmp.v6.trns(angle, circleRad);
                             for(int s : Mathf.signs)
                                 Drawf.tri(e.x + Tmp.v6.x, e.y + Tmp.v6.y, e.foutpow() * 30.0f, e.fout() * 24.0f * lenRand + 6.0f, angle + 90.0f + s * 90.0f);
@@ -997,7 +1001,6 @@ public class FRBlocks{
                     trailColor = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
                     trailEffect = new Effect(140.0f, 240.0f, e -> {
                         final float intensity = 1.6f;
-
                         Draw.color(e.color, 0.7f);
                         Fx.rand.setSeed(e.id * 2L + 1);
                         e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), f ->
@@ -1123,6 +1126,8 @@ public class FRBlocks{
                     status = FRStatusEffects.disintegrated;
                     statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
+                    backColor = hitColor = Pal.thoriumAmmoBack;
+                    frontColor = Pal.thoriumAmmoFront;
                     fragBullets = 4;
                     fragBullet = new BasicBulletType(4.0f, 30.0f){{
                         lifetime = 8.0f;
@@ -1149,8 +1154,8 @@ public class FRBlocks{
                     status = FRStatusEffects.disintegrated;
                     statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
+                    backColor = hitColor = Pal.lightOrange;
                     frontColor = Pal.lightishOrange;
-                    backColor = Pal.lightOrange;
                     fragBullets = 2;
                     fragBullet = new BulletType(4.0f, 0.0f){{
                         lifetime = 1.0f;
@@ -1189,8 +1194,8 @@ public class FRBlocks{
                     status = FRStatusEffects.disintegrated;
                     statusDuration = 120.0f;
                     shootEffect = Fx.shootBig;
+                    backColor = hitColor = Pal.sapBulletBack;
                     frontColor = Pal.sapBullet;
-                    backColor = Pal.sapBulletBack;
                     fragBullets = 2;
                     fragBullet = new BulletType(48.0f, 0.0f){{
                         instantDisappear = true;
@@ -1224,10 +1229,8 @@ public class FRBlocks{
             size = 4;
             armor = 20.0f;
             liquidCapacity = 75.0f;
-            canOverdrive = false;
             targetAir = false;
-            targetGround = true;
-            reload = 90.0f;
+            reload = 380.0f;
             range = 80 * tilesize;
             inaccuracy = 15.0f;
             maxAmmo = 50;
@@ -1251,8 +1254,9 @@ public class FRBlocks{
                     height = 12.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 40.0f;
-                    splashDamage = 375.0f;
+                    splashDamage = 180.0f;
                     ammoMultiplier = 8.0f;
+                    buildingDamageMultiplier = 2.75f;
                     status = StatusEffects.blasted;
                     frontColor = Color.white;
                     backColor = trailColor = Pal.plastanium;
@@ -1265,7 +1269,7 @@ public class FRBlocks{
                         sizeFrom = 28.0f;
                         sizeTo = 0.0f;
                         sizeInterp = Interp.pow3In;
-                        Color.valueOf(colorFrom, "fffac67f");
+                        Color.valueOf(colorFrom, "fffac6");
                         Color.valueOf(colorTo, "d8d97faa");
                     }};
 
@@ -1290,8 +1294,9 @@ public class FRBlocks{
                     height = 16.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 160.0f;
-                    splashDamage = 500.0f;
+                    splashDamage = 240.0f;
                     ammoMultiplier = 12.0f;
+                    buildingDamageMultiplier = 2.75f;
                     status = StatusEffects.blasted;
                     frontColor = Color.white;
                     backColor = color1;
@@ -1353,8 +1358,9 @@ public class FRBlocks{
                     height = 12.0f;
                     knockback = 10.0f;
                     splashDamageRadius = 80.0f;
-                    splashDamage = 430.0f;
+                    splashDamage = 210.0f;
                     ammoMultiplier = 12.0f;
+                    buildingDamageMultiplier = 2.75f;
                     makeFire = true;
                     status = StatusEffects.burning;
                     statusDuration = 840.0f;
@@ -1390,8 +1396,9 @@ public class FRBlocks{
                     height = 16.0f;
                     knockback = 8.0f;
                     splashDamageRadius = 100.0f;
-                    splashDamage = 600.0f;
+                    splashDamage = 300.0f;
                     ammoMultiplier = 15.0f;
+                    buildingDamageMultiplier = 2.75f;
                     status = StatusEffects.blasted;
 
                     hitEffect = new MultiEffect(
@@ -1694,24 +1701,266 @@ public class FRBlocks{
             );
         }};
 
+        obstruction = new ItemDefenseTurret("obstruction"){{
+            requirements(Category.turret, with(
+                Items.plastanium, 1200,
+                Items.phaseFabric, 600,
+                FRItems.logicAlloy, 500,
+                Items.surgeAlloy, 800,
+                FRItems.hardenedAlloy, 800,
+                FRItems.magneticAlloy, 500
+            ));
+            health = 12000;
+            size = 6;
+            armor = 22.0f;
+            liquidCapacity = 120.0f;
+            reload = 263.0f;
+            range = 65 * tilesize;
+            trackingRange = 95 * tilesize;
+            inaccuracy = 35.0f;
+            maxAmmo = 100;
+            recoil = 3.6f;
+            recoilTime = 40.0f;
+            shake = 2.0f;
+            rotateSpeed = 2.0f;
+            shootCone = 90.0f;
+            shootY = 10.0f;
+            ammoPerShot = 5;
+            consumeAmmoOnce = false;
+            shoot.shots = 3;
+            shoot.shotDelay = 6.0f;
+            shootSound = Sounds.malignShoot;
+            coolantMultiplier = 1.5f;
+
+            warmupMaintainTime = 120.0f;
+            minWarmup = 0.96f;
+            shootWarmupSpeed = 0.1f;
+
+            drawer = new DrawTurret(){{
+                var circleProgress = DrawPart.PartProgress.warmup.delay(0.9f);
+                parts.addAll(
+                    new RegionPart("-main"){{
+                        progress = PartProgress.warmup;
+                        under = true;
+                    }},
+                    new RegionPart("-barrel-in"){{
+                        progress = PartProgress.warmup;
+                        mirror = true;
+                        moves.add(new PartMove(PartProgress.warmup, 0.0f, -1.6f, -20.0f));
+                    }},
+                    new RegionPart("-barrel-out"){{
+                        progress = PartProgress.warmup;
+                        mirror = true;
+                        moves.add(new PartMove(PartProgress.warmup, 1.0f, 2.4f, -30.0f));
+                    }},
+                    new ShapePart(){{
+                        progress = circleProgress;
+                        rotateSpeed = -2f;
+                        color = Pal.surge;
+                        sides = 3;
+                        hollow = true;
+                        stroke = 0f;
+                        strokeTo = 3f;
+                        radius = 8f;
+                        layer = Layer.effect;
+                        y = -18;
+                    }},
+                    new ShapePart(){{
+                        progress = circleProgress;
+                        rotateSpeed = 2f;
+                        color = Pal.surge;
+                        sides = 3;
+                        hollow = true;
+                        stroke = 0f;
+                        strokeTo = 3f;
+                        radius = 8f;
+                        layer = Layer.effect;
+                        y = -18;
+                    }}
+                );
+            }};
+
+            consumeCoolant(0.8f);
+            consumePower(10.0f);
+
+            ammo(
+                Items.surgeAlloy, new SegmentalBulletType(16.0f, 150.0f, 275.0f){{
+                    lifetime = 120.0f;
+                    drag = 0.03f;
+                    homingDelay = 10.0f;
+                    homingPower = 0.16f;
+                    homingRange = 200.0f;
+                    damageMultiplier = 0.1f;
+                    speedMultiplier = 0.3f;
+                    buildingDamageMultiplier = 0.15f;
+                    width = 16.0f;
+                    height = 12.0f;
+                    knockback = 8.0f;
+                    splashDamageRadius = 60.0f;
+                    ammoMultiplier = 5.0f;
+                    status = StatusEffects.shocked;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = Pal.surge;
+                    trailWidth = 2f;
+                    trailLength = 8;
+
+                    hitEffect = new MultiEffect(
+                        new WaveEffect(){{
+                            lifetime = 40.0f;
+                            colorFrom = Pal.surge;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 60.0f;
+                            sides = 4;
+                            rotation = 0.0f;
+                            strokeFrom = 4.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }},
+                        new WaveEffect(){{
+                            lifetime = 40.0f;
+                            colorFrom = Pal.surge;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 60.0f;
+                            sides = 4;
+                            rotation = 45.0f;
+                            strokeFrom = 4.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }}
+                    );
+
+                    lightning = 3;
+                    lightningLength = 6;
+                    lightningLengthRand = 2;
+                    lightningDamage = 12.0f;
+                }},
+
+                Items.phaseFabric, new SegmentalBulletType(16.0f, 120.0f, 255.0f){{
+                    lifetime = 120.0f;
+                    drag = 0.03f;
+                    homingDelay = 10.0f;
+                    homingPower = 0.16f;
+                    homingRange = 220.0f;
+                    damageMultiplier = 0.1f;
+                    speedMultiplier = 0.3f;
+                    buildingDamageMultiplier = 0.05f;
+                    destroyDistanceFactor = 0.2f;
+                    width = 16.0f;
+                    height = 12.0f;
+                    knockback = 10.0f;
+                    splashDamageRadius = 90.0f;
+                    ammoMultiplier = 3.0f;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = find("f4ba6e");
+                    trailWidth = 3f;
+                    trailLength = 8;
+
+                    hitEffect = new MultiEffect(
+                        new WaveEffect(){{
+                            lifetime = 50.0f;
+                            colorFrom = find("f4ba6e");
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 90.0f;
+                            sides = 3;
+                            rotation = 0.0f;
+                            strokeFrom = 5.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }},
+                        new WaveEffect(){{
+                            lifetime = 50.0f;
+                            colorFrom = find("f4ba6e");
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 90.0f;
+                            sides = 3;
+                            rotation = 180.0f;
+                            strokeFrom = 5.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }}
+                    );
+                }},
+
+                FRItems.magneticAlloy, new SegmentalBulletType(23.0f, 250.0f, 435.0f){{
+                    lifetime = 80.0f;
+                    drag = 0.03f;
+                    rangeChange = 164.0f;
+                    homingDelay = 15.0f;
+                    homingPower = 0.16f;
+                    homingRange = 200.0f;
+                    damageMultiplier = 0.1f;
+                    speedMultiplier = 0.3f;
+                    buildingDamageMultiplier = 0.1f;
+                    reloadMultiplier = 0.6f;
+                    width = 20.0f;
+                    height = 16.0f;
+                    knockback = 12.0f;
+                    splashDamageRadius = 100.0f;
+                    ammoMultiplier = 6.0f;
+                    status = FRStatusEffects.magnetized;
+                    statusDuration = 90.0f;
+                    frontColor = Color.white;
+                    backColor = trailColor = hitColor = Pal.surge;
+                    trailWidth = 3.5f;
+                    trailLength = 12;
+
+                    hitEffect = new MultiEffect(
+                        new WaveEffect(){{
+                            lifetime = 60.0f;
+                            colorFrom = Pal.surge;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 100.0f;
+                            sides = 6;
+                            rotation = 0.0f;
+                            strokeFrom = 5.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }},
+                        new WaveEffect(){{
+                            lifetime = 60.0f;
+                            colorFrom = Pal.surge;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 100.0f;
+                            sides = 6;
+                            rotation = 30.0f;
+                            strokeFrom = 5.0f;
+                            interp = Interp.pow5Out;
+                            lightInterp = Interp.pow5Out;
+                        }}
+                    );
+
+                    lightning = 5;
+                    lightningLength = 12;
+                    lightningLengthRand = 4;
+                    lightningDamage = 20.0f;
+                }}
+            );
+        }};
+
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
             final float
-                chargeTime = 150.0f,
-                baseRange = 1200.0f, extraRange = 400.0f;
+            chargeTime = 150.0f,
+            baseRange = 1200.0f, extraRange = 400.0f;
 
             Item
-                item_1 = FRItems.hardenedAlloy,
-                item_2 = FRItems.magneticAlloy;
+            item_1 = FRItems.hardenedAlloy,
+            item_2 = FRItems.magneticAlloy;
 
             BulletType
-                bullet_1_1,
-                bullet_2_1,
-                bullet_2_2,
-                bullet_2_3;
+            bullet_1_1,
+            bullet_2_1,
+            bullet_2_2,
+            bullet_2_3;
 
             final float
-                speed_1_1 = 60.0f,
-                lifetime_1_1 = 35.0f;
+            speed_1_1 = 60.0f,
+            lifetime_1_1 = 35.0f;
 
             bullet_1_1 = new BasicBulletType(speed_1_1, 18000.0f){{
                 lifetime = lifetime_1_1;
@@ -2244,10 +2493,9 @@ public class FRBlocks{
 
         chopper = new WallCrafter("fmj"){{
             requirements(Category.production, with(
-                Items.copper, 20,
-                Items.lead, 15,
+                Items.copper, 15,
                 Items.titanium, 10,
-                Items.silicon, 15
+                Items.silicon, 10
             ));
             researchCost = mult(requirements, 5);
             health = 65;
@@ -2270,7 +2518,7 @@ public class FRBlocks{
             size = 2;
             hasPower = true;
             hasLiquids = true;
-            updateEffect = new Effect(60f, e -> {
+            updateEffect = new Effect(60.0f, e -> {
                 Draw.color(find("6aa85e"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
@@ -2328,8 +2576,8 @@ public class FRBlocks{
             hasPower = true;
             hasLiquids = true;
             itemCapacity = 20;
-            liquidCapacity = 30f;
-            updateEffect = new Effect(60f, e -> {
+            liquidCapacity = 30.0f;
+            updateEffect = new Effect(60.0f, e -> {
                 Draw.color(find("9e78dc"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
@@ -3668,7 +3916,6 @@ public class FRBlocks{
                 Fx.generatespark
             );
             drawArrows = new DrawArrows(2, Pal.lightishOrange, find("c75807"));
-            arrowMaxBoost = 3.38f; //hardcode
 
             reload = 30.0f;
             range = 20 * tilesize;
@@ -3827,154 +4074,149 @@ public class FRBlocks{
         }};
 
         //region env
+        //no references needed
 
-        envEteriverStronghold = new EnvBlock("env-eteriver-stronghold"){{
-            buildType = () -> new EnvBlockBuild(){
+        new EnvBlock("env-eteriver-stronghold", () -> new EnvBlock.EnvBlockBuild(){
+            /** Apollo spawn. */
+            @Override
+            public void add(){
+                super.add();
+                if(Weathers.rain.isActive()) return;
 
-                /** Apollo spawn. */
-                @Override
-                public void add(){
-                    super.add();
-                    if(Weathers.rain.isActive()) return;
-                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
-                    Weathers.rain.create(1.2f);
+                for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                Weathers.rain.create(1.2f);
+            }
+
+            /** Apollo death. */
+            @Override
+            public void onRemoved(){
+                super.onRemoved();
+                if(Weathers.rain.isActive()) Weathers.rain.instance().life = WeatherState.fadeTime;
+            }
+        });
+
+        new EnvBlock("env-stormy-coast1", () -> new EnvBlock.EnvBlockBuild(){
+            /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
+            private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+            private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
+
+            /** Wave 41-47 / 60. */
+            @Override
+            protected void updateStart(){
+                state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.4f, 0.003f);
+                if(Weathers.rain.isActive()) return;
+
+                for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                Weathers.rain.create(1.25f);
+            }
+
+            /** When wave 47 is in half. */
+            @Override
+            protected void updateStop(){
+                state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.003f);
+
+                if(state.rules.ambientLight.a <= 0.01f){
+                    if(state.isCampaign())
+                        state.rules.ambientLight.set(defaultColor);
+                    else
+                        state.rules.ambientLight.set(Color.clear); //might be buggy if default light is customized
+
+                    if(Weathers.rain.isActive()) Weathers.rain.instance().life = WeatherState.fadeTime;
+                    rm();
                 }
+            }
 
-                /** Apollo death. */
-                @Override
-                public void onRemoved(){
-                    super.onRemoved();
-                    if(Weathers.rain.isActive())
-                        Weathers.rain.instance().life = WeatherState.fadeTime;
+            @Override
+            public void add(){
+                super.add();
+                state.rules.lighting = true;
+                state.rules.ambientLight.set(specificColor);
+
+                float time = 0.0f;
+                if(!renderer.drawWeather){
+                    Core.settings.put("showweather", true);
+                    ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
+                    time = 180.0f;
                 }
-            };
-        }};
-
-        envStormyCoast1 = new EnvBlock("env-stormy-coast1"){{
-            buildType = () -> new EnvBlockBuild(){
-                /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-                private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
-
-                /** Wave 41-47 / 60. */
-                @Override
-                protected void updateStart(){
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.4f, 0.003f);
-                    if(Weathers.rain.isActive()) return;
-                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
-                    Weathers.rain.create(1.25f);
+                if(!renderer.drawLight){
+                    Core.settings.put("drawlight", true);
+                    Time.run(time, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                 }
+            }
+        });
 
-                /** When wave 47 is in half. */
-                @Override
-                protected void updateStop(){
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.003f);
+        new EnvBlock("env-stormy-coast2", () -> new EnvBlock.EnvBlockBuild(){
+            /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
+            private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
+            private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
 
-                    if(state.rules.ambientLight.a <= 0.01f){
-                        if(state.isCampaign())
-                            state.rules.ambientLight.set(defaultColor);
-                        else
-                            state.rules.ambientLight.set(Color.clear); //might be buggy if default light is customized
+            /** Wave 59 / 60. */
+            @Override
+            protected void updateStart(){
+                state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.8f, 0.004f);
+                if(FRWeathers.rainstorm.isActive()) return;
 
-                        if(Weathers.rain.isActive())
-                            Weathers.rain.instance().life = WeatherState.fadeTime;
+                for(var state : Groups.weather) state.life = WeatherState.fadeTime;
+                FRWeathers.rainstorm.create(1.5f, 240.0f);
+            }
 
-                        kill();
-                    }
+            /** After all the apollos are destructed. */
+            @Override
+            protected void updateStop(){
+                state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.004f);
+
+                if(state.rules.ambientLight.a <= 0.01f){
+                    if(state.isCampaign())
+                        state.rules.ambientLight.set(defaultColor);
+                    else
+                        state.rules.ambientLight.set(Color.clear);
+
+                    if(FRWeathers.rainstorm.isActive()) FRWeathers.rainstorm.instance().life = WeatherState.fadeTime;
+                    rm();
                 }
+            }
 
-                @Override
-                public void add(){
-                    super.add();
-                    state.rules.lighting = true;
-                    state.rules.ambientLight.set(specificColor);
-                    if(!renderer.drawWeather){
-                        Core.settings.put("showweather", true);
-                        ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
-                    }
-                    if(!renderer.drawLight){
-                        Core.settings.put("drawlight", true);
-                        Time.run(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
-                    }
+            @Override
+            public void add(){
+                super.add();
+                state.rules.lighting = true;
+                state.rules.ambientLight.set(specificColor);
+
+                float time = 0.0f;
+                if(!renderer.drawWeather){
+                    Core.settings.put("showweather", true);
+                    ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
+                    time = 180.0f;
                 }
-            };
-        }};
-
-        envStormyCoast2 = new EnvBlock("env-stormy-coast2"){{
-            buildType = () -> new EnvBlockBuild(){
-                /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-                private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-                private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
-
-                /** Wave 59 / 60. */
-                @Override
-                protected void updateStart(){
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.8f, 0.004f);
-                    if(FRWeathers.rainstorm.isActive()) return;
-                    for(var state : Groups.weather) state.life = WeatherState.fadeTime;
-                    FRWeathers.rainstorm.create(1.5f);
+                if(!renderer.drawLight){
+                    Core.settings.put("drawlight", true);
+                    Time.run(time, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
                 }
+            }
+        });
 
-                /** After all the apollos are destructed. */
-                @Override
-                protected void updateStop(){
-                    state.rules.ambientLight.a = Mathf.lerpDelta(state.rules.ambientLight.a, 0.0f, 0.004f);
+        new EnvBlock("env-glaciated-peaks", () -> new EnvBlock.EnvBlockBuild(){
+            private byte counter;
 
-                    if(state.rules.ambientLight.a <= 0.01f){
-                        if(state.isCampaign())
-                            state.rules.ambientLight.set(defaultColor);
-                        else
-                            state.rules.ambientLight.set(Color.clear);
+            /** Landing. */
+            @Override
+            public void add(){
+                super.add();
+                if(!state.isCampaign()) return;
 
-                        if(FRWeathers.rainstorm.isActive())
-                            FRWeathers.rainstorm.instance().life = WeatherState.fadeTime;
+                byte n = (byte)Mathf.random(4, 6);
+                for(var s : state.getPlanet().sectors)
+                    if(s.hasBase() && counter++ < n)
+                        Events.fire(new EventType.SectorInvasionEvent(s)); //fake invasions, visually only
 
-                        kill();
-                    }
-                }
+                rm();
+            }
+        });
 
-                @Override
-                public void add(){
-                    super.add();
-                    state.rules.lighting = true;
-                    state.rules.ambientLight.set(specificColor);
-                    if(!renderer.drawWeather){
-                        Core.settings.put("showweather", true);
-                        ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.showweather.name")));
-                    }
-                    if(!renderer.drawLight){
-                        Core.settings.put("drawlight", true);
-                        Time.run(180.0f, () -> ui.announce(Core.bundle.format("fire.settingEnabled", Core.bundle.get("setting.drawlight.name"))));
-                    }
-                }
-            };
-        }};
-
-        envGlaciatedPeaks = new EnvBlock("env-glaciated-peaks"){{
-            buildType = () -> new EnvBlockBuild(){
-                private byte counter;
-
-                /** Landing. */
-                @Override
-                public void add(){
-                    super.add();
-                    if(!state.isCampaign()) return;
-
-                    int n = Mathf.random(4, 6);
-                    for(var s : state.getPlanet().sectors)
-                        if(s.hasBase() && counter++ < n)
-                            Events.fire(new EventType.SectorInvasionEvent(s)); //false invasions, visually only
-
-                    kill();
-                }
-            };
-        }};
-
-        //region DEBUG
-
-        DEBUG_TURRET = new DEBUG.DEBUG_Turret("DEBUG_TURRET");
-        DEBUG_MEND = new DEBUG.DEBUG_Mend("DEBUG_MEND");
-        DEBUG_SUPPLIER = new DEBUG.DEBUG_ItemTurretSupplier("DEBUG_SUPPLIER");
+        //region debug
+        new DEBUG.DEBUG_Turret("DEBUG_TURRET");
+        new DEBUG.DEBUG_Mend("DEBUG_MEND");
+        new DEBUG.DEBUG_ItemTurretSupplier("DEBUG_SUPPLIER");
     }
 
     public static void load(){}

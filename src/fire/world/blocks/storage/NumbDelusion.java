@@ -1,5 +1,6 @@
 package fire.world.blocks.storage;
 
+import arc.Core;
 import arc.func.Boolf;
 import arc.graphics.Color;
 import arc.math.Mathf;
@@ -19,6 +20,7 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.Item;
 import mindustry.world.Block;
+import mindustry.world.Build;
 import mindustry.world.blocks.logic.LogicBlock;
 import mindustry.world.blocks.storage.StorageBlock;
 import mindustry.world.meta.Stat;
@@ -133,52 +135,63 @@ public class NumbDelusion extends StorageBlock{
             var items = this.items;
             if(!items.any()) return;
 
-            final float threshold = 0.1f;
-            byte n = (byte)content.items().size;
-            float[] amounts = new float[n]; //actually it's more like an int[]
-            Queue<Teams.BlockPlan> plansFrom = team.data().plans, plansTo = new Queue<>();
+            Core.app.post(() -> {
+                final float threshold = 0.1f;
+                byte n = (byte)content.items().size;
+                short tx = (short)tileX(), ty = (short)tileY();
 
-            boolean complex = false;
-            for(var plan : plansFrom){
-                float dst = Mathf.dst(tileX(), tileY(), plan.x, plan.y);
-                if(dst > range || plan.block instanceof NumbDelusion) continue;
-                plansTo.add(plan);
-                if(!complex) complex = wasComplex.get(plan.block);
-                for(var stack : plan.block.requirements) amounts[stack.item.id] += stack.amount;
-            }
 
-            boolean enough = true;
-            for(byte i = 0; i < n; i++){
-                if(items.get(i) < (amounts[i] *= threshold)){
-                    enough = false;
-                    break;
+
+
+                float[] amounts = new float[n]; //actually it's more like an int[]
+                Queue<Teams.BlockPlan> plansFrom = team.data().plans, plansTo = new Queue<>();
+
+                boolean complex = false;
+                for(var plan : plansFrom){
+                    float dst = Mathf.dst(tx, ty, plan.x, plan.y);
+                    if(dst > range || plan.block instanceof NumbDelusion || !Build.validPlace(plan.block, team, plan.x, plan.y, plan.rotation)) continue;
+
+                    complex |= wasComplex.get(plan.block);
+
+                    //TODO iterates twice here would be bad
+                    boolean enough = true;
+                    for(var stack : plan.block.requirements){
+                        if(items.get(stack.item) - amounts[stack.item.id] < stack.amount * threshold){
+                            enough = false;
+                            break;
+                        }
+                    }
+                    if(enough){
+                        plansTo.add(plan);
+                        for(var stack : plan.block.requirements)
+                            amounts[stack.item.id] += stack.amount * threshold;
+                    }
                 }
-            }
 
-            boolean Enough = enough, Complex = complex;
-            Time.run(delay, () -> {
-                if(Enough){
+                boolean Complex = complex;
+                Time.run(delay, () -> {
                     for(var plan : plansTo){
                         var tile = world.tile(plan.x, plan.y);
-                        tile.setBlock(plan.block, team, plan.rotation);
+                        tile.setNet(plan.block, team, plan.rotation);
                         if(tile.build != null) tile.build.configured(null, plan.config); //sometimes build will be null if immediately destroyed
                         plansFrom.remove(plan);
                         plan.block.placeEffect.at(tile.drawx(), tile.drawy(), plan.block.size);
                     }
 
-                    for(byte i = 0; i < n; i++) items.add(content.item(i), (int)-amounts[i]);
-                }
+                    for(byte i = 0; i < n; i++)
+                        items.add(content.item(i), (int)-amounts[i]);
 
-                var bullets = NumbDelusion.this.bullets;
-                for(byte i = 0; i < n; i++){
-                    var type = bullets[i];
-                    if(type == null) continue;
-                    for(byte j = 0, m = (byte)(Math.min(items.get(i), itemCapacity) / 50); j < m; j++)
-                        type.create(this, Complex ? Team.derelict : team, x, y, Mathf.random(360.0f), Mathf.random(0.75f, 1.25f) + (Complex ? 0.6f : 0.0f), Mathf.random(0.75f, 1.25f));
-                }
+                    var bullets = NumbDelusion.this.bullets;
+                    for(byte i = 0; i < n; i++){
+                        var type = bullets[i];
+                        if(type == null) continue;
+                        for(byte j = 0, m = (byte)(Math.min(items.get(i), itemCapacity) / 50); j < m; j++)
+                            type.create(this, Complex ? Team.derelict : team, x, y, Mathf.random(360.0f), Mathf.random(0.75f, 1.25f) + (Complex ? 0.6f : 0.0f), Mathf.random(0.75f, 1.25f));
+                    }
+                });
+
+                destroyFx.at(this);
             });
-
-            destroyFx.at(this);
         }
     }
 }

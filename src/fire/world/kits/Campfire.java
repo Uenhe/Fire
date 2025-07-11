@@ -36,7 +36,7 @@ public class Campfire{
         public float updateEffectChance;
         public Effect updateEffect = Fx.none;
         public DrawArrows drawArrows;
-        public float arrowMaxBoost;
+        public final float maxBoost = 3.38f; //hardcoded;
 
         public CampfireBlock(String name){
             super(name);
@@ -81,7 +81,10 @@ public class Campfire{
             /** Now only affects {@code optionalEfficiency}. */
             @Override
             public void updateEfficiencyMultiplier(){
-                optionalEfficiency *= items.sum(((item, amount) -> item.flammability));
+                if(cheating())
+                    optionalEfficiency = (maxBoost - speedBoost + 1.0f) / speedBoostPhase;
+                else
+                    optionalEfficiency *= items.sum(((item, amount) -> item.flammability));
             }
 
             @Override
@@ -113,7 +116,7 @@ public class Campfire{
                 else if(Mathf.equal(phaseHeat, optionalEfficiency, 0.001f))
                     phaseHeat = optionalEfficiency;
 
-                smoothProgress = Mathf.lerpDelta(smoothProgress, (realBoost() - 1.0f) / arrowMaxBoost, 0.1f);
+                smoothProgress = Mathf.lerpDelta(smoothProgress, (realBoost() - 1.0f) / maxBoost, 0.1f);
                 smoothOffset = Mathf.sin(totalProgress(), 12.0f, 0.3f);
 
                 if(efficiency <= 0.0f) return;

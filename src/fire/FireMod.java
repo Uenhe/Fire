@@ -5,9 +5,12 @@ import arc.Events;
 import arc.graphics.Texture;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
+import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
+import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Reflect;
 import arc.util.Scaling;
 import fire.ai.FRUnitCommand;
 import fire.content.*;
@@ -28,6 +31,7 @@ import mindustry.type.Item;
 import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
+import mindustry.ui.fragments.MenuFragment;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.Attribute;
 
@@ -44,6 +48,7 @@ public class FireMod extends mindustry.mod.Mod{
     private static boolean multiplied;
     private static byte counter;
     private static BaseDialog mainDialog;
+    private static final Seq<MenuFragment.MenuButton> menuButtons = new Seq<>(8);
 
     public FireMod(){
         if(!headless) FRBinding.init();
@@ -101,6 +106,8 @@ public class FireMod extends mindustry.mod.Mod{
             showLog(false);
             showUpdate();
             showNoMultipleMods();
+
+            doSomethingUnplayable();
         });
     }
 
@@ -137,7 +144,7 @@ public class FireMod extends mindustry.mod.Mod{
         setupDialog(historyDialog);
         historyDialog.cont.pane(t -> t.add("@fire.history").width(Core.graphics.getWidth() * 0.25f));
 
-        var main = mainDialog = new BaseDialog(Core.bundle.format("fire.maintitle", FIRE.meta.version));
+        var main = mainDialog = new BaseDialog("@fire.maintitle");
         setupDialog(main);
 
         main.buttons.button(Core.bundle.format("fire.historytitle", ""), Icon.list, historyDialog::show).size(210.0f, 64.0f);
@@ -160,7 +167,10 @@ public class FireMod extends mindustry.mod.Mod{
             );
             t.row();
 
-            t.add("@fire.content1").left().maxWidth(width()).pad(4.0f);
+            t.add(Core.bundle.format("fire.content1", "v" + FIRE.meta.version.substring(0, 3))).left().maxWidth(width()).pad(4.0f);
+            t.row();
+            t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
+
         }).maxWidth(width());
 
         main.show();
@@ -172,18 +182,16 @@ public class FireMod extends mindustry.mod.Mod{
         multiplied = true;
         doSomethingUnplayable();
 
-        new DelayClosableDialog("Warning", 300.0f).show().cont.add("@fire.nomultimods");
+        new DelayClosableDialog("Warning", 600.0f).show().cont.add("@fire.nomultimods");
     }
 
     private static void showUpdate(){
-        try{
-            if(FIRE.meta.version.equals(Core.settings.getString("mod-fire-version"))) return;
-            Core.settings.put("mod-fire-version", FIRE.meta.version);
-        }catch(Throwable e){
-            Core.settings.put("mod-fire-version", "");
-        }
+        var ver = FIRE.meta.version.substring(0, 3);
+        if(ver.equals(Core.settings.getString("mod-fire-version").substring(0, 3))) return;
+        Core.settings.put("mod-fire-version", ver);
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
+
         new DelayClosableDialog("Update Notice", 300.0f).show().cont.pane(t -> {
             t.table(tt -> {
                 try{
@@ -192,7 +200,7 @@ public class FireMod extends mindustry.mod.Mod{
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content2", FIRE.meta.version)).maxWidth(width()).padRight(200.0f);
+            t.add(Core.bundle.format("fire.content1", "v" + ver)).maxWidth(width()).padRight(200.0f);
         });
     }
 
@@ -202,12 +210,13 @@ public class FireMod extends mindustry.mod.Mod{
         if(!Core.app.isDesktop()) return;
 
         String[] titles = Core.bundle.get("fire.titles").split("\\|");
-        int index = Mathf.random(titles.length - 1);
+        byte index = (byte)Mathf.random(titles.length - 1);
         String title = titles[index];
 
-        //"Today is the %th Day of God's Creation of Planet Lysetta" picked
-        if(index == 0)
+        if(index == 0) //"Today is the @th Day of God's Creation of Planet Lysetta" picked
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
+        else if(index == 1) //"Probability of drawing this title is @%" picked
+            title = String.format(title, Math.round(10000.0f / titles.length) * 0.01f + "%");
 
         Core.graphics.setTitle("Mindustry: " + title);
     }
@@ -246,14 +255,35 @@ public class FireMod extends mindustry.mod.Mod{
 
     /** ??? */
     private static void doSomethingUnplayable(){
-        for(var unit : content.units()) unit.health -= 10000.0f;
+        if(mobile){
+            Table table = Reflect.get(ui.menufrag, "container");
+            table.getCells().removeRange(0, 4);
+
+        }else{
+            var buttons = ui.menufrag.desktopButtons;
+            for(var b : buttons)
+                if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
+                    menuButtons.add(b);
+
+            buttons.removeAll(menuButtons);
+        }
     }
 
     /** !!! */
     private static void doSomethingPlayable(){
         if(multiplied){
             multiplied = false;
-            for(var unit : content.units()) unit.health += 10000.0f;
+
+            if(mobile){
+
+            }else{
+                menuButtons.reverse();
+                for(var b : menuButtons)
+                    ui.menufrag.desktopButtons.insert(0, b);
+
+                ui.menufrag.build(ui.menuGroup);
+                menuButtons.clear();
+            }
         }
     }
 }

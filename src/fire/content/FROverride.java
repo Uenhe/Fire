@@ -1,10 +1,13 @@
 package fire.content;
 
+import fire.logic.FRLogicStatements;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.gen.LogicIO;
+import mindustry.logic.LAssembler;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.MassDriver;
@@ -21,6 +24,7 @@ import static mindustry.content.UnitTypes.*;
 public class FROverride{
 
     public static void load(){
+
         //region block environment
         sandWater.itemDrop = darksandWater.itemDrop = darksandTaintedWater.itemDrop = Items.sand;
         sporePine.attributes.set(FRAttribute.tree, 1.5f);
@@ -29,7 +33,6 @@ public class FROverride{
         whiteTreeDead.attributes.set(FRAttribute.tree, 1.0f);
         whiteTree.attributes.set(FRAttribute.tree, 1.0f);
         grass.attributes.set(FRAttribute.grass, 0.25f);
-
         grass.asFloor().wall = shrubs;
 
         //region block turret
@@ -97,5 +100,10 @@ public class FROverride{
 
         //region liquid
         Liquids.neoplasm.effect = FRStatusEffects.overgrown;
+
+
+        //region logic
+        LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
     }
 }

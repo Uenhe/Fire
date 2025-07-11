@@ -69,13 +69,13 @@ public class MechPad extends mindustry.world.Block{
         /** Active only when the player is close enough and power is enough. */
         @Override
         public boolean canControlSelect(Unit unit){
-            return unit.isPlayer() && Mathf.dst(unit.x, unit.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= powerCons || power.graph.getPowerBalance() * 60.0f >= powerCons);
+            return cheating() || (unit.isPlayer() && Mathf.dst(unit.x, unit.y, x, y) <= 120.0f && (power.graph.getBatteryStored() >= powerCons || power.graph.getPowerBalance() * 60.0f >= powerCons));
         }
 
         @Override
         public void onControlSelect(Unit unit){
             if(!unit.isPlayer()) return;
-            Player pl = unit.getPlayer();
+            var pl = unit.getPlayer();
 
             Fx.spawn.at(pl);
             if(net.client() && pl == player)

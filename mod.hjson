@@ -2,7 +2,7 @@
   name: "fire"
   displayName: "Fire"
   author: "飞雨a_sszylfyzgmz\nKochiyaUeneh油苗子"
-  version: "1.4.2"
+  version: "1.4.3dev"
   minGameVersion: "149"
   java: true
   main: "fire.FireMod"

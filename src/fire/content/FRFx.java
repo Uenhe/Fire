@@ -248,11 +248,9 @@ public class FRFx{
             dst = Mathf.dst(e.x, e.y, tx, ty);
         short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
-        var v = Tmp.v6;
         var rand = Fx.rand;
         rand.setSeed(e.id * 2L);
-
-        v.set(p).sub(e.x, e.y).nor();
+        var v = Tmp.v6.set(p).sub(e.x, e.y).nor();
         float nx = v.x, ny = v.y;
 
         Lines.stroke(1.2f * e.fout());
@@ -272,6 +270,42 @@ public class FRFx{
 
         Lines.endLine();
     }).followParent(false);
+
+    /** @see Fx#chainEmp */
+    public static final Effect chainEmpThin = new Effect(15.0f, 200.0f, e -> {
+        if(!(e.data instanceof Position p)) return;
+        float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
+        var v = Tmp.v6.set(p).sub(e.x, e.y).nor();
+        var rand = Fx.rand;
+
+        final float range = 6.0f, normx = v.x, normy = v.y;
+        short links = (short)Mathf.ceil(dst / range);
+        float spacing = dst / links;
+
+        Lines.stroke(3.0f * e.fout());
+        Draw.color(Color.white, e.color, e.fin());
+        Lines.beginLine();
+        Lines.linePoint(e.x, e.y);
+
+        rand.setSeed(e.id * 2L);
+
+        for(short i = 0; i < links; i++){
+            float nx, ny;
+            if(i == links - 1){
+                nx = tx;
+                ny = ty;
+            }else{
+                float len = (i + 1) * spacing;
+                v.setToRandomDirection(rand).scl(range * 0.5f);
+                nx = e.x + normx * len + v.x;
+                ny = e.y + normy * len + v.y;
+            }
+
+            Lines.linePoint(nx, ny);
+        }
+
+        Lines.endLine();
+    }).followParent(false).rotWithParent(false);
 
     /** @see Fx#reactorExplosion */
     public static final Effect reactorExplosionLarge = new Effect(30.0f, 500.0f, b -> {

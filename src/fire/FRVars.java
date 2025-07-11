@@ -12,7 +12,7 @@ import static mindustry.Vars.net;
 
 public final class FRVars{
 
-    private static final Seq<Color> colorPool = new Seq<>(44); //hardcoded initial capacity
+    public static final Seq<Color> colorPool = new Seq<>(45); //hardcoded initial capacity
 
     /** Temporary colors. */
     public static final Color
@@ -25,14 +25,10 @@ public final class FRVars{
     static{
         Events.run(EventType.Trigger.update, () -> {
             if(Core.graphics.getFrameId() % 60 == 0){
-                //arc.util.Log.info(colorPool.size);
                 getSettings();
-
-                Blocks.sand.playerUnmineable =
-                    Blocks.darksand.playerUnmineable =
-                        Blocks.sandWater.playerUnmineable =
-                            Blocks.darksandWater.playerUnmineable =
-                                Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+                Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable =
+                    Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
+                        Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
             }
         });
     }
@@ -51,8 +47,7 @@ public final class FRVars{
             var color = Color.valueOf(hex);
             colorPool.add(color);
             return color;
-        }else{
-            return result;
         }
+        return result;
     }
 }
