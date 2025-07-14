@@ -2,12 +2,12 @@
   name: "fire"
   displayName: "Fire"
   author: "飞雨a_sszylfyzgmz\nKochiyaUeneh油苗子"
-  version: "1.4.2"
+  version: "1.4.3"
   minGameVersion: "149"
   java: true
   main: "fire.FireMod"
   repo: "Uenhe/Fire"
-  subtitle: "v1.4.2-149"
+  subtitle: "v1.4.3-149"
   description:
     '''
     [#FFE9BF[]]A Mindustry Mod that adds many unique things...

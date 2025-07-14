@@ -176,7 +176,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
     }
 
     private boolean locked(InfoNode node){
-        return node.content.locked();
+        return !node.content.unlockedHost();
     }
 
     private void treeLayout(){

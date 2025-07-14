@@ -103,18 +103,21 @@ public class AdaptRouter extends mindustry.world.Block{
                 var other = nearby(rotation);
                 if(other != null && other.acceptItem(this, item)) return other;
 
-            }else if(net.server()){ //byd desync
-                for(byte i = 0, n = (byte)proximity.size, c = (byte)rotation; i < n; i++){
-                    var other = proximity.get((i + c) % n);
-                    if(set) rotation = (rotation + 1) % n;
-                    if(other == src || other == source || (src.block.instantTransfer && other.block.instantTransfer) || !other.acceptItem(this, item) || team != other.team) continue;
-                    return other;
-                }
-
             }else{
-                return new Seq<>(proximity)
-                    .removeAll(build -> build == src || build == source || (src.block.instantTransfer && build.block.instantTransfer) || !build.acceptItem(this, item) || team != build.team)
-                    .random();
+                var proximity = this.proximity;
+                if(net.server()){ //byd desync
+                    for(byte i = 0, n = (byte)proximity.size, c = (byte)rotation; i < n; i++){
+                        var other = proximity.get((i + c) % n);
+                        if(set) rotation = (rotation + 1) % n;
+                        if(other == src || other == source || (src.block.instantTransfer && other.block.instantTransfer) || !other.acceptItem(this, item) || team != other.team) continue;
+                        return other;
+                    }
+
+                }else{
+                    return new Seq<>(proximity)
+                        .removeAll(build -> build == src || build == source || (src.block.instantTransfer && build.block.instantTransfer) || !build.acceptItem(this, item) || team != build.team)
+                        .random();
+                }
             }
 
             return null;

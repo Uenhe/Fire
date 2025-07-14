@@ -4,6 +4,8 @@ import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.g2d.TextureAtlas;
 
+import java.lang.reflect.Field;
+
 public final class FRUtils{
 
     public static void colors(Color[] colors, Color... color){
@@ -17,6 +19,12 @@ public final class FRUtils{
     /** 1 to 10, that should be enough. */
     public static String toNumeral(int n){
         return Core.bundle.get("fire.numerals").split("\\|")[n - 1];
+    }
+
+    public static Field field(Class<?> type, String name) throws NoSuchFieldException{
+        var field = type.getDeclaredField(name);
+        field.setAccessible(true);
+        return field;
     }
 
     public static final class TimeNode{

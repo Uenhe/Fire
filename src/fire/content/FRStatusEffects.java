@@ -6,6 +6,7 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.struct.Seq;
 import arc.util.Reflect;
@@ -19,7 +20,10 @@ import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
+import mindustry.entities.effect.MultiEffect;
+import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.units.StatusEntry;
+import mindustry.game.Team;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
@@ -29,11 +33,11 @@ import mindustry.world.meta.StatUnit;
 public class FRStatusEffects{
 
     public static final StatusEffect
-        frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated, magnetized;
+        frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated, magnetized, informationalProjection;
 
     static{
         frostbite = new StatusEffect("frostbite"){{
-            color = Color.valueOf("ff0000");
+            Color.valueOf(color, "ff0000");
             damage = 8.0f / 60.0f;
             speedMultiplier = 0.55f;
             healthMultiplier = 0.75f;
@@ -53,7 +57,7 @@ public class FRStatusEffects{
         }};
 
         inspired = new StatusEffect("inspired"){{
-            color = Pal.accent;
+            color.set(Pal.accent);
             healthMultiplier = 1.15f;
             speedMultiplier = 1.4f;
             reloadMultiplier = 1.2f;
@@ -63,8 +67,6 @@ public class FRStatusEffects{
         }};
 
         sanctuaryGuard = new StatusEffect("sanctuary-guard"){
-            /** This is buggy... If the world reloads, it triggers again. */
-            private boolean added;
 
             @Override
             public void setStats(){
@@ -73,14 +75,10 @@ public class FRStatusEffects{
             }
 
             @Override
-            public void update(Unit unit, float time){
-                super.update(unit, time);
-
-                if(!added){
-                    added = true;
-                    DebuffRemoveFieldAbility.removeDebuff(unit);
-                    Fx.healWave.at(unit);
-                }
+            public void applied(Unit unit, float time, boolean extend){
+                super.applied(unit, time, extend);
+                DebuffRemoveFieldAbility.removeDebuff(unit);
+                Fx.healWave.at(unit);
             }
 
             @Override
@@ -88,14 +86,14 @@ public class FRStatusEffects{
                 unit.heal(0.05f * unit.maxHealth);
             }
             {
-                color = Pal.accent;
+                color.set(Pal.accent);
                 damage = -2.4f;
                 healthMultiplier = 2.25f;
             }
         };
 
         mu = new StatusEffect("mu"){{
-            color = Pal.accent;
+            color.set(Pal.accent);
             damageMultiplier = 0.4f;
             speedMultiplier = 3.0f;
         }};
@@ -139,7 +137,7 @@ public class FRStatusEffects{
                     unit.heal(perc * unit.maxHealth);
 
                     if(unit.shield < maxShield)
-                        unit.shield = Math.min(unit.shield + perc * maxShield, maxShield);
+                        unit.shield = Math.min(unit.shield + Math.min(perc * maxShield, 10.0f * Time.delta), maxShield);
 
                 }else{
                     unit.damageContinuousPierce(damage + (wet ? damagePercent / 60.0f * unit.maxHealth : 0.0f));
@@ -160,7 +158,7 @@ public class FRStatusEffects{
                 return false; //make them coexist
             }
             {
-                color = Liquids.neoplasm.color;
+                color.set(Liquids.neoplasm.color);
                 damage = 0.6f;
                 speedMultiplier = 0.9f;
                 effectChance = 0.1f;
@@ -204,10 +202,10 @@ public class FRStatusEffects{
                 unit.armor = unit.type.armor;
             }
             {
-                color = Color.valueOf("989aa4");
+                Color.valueOf(color, "989aa4");
                 damage = 3.5f;
-                speedMultiplier = 0.6f;
-                effectChance = 0.15f;
+                healthMultiplier = 0.85f;
+                effectChance = 0.14f;
                 parentizeEffect = true;
                 effect = Fx.unitShieldBreak;
             }
@@ -223,7 +221,7 @@ public class FRStatusEffects{
                     unit.vel.scl(Mathf.random(0.1f, 1.5f));
             }
             {
-                color = Color.valueOf("98ffa8");
+                Color.valueOf(color, "98ffa8");
                 damage = 2.0f;
                 transitionDamage = 10.0f;
                 speedMultiplier = dragMultiplier = 0.95f;
@@ -237,6 +235,71 @@ public class FRStatusEffects{
                 init(() ->
                     affinity(StatusEffects.shocked, (unit, result, time) ->
                         unit.damagePierce(transitionDamage)));
+            }
+        };
+
+        informationalProjection = new StatusEffect("informational-projection"){
+
+            @Override
+            public void setStats(){
+                super.setStats();
+                stats.add(FRStat.percentageHealing, 1, FRStatUnit.percentPerSec);
+            }
+
+            @Override
+            public void update(Unit unit, float time){
+                super.update(unit,time);
+                unit.heal(unit.maxHealth * Time.delta / 3600f);
+                unit.team = Team.get(4);
+            }
+            {
+                healthMultiplier = 3.0f;
+                damageMultiplier = 1.4f;
+                reloadMultiplier = 0.8f;
+                speedMultiplier = 1.3f;
+                damage = 1.0f;
+                effectChance = 0.05f;
+                effect = new MultiEffect(
+                    new ParticleEffect(){{
+                        parentizeEffect = true;
+                        lifetime = 300.0f;
+                        particles = 1;
+                        baseLength = 4.0f;
+                        length = 4.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 3.0f;
+                        sizeTo = 0.0f;
+                        Color.valueOf(colorFrom, "5555ff00");
+                        Color.valueOf(colorTo, "5555ffff");
+                    }},
+                    new ParticleEffect(){{
+                        parentizeEffect = true;
+                        lifetime = 300.0f;
+                        particles = 1;
+                        baseLength = 4.0f;
+                        length = 4.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 3.0f;
+                        sizeTo = 0.0f;
+                        Color.valueOf(colorFrom, "55ff5500");
+                        Color.valueOf(colorTo, "55ff55ff");
+                    }},
+                    new ParticleEffect(){{
+                        parentizeEffect = true;
+                        lifetime = 300.0f;
+                        particles = 1;
+                        baseLength = 4.0f;
+                        length = 4.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 3.0f;
+                        sizeTo = 0.0f;
+                        Color.valueOf(colorFrom, "ff555500");
+                        Color.valueOf(colorTo, "ff5555ff");
+                    }}
+                );
             }
         };
     }

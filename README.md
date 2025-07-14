@@ -24,12 +24,12 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 #### Blocks:
 
 - 13 new powerful turrets with their unique shoot patterns
-- 21 new cool factories with their special effects
+- 20+ new cool factories with their special effects
 - Brand-new mender, overdrive projector, core, build tower
 - More practical drills, generators, walls and distribution facilities
 - More blocks as superior of some vanilla blocks
 - Javelin Pad from Mindustry v5
-- Totally 60+ new blocks
+- Totally 70+ new blocks
 
 #### Units:
 
@@ -43,4 +43,4 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 #### Others:
 
 - 12 new items and 1 new liquid
-- 7 new status effects
+- 8 new status effects

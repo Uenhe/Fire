@@ -14,6 +14,7 @@ public class FRStat{
     floorMultiplier = new Stat("floorMultiplier"),
     neoHealthMultiplier = new Stat("neoHealthMultiplier"),
     neoHealing = new Stat("neoHealing"),
+    percentageHealing = new Stat("percentageHealing"),
 
     statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
     maxTargets = new Stat("maxTargets", StatCat.function),

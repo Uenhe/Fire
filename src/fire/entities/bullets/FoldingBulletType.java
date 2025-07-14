@@ -8,7 +8,7 @@ import mindustry.gen.Bullet;
 /** Bullet type that folds around its owner bullet. */
 public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType{
 
-    public final byte foldAngle;
+    private final byte foldAngle;
     private final float foldInterval;
 
     private static final ObjectIntMap<Bullet> foldTimesMap = new ObjectIntMap<>();
@@ -25,8 +25,9 @@ public class FoldingBulletType extends mindustry.entities.bullet.BasicBulletType
         super.init(b);
         b.rotation(b.rotation() + foldAngle);
         b.mover = bl -> {
-            int ft = foldTimesMap.get(bl);
-            if(bl.time < foldInterval * (0.5f + ft) && bl.time + Time.delta >= foldInterval * (0.5f + ft)){
+            byte ft = (byte)foldTimesMap.get(bl);
+            float v = foldInterval * (0.5f + ft);
+            if(bl.time < v && bl.time + Time.delta >= v){
                 foldTimesMap.increment(bl, 1);
                 bl.rotation(bl.rotation() + 2.0f * foldAngle * Mathf.sign(ft % 2 == 1));
             }

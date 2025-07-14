@@ -12,15 +12,17 @@ import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Align;
-import arc.util.Reflect;
 import arc.util.Scaling;
 import arc.util.Time;
 import fire.FRUtils;
 import fire.content.FRPlanets;
+import mindustry.core.UI;
 import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Iconc;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.world.blocks.storage.CoreBlock;
+
+import java.lang.reflect.Field;
 
 import static mindustry.Vars.*;
 
@@ -47,7 +49,6 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
     @Override
     public void load(){
         super.load();
-
         launchCandidates = Seq.with(FRPlanets.lysetta); //byd Anuke
         if(launchCandidates.size == 1) originColor.set(launchCandidates.first().atmosphereColor);
     }
@@ -56,6 +57,17 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
 
         private boolean scene;
         private float sceneTimer;
+
+        private static final Field field_lastAnnouncement, field_shouldPause;
+
+        static{
+            try{
+                field_lastAnnouncement = FRUtils.field(UI.class, "lastAnnouncement");
+                field_shouldPause =  FRUtils.field(BaseDialog.class, "shouldPause");
+            }catch(NoSuchFieldException e){
+                throw new RuntimeException("?", e);
+            }
+        }
 
         @Override
         public void buildConfiguration(Table table){
@@ -69,6 +81,7 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
 
             reset();
             setup();
+
             ui.planet.showPlanetLaunch(state.rules.sector, launchCandidates, sector -> {
                 if(canLaunch()){
                     consume();
@@ -95,20 +108,24 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             if(launchCandidates.size != 1 || !scene) return;
 
             if(ui.hasAnnouncement()){
-                Table t = Reflect.get(ui, "lastAnnouncement");
-                if(t.getCells().any()) ((Cell<Label>)t.getCells().first()).with(label -> {
-                    var texts = label.getText();
+                try{
+                    Table t = (Table)field_lastAnnouncement.get(ui);
+                    if(t.getCells().any()) ((Cell<Label>)t.getCells().first()).with(label -> {
+                        var texts = label.getText();
+                        if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ //avoids side effect but doesn't work entirely
+                            t.visible = false;
+                        }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
+                            t.update(() -> {
+                                t.setPosition(Core.graphics.getWidth() * 0.5f, Core.graphics.getHeight() * 0.14f, Align.center);
+                                t.toFront();
+                                if(!ui.planet.isShown()) t.remove();
+                            });
+                        }
+                    });
 
-                    if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ //avoids side effect but doesn't work entirely
-                        t.visible = false;
-                    }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
-                        t.update(() -> {
-                            t.setPosition(Core.graphics.getWidth() * 0.5f, Core.graphics.getHeight() * 0.14f, Align.center);
-                            t.toFront();
-                            if(!ui.planet.isShown()) t.remove();
-                        });
-                    }
-                });
+                }catch(IllegalAccessException e){
+                    throw new RuntimeException(e);
+                }
             }
 
             sceneTimer += Time.delta;
@@ -132,7 +149,11 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
         }
 
         private void setup(){
-            Reflect.set(BaseDialog.class, ui.planet, "shouldPause", false);
+            try{
+                field_shouldPause.set(ui.planet, false);
+            }catch(IllegalAccessException e){
+                throw new RuntimeException("?", e);
+            }
 
             //without announcement since it will be covered by PlanetDialog
             Core.settings.put("skipcoreanimation", false);
@@ -142,9 +163,11 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             launchCandidates.first().unlock();
 
             for(byte i = 0; i < 2; i++){
-                float p = 0.2f, height = Core.graphics.getHeight(), y1 = i == 0 ? height * -p : height * (1.0f + p);
-                var mask = new Image();
+                final float p = 0.2f,
+                height = Core.graphics.getHeight(),
+                y1 = i == 0 ? height * -p : height * (1.0f + p);
 
+                var mask = new Image();
                 mask.color.set(Color.black);
                 mask.touchable = Touchable.disabled;
                 mask.setSize(Core.graphics.getWidth(), height * p);
@@ -186,7 +209,11 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
         }
 
         private void reset(){
-            Reflect.set(BaseDialog.class, ui.planet, "shouldPause", true);
+            try{
+                field_shouldPause.set(ui.planet, true);
+            }catch(IllegalAccessException e){
+                throw new RuntimeException("?", e);
+            }
             launchCandidates.first().atmosphereColor.set(originColor);
             scene = false;
             sceneTimer = 0.0f;

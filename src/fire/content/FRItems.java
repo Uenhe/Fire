@@ -4,6 +4,8 @@ import arc.graphics.Color;
 import mindustry.content.Items;
 import mindustry.type.Item;
 
+import static fire.FRVars.find;
+
 public class FRItems{
     
     public static final Item
@@ -63,8 +65,8 @@ public class FRItems{
             Items.serpuloItems.add(this);
         }
 
-        public FRItem(String name, String color){
-            super(name, Color.valueOf(color));
+        public FRItem(String name, String hex){
+            super(name, find(hex));
             Items.serpuloItems.add(this);
         }
 

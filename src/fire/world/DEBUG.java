@@ -1,22 +1,36 @@
 package fire.world;
 
-import arc.math.Mathf;
+import arc.Core;
+import arc.struct.Seq;
+import arc.util.OS;
+import fire.FRUtils;
 import fire.content.FRFx;
+import fire.world.blocks.sandbox.AdaptiveSource;
+import mindustry.ai.BlockIndexer;
+import mindustry.content.Blocks;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.PointBulletType;
+import mindustry.game.Team;
 import mindustry.gen.Building;
 import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
+import mindustry.world.Block;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.BuildVisibility;
+
+import java.lang.reflect.Field;
 
 import static mindustry.Vars.*;
 
 public class DEBUG{
+
+    private static final BuildVisibility DEBUG_BuildVisibility = new BuildVisibility(() -> state.rules.infiniteResources && isDeveloper());
+    private static final BuildVisibility DEBUG_CheatBuildVisibility = new BuildVisibility(() -> player.team().rules().cheat && isDeveloper());
 
     public static class DEBUG_Turret extends mindustry.world.blocks.defense.turrets.Turret{
 
@@ -24,7 +38,8 @@ public class DEBUG{
 
         public DEBUG_Turret(String name){
             super(name);
-            requirements(Category.logic, BuildVisibility.debugOnly, ItemStack.empty);
+            requirements(Category.logic, DEBUG_BuildVisibility, ItemStack.empty);
+            alwaysUnlocked = true;
             reload = 3.0f;
             range = 1600.0f;
             rotateSpeed = 60.0f;
@@ -48,14 +63,21 @@ public class DEBUG{
         }
 
         @Override
+        public void load(){
+            super.load();
+        }
+
+        @Override
         public void setStats(){}
 
         public class DEBUG_TurretBuild extends TurretBuild{
 
             @Override
             public void updateTile(){
+                if(!isDeveloper()) return;
                 unit.ammo(60.0f);
                 super.updateTile();
+
             }
 
             @Override
@@ -88,11 +110,12 @@ public class DEBUG{
         }
     }
 
-    public static class DEBUG_Mend extends mindustry.world.Block{
+    public static class DEBUG_Mend extends Block{
 
         public DEBUG_Mend(String name){
             super(name);
-            requirements(Category.logic, BuildVisibility.debugOnly, ItemStack.empty);
+            requirements(Category.logic, DEBUG_BuildVisibility, ItemStack.empty);
+            alwaysUnlocked = true;
             solid = destructible = true;
             buildType = DEBUG_MendBuild::new;
         }
@@ -102,11 +125,71 @@ public class DEBUG{
 
         public static class DEBUG_MendBuild extends Building{
 
+            private static final Field field_activeTeams;
+
+            static{
+                try{
+                    field_activeTeams = FRUtils.field(BlockIndexer.class, "activeTeams");
+                }catch(NoSuchFieldException e){
+                    throw new RuntimeException("?", e);
+                }
+            }
+
             @Override
+            @SuppressWarnings("unchecked")
             public void placed(){
-                indexer.allBuildings(world.width() * tilesize * 0.5f, world.height() * tilesize * 0.5f, Mathf.dst(world.width(), world.height()) * tilesize * 0.5f, Building::heal);
-                killed();
+                if(!isDeveloper()) return;
+                try{
+                    Seq<Team> activeTeams = (Seq<Team>)field_activeTeams.get(indexer);
+                    for(var team : activeTeams)
+                        for(var build : team.data().buildings)
+                            build.heal();
+                    tile.setNet(Blocks.air);
+
+                }catch(IllegalAccessException e){
+                    throw new RuntimeException("?", e);
+                }
             }
         }
+    }
+
+    public static class DEBUG_ItemTurretSupplier extends Block{
+
+        public DEBUG_ItemTurretSupplier(String name){
+            super(name);
+            requirements(Category.logic, DEBUG_CheatBuildVisibility, ItemStack.empty);
+            alwaysUnlocked = true;
+            solid = destructible = update = true;
+            buildType = DEBUG_ItemTurretSupplierBuild::new;
+        }
+
+        @Override
+        public void setStats(){}
+
+        public static class DEBUG_ItemTurretSupplierBuild extends Building{
+
+            @Override
+            public void updateTile(){
+                if(isDeveloper() && cheating() && timer(0, 90.0f)){
+                    for(var build : team.data().buildings){
+                        if(!(build instanceof ItemTurret.ItemTurretBuild)) continue;
+
+                        var ammo = ((ItemTurret.ItemTurretBuild)build).ammo;
+                        var item = content.item(AdaptiveSource.turretItemMap.get(build.block.id));
+                        if(ammo.isEmpty()) build.handleItem(build, item);
+
+                        var entry = (ItemTurret.ItemEntry)ammo.peek();
+                        entry.amount = ((ItemTurret.ItemTurretBuild)build).totalAmmo = 100;
+                        entry.item = item;
+                    }
+                }
+            }
+        }
+    }
+
+    public static boolean isDeveloper(){
+        return "KochiyaUeneh".equals(OS.username)
+            || "12879".equals(OS.username)
+            || "aaaaaa".equals(Core.settings.getString("name")); //username="root" on Android
     }
 }
