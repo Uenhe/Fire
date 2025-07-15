@@ -181,9 +181,9 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showUpdate(){
-        var ver = FIRE.meta.version.substring(0, 3);
-        if(ver.equals(Core.settings.getString("mod-fire-version").substring(0, 3))) return;
-        Core.settings.put("mod-fire-version", ver);
+        String ofullv = Core.settings.getString("mod-fire-version"), cv = FIRE.meta.version.substring(0, 3);
+        if(ofullv != null && cv.equals(ofullv.substring(0, 3))) return;
+        Core.settings.put("mod-fire-version", cv);
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
 
@@ -195,7 +195,7 @@ public class FireMod extends mindustry.mod.Mod{
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content1", "v" + ver)).maxWidth(width()).padRight(200.0f);
+            t.add(Core.bundle.format("fire.content1", "v" + cv)).center();
         });
     }
 
@@ -338,7 +338,7 @@ public class FireMod extends mindustry.mod.Mod{
                 container.add(customs.get(i));
 
         }else{
-            container.marginTop(0f);
+            container.marginTop(0.0f);
             container.add(settings);
             container.add(mods);
             container.row();

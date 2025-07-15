@@ -12,7 +12,7 @@ public class FRSectorPresets{
 
     static{
         landingBase = create("jljd", 0, 6.0f);
-        darksandPeakforest = create("hspy", 94, 7.0f, 50);
+        darksandPeakforest = create("hspy", 94, 7.0f, 40);
 
         frozenGround = create("lhyj", 15, 6.0f, 35);
         beachLanding = create("htdl", 183, 6.0f);
