@@ -2,6 +2,7 @@ package fire.content;
 
 import arc.graphics.Color;
 import fire.maps.LysettaPlanetGenerator;
+import fire.world.DEBUG;
 import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.g3d.HexMesh;
@@ -37,10 +38,11 @@ public class FRPlanets{
             clearSectorOnLose = true;
             prebuildBase = false;
             allowCampaignRules = true;
-            atmosphereColor = find("1a3db1");
+            allowWaveSimulation = DEBUG.isDeveloper();
+            Color.valueOf(atmosphereColor, "1a3db1");
             atmosphereRadIn = 0.05f;
             atmosphereRadOut = 0.5f;
-            iconColor = find("5b6fff");
+            Color.valueOf(iconColor, "5b6fff");
 
             unlockedOnLand.add(fireCompany);
             ruleSetter = r -> {

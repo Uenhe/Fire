@@ -28,10 +28,7 @@ import fire.world.blocks.distribution.AdaptRouter;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.HydroelectricGenerator;
-import fire.world.blocks.production.BeamExtractor;
-import fire.world.blocks.production.EnergyCrafter;
-import fire.world.blocks.production.GeneratorCrafter;
-import fire.world.blocks.production.SurgeCrafter;
+import fire.world.blocks.production.*;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
@@ -42,6 +39,7 @@ import fire.world.draw.DrawArrows;
 import fire.world.draw.DrawWeavePlus;
 import fire.world.kits.Campfire;
 import fire.world.kits.EnergyField;
+import fire.world.kits.MeltingFurnace;
 import fire.world.meta.FRAttribute;
 import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
@@ -142,8 +140,7 @@ public class FRBlocks{
     //crafting
     thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
     electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
-    cryofluidMixerLarge,
-    magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
+    cryofluidMixerLarge, meltingFurnace, magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
     hardenedAlloyCrucible,
 
     //units
@@ -590,9 +587,9 @@ public class FRBlocks{
         ignition = new ContinuousTurret("dr"){{
             requirements(Category.turret, with(
                 Items.copper, 350,
-                Items.graphite, 240,
-                Items.silicon, 220,
-                Items.plastanium, 180
+                Items.graphite, 225,
+                Items.silicon, 200,
+                Items.plastanium, 150
             ));
             health = 1800;
             size = 3;
@@ -812,7 +809,7 @@ public class FRBlocks{
                             shotDelay = 6.0f;
                             firstShotDelay = shoot.firstShotDelay;
                         }},
-                        new ShootSpread(7, 3.0f)
+                        new ShootSpread(7, 4.0f)
                     ),
                     new BasicBulletType(10.5f, 90.0f){{
                         lifetime = 33.0f;
@@ -823,8 +820,8 @@ public class FRBlocks{
                         pierce = pierceBuilding = true;
                         pierceCap = 3;
                         lightning = 2;
-                        lightningDamage = 10.0f;
-                        lightningLength = 3;
+                        lightningDamage = 15.0f;
+                        lightningLength = 4;
                         lightningLengthRand = 1;
 
                         chargeEffect = chargeFx;
@@ -842,9 +839,9 @@ public class FRBlocks{
                             shotDelay = 4.0f;
                             firstShotDelay = shoot.firstShotDelay;
                         }},
-                        new ShootSpread(7, 3.0f)
+                        new ShootSpread(7, 4.0f)
                     ),
-                    new BasicBulletType(10.8f, 80.0f){{
+                    new BasicBulletType(10.8f, 70.0f){{
                         lifetime = 33.0f;
                         width = 8.0f;
                         height = 10.0f;
@@ -864,11 +861,11 @@ public class FRBlocks{
 
         seaquake = new LiquidTurret("dh"){{
             requirements(Category.turret, with(
-                Items.lead, 420,
-                Items.metaglass, 175,
-                Items.thorium, 225,
-                Items.plastanium, 135,
-                Items.surgeAlloy, 60
+                Items.lead, 375,
+                Items.thorium, 200,
+                Items.plastanium, 120,
+                Items.surgeAlloy, 60,
+                FRItems.mirrorglass, 75
             ));
             health = 1980;
             size = 3;
@@ -883,7 +880,6 @@ public class FRBlocks{
             shoot.shots = 3;
 
             consumePower(n(200));
-
             ammo(
                 Liquids.water, new LiquidBulletType(Liquids.water){{
                     speed = 6.0f;
@@ -952,11 +948,11 @@ public class FRBlocks{
 
         distance = new ItemTurret("ql"){{
             requirements(Category.turret, with(
-                Items.copper, 800,
-                Items.thorium, 450,
-                Items.silicon, 525,
-                Items.plastanium, 250,
-                FRItems.hardenedAlloy, 225
+                Items.copper, 600,
+                Items.thorium, 225,
+                Items.silicon, 275,
+                Items.plastanium, 175,
+                FRItems.hardenedAlloy, 175
             ));
             health = 2160;
             armor = 8.0f;
@@ -993,7 +989,6 @@ public class FRBlocks{
                     trailChance = 0.1f;
                     trailColor = Color.grays(0.6f).lerp(Pal.redLight, 0.5f).a(0.4f);
                     trailEffect = new Effect(100.0f, 180.0f, e -> {
-
                         Draw.color(e.color, 0.5f);
                         Fx.rand.setSeed(e.id * 2L);
                         e.scaled(e.lifetime * Fx.rand.random(0.5f, 1.0f), f ->
@@ -1022,15 +1017,16 @@ public class FRBlocks{
                     hitSound = Sounds.mediumCannon;
                     hitColor = Pal.redLight;
                     hitEffect = despawnEffect = new Effect(50.0f, 140.0f, e -> {
+                        var rand = Fx.rand;
                         float circleRad = 6.0f + e.finpow() * 40.0f;
 
                         Draw.color(e.color);
                         Lines.stroke(e.fout() * 5.0f);
                         Lines.circle(e.x, e.y, circleRad);
-                        Fx.rand.setSeed(e.id);
+                        rand.setSeed(e.id);
                         for(byte i = 0; i < 12; i++){
-                            float angle = Fx.rand.random(360.0f);
-                            float lenRand = Fx.rand.random(0.5f, 1.0f);
+                            float angle = rand.random(360.0f);
+                            float lenRand = rand.random(0.5f, 1.0f);
                             Tmp.v6.trns(angle, circleRad);
                             for(int s : Mathf.signs)
                                 Drawf.tri(e.x + Tmp.v6.x, e.y + Tmp.v6.y, e.foutpow() * 30.0f, e.fout() * 24.0f * lenRand + 6.0f, angle + 90.0f + s * 90.0f);
@@ -1124,11 +1120,11 @@ public class FRBlocks{
 
         grudge = new ItemTurret("grudge"){{
             requirements(Category.turret, with(
-                Items.copper, 1350,
-                Items.graphite, 475,
-                Items.phaseFabric, 175,
-                Items.surgeAlloy, 350,
-                FRItems.hardenedAlloy, 400
+                Items.copper, 1100,
+                Items.graphite, 400,
+                Items.phaseFabric, 75,
+                Items.surgeAlloy, 300,
+                FRItems.hardenedAlloy, 300
             ));
             health = 4320;
             size = 4;
@@ -1159,17 +1155,16 @@ public class FRBlocks{
                     moveY = 2.0f;
                 }});
 
-                for(byte i = 0; i < 2; i ++){
+                for(byte i = 0; i < 2; i ++)
                     parts.add(new RegionPart("-side"){{
                         progress = PartProgress.reload;
                         mirror = true;
                         under = true;
                         moveY = -1.25f;
                     }});
-                }
             }};
 
-            consumeCoolant(1.2f);
+            consumeCoolant(n(72));
             ammo(
                 Items.thorium, new BasicBulletType(8.0f, 90.0f){{
                     lifetime = 46.0f;
@@ -1247,7 +1242,7 @@ public class FRBlocks{
                     rangeChange = 120.0f;
                     pierceCap = 4;
                     pierceBuilding = true;
-                    reloadMultiplier = 0.25f;
+                    reloadMultiplier = 0.3f;
                     buildingDamageMultiplier = 0.2f;
                     status = FRStatusEffects.disintegrated;
                     statusDuration = 120.0f;
@@ -3590,6 +3585,26 @@ public class FRBlocks{
             consumePower(n(240));
             consumeItem(Items.titanium, 4);
             consumeLiquid(Liquids.water, n(90));
+        }};
+
+        meltingFurnace = new MeltingFurnace.MeltingFurnaceBlock("melting-furnace", new MeltingFurnace.ConsumeMeltingFurnace(0.1f)){{
+            requirements(Category.crafting, with(
+            ));
+            scaledHealth = 90.0f;
+            armor = 8.0f;
+            size = 5;
+            hasPower = true;
+            hasLiquids = true;
+            itemCapacity = 20;
+            liquidCapacity = 120.0f;
+            drawer = new DrawMulti(
+                new DrawRegion("-bottom"),
+                new DrawLiquidTile(),
+                new DrawDefault()
+            );
+
+            outputLiquid = new LiquidStack(Liquids.slag, n(90));
+            consumePower(n(600));
         }};
 
         magnetismConcentratedRollingMill = new GenericCrafter("magnetism-concentrated-rolling-mill"){{

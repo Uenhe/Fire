@@ -30,8 +30,8 @@ public class GeneratorCrafter extends mindustry.world.blocks.production.GenericC
     @Override
     public void setBars(){
         super.setBars();
-        addBar("power", (GeneratorCrafterBuild build) -> new Bar(
-            () -> Core.bundle.format("bar.poweroutput", Strings.fixed(build.getPowerProduction() * 60.0f * build.timeScale(), 1)),
+        addBar("power", build -> new Bar(
+            () -> Core.bundle.format("bar.poweroutput", Strings.fixed(build.getPowerProduction() * build.timeScale() * 60.0f, 1)),
             () -> Pal.powerBar,
             () -> Mathf.num(build.efficiency > 0.0f)
         ));

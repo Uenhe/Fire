@@ -36,7 +36,7 @@ public class Campfire{
         public float updateEffectChance;
         public Effect updateEffect = Fx.none;
         public DrawArrows drawArrows;
-        public final float maxBoost = 3.38f; //hardcoded;
+        public final float maxBoost = 3.38f; //hardcoded
 
         public CampfireBlock(String name){
             super(name);
@@ -56,18 +56,18 @@ public class Campfire{
                 table.row();
 
                 for(byte i = 0; i < 2; i++){
-                    var s = i == 0 ? allyStatus : enemyStatus;
+                    var sfx = i == 0 ? allyStatus : enemyStatus;
 
                     table.table(Styles.grayPanel, t -> {
-                        t.left().button(new TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
+                        t.left().button(new TextureRegionDrawable(sfx.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(sfx)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
-                            String detail = s == allyStatus
+                            String detail = sfx == allyStatus
                             ? FRStat.allyStatusEffect.localized()
                             : FRStat.enemyStatusEffect.localized();
 
                             info.left().add("[accent]" + detail).left();
                             info.row();
-                            info.left().add(s.localizedName).color(s.color).left();
+                            info.left().add(sfx.localizedName).color(sfx.color).left();
                         });
                     }).growX().pad(5.0f).row();
                 }
