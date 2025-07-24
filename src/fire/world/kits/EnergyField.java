@@ -58,7 +58,7 @@ public class EnergyField{
                 Draw.color(type().lightningColor);
                 Lines.stroke(Lines.getStroke() * shootWarmup * 0.8f);
                 Drawf.light(x, y, range * 1.2f, type().lightningColor, shootWarmup * 0.6f);
-                for(byte i = 0, n = 6; i < n; i++)
+                for(int i = 0, n = 6; i < n; i++)
                     Lines.arc(x, y, range, 0.12f, i * 360.0f / n + Time.time * rotateSpeed * 0.5f);
 
                 Draw.reset();
@@ -97,7 +97,7 @@ public class EnergyField{
                 b.damage *= Mathf.sqrt(build.timeScale());
 
             targets.sort(h -> h.dst2(b.x, b.y));
-            for(byte i = 0, len = (byte)Math.min(targets.size, maxTargets); i < len; i++){
+            for(int i = 0, len = Math.min(targets.size, maxTargets); i < len; i++){
                 var target = targets.get(i);
 
                 //lightning gets absorbed by plastanium

@@ -48,13 +48,13 @@ public class FleshUnitType extends UnitType{
             if(unit.lastDrownFloor != FRBlocks.neoplasm || unit.team != team) return;
 
             float min = Float.MAX_VALUE;
-            final short tr = 6;
-            short utx = (short)unit.tileX(), uty = (short)unit.tileY(),
-                mtx = (short)(utx + tr + 1), mty = (short)(uty + tr + 1),
+            final int tr = 6;
+            int utx = unit.tileX(), uty = unit.tileY(),
+                mtx = utx + tr + 1, mty = uty + tr + 1,
                 ttx = -1, tty = -1;
 
-            for(short tx = (short)(utx - tr); tx < mtx; tx++){
-                for(short ty = (short)(uty - tr); ty < mty; ty++){
+            for(int tx = utx - tr; tx < mtx; tx++){
+                for(int ty = uty - tr; ty < mty; ty++){
                     var tile = world.tile(tx, ty);
                     if(tile == null || !tile.block().isAir() || tile.floor().isDeep()) continue;
                     float dst = Mathf.dst(utx, uty, tx, ty);

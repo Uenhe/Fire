@@ -4,6 +4,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
@@ -29,7 +30,7 @@ public class FRFx{
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0.0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0.0f, 0.3f) * e.fin();
             Draw.color(color);
 
-            for(short i = 0, interval = (short)(range / spacing); i <= interval; i++){
+            for(int i = 0, interval = (int)(range / spacing); i <= interval; i++){
                 Tmp.v6.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
                 Draw.rect("fire-aim-shoot", e.x + Tmp.v6.x, e.y + Tmp.v6.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
@@ -136,7 +137,7 @@ public class FRFx{
         return new Effect(lifetime, e -> {
             float orbSize = 2.0f * e.fout() + 1.0f;
 
-            for(byte i = 0; i < amount; i++){
+            for(int i = 0; i < amount; i++){
                 float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * (float)i / amount / speed,
                     mag = radius * e.fout(),
                     x = Mathf.cos(theta, 1.0f / speed, mag) + e.x,
@@ -170,7 +171,7 @@ public class FRFx{
                 Lines.circle(e.x, e.y, circleRad);
             }
 
-            for(byte i = 0; i < 4; i++){
+            for(int i = 0; i < 4; i++){
                 Draw.color(col);
                 Drawf.tri(e.x, e.y, size * 1.8f, size * 24.0f * e.foutpow(), i * 90.0f + rotation);
                 Draw.color();
@@ -198,7 +199,7 @@ public class FRFx{
 
     /** @see Fx#instTrail */
     public static final Effect instTrailPurple = new Effect(10.0f, e -> {
-        for(byte i = 0; i < 2; i++){
+        for(int i = 0; i < 2; i++){
             float m = i == 0 ? 1.0f : 0.5f;
             float w = 15.0f * e.fout() * m;
 
@@ -214,7 +215,7 @@ public class FRFx{
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
         float length = 4.0f + e.finpow() * 24.0f;
         var rand = Fx.rand;
-        for(byte i = 0; i < 16; i++){
+        for(int i = 0; i < 16; i++){
             rand.setSeed(e.id * 2L + i);
             Fx.v.trns(rand.random(360.0f), rand.random(length));
 
@@ -246,7 +247,7 @@ public class FRFx{
         final float rangeBetweenPoints = 12.0f,
             tx = p.getX(), ty = p.getY(),
             dst = Mathf.dst(e.x, e.y, tx, ty);
-        short links = (short)Mathf.ceil(dst / rangeBetweenPoints);
+        int links = Mathf.ceil(dst / rangeBetweenPoints);
         float spacing = dst / links;
         var rand = Fx.rand;
         rand.setSeed(e.id * 2L);
@@ -258,7 +259,7 @@ public class FRFx{
         Lines.beginLine();
         Lines.linePoint(e.x, e.y);
 
-        for(short i = 0; i < links; i++){
+        for(int i = 0; i < links; i++){
             if(i == links - 1){
                 Lines.linePoint(tx, ty);
             }else{
@@ -279,7 +280,7 @@ public class FRFx{
         var rand = Fx.rand;
 
         final float range = 6.0f, normx = v.x, normy = v.y;
-        short links = (short)Mathf.ceil(dst / range);
+        int links = Mathf.ceil(dst / range);
         float spacing = dst / links;
 
         Lines.stroke(3.0f * e.fout());
@@ -289,7 +290,7 @@ public class FRFx{
 
         rand.setSeed(e.id * 2L);
 
-        for(short i = 0; i < links; i++){
+        for(int i = 0; i < links; i++){
             float nx, ny;
             if(i == links - 1){
                 nx = tx;
@@ -317,8 +318,8 @@ public class FRFx{
         Draw.color(Pal.reactorPurple2);
         Draw.alpha(0.7f);
         var rand = Fx.rand;
-        for(byte i = 0; i < 4; i++){
-            byte j = i;
+        for(int i = 0; i < 4; i++){
+            int j = i;
             rand.setSeed(b.id * 2L + j);
 
             b.scaled(b.lifetime * rand.random(0.4f, 1.0f), e ->
@@ -346,6 +347,12 @@ public class FRFx{
                 Drawf.light(e.x + x, e.y + y, (out * 4.0f * (3.0f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
             });
         });
+    });
+
+    public static final Effect ghostEffect = new Effect(12.0f, e -> {
+        if(!(e.data instanceof TextureRegion region)) return;
+        Draw.color(e.color, e.fout());
+        Draw.rect(region, e.x, e.y, e.rotation);
     });
 
     public static class TpFxData{

@@ -111,7 +111,7 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public void draw(){
             super.draw();
-            if(frames > 0) Draw.rect(name + (byte)((Time.time / frameTime % frames) + 1), x, y);
+            if(frames > 0) Draw.rect(name + (int)((Time.time / frameTime % frames) + 1), x, y);
         }
     }
 }

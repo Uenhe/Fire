@@ -101,7 +101,9 @@ import mindustry.world.meta.BuildVisibility;
 
 import static fire.FRUtils.colors;
 import static fire.FRVars.*;
+import static fire.content.FRItems.*;
 import static mindustry.Vars.*;
+import static mindustry.content.Items.*;
 import static mindustry.type.ItemStack.mult;
 import static mindustry.type.ItemStack.with;
 
@@ -140,7 +142,8 @@ public class FRBlocks{
     //crafting
     thermalKiln, metaglassPlater, mirrorglassPolisher, sulflameExtractor, kindlingExtractor, conductorFormer, logicAlloyProcessor, detonationMixer, slagCooler, crusher, timberBurner,
     electrothermalSiliconFurnace, fleshSynthesizer, liquidNitrogenCompressor, hardenedAlloySmelter, magneticAlloyFormer,
-    cryofluidMixerLarge, meltingFurnace, magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
+    cryofluidMixerLarge,
+    meltingFurnace, magnetismConcentratedRollingMill, magneticRingSynthesizer, electromagnetismDiffuser,
     hardenedAlloyCrucible,
 
     //units
@@ -179,11 +182,11 @@ public class FRBlocks{
         hardenedCovering = new OverlayFloor("hardened-covering");
         hardenedCovering.variants = 8;
 
-        oreGraphite = new OreBlock(Items.graphite);
-        Items.graphite.hardness = 2;
+        oreGraphite = new OreBlock(graphite);
+        graphite.hardness = 2;
 
-        orePyratite = new OreBlock(Items.pyratite);
-        Items.pyratite.hardness = 2;
+        orePyratite = new OreBlock(pyratite);
+        pyratite.hardness = 2;
 
         //region sandbox & misc
 
@@ -203,14 +206,14 @@ public class FRBlocks{
 
         smasher = new ItemTurret("js"){{
             requirements(Category.turret, with(
-                Items.copper, 65,
-                Items.lead, 45,
-                Items.titanium, 20
+                copper, 65,
+                lead, 45,
+                titanium, 20
             ));
             researchCost = with(
-                Items.copper, 150,
-                Items.lead, 105,
-                Items.titanium, 50
+                copper, 150,
+                lead, 105,
+                titanium, 50
             );
             health = 800;
             size = 2;
@@ -226,7 +229,7 @@ public class FRBlocks{
             consumeCoolant(n(12));
 
             ammo(
-                Items.copper, new ArtilleryBulletType(6f, 20f){{
+                copper, new ArtilleryBulletType(6f, 20f){{
                     lifetime = 130f;
                     knockback = 1.6f;
                     width = 12f;
@@ -237,7 +240,7 @@ public class FRBlocks{
                     pierceArmor = true;
                 }},
 
-                Items.lead, new ArtilleryBulletType(12f, 10.0f){{
+                lead, new ArtilleryBulletType(12f, 10.0f){{
                     lifetime = 78f;
                     knockback = 1.6f;
                     width = 8.0f;
@@ -248,7 +251,7 @@ public class FRBlocks{
                     pierceArmor = true;
                 }},
 
-                Items.metaglass, new ArtilleryBulletType(6f, 25f){{
+                metaglass, new ArtilleryBulletType(6f, 25f){{
                     lifetime = 130f;
                     knockback = 1.6f;
                     width = 12f;
@@ -268,7 +271,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                Items.plastanium, new ArtilleryBulletType(5.5f, 55.0f){{
+                plastanium, new ArtilleryBulletType(5.5f, 55.0f){{
                     lifetime = 142.0f;
                     knockback = 2.2f;
                     width = 12.0f;
@@ -292,7 +295,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                Items.graphite, new ArtilleryBulletType(5f, 40f){{
+                graphite, new ArtilleryBulletType(5f, 40f){{
                     lifetime = 160f;
                     knockback = 1.6f;
                     width = 12f;
@@ -305,7 +308,7 @@ public class FRBlocks{
                     frontColor = Pal.graphiteAmmoFront;
                 }},
 
-                FRItems.sulflameAlloy, new ArtilleryBulletType(6f, 105f){{
+                sulflameAlloy, new ArtilleryBulletType(6f, 105f){{
                     lifetime = 130f;
                     knockback = 1.6f;
                     width = 12f;
@@ -333,7 +336,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                FRItems.detonationCompound, new ArtilleryBulletType(4f, 65f){{
+                detonationCompound, new ArtilleryBulletType(4f, 65f){{
                     lifetime = 196f;
                     knockback = 2.0f;
                     width = 15f;
@@ -352,16 +355,16 @@ public class FRBlocks{
 
         nightmare = new ItemTurret("yg"){{
             requirements(Category.turret, with(
-                Items.titanium, 75,
-                Items.thorium, 60,
-                Items.silicon, 35,
-                FRItems.mirrorglass, 25
+                titanium, 75,
+                thorium, 60,
+                silicon, 35,
+                mirrorglass, 25
             ));
             researchCost = with(
-                Items.titanium, 400,
-                Items.thorium, 250,
-                Items.silicon, 275,
-                FRItems.mirrorglass, 165
+                titanium, 400,
+                thorium, 250,
+                silicon, 275,
+                mirrorglass, 165
             );
             health = 1080;
             size = 2;
@@ -376,7 +379,7 @@ public class FRBlocks{
             consumeCoolant(n(12));
 
             ammo(
-                Items.copper, new LaserBulletType(50.0f){{
+                copper, new LaserBulletType(50.0f){{
                     length = 196.0f;
                     width = 12.0f;
                     colors(colors, Pal.copperAmmoFront, Pal.copperAmmoBack, Color.white);
@@ -384,7 +387,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.lead, new LaserBulletType(45.0f){{
+                lead, new LaserBulletType(45.0f){{
                     length = 196.0f;
                     width = 12.0f;
                     colors(colors, Pal.glassAmmoFront, Pal.glassAmmoBack, Color.white);
@@ -392,7 +395,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.metaglass, new LaserBulletType(55.0f){{
+                metaglass, new LaserBulletType(55.0f){{
                     length = 241.0f;
                     width = 9.0f;
                     hitSize = 3.5f;
@@ -403,7 +406,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.graphite, new LaserBulletType(40.0f){{
+                graphite, new LaserBulletType(40.0f){{
                     length = 196.0f;
                     width = 12.0f;
                     colors(colors, Pal.graphiteAmmoFront, Pal.graphiteAmmoBack, Color.white);
@@ -415,7 +418,7 @@ public class FRBlocks{
                     pierceCap = 4;
                 }},
 
-                Items.sand, new LaserBulletType(15.0f){{
+                sand, new LaserBulletType(15.0f){{
                     length = 346.0f;
                     width = 8.0f;
                     hitSize = 3.0f;
@@ -426,7 +429,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.titanium, new LaserBulletType(50.0f){{
+                titanium, new LaserBulletType(50.0f){{
                     length = 196.0f;
                     width = 12.0f;
                     colors(colors, find("ccccff66"), find("ccccff"), Color.white);
@@ -437,7 +440,7 @@ public class FRBlocks{
                     pierceCap = 4;
                 }},
 
-                Items.thorium, new LaserBulletType(60.0f){{
+                thorium, new LaserBulletType(60.0f){{
                     length = 196.0f;
                     hitSize = 5.0f;
                     colors(colors, Pal.thoriumAmmoFront, Pal.thoriumAmmoBack, Color.white);
@@ -448,7 +451,7 @@ public class FRBlocks{
                     pierceCap = 4;
                 }},
 
-                Items.scrap, new LaserBulletType(25.0f){{
+                scrap, new LaserBulletType(25.0f){{
                     length = 366.0f;
                     width = 8.0f;
                     hitSize = 3.0f;
@@ -459,7 +462,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.silicon, new LaserBulletType(65.0f){{
+                silicon, new LaserBulletType(65.0f){{
                     length = 196.0f;
                     width = 12.0f;
                     colors(colors, find("40404066"), find("404040"), Color.white);
@@ -468,7 +471,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                Items.surgeAlloy, new LaserBulletType(70.0f){{
+                surgeAlloy, new LaserBulletType(70.0f){{
                     length = 231.0f;
                     hitSize = 4.5f;
                     colors(colors, Pal.surgeAmmoFront, Pal.surgeAmmoBack, Color.white);
@@ -488,7 +491,7 @@ public class FRBlocks{
                     hitSound = Sounds.spark;
                 }},
 
-                FRItems.glass, new LaserBulletType(25.0f){{
+                glass, new LaserBulletType(25.0f){{
                     length = 281.0f;
                     width = 8.0f;
                     hitSize = 3.0f;
@@ -499,7 +502,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                FRItems.mirrorglass, new LaserBulletType(75.0f){{
+                mirrorglass, new LaserBulletType(75.0f){{
                     length = 356.0f;
                     width = 8.0f;
                     hitSize = 3.0f;
@@ -510,7 +513,7 @@ public class FRBlocks{
                     buildingDamageMultiplier = 0.5f;
                 }},
 
-                FRItems.hardenedAlloy, new LaserBulletType(85.0f){{
+                hardenedAlloy, new LaserBulletType(85.0f){{
                     length = 271.0f;
                     width = 18.0f;
                     hitSize = 5.5f;
@@ -530,10 +533,10 @@ public class FRBlocks{
 
         fulmination = new PowerTurret("fulmination"){{
             requirements(Category.turret, with(
-                Items.copper, 75,
-                Items.metaglass, 40,
-                Items.silicon, 60,
-                Items.titanium, 40
+                copper, 75,
+                metaglass, 40,
+                silicon, 60,
+                titanium, 40
             ));
             researchCostMultiplier = 0.5f;
             health = 1200;
@@ -586,10 +589,10 @@ public class FRBlocks{
 
         ignition = new ContinuousTurret("dr"){{
             requirements(Category.turret, with(
-                Items.copper, 350,
-                Items.graphite, 225,
-                Items.silicon, 200,
-                Items.plastanium, 150
+                copper, 350,
+                graphite, 225,
+                silicon, 200,
+                plastanium, 150
             ));
             health = 1800;
             size = 3;
@@ -645,10 +648,10 @@ public class FRBlocks{
 
         blossom = new PowerTurret("blossom"){{
             requirements(Category.turret, with(
-                Items.lead, 175,
-                Items.graphite, 100,
-                Items.silicon, 125,
-                Items.plastanium, 60
+                lead, 175,
+                graphite, 100,
+                silicon, 125,
+                plastanium, 60
             ));
             health = 1650;
             size = 3;
@@ -737,10 +740,10 @@ public class FRBlocks{
             var chargeFx = FRFx.jackpotChargeEffect(shoot.firstShotDelay = 120.0f, 0.17f, 40.0f, 4, colors);
 
             requirements(Category.turret, with(
-                Items.thorium, 400,
-                Items.plastanium, 120,
-                Items.surgeAlloy, 80,
-                FRItems.logicAlloy, 60
+                thorium, 400,
+                plastanium, 120,
+                surgeAlloy, 80,
+                logicAlloy, 60
             ));
             health = 1920;
             size = 3;
@@ -757,7 +760,7 @@ public class FRBlocks{
             shootSound = Sounds.shotgun;
 
             jackpotAmmo.add(
-                new JackpotAmmo(Items.copper, 50,
+                new JackpotAmmo(copper, 50,
                     new ShootAlternate(4.0f){{
                         shots = barrels = 3;
                         firstShotDelay = shoot.firstShotDelay;
@@ -776,7 +779,7 @@ public class FRBlocks{
                         backColor = hitColor = colors[0];
                     }}),
 
-                new JackpotAmmo(Items.thorium, 35,
+                new JackpotAmmo(thorium, 35,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 1;
@@ -801,7 +804,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(Items.surgeAlloy, 20,
+                new JackpotAmmo(surgeAlloy, 20,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 2;
@@ -831,7 +834,7 @@ public class FRBlocks{
                     }}
                 ),
 
-                new JackpotAmmo(FRItems.hardenedAlloy, 0,
+                new JackpotAmmo(hardenedAlloy, 0,
                     new ShootMulti(
                         new ShootAlternate(0.0f){{
                             shots = 7;
@@ -861,11 +864,11 @@ public class FRBlocks{
 
         seaquake = new LiquidTurret("dh"){{
             requirements(Category.turret, with(
-                Items.lead, 375,
-                Items.thorium, 200,
-                Items.plastanium, 120,
-                Items.surgeAlloy, 60,
-                FRItems.mirrorglass, 75
+                lead, 375,
+                thorium, 200,
+                plastanium, 120,
+                surgeAlloy, 60,
+                mirrorglass, 75
             ));
             health = 1980;
             size = 3;
@@ -948,11 +951,11 @@ public class FRBlocks{
 
         distance = new ItemTurret("ql"){{
             requirements(Category.turret, with(
-                Items.copper, 600,
-                Items.thorium, 225,
-                Items.silicon, 275,
-                Items.plastanium, 175,
-                FRItems.hardenedAlloy, 175
+                copper, 600,
+                thorium, 225,
+                silicon, 275,
+                plastanium, 175,
+                hardenedAlloy, 175
             ));
             health = 2160;
             armor = 8.0f;
@@ -971,7 +974,7 @@ public class FRBlocks{
             consumeCoolant(0.5f);
 
             ammo(
-                FRItems.logicAlloy, new SpriteBulletType(4.5f, 300.0f, 18.0f, 30.0f, "fire-missile"){{
+                logicAlloy, new SpriteBulletType(4.5f, 300.0f, 18.0f, 30.0f, "fire-missile"){{
                     lifetime = 112.0f;
                     splashDamageRadius = 30.0f;
                     splashDamage = 75.0f;
@@ -1001,7 +1004,7 @@ public class FRBlocks{
                     }).layer(Layer.bullet - 1.0f);
                 }},
 
-                FRItems.detonationCompound, new SpriteBulletType(6.0f, 210.0f, 18.0f, 30.0f, "fire-missile"){{
+                detonationCompound, new SpriteBulletType(6.0f, 210.0f, 18.0f, 30.0f, "fire-missile"){{
                     lifetime = 129.0f;
                     splashDamage = 330.0f;
                     splashDamageRadius = 64.0f;
@@ -1024,7 +1027,7 @@ public class FRBlocks{
                         Lines.stroke(e.fout() * 5.0f);
                         Lines.circle(e.x, e.y, circleRad);
                         rand.setSeed(e.id);
-                        for(byte i = 0; i < 12; i++){
+                        for(int i = 0; i < 12; i++){
                             float angle = rand.random(360.0f);
                             float lenRand = rand.random(0.5f, 1.0f);
                             Tmp.v6.trns(angle, circleRad);
@@ -1077,10 +1080,10 @@ public class FRBlocks{
             final float r = range = 36.0f * tilesize;
 
             requirements(Category.turret, with(
-                Items.lead, 450,
-                Items.surgeAlloy, 80,
-                FRItems.logicAlloy, 65,
-                FRItems.magneticAlloy, 125
+                lead, 450,
+                surgeAlloy, 80,
+                logicAlloy, 65,
+                magneticAlloy, 125
             ));
             health = 1980;
             armor = 8.0f;
@@ -1120,11 +1123,11 @@ public class FRBlocks{
 
         grudge = new ItemTurret("grudge"){{
             requirements(Category.turret, with(
-                Items.copper, 1100,
-                Items.graphite, 400,
-                Items.phaseFabric, 75,
-                Items.surgeAlloy, 300,
-                FRItems.hardenedAlloy, 300
+                copper, 1100,
+                graphite, 400,
+                phaseFabric, 75,
+                surgeAlloy, 300,
+                hardenedAlloy, 300
             ));
             health = 4320;
             size = 4;
@@ -1155,7 +1158,7 @@ public class FRBlocks{
                     moveY = 2.0f;
                 }});
 
-                for(byte i = 0; i < 2; i ++)
+                for(int i = 0; i < 2; i ++)
                     parts.add(new RegionPart("-side"){{
                         progress = PartProgress.reload;
                         mirror = true;
@@ -1166,7 +1169,7 @@ public class FRBlocks{
 
             consumeCoolant(n(72));
             ammo(
-                Items.thorium, new BasicBulletType(8.0f, 90.0f){{
+                thorium, new BasicBulletType(8.0f, 90.0f){{
                     lifetime = 46.0f;
                     knockback = 0.8f;
                     width = 16.0f;
@@ -1192,7 +1195,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                FRItems.detonationCompound, new BasicBulletType(8.0f, 65.0f){{
+                detonationCompound, new BasicBulletType(8.0f, 65.0f){{
                     lifetime = 46.0f;
                     knockback = 0.7f;
                     width = 14.0f;
@@ -1232,7 +1235,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                FRItems.hardenedAlloy, new BasicBulletType(10.0f, 225.0f){{
+                hardenedAlloy, new BasicBulletType(10.0f, 225.0f){{
                     lifetime = 64.0f;
                     knockback = 2.0f;
                     width = 18.0f;
@@ -1272,11 +1275,11 @@ public class FRBlocks{
 
         aerolite = new ItemTurret("aerolite"){{
             requirements(Category.turret, with(
-                Items.copper, 1100,
-                Items.graphite, 600,
-                FRItems.logicAlloy, 250,
-                Items.surgeAlloy, 350,
-                FRItems.hardenedAlloy, 300
+                copper, 1100,
+                graphite, 600,
+                logicAlloy, 250,
+                surgeAlloy, 350,
+                hardenedAlloy, 300
             ));
             health = 3840;
             size = 4;
@@ -1301,7 +1304,7 @@ public class FRBlocks{
             consumeCoolant(0.5f);
 
             ammo(
-                Items.plastanium, new ArtilleryBulletType(16.0f, 0.0f){{
+                plastanium, new ArtilleryBulletType(16.0f, 0.0f){{
                     lifetime = 40.0f;
                     width = 16.0f;
                     height = 12.0f;
@@ -1339,7 +1342,7 @@ public class FRBlocks{
                     }};
                 }},
 
-                Items.blastCompound, new ArtilleryBulletType(4.0f, 0.0f){{
+                blastCompound, new ArtilleryBulletType(4.0f, 0.0f){{
                     var color1 = find("ea88787f").cpy().lerp(Pal.redLight, 0.5f);
 
                     lifetime = 160.0f;
@@ -1405,7 +1408,7 @@ public class FRBlocks{
                     );
                 }},
 
-                Items.pyratite, new ArtilleryBulletType(16.0f,0.0f){{
+                pyratite, new ArtilleryBulletType(16.0f,0.0f){{
                     lifetime = 40.0f;
                     width = 16.0f;
                     height = 12.0f;
@@ -1443,7 +1446,7 @@ public class FRBlocks{
                     );
                 }},
 
-                FRItems.detonationCompound, new ArtilleryBulletType(8.0f,0.0f){{
+                detonationCompound, new ArtilleryBulletType(8.0f,0.0f){{
                     lifetime = 80.0f;
                     width = 16.0f;
                     height = 16.0f;
@@ -1536,10 +1539,10 @@ public class FRBlocks{
 
         magneticSphere = new PowerTurret("magnetic-sphere"){{
             requirements(Category.turret, with(
-                Items.plastanium, 425,
-                Items.surgeAlloy, 250,
-                FRItems.logicAlloy, 400,
-                FRItems.magneticAlloy, 125
+                plastanium, 425,
+                surgeAlloy, 250,
+                logicAlloy, 400,
+                magneticAlloy, 125
             ));
             health = 6000;
             size = 4;
@@ -1593,7 +1596,7 @@ public class FRBlocks{
 
                     //special thanks to Extra Utilities mod
                     //this is really lazy
-                    for(byte i = 0; i < 4; i++){
+                    for(int i = 0; i < 4; i++){
                         Draw.color(find("92f3fd"));
                         Draw.alpha(0.3f + Mathf.absin(Time.time, 2.0f + i * 2.0f, 0.3f + i * 0.05f));
                         Draw.blend(Blending.additive);
@@ -1624,7 +1627,7 @@ public class FRBlocks{
                         Lines.stroke(1.4f + e.fout() * 3.4f);
                         Fx.rand.setSeed(e.id);
 
-                        for(byte i = 0; i < 3; i++){
+                        for(int i = 0; i < 3; i++){
                             float rot = e.rotation + Fx.rand.range(15.0f) + 180.0f;
                             Fx.v.trns(rot, Fx.rand.random(e.fin() * 27.0f));
                             Lines.lineAngle(e.x + Fx.v.x, e.y + Fx.v.y, rot, e.fout() * Fx.rand.random(3.0f, 8.0f) + 2.0f);
@@ -1704,9 +1707,9 @@ public class FRBlocks{
 
         scab = new ItemTurret("scab"){{
             requirements(Category.turret, with(
-                Items.titanium, 300,
-                FRItems.logicAlloy, 125,
-                FRItems.flesh, 40
+                titanium, 300,
+                logicAlloy, 125,
+                flesh, 40
             ));
             health = 4000;
             size = 4;
@@ -1730,7 +1733,7 @@ public class FRBlocks{
             coolant = consumeLiquid(Liquids.neoplasm, n(18));
 
             ammo(
-                FRItems.flesh, new FleshBulletType(15.8f, 75.0f, 12, 6, 120.0f){{
+                flesh, new FleshBulletType(15.8f, 75.0f, 12, 6, 120.0f){{
                     lifetime = 125.0f;
                     drag = 0.05f;
                     homingDelay = 10.0f;
@@ -1756,12 +1759,12 @@ public class FRBlocks{
 
         obstruction = new ItemDefenseTurret("obstruction"){{
             requirements(Category.turret, with(
-                Items.plastanium, 1200,
-                Items.phaseFabric, 600,
-                FRItems.logicAlloy, 500,
-                Items.surgeAlloy, 800,
-                FRItems.hardenedAlloy, 800,
-                FRItems.magneticAlloy, 500
+                plastanium, 1200,
+                phaseFabric, 600,
+                logicAlloy, 500,
+                surgeAlloy, 800,
+                hardenedAlloy, 800,
+                magneticAlloy, 500
             ));
             health = 12000;
             size = 6;
@@ -1837,7 +1840,7 @@ public class FRBlocks{
             consumePower(10.0f);
 
             ammo(
-                Items.surgeAlloy, new SegmentalBulletType(16.0f, 150.0f, 275.0f){{
+                surgeAlloy, new SegmentalBulletType(16.0f, 150.0f, 275.0f){{
                     lifetime = 120.0f;
                     drag = 0.03f;
                     homingDelay = 10.0f;
@@ -1890,7 +1893,7 @@ public class FRBlocks{
                     lightningDamage = 12.0f;
                 }},
 
-                Items.phaseFabric, new SegmentalBulletType(16.0f, 120.0f, 255.0f){{
+                phaseFabric, new SegmentalBulletType(16.0f, 120.0f, 255.0f){{
                     lifetime = 120.0f;
                     drag = 0.03f;
                     homingDelay = 10.0f;
@@ -1938,7 +1941,7 @@ public class FRBlocks{
                     );
                 }},
 
-                FRItems.magneticAlloy, new SegmentalBulletType(23.0f, 250.0f, 435.0f){{
+                magneticAlloy, new SegmentalBulletType(23.0f, 250.0f, 435.0f){{
                     lifetime = 80.0f;
                     drag = 0.03f;
                     rangeChange = 164.0f;
@@ -2002,8 +2005,8 @@ public class FRBlocks{
             baseRange = 1200.0f, extraRange = 400.0f;
 
             Item
-            item_1 = FRItems.hardenedAlloy,
-            item_2 = FRItems.magneticAlloy;
+            item_1 = hardenedAlloy,
+            item_2 = magneticAlloy;
 
             BulletType
             bullet_1_1,
@@ -2350,10 +2353,10 @@ public class FRBlocks{
             }};
 
             requirements(Category.turret, with(
-                FRItems.conductor, 14400,
-                FRItems.logicAlloy, 4000,
-                FRItems.hardenedAlloy, 3600,
-                FRItems.magneticAlloy, 3200
+                conductor, 14400,
+                logicAlloy, 4000,
+                hardenedAlloy, 3600,
+                magneticAlloy, 3200
             ));
             scaledHealth = 1000;
             size = 12;
@@ -2546,9 +2549,9 @@ public class FRBlocks{
 
         chopper = new WallCrafter("fmj"){{
             requirements(Category.production, with(
-                Items.copper, 15,
-                Items.titanium, 10,
-                Items.silicon, 10
+                copper, 15,
+                titanium, 10,
+                silicon, 10
             ));
             researchCost = mult(requirements, 5);
             health = 65;
@@ -2556,17 +2559,17 @@ public class FRBlocks{
             ambientSoundVolume = 0.01f;
             attribute = FRAttribute.tree;
             drillTime = 120.0f;
-            output = FRItems.timber;
+            output = timber;
 
             consumePower(n(24));
         }};
 
         treeFarm = new AttributeCrafter("sc"){{
             requirements(Category.production, with(
-                Items.copper, 50,
-                Items.lead, 30,
-                Items.metaglass, 20,
-                Items.titanium, 25
+                copper, 50,
+                lead, 30,
+                metaglass, 20,
+                titanium, 25
             ));
             size = 2;
             hasPower = true;
@@ -2575,7 +2578,7 @@ public class FRBlocks{
                 Draw.color(find("6aa85e"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
-                for(byte i = 0; i < 2; i++){
+                for(int i = 0; i < 2; i++){
                     Fx.v.trns(Fx.rand.random(360f), Fx.rand.random(e.finpow() * 9.0f)).add(e.x, e.y);
                     Fill.circle(Fx.v.x, Fx.v.y, Fx.rand.random(1.4f, 2.4f));
                 }
@@ -2589,7 +2592,7 @@ public class FRBlocks{
             attribute = FRAttribute.grass;
             maxBoost = 1.0f;
             craftTime = 240f;
-            outputItem = new ItemStack(FRItems.timber, 4);
+            outputItem = new ItemStack(timber, 4);
 
             consumePower(n(150));
             consumeLiquid(Liquids.water, n(12));
@@ -2597,10 +2600,10 @@ public class FRBlocks{
 
         vapourCondenser = new GenericCrafter("sqlnq"){{
             requirements(Category.production, with(
-                Items.lead, 50,
-                Items.graphite, 30,
-                Items.metaglass, 30,
-                Items.titanium, 20
+                lead, 50,
+                graphite, 30,
+                metaglass, 30,
+                titanium, 20
             ));
             size = 2;
             hasPower = true;
@@ -2619,10 +2622,10 @@ public class FRBlocks{
 
         biomassCultivator = new AttributeCrafter("swzzsj"){{
             requirements(Category.production, with(
-                Items.copper, 80,
-                Items.lead, 105,
-                Items.titanium, 50,
-                Items.silicon, 75
+                copper, 80,
+                lead, 105,
+                titanium, 50,
+                silicon, 75
             ));
             size = 3;
             researchCostMultiplier = 0.6f;
@@ -2634,7 +2637,7 @@ public class FRBlocks{
                 Draw.color(find("9e78dc"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
-                for(byte i = 0; i < 2; i++){
+                for(int i = 0; i < 2; i++){
                     Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(e.finpow() * 12.0f)).add(e.x, e.y);
                     Fill.circle(Fx.v.x, Fx.v.y, Fx.rand.random(1.8f, 2.8f));
                 }
@@ -2650,7 +2653,7 @@ public class FRBlocks{
             attribute = Attribute.spores;
             maxBoost = 3.5f;
             craftTime = 60.0f;
-            outputItem = new ItemStack(Items.sporePod, 3);
+            outputItem = new ItemStack(sporePod, 3);
 
             consumePower(n(180));
             consumeLiquid(Liquids.water, n(30));
@@ -2658,9 +2661,9 @@ public class FRBlocks{
 
         stackedCultivator = new AttributeCrafter("stacked-cultivator"){{
             requirements(Category.production, with(
-                Items.graphite, 300,
-                FRItems.logicAlloy, 250,
-                FRItems.hardenedAlloy, 300
+                graphite, 300,
+                logicAlloy, 250,
+                hardenedAlloy, 300
             ));
             size = 6;
             hasPower = true;
@@ -2671,7 +2674,7 @@ public class FRBlocks{
                 Draw.color(find("9e78dc"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
-                for(byte i = 0; i < 4; i++){
+                for(int i = 0; i < 4; i++){
                     Fx.v.trns(Fx.rand.random(360.0f), Fx.rand.random(e.finpow() * 18.0f)).add(e.x, e.y);
                     Fill.circle(Fx.v.x, Fx.v.y, Fx.rand.random(2.5f, 4.0f));
                 }
@@ -2689,7 +2692,7 @@ public class FRBlocks{
             boostScale = 0.625f;
             maxBoost = 2.25f;
             craftTime = 25.0f;
-            outputItem = new ItemStack(Items.sporePod, 10);
+            outputItem = new ItemStack(sporePod, 10);
             outputLiquid = new LiquidStack(Liquids.water, n(60));
             ignoreLiquidFullness = true;
             dumpTime = 1;
@@ -2699,10 +2702,10 @@ public class FRBlocks{
 
         fissionDrill = new BurstDrill("lbzt"){{
             requirements(Category.production, with(
-                Items.copper, 160,
-                Items.metaglass, 80,
-                Items.thorium, 375,
-                Items.silicon, 145)
+                copper, 160,
+                metaglass, 80,
+                thorium, 375,
+                silicon, 145)
             );
             health = 1120;
             size = 5;
@@ -2728,9 +2731,9 @@ public class FRBlocks{
 
         constraintExtractor = new BeamExtractor("constraint-extractor"){{
             requirements(Category.production, with(
-                Items.metaglass, 75,
-                FRItems.logicAlloy, 40,
-                FRItems.magneticAlloy, 5
+                metaglass, 75,
+                logicAlloy, 40,
+                magneticAlloy, 5
             ));
             health = 220;
             armor = 12.0f;
@@ -2762,11 +2765,11 @@ public class FRBlocks{
 
         focusingExtractor = new BeamExtractor("focusing-extractor"){{
             requirements(Category.production, with(
-                Items.graphite, 75,
-                FRItems.mirrorglass, 90,
-                FRItems.logicAlloy, 120,
-                FRItems.hardenedAlloy, 45,
-                FRItems.magneticAlloy, 25
+                graphite, 75,
+                mirrorglass, 90,
+                logicAlloy, 120,
+                hardenedAlloy, 45,
+                magneticAlloy, 25
             ));
             health = 1280;
             armor = 16.0f;
@@ -2804,8 +2807,8 @@ public class FRBlocks{
 
         compositeConveyor = new Conveyor("fhcsd"){{
             requirements(Category.distribution, with(
-                Items.thorium, 1,
-                Items.plastanium, 1
+                thorium, 1,
+                plastanium, 1
             ));
             health = 85;
             speed = 0.22f;
@@ -2817,9 +2820,9 @@ public class FRBlocks{
 
         hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
             requirements(Category.distribution, with(
-                Items.graphite, 1,
-                Items.silicon, 1,
-                FRItems.hardenedAlloy, 1
+                graphite, 1,
+                silicon, 1,
+                hardenedAlloy, 1
             ));
             health = 240;
             armor = 12.0f;
@@ -2830,10 +2833,10 @@ public class FRBlocks{
 
         compositeBridgeConveyor = new ItemBridge("composite-bridge-conveyor"){{
             requirements(Category.distribution, with(
-                Items.metaglass, 4,
-                Items.titanium, 6,
-                Items.thorium, 4,
-                Items.plastanium, 4
+                metaglass, 4,
+                titanium, 6,
+                thorium, 4,
+                plastanium, 4
             ));
             health = 85;
             hasPower = false;
@@ -2848,9 +2851,9 @@ public class FRBlocks{
 
         compositeRouter = new AdaptRouter("composite-router"){{
             requirements(Category.distribution, with(
-                Items.thorium, 4,
-                Items.plastanium, 6,
-                FRItems.mirrorglass, 6
+                thorium, 4,
+                plastanium, 6,
+                mirrorglass, 6
             ));
             health = 85;
 
@@ -2861,9 +2864,9 @@ public class FRBlocks{
 
         magneticRingPump = new Pump("magnetic-ring-pump"){{
             requirements(Category.liquid, with(
-                FRItems.logicAlloy, 30,
-                FRItems.hardenedAlloy, 90,
-                FRItems.magneticAlloy, 30
+                logicAlloy, 30,
+                hardenedAlloy, 90,
+                magneticAlloy, 30
             ));
             health = 720;
             armor = 16.0f;
@@ -2876,10 +2879,10 @@ public class FRBlocks{
 
         compositeLiquidRouter = new LiquidRouter("composite-liquid-router"){{
             requirements(Category.liquid, with(
-                Items.metaglass, 8,
-                Items.titanium, 12,
-                Items.thorium, 6,
-                Items.plastanium, 8
+                metaglass, 8,
+                titanium, 12,
+                thorium, 6,
+                plastanium, 8
             ));
             health = 85;
             liquidCapacity = 150.0f;
@@ -2891,9 +2894,9 @@ public class FRBlocks{
 
         hardenedLiquidTank = new LiquidRouter("hardened-liquid-tank"){{
             requirements(Category.liquid, with(
-                Items.graphite, 100,
-                FRItems.mirrorglass, 60,
-                FRItems.hardenedAlloy, 150
+                graphite, 100,
+                mirrorglass, 60,
+                hardenedAlloy, 150
             ));
             health = 6000;
             armor = 20.0f;
@@ -2903,10 +2906,10 @@ public class FRBlocks{
 
         compositeBridgeConduit = new LiquidBridge("composite-bridge-conduit"){{
             requirements(Category.liquid, with(
-                Items.metaglass, 6,
-                Items.titanium, 8,
-                Items.thorium, 4,
-                Items.plastanium, 4
+                metaglass, 6,
+                titanium, 8,
+                thorium, 4,
+                plastanium, 4
             ));
             hasPower = false;
             liquidCapacity = 114.0f;
@@ -2920,8 +2923,8 @@ public class FRBlocks{
 
         conductorPowerNode = new BatteryNode("zjjd"){{
             requirements(Category.power, with(
-                Items.lead, 10,
-                FRItems.conductor, 5
+                lead, 10,
+                conductor, 5
             ));
             health = 225;
             size = 2;
@@ -2933,11 +2936,11 @@ public class FRBlocks{
 
         flameGenerator = new ConsumeGenerator("yrfdj"){{
             requirements(Category.power, with(
-                Items.lead, 225,
-                Items.thorium, 100,
-                Items.silicon, 160,
-                Items.plastanium, 75,
-                FRItems.conductor, 75
+                lead, 225,
+                thorium, 100,
+                silicon, 160,
+                plastanium, 75,
+                conductor, 75
             ));
             health = 840;
             size = 3;
@@ -2969,10 +2972,10 @@ public class FRBlocks{
 
         hydroelectricGenerator = new HydroelectricGenerator("hydroelectric-generator"){{
             requirements(Category.power, with(
-                Items.metaglass, 80,
-                Items.graphite, 120,
-                Items.plastanium, 60,
-                FRItems.logicAlloy, 60
+                metaglass, 80,
+                graphite, 120,
+                plastanium, 60,
+                logicAlloy, 60
             ));
             health = 640;
             size = 2;
@@ -2988,11 +2991,11 @@ public class FRBlocks{
 
         hydroelectricGeneratorLarge = new HydroelectricGenerator("hydroelectric-generator-large"){{
             requirements(Category.power, with(
-                Items.graphite, 300,
-                Items.metaglass, 220,
-                Items.plastanium, 220,
-                FRItems.logicAlloy, 160,
-                FRItems.hardenedAlloy, 120
+                graphite, 300,
+                metaglass, 220,
+                plastanium, 220,
+                logicAlloy, 160,
+                hardenedAlloy, 120
             ));
             health = 2560;
             armor = 4.0f;
@@ -3010,7 +3013,7 @@ public class FRBlocks{
         //TODO...
         burstReactor = new ImpactReactor("burst-reactor"){{
             requirements(Category.power, BuildVisibility.hidden, with(
-                FRItems.magneticAlloy, 500
+                magneticAlloy, 500
             ));
             health = 9600;
             size = 6;
@@ -3032,7 +3035,7 @@ public class FRBlocks{
             );
 
             consumePower(n(5760));
-            consumeItem(FRItems.detonationCompound, 8);
+            consumeItem(detonationCompound, 8);
             consumeLiquid(FRLiquids.liquidNitrogen, n(50));
         }};
 
@@ -3040,8 +3043,8 @@ public class FRBlocks{
 
         damWall = new Wall("sbq"){{
             requirements(Category.defense, with(
-                Items.metaglass, 3,
-                Items.titanium, 4
+                metaglass, 3,
+                titanium, 4
             ));
             health = 720;
             size = 1;
@@ -3057,8 +3060,8 @@ public class FRBlocks{
 
         hardenedWall = new ArmorWall("hardened-wall"){{
             requirements(Category.defense, with(
-                Items.surgeAlloy, 3,
-                FRItems.hardenedAlloy, 6
+                surgeAlloy, 3,
+                hardenedAlloy, 6
             ));
             health = 1440;
             armor = 12;
@@ -3086,11 +3089,11 @@ public class FRBlocks{
 
         fleshWall = new FleshWall("xrq"){{
             requirements(Category.defense, with(
-                FRItems.flesh, 24,
-                FRItems.logicAlloy, 12
+                flesh, 24,
+                logicAlloy, 12
             ));
             researchCost = ItemStack.with(
-                FRItems.flesh, 200
+                flesh, 200
             );
 
             health = 8000;
@@ -3112,14 +3115,14 @@ public class FRBlocks{
 
         thermalKiln = new AttributeCrafter("rnyl"){{
             requirements(Category.crafting, with(
-                Items.copper, 60,
-                Items.lead, 45,
-                Items.graphite, 30
+                copper, 60,
+                lead, 45,
+                graphite, 30
             ));
             researchCost = with(
-                Items.copper, 120,
-                Items.lead, 80,
-                Items.graphite, 40
+                copper, 120,
+                lead, 80,
+                graphite, 40
             );
             size = 2;
             hasPower = true;
@@ -3132,27 +3135,27 @@ public class FRBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FRItems.glass, 6);
+            outputItem = new ItemStack(glass, 6);
             attribute = Attribute.heat;
             boostScale = 1.0f / 3.0f;
 
             consumePower(n(30));
             consumeItems(with(
-                Items.sand, 6,
-                Items.coal, 1
+                sand, 6,
+                coal, 1
             ));
         }};
 
         metaglassPlater = new GenericCrafter("dgj"){{
             requirements(Category.crafting, with(
-                Items.lead, 75,
-                Items.titanium, 55,
-                Items.silicon, 40
+                lead, 75,
+                titanium, 55,
+                silicon, 40
             ));
             researchCost = ItemStack.with(
-                Items.lead, 200,
-                Items.titanium, 135,
-                Items.silicon, 60
+                lead, 200,
+                titanium, 135,
+                silicon, 60
             );
             size = 2;
             hasPower = true;
@@ -3165,25 +3168,25 @@ public class FRBlocks{
             );
 
             craftTime = 10.0f;
-            outputItem = new ItemStack(Items.metaglass, 2);
+            outputItem = new ItemStack(metaglass, 2);
 
             consumePower(n(120));
             consumeItems(with(
-                Items.lead, 1,
-                FRItems.glass, 2
+                lead, 1,
+                glass, 2
             ));
         }};
 
         mirrorglassPolisher = new GenericCrafter("dmj"){{
             requirements(Category.crafting, with(
-                Items.graphite, 45,
-                Items.titanium, 60,
-                Items.silicon, 75
+                graphite, 45,
+                titanium, 60,
+                silicon, 75
             ));
             researchCost = ItemStack.with(
-                Items.graphite, 160,
-                Items.titanium, 200,
-                Items.silicon, 180
+                graphite, 160,
+                titanium, 200,
+                silicon, 180
             );
             size = 2;
             hasPower = true;
@@ -3195,17 +3198,17 @@ public class FRBlocks{
             );
 
             craftTime = 90f;
-            outputItem = new ItemStack(FRItems.mirrorglass, 1);
+            outputItem = new ItemStack(mirrorglass, 1);
 
             consumePower(n(120));
-            consumeItem(Items.metaglass, 2);
+            consumeItem(metaglass, 2);
         }};
 
         sulflameExtractor = new GenericCrafter("hhhjtqq"){{
             requirements(Category.crafting, with(
-                Items.lead, 85,
-                Items.graphite, 55,
-                Items.titanium, 40
+                lead, 85,
+                graphite, 55,
+                titanium, 40
             ));
             size = 2;
             hasPower = true;
@@ -3220,21 +3223,21 @@ public class FRBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FRItems.sulflameAlloy, 2);
+            outputItem = new ItemStack(sulflameAlloy, 2);
 
             consumePower(n(90));
             consumeItems(with(
-                Items.coal, 3,
-                Items.sporePod, 2
+                coal, 3,
+                sporePod, 2
             ));
             consumeLiquid(Liquids.slag, n(24));
         }};
 
         kindlingExtractor = new GenericCrafter("hhhjcqc"){{
             requirements(Category.crafting, with(
-                Items.graphite, 90,
-                Items.titanium, 80,
-                Items.silicon, 60
+                graphite, 90,
+                titanium, 80,
+                silicon, 60
             ));
             size = 2;
             hasPower = true;
@@ -3243,20 +3246,20 @@ public class FRBlocks{
             updateEffect = Fx.explosion;
 
             craftTime = 60f;
-            outputItem = new ItemStack(FRItems.kindlingAlloy, 1);
+            outputItem = new ItemStack(kindlingAlloy, 1);
 
             consumePower(n(120));
             consumeItems(with(
-                Items.coal, 1,
-                FRItems.sulflameAlloy, 1
+                coal, 1,
+                sulflameAlloy, 1
             ));
         }};
 
         conductorFormer = new GenericCrafter("dtgcy"){{
             requirements(Category.crafting, with(
-                Items.lead, 75,
-                Items.surgeAlloy, 20,
-                FRItems.mirrorglass, 25
+                lead, 75,
+                surgeAlloy, 20,
+                mirrorglass, 25
             ));
             size = 2;
             hasPower = true;
@@ -3272,20 +3275,20 @@ public class FRBlocks{
             );
 
             craftTime = 120;
-            outputItem = new ItemStack(FRItems.conductor, 2);
+            outputItem = new ItemStack(conductor, 2);
 
             consumePower(n(200));
             consumeItems(with(
-                Items.copper, 2,
-                Items.silicon, 3
+                copper, 2,
+                silicon, 3
             ));
         }};
 
         logicAlloyProcessor = new GenericCrafter("logic-alloy-processor"){{
             requirements(Category.crafting, with(
-                Items.titanium, 105,
-                Items.silicon, 60,
-                Items.plastanium, 55
+                titanium, 105,
+                silicon, 60,
+                plastanium, 55
             ));
             size = 2;
             hasPower = true;
@@ -3296,21 +3299,21 @@ public class FRBlocks{
             );
 
             craftTime = 120f;
-            outputItem = new ItemStack(FRItems.logicAlloy, 2);
+            outputItem = new ItemStack(logicAlloy, 2);
 
             consumePower(n(120));
             consumeItems(with(
-                Items.copper, 3,
-                Items.titanium, 2,
-                Items.silicon, 3
+                copper, 3,
+                titanium, 2,
+                silicon, 3
             ));
         }};
 
         detonationMixer = new GenericCrafter("detonation-mixer"){{
             requirements(Category.crafting, with(
-                Items.thorium, 45,
-                Items.plastanium, 30,
-                FRItems.logicAlloy, 55
+                thorium, 45,
+                plastanium, 30,
+                logicAlloy, 55
             ));
             size = 2;
             hasPower = true;
@@ -3320,21 +3323,21 @@ public class FRBlocks{
             updateEffect = Fx.explosion;
 
             craftTime = 300f;
-            outputItem = new ItemStack(FRItems.detonationCompound, 6);
+            outputItem = new ItemStack(detonationCompound, 6);
 
             consumePower(n(90));
             consumeItems(with(
-                Items.blastCompound, 4,
-                Items.pyratite, 4,
-                FRItems.logicAlloy, 3
+                blastCompound, 4,
+                pyratite, 4,
+                logicAlloy, 3
             ));
         }};
 
         slagCooler = new GenericCrafter("gslqq"){{
             requirements(Category.crafting, with(
-                Items.copper, 90,
-                Items.graphite, 55,
-                Items.titanium, 70
+                copper, 90,
+                graphite, 55,
+                titanium, 70
             ));
             size = 2;
             hasPower = true;
@@ -3350,7 +3353,7 @@ public class FRBlocks{
             );
 
             craftTime = 60.0f;
-            outputItem = new ItemStack(FRItems.flamefluidCrystal, 2);
+            outputItem = new ItemStack(flamefluidCrystal, 2);
 
             consumePower(n(90));
             consumeLiquids(LiquidStack.with(
@@ -3361,9 +3364,9 @@ public class FRBlocks{
 
         crusher = new GenericCrafter("tqjsj"){{
             requirements(Category.crafting, with(
-                Items.copper, 45,
-                Items.lead, 75,
-                Items.graphite, 30
+                copper, 45,
+                lead, 75,
+                graphite, 30
             ));
             size = 2;
             hasPower = true;
@@ -3378,21 +3381,21 @@ public class FRBlocks{
             );
 
             craftTime = 30f;
-            outputItem = new ItemStack(Items.scrap, 2);
+            outputItem = new ItemStack(scrap, 2);
 
             consumePower(n(30));
             consumeItems(with(
-                Items.copper, 1,
-                Items.lead, 1
+                copper, 1,
+                lead, 1
             ));
         }};
 
         timberBurner = new GeneratorCrafter("timber-burner", 3.5f){{
             requirements(Category.crafting, with(
-                Items.copper, 50,
-                Items.lead, 25,
-                Items.metaglass, 15,
-                Items.graphite, 20
+                copper, 50,
+                lead, 25,
+                metaglass, 15,
+                graphite, 20
             ));
             size = 2;
             updateEffect = Fx.generatespark;
@@ -3402,17 +3405,17 @@ public class FRBlocks{
             );
 
             craftTime = 30.0f;
-            outputItem = new ItemStack(Items.coal, 1);
+            outputItem = new ItemStack(coal, 1);
 
-            consumeItem(FRItems.timber);
+            consumeItem(timber);
         }};
 
         electrothermalSiliconFurnace = new GenericCrafter("drgl"){{
             requirements(Category.crafting, with(
-                Items.copper, 275,
-                Items.graphite, 200,
-                Items.titanium, 160,
-                Items.surgeAlloy, 85
+                copper, 275,
+                graphite, 200,
+                titanium, 160,
+                surgeAlloy, 85
             ));
             size = 3;
             hasPower = true;
@@ -3425,18 +3428,18 @@ public class FRBlocks{
             );
 
             craftTime = 10.0f;
-            outputItem = new ItemStack(Items.silicon, 2);
+            outputItem = new ItemStack(silicon, 2);
 
             consumePower(n(900));
-            consumeItem(Items.sand, 3);
+            consumeItem(sand, 3);
         }};
 
         fleshSynthesizer = new AttributeCrafter("flesh-synthesizer"){{
             requirements(Category.crafting, with(
-                Items.lead, 120,
-                Items.graphite, 60,
-                Items.silicon, 75,
-                Items.plastanium, 50
+                lead, 120,
+                graphite, 60,
+                silicon, 75,
+                plastanium, 50
             ));
             size = 3;
             hasPower = true;
@@ -3456,23 +3459,23 @@ public class FRBlocks{
 
             attribute = FRAttribute.flesh;
             craftTime = 45.0f;
-            outputItem = new ItemStack(FRItems.flesh, 1);
+            outputItem = new ItemStack(flesh, 1);
 
             consumePower(n(100));
             consumeItems(with(
-                Items.plastanium, 2,
-                Items.phaseFabric, 1,
-                Items.sporePod, 1
+                plastanium, 2,
+                phaseFabric, 1,
+                sporePod, 1
             ));
             consumeLiquid(Liquids.neoplasm, n(12));
         }};
 
         liquidNitrogenCompressor = new GenericCrafter("ydysj"){{
             requirements(Category.crafting, with(
-                Items.lead, 220,
-                Items.metaglass, 175,
-                Items.silicon, 185,
-                Items.plastanium, 130
+                lead, 220,
+                metaglass, 175,
+                silicon, 185,
+                plastanium, 130
             ));
             size = 3;
             hasPower = true;
@@ -3493,18 +3496,18 @@ public class FRBlocks{
 
             consumePower(n(400));
             consumeItems(with(
-                Items.blastCompound, 2,
-                FRItems.kindlingAlloy, 2
+                blastCompound, 2,
+                kindlingAlloy, 2
             ));
             consumeLiquid(Liquids.cryofluid, n(60));
         }};
 
         hardenedAlloySmelter = new GenericCrafter("hardened-alloy-smelter"){{
             requirements(Category.crafting, with(
-                Items.graphite, 135,
-                Items.thorium, 50,
-                Items.silicon, 90,
-                Items.plastanium, 80
+                graphite, 135,
+                thorium, 50,
+                silicon, 90,
+                plastanium, 80
             ));
             armor = 4.0f;
             size = 3;
@@ -3517,21 +3520,21 @@ public class FRBlocks{
             );
 
             craftTime = 60f;
-            outputItem = new ItemStack(FRItems.hardenedAlloy, 3);
+            outputItem = new ItemStack(hardenedAlloy, 3);
 
             consumePower(n(600));
             consumeItems(with(
-                Items.thorium, 3,
-                Items.plastanium, 6,
-                FRItems.kindlingAlloy, 2
+                thorium, 3,
+                plastanium, 6,
+                kindlingAlloy, 2
             ));
         }};
 
         magneticAlloyFormer = new GenericCrafter("magnetic-alloy-former"){{
             requirements(Category.crafting, with(
-                Items.plastanium, 135,
-                FRItems.logicAlloy, 180,
-                FRItems.hardenedAlloy, 75
+                plastanium, 135,
+                logicAlloy, 180,
+                hardenedAlloy, 75
             ));
             armor = 8.0f;
             size = 3;
@@ -3545,22 +3548,22 @@ public class FRBlocks{
             );
 
             craftTime = 90.0f;
-            outputItem = new ItemStack(FRItems.magneticAlloy, 2);
+            outputItem = new ItemStack(magneticAlloy, 2);
 
             consumePower(n(1440));
             consumeItems(with(
-                Items.surgeAlloy, 1,
-                FRItems.conductor, 3,
-                FRItems.hardenedAlloy, 2
+                surgeAlloy, 1,
+                conductor, 3,
+                hardenedAlloy, 2
             ));
         }};
 
         cryofluidMixerLarge = new GenericCrafter("cryofluid-mixer-large"){{
             requirements(Category.crafting, with(
-                Items.lead, 240,
-                FRItems.mirrorglass, 75,
-                FRItems.logicAlloy, 200,
-                FRItems.hardenedAlloy, 75
+                lead, 240,
+                mirrorglass, 75,
+                logicAlloy, 200,
+                hardenedAlloy, 75
             ));
             scaledHealth = 90.0f;
             armor = 8.0f;
@@ -3575,7 +3578,7 @@ public class FRBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.water),
-                new DrawLiquidTile(Liquids.cryofluid){{drawLiquidLight = true;}},
+                new DrawLiquidTile(Liquids.cryofluid),
                 new DrawDefault()
             );
 
@@ -3583,37 +3586,45 @@ public class FRBlocks{
             outputLiquid = new LiquidStack(Liquids.cryofluid, n(90));
 
             consumePower(n(240));
-            consumeItem(Items.titanium, 4);
+            consumeItem(titanium, 4);
             consumeLiquid(Liquids.water, n(90));
         }};
 
-        meltingFurnace = new MeltingFurnace.MeltingFurnaceBlock("melting-furnace", new MeltingFurnace.ConsumeMeltingFurnace(0.1f)){{
+        meltingFurnace = new MeltingFurnace.MeltingFurnaceBlock("melting-furnace", new MeltingFurnace.ConsumeMeltingFurnace(0.4f)){{
             requirements(Category.crafting, with(
+                plastanium, 300,
+                thorium, 225,
+                logicAlloy, 200,
+                conductor, 125
             ));
-            scaledHealth = 90.0f;
-            armor = 8.0f;
+            scaledHealth = 75.0f;
+            armor = 4.0f;
             size = 5;
             hasPower = true;
             hasLiquids = true;
-            itemCapacity = 20;
-            liquidCapacity = 120.0f;
+            itemCapacity = 75;
+            liquidCapacity = 450.0f;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(),
                 new DrawDefault()
             );
 
-            outputLiquid = new LiquidStack(Liquids.slag, n(90));
-            consumePower(n(600));
+            craftTime = 5.0f;
+            basePowerProduction = 15.0f;
+            boostScale = 4.0f / 37.5f;
+            maxBoost = 2.0f;
+            outputLiquid = new LiquidStack(Liquids.slag, n(24));
+            consume(new ConsumePowerCustom(n(300), 0.0f, false, this));
         }};
 
         magnetismConcentratedRollingMill = new GenericCrafter("magnetism-concentrated-rolling-mill"){{
             requirements(Category.crafting, with(
-                Items.lead, 450,
-                Items.graphite, 220,
-                FRItems.mirrorglass, 180,
-                FRItems.logicAlloy, 320,
-                FRItems.hardenedAlloy, 225
+                lead, 450,
+                graphite, 220,
+                mirrorglass, 180,
+                logicAlloy, 320,
+                hardenedAlloy, 225
             ));
             scaledHealth = 90.0f;
             armor = 16.0f;
@@ -3632,19 +3643,19 @@ public class FRBlocks{
             );
 
             craftTime = 40.0f;
-            outputItem = new ItemStack(Items.plastanium, 6);
+            outputItem = new ItemStack(plastanium, 6);
             consumePower(n(840));
-            consumeItem(Items.titanium, 8);
+            consumeItem(titanium, 8);
             consumeLiquid(Liquids.oil, n(90));
         }};
 
         magneticRingSynthesizer = new GenericCrafter("magnetic-ring-synthesizer"){{
             requirements(Category.crafting, with(
-                Items.lead, 450,
-                Items.phaseFabric, 125,
-                FRItems.logicAlloy, 500,
-                FRItems.hardenedAlloy, 225,
-                FRItems.magneticAlloy, 125
+                lead, 450,
+                phaseFabric, 125,
+                logicAlloy, 500,
+                hardenedAlloy, 225,
+                magneticAlloy, 125
             ));
             scaledHealth = 90.0f;
             armor = 16.0f;
@@ -3655,7 +3666,7 @@ public class FRBlocks{
             ambientSoundVolume = 0.015f;
             updateEffectChance = 0.03f;
             updateEffect = new Effect(33.0f, e -> {
-                Draw.color(Items.phaseFabric.color, Pal.accent, e.fin() * 0.8f);
+                Draw.color(phaseFabric.color, Pal.accent, e.fin() * 0.8f);
                 Lines.stroke(3.0f * e.fout());
                 Lines.spikes(e.x, e.y, 10.0f * e.finpow(), 2.0f * e.fout() + 4.0f * e.fslope(), 4, 45.0f);
             });
@@ -3666,20 +3677,20 @@ public class FRBlocks{
             );
 
             craftTime = 60.0f;
-            outputItem = new ItemStack(Items.phaseFabric, 6);
+            outputItem = new ItemStack(phaseFabric, 6);
             consumePower(n(3360));
             consumeItems(with(
-                Items.sand, 33,
-                Items.thorium, 18
+                sand, 33,
+                thorium, 18
             ));
         }};
 
         electromagnetismDiffuser = new SurgeCrafter("electromagnetism-diffuser"){{
             requirements(Category.crafting, with(
-                Items.surgeAlloy, 325,
-                FRItems.logicAlloy, 500,
-                FRItems.hardenedAlloy, 375,
-                FRItems.magneticAlloy, 250
+                surgeAlloy, 325,
+                logicAlloy, 500,
+                hardenedAlloy, 375,
+                magneticAlloy, 250
             ));
             scaledHealth = 90.0f;
             armor = 16.0f;
@@ -3695,7 +3706,7 @@ public class FRBlocks{
                 new DrawDefault()
             );
             craftEffect = new Effect(45.0f, e -> {
-                for(byte i = 0; i < 3; i++){
+                for(int i = 0; i < 3; i++){
                     Fx.rand.setSeed(e.id * i * 2L);
                     Draw.color(Pal.surge, e.fout());
                     Lines.stroke(4.0f * e.fout());
@@ -3705,8 +3716,8 @@ public class FRBlocks{
 
             craftTime = 240.0f;
             outputItems = ItemStack.with(
-                Items.surgeAlloy, 32,
-                FRItems.hardenedAlloy, 2
+                surgeAlloy, 32,
+                hardenedAlloy, 2
             );
 
             fragBullets = 6;
@@ -3715,7 +3726,7 @@ public class FRBlocks{
                 @Override
                 public void updateTrail(Bullet b){
                     if(!headless){
-                        byte length = (byte)(trailLength * Mathf.sqrt(speed / b.vel.len()));
+                        int length = (int)(trailLength * Mathf.sqrt(speed / b.vel.len()));
                         if(b.trail == null) b.trail = new Trail(length);
                         b.trail.length = length;
                         b.trail.update(b.x, b.y, trailInterp.apply(b.fin()));
@@ -3748,25 +3759,25 @@ public class FRBlocks{
                 if(Units.closestTarget(b.team, b.x, b.y, b.type.homingRange, e -> e != null && !b.hasCollided(e.id)) != null)
                     return; //checks whether there's any target first
 
-                b.rotation(b.rotation() + 720.0f*sign * Time.delta / b.lifetime);
+                b.rotation(b.rotation() + 720.0f * sign * Time.delta / b.lifetime);
             };
 
             consumePower(n(7200));
             consumeItems(with(
-                FRItems.flamefluidCrystal, 32,
-                FRItems.magneticAlloy, 2
+                flamefluidCrystal, 32,
+                magneticAlloy, 2
             ));
             consumeLiquid(Liquids.cryofluid, n(30));
         }};
 
         hardenedAlloyCrucible = new EnergyCrafter("hardened-alloy-crucible"){{
             requirements(Category.crafting, with(
-                Items.metaglass, 550,
-                Items.titanium, 425,
-                Items.silicon, 275,
-                FRItems.hardenedAlloy, 500
+                metaglass, 550,
+                titanium, 425,
+                silicon, 275,
+                hardenedAlloy, 500
             ));
-            scaledHealth = 10.0f;
+            scaledHealth = 100.0f;
             armor = 20.0f;
             size = 6;
             hasPower = true;
@@ -3792,7 +3803,7 @@ public class FRBlocks{
             );
 
             craftTime = 120.0f;
-            outputItem = new ItemStack(FRItems.hardenedAlloy, 20);
+            outputItem = new ItemStack(hardenedAlloy, 20);
 
             explosionRadius = 240.0f;
             explosionDamage = 2880.0f;
@@ -3873,8 +3884,8 @@ public class FRBlocks{
 
             consumePower(n(18000));
             consumeItems(with(
-                Items.thorium, 12,
-                Items.plastanium, 20
+                thorium, 12,
+                plastanium, 20
             ));
             consumeLiquid(Liquids.water, n(120));
         }};
@@ -3883,9 +3894,9 @@ public class FRBlocks{
 
         fleshReconstructor = new UnitFactory("flesh-reconstructor"){{
             requirements(Category.units, with(
-                Items.titanium, 400,
-                FRItems.logicAlloy, 250,
-                FRItems.flesh, 100
+                titanium, 400,
+                logicAlloy, 250,
+                flesh, 100
             ));
             size = 3;
             hasLiquids = true;
@@ -3893,8 +3904,8 @@ public class FRBlocks{
 
             plans.add(
                 new UnitFactory.UnitPlan(FRUnitTypes.blade, 2700.0f, with(
-                    FRItems.flesh, 55,
-                    FRItems.logicAlloy, 65
+                    flesh, 55,
+                    logicAlloy, 65
                 ))
             );
 
@@ -3904,9 +3915,9 @@ public class FRBlocks{
 
         unitHealer = new RepairTower("unit-healer"){{
             requirements(Category.units, with(
-                Items.copper, 45,
-                Items.titanium, 35,
-                Items.silicon, 30
+                copper, 45,
+                titanium, 35,
+                silicon, 30
             ));
             size = 2;
             range = 96.0f;
@@ -3919,8 +3930,8 @@ public class FRBlocks{
 
         payloadConveyorLarge = new PayloadConveyor("payload-conveyor-large"){{
             requirements(Category.units, with(
-                Items.graphite, 80,
-                FRItems.hardenedAlloy, 40
+                graphite, 80,
+                hardenedAlloy, 40
             ));
             armor = 14.0f;
             payloadLimit = size = 7;
@@ -3931,8 +3942,8 @@ public class FRBlocks{
 
         payloadRouterLarge = new PayloadRouter("payload-router-large"){{
             requirements(Category.units, with(
-                Items.graphite, 120,
-                FRItems.hardenedAlloy, 50
+                graphite, 120,
+                hardenedAlloy, 50
             ));
             armor = 14.0f;
             payloadLimit = size = 7;
@@ -3945,9 +3956,9 @@ public class FRBlocks{
 
         buildingHealer = new RegenProjector("buildingHealer"){{
             requirements(Category.effect, with(
-                Items.titanium, 30,
-                Items.silicon, 25,
-                FRItems.logicAlloy, 10
+                titanium, 30,
+                silicon, 25,
+                logicAlloy, 10
             ));
             health = 320;
             size = 2;
@@ -3970,15 +3981,15 @@ public class FRBlocks{
             optionalUseTime = 200f;
 
             consumePower(n(100));
-            consumeItem(Items.silicon).boost();
+            consumeItem(silicon).boost();
         }};
 
         campfire = new Campfire.CampfireBlock("gh"){{
             requirements(Category.effect, with(
-                Items.copper, 300,
-                Items.metaglass, 220,
-                Items.plastanium, 175,
-                FRItems.timber, 200
+                copper, 300,
+                metaglass, 220,
+                plastanium, 175,
+                timber, 200
             ));
             size = 5;
             itemCapacity = 20;
@@ -4006,10 +4017,10 @@ public class FRBlocks{
 
         skyDome = new ForceProjector("sky-dome"){{
             requirements(Category.effect, with(
-                Items.lead, 300,
-                Items.phaseFabric, 120,
-                FRItems.logicAlloy, 225,
-                FRItems.hardenedAlloy, 180
+                lead, 300,
+                phaseFabric, 120,
+                logicAlloy, 225,
+                hardenedAlloy, 180
             ));
             armor = 4.0f;
             size = 5;
@@ -4025,14 +4036,14 @@ public class FRBlocks{
             coolantConsumption = 0.2f;
 
             consumePower(n(1200));
-            itemConsumer = consumeItem(Items.phaseFabric).boost();
+            itemConsumer = consumeItem(phaseFabric).boost();
         }};
 
         buildIndicator = new BuildTurret("jzzsq"){{
             requirements(Category.effect, with(
-                Items.lead, 120,
-                Items.thorium, 50,
-                FRItems.logicAlloy, 30
+                lead, 120,
+                thorium, 50,
+                logicAlloy, 30
             ));
             health = 720;
             size = 2;
@@ -4045,12 +4056,12 @@ public class FRBlocks{
 
         coreBulwark = new ForceCoreBlock("zjhx"){{
             requirements(Category.effect, with(
-                Items.copper, 9000,
-                Items.lead, 8000,
-                Items.metaglass, 2500,
-                Items.thorium, 3500,
-                Items.silicon, 6000,
-                Items.plastanium, 1750
+                copper, 9000,
+                lead, 8000,
+                metaglass, 2500,
+                thorium, 3500,
+                silicon, 6000,
+                plastanium, 1750
             ));
             researchCostMultiplier = 0.25f;
             buildCostMultiplier = 0.5f;
@@ -4072,9 +4083,9 @@ public class FRBlocks{
 
         numbDelusion = new NumbDelusion("numb-delusion"){{
             requirements(Category.effect, with(
-                FRItems.logicAlloy, 150,
-                FRItems.hardenedAlloy, 175,
-                FRItems.magneticAlloy, 120
+                logicAlloy, 150,
+                hardenedAlloy, 175,
+                magneticAlloy, 120
             ));
             health = 1640;
             armor = 22.0f;
@@ -4084,11 +4095,11 @@ public class FRBlocks{
 
         javelinPad = new MechPad("javelin-pad", FRUnitTypes.javelin){{
             requirements(Category.effect, with(
-                Items.lead, 350,
-                Items.titanium, 500,
-                Items.silicon, 450,
-                Items.plastanium, 400,
-                Items.phaseFabric, 200
+                lead, 350,
+                titanium, 500,
+                silicon, 450,
+                plastanium, 400,
+                phaseFabric, 200
             ));
             health = 1200;
             size = 2;
@@ -4098,10 +4109,10 @@ public class FRBlocks{
 
         compositeUnloader = new AdaptDirectionalUnloader("composite-unloader"){{
             requirements(Category.effect, with(
-                Items.metaglass, 15,
-                Items.titanium, 30,
-                Items.thorium, 15,
-                Items.silicon, 20
+                metaglass, 15,
+                titanium, 30,
+                thorium, 15,
+                silicon, 20
             ));
             health = 85;
             underBullets = true;
@@ -4120,11 +4131,11 @@ public class FRBlocks{
             new short[]{0, 41, 70, 185, 79}
         ){{
             requirements(Category.effect, BuildVisibility.campaignOnly, with(
-                Items.copper, 13000,
-                Items.lead, 13000,
-                Items.silicon, 6500,
-                Items.thorium, 6500,
-                Items.titanium, 3250
+                copper, 13000,
+                lead, 13000,
+                silicon, 6500,
+                thorium, 6500,
+                titanium, 3250
             ));
             researchCostMultiplier = 0.1f;
             buildCostMultiplier = 0.5f;

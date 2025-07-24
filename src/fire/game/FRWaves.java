@@ -42,9 +42,9 @@ public class FRWaves{
         var out = new Seq<SpawnGroup>();
 
         //max reasonable wave, after which everything gets boring
-        final short cap = 225;
+        final int cap = 225;
 
-        float[] scaling = {1, 1.6f, 2f, 3.1f, 4.4f};
+        float[] scaling = {1.0f, 1.6f, 2.0f, 3.1f, 4.4f};
 
         var finalSpecies = species;
         Intc createProgression = start -> {
@@ -52,8 +52,8 @@ public class FRWaves{
             int tier;
             int type;
 
-            for(short i = (short)start; i < cap;){
-                float f = i;
+            for(int i = start; i < cap;){
+                int f = i;
 
                 if(f < 10){
                     tier = rand.random(10) > 4 ? 1 : 2;
@@ -91,9 +91,9 @@ public class FRWaves{
                     int finalJ = j;
                     if(tier >= 1){
                         out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
-                            unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier] * 2;
-                            begin = (int)(f + finalJ);
-                            end = (int)(f + f >= cap ? never : 10 + f * 2);
+                            unitAmount = (int)(6 + sqrt(f * 0.1f + difficulty)) / (int)scaling[finalTier] * 2;
+                            begin = f + finalJ;
+                            end = f + f >= cap ? never : 10 + f * 2;
                             max = unitAmount * 8;
                             unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[finalTier] * 2;
                             shieldScaling = (sqrt(f * f * f) / 2 + 8 + difficulty * 10) * counts;
@@ -103,9 +103,9 @@ public class FRWaves{
                         }});
                     }
                     out.add(new SpawnGroup(finalSpecies[type][Math.min(tier, finalSpecies.length - 1)]){{
-                        unitAmount = (int)(6 + sqrt(f / 10 + difficulty)) / (int)scaling[finalTier];
-                        begin = (int)(f + finalJ);
-                        end = (int)(f + f >= cap ? never : 10 + f * 2);
+                        unitAmount = (int)(6 + sqrt(f * 0.1f + difficulty)) / (int)scaling[finalTier];
+                        begin = f + finalJ;
+                        end = f + f >= cap ? never : 10 + f * 2;
                         max = unitAmount * 4;
                         unitScaling = (difficulty < 0.4f ? rand.random(2.5f, 5f) : rand.random(1f, 4f)) * scaling[finalTier];
                         shieldScaling = (sqrt(f * f * f) + 15 + difficulty * 20) * counts;
@@ -114,7 +114,7 @@ public class FRWaves{
                         effect = ChosenEffect;
                     }});
                 }
-                i += (short)(rand.random(10, 18 + counts) - difficulty * 0.5f + tier * 5 + counts + 5);
+                i += (int)(rand.random(10, 18 + counts) - difficulty * 0.5f + tier * 5 + counts + 5);
             }
         };
 

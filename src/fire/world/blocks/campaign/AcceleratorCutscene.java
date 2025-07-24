@@ -162,7 +162,7 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             ui.planet.state.planet.sectors.get(ui.planet.state.planet.startSector).preset.clearUnlock();
             launchCandidates.first().unlock();
 
-            for(byte i = 0; i < 2; i++){
+            for(int i = 0; i < 2; i++){
                 final float p = 0.2f,
                 height = Core.graphics.getHeight(),
                 y1 = i == 0 ? height * -p : height * (1.0f + p);
@@ -194,8 +194,8 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
                     ui.planet.newPresets.add(ui.planet.state.planet.sectors.get(id));
             });
 
-            for(byte i = 0, len = (byte)texts.length; i < len; i++){
-                byte j = i;
+            for(int i = 0, len = (byte)texts.length; i < len; i++){
+                int j = i;
                 float delay = j != 0
                     ? node.getQuantum(2) + 150.0f * (j - 1)
                     : 0.0f;

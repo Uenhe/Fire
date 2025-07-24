@@ -19,8 +19,8 @@ public class FRStatValues{
         return table -> {
             table.row();
 
-            for(byte i = 0, size = (byte)ammo.size; i < size; i++){
-                byte j = i;
+            for(int i = 0, size = ammo.size; i < size; i++){
+                int j = i;
                 var entry = ammo.get(j);
 
                 table.table(Styles.grayPanel, bt -> {

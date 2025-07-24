@@ -645,7 +645,7 @@ public class FRUnitTypes{
                             Lines.circle(e.x, e.y, radius);
 
                             float offset = Mathf.randomSeed(e.id, 360f);
-                            for(byte i = 0, points = 8; i < points; i++){
+                            for(int i = 0, points = 8; i < points; i++){
                                 float angle = i * 360f / points + offset;
                                 Drawf.tri(e.x + Angles.trnsx(angle, radius), e.y + Angles.trnsy(angle, radius), 4.0f, 30f * e.fout(), angle);
                             }
@@ -1575,8 +1575,8 @@ public class FRUnitTypes{
                             colors(colors, Pal.heal, Pal.heal, Color.white);
                         }});
 
-                        for(byte i = 0; i < 12; i++){
-                            byte j = i;
+                        for(int i = 0; i < 12; i++){
+                            int j = i;
                             spawnBullets.add(new FlakBulletType(20.0f - j * 1.2f, 100.0f + j * 6.0f){{
                                 sprite = "missile-large";
                                 collidesGround = collidesAir = true;
