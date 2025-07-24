@@ -28,7 +28,7 @@ public class DrawArrows extends mindustry.world.draw.DrawBlock{
 
     @Override
     public void load(Block block){
-        for(byte i = 0, arrows = this.arrows; i < arrows; i++){
+        for(int i = 0, arrows = this.arrows; i < arrows; i++){
             arrowRegions[i] = Core.atlas.find(block.name + "-arrow" + (i + 1));
             arrowBlurRegions[i] = Core.atlas.find(block.name + "-arrow-blur" + (i + 1));
         }
@@ -39,7 +39,7 @@ public class DrawArrows extends mindustry.world.draw.DrawBlock{
         if(!(build instanceof SmoothCrafter)) return;
 
         float sp = ((SmoothCrafter)build).smoothProgress();
-        for(byte i = 0, arrows = this.arrows; i < arrows; i++){
+        for(int i = 0, arrows = this.arrows; i < arrows; i++){
             float a = Mathf.clamp(sp * (i + 1));
 
             Draw.z(Layer.blockAdditive);

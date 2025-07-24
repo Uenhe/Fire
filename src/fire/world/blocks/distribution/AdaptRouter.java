@@ -96,18 +96,18 @@ public class AdaptRouter extends mindustry.world.Block{
                 u.set(x, y);
                 if(u.isShooting()){
                     var other = nearby(rotation = Mathf.mod((int)((angleTo(u.aimX(), u.aimY()) + 45) / 90), 4));
-                    if(other != null && other.acceptItem(this, item)) return other;
+                    if(other != null && other != src && other != source && !(src.block.instantTransfer && other.block.instantTransfer) & other.acceptItem(this, item) && team == other.team) return other;
                 }
 
             }else if(logicTimer >= 0.0f){
                 var other = nearby(rotation);
-                if(other != null && other.acceptItem(this, item)) return other;
+                if(other != null && other != src && other != source && !(src.block.instantTransfer && other.block.instantTransfer) & other.acceptItem(this, item) && team == other.team) return other;
 
             }else{
                 var proximity = this.proximity;
                 if(net.server()){ //byd desync
-                    for(byte i = 0, n = (byte)proximity.size, c = (byte)rotation; i < n; i++){
-                        var other = proximity.get((i + c) % n);
+                    for(int i = 0, n = proximity.size; i < n; i++){
+                        var other = proximity.get((i + rotation) % n);
                         if(set) rotation = (rotation + 1) % n;
                         if(other == src || other == source || (src.block.instantTransfer && other.block.instantTransfer) || !other.acceptItem(this, item) || team != other.team) continue;
                         return other;

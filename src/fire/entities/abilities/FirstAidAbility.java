@@ -72,7 +72,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             detectTimer += Time.delta;
 
             if(detectTimer >= detectInterval){
-                for(byte i = 0, lenm1 = (byte)(healthArray.length - 1); i < lenm1; i++)
+                for(int i = 0, lenm1 = (byte)(healthArray.length - 1); i < lenm1; i++)
                     healthArray[i] = healthArray[i + 1];
                 healthArray[healthArray.length - 1] = unit.health;
 

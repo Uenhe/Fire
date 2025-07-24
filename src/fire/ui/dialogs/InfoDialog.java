@@ -468,7 +468,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
             nodes.add(this);
             children = new InfoTreeNode[node.children.size];
 
-            for(byte i = 0, len = (byte)children.length; i < len; i++)
+            for(int i = 0, len = children.length; i < len; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
         }
     }

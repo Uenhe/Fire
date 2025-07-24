@@ -205,7 +205,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(!Core.app.isDesktop()) return;
 
         String[] titles = Core.bundle.get("fire.titles").split("\\|");
-        byte index = (byte)Mathf.random(titles.length - 1);
+        int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
         if(index == 0) //"Today is the @th Day of God's Creation of Planet Lysetta" picked
@@ -229,7 +229,7 @@ public class FireMod extends mindustry.mod.Mod{
                     t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
                     t.table(info -> {
                         info.left().add("[accent]" + c.localizedName).left().row();
-                        short index = (short)c.description.indexOf(Core.bundle.get("fire.strend"));
+                        int index = c.description.indexOf(Core.bundle.get("fire.strend"));
                         String desc = index == -1 ? c.description : c.description.substring(0, index);
                         if(c instanceof SectorPreset) desc += "...";
                         info.left().add(desc).left();
@@ -262,7 +262,7 @@ public class FireMod extends mindustry.mod.Mod{
         }
 
         if(mobile){
-            final byte m, n;
+            final int m, n;
             if(mods.locateMod("mindustryx") != null){
                 m = 2; n = 5;
             }else{
@@ -326,7 +326,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(!Core.graphics.isPortrait()){
             container.marginTop(60.0f);
 
-            for(byte i = 1; i < customs.size; i += 2)
+            for(int i = 1; i < customs.size; i += 2)
                 container.add(customs.get(i));
 
             container.row();
@@ -334,7 +334,7 @@ public class FireMod extends mindustry.mod.Mod{
             container.add(settings);
             container.add(mods);
 
-            for(byte i = 0; i < customs.size; i += 2)
+            for(int i = 0; i < customs.size; i += 2)
                 container.add(customs.get(i));
 
         }else{
@@ -343,7 +343,7 @@ public class FireMod extends mindustry.mod.Mod{
             container.add(mods);
             container.row();
 
-            for(byte i = 0; i < customs.size; i++){
+            for(int i = 0; i < customs.size; i++){
                 container.add(customs.get(i));
                 if(i % 2 == 0) container.row();
             }

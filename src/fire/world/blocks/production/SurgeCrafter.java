@@ -44,6 +44,8 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
 
             for(byte i = 0; i < n; i++){
                 var bullet = fragBullet.create(this, x, y, 360.0f * i / n);
+                if(bullet == null) continue; //???
+
                 boolean s = signs.apply(i)[counter];
                 bullet.lifetime /= Mathf.pow(timeScale, 0.99f);
                 bullet.vel.scl(timeScale);

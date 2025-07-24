@@ -2,21 +2,28 @@ package fire.world.kits;
 
 import arc.Core;
 import arc.math.Mathf;
+import arc.scene.style.TextureRegionDrawable;
+import arc.scene.ui.layout.Cell;
+import arc.scene.ui.layout.Table;
+import arc.util.Scaling;
 import arc.util.Strings;
+import fire.content.FRPlanets;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
+import mindustry.ui.Styles;
 import mindustry.world.meta.BlockStatus;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static mindustry.Vars.content;
+import static mindustry.Vars.ui;
 
 public class MeltingFurnace{
 
-    public static class MeltingFurnaceBlock extends mindustry.world.blocks.production.GenericCrafter{
+    public static class MeltingFurnaceBlock extends mindustry.world.blocks.production.AttributeCrafter{
 
-        protected float basePowerProduction = 600;
+        protected float basePowerProduction;
         private final ConsumeMeltingFurnace cons;
 
         public MeltingFurnaceBlock(String name, ConsumeMeltingFurnace cons){
@@ -37,6 +44,29 @@ public class MeltingFurnace{
         public void setStats(){
             super.setStats();
             stats.add(Stat.basePowerGeneration, basePowerProduction * 60.0f, StatUnit.powerSecond);
+            stats.add(Stat.input, mt -> {
+                mt.row().table(Styles.grayPanel, t ->
+                    t.row().left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f)
+                );
+
+                final float size = 32.0f;
+                int i = 0;
+                Cell<Table> tableSlag = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnaceslag").minWidth(size).maxWidth(size).pad(10.0f).row()).left(),
+                            tablePower = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnacepower").minWidth(size).maxWidth(size).pad(10.0f).row()).left();
+                for(var item : content.items()){
+                    if(item.isHidden() || !item.isOnPlanet(FRPlanets.lysetta)) continue;
+                    if(item.flammability > cons.value){
+                        tablePower.get().stack(
+                            new Table(t -> t.button(new TextureRegionDrawable(item.uiIcon), Styles.emptyi, size, () -> ui.content.show(item)).size(size).pad(10.0f).scaling(Scaling.fit)),
+                            new Table(t -> t.top().right().add("[accent]" + Strings.fixed(basePowerProduction * item.flammability * 0.06f, 1) + "K" + StatUnit.perSecond.localized()).style(Styles.outlineLabel).fontScale(0.8f))
+                        );
+
+                    }else{
+                        tableSlag.get().button(new TextureRegionDrawable(item.uiIcon), Styles.emptyi, size, () -> ui.content.show(item)).size(size).pad(10.0f).scaling(Scaling.fit);
+                        if(++i % 10 == 0) tableSlag.get().row();
+                    }
+                }
+            });
         }
 
         @Override
@@ -49,7 +79,7 @@ public class MeltingFurnace{
             ));
         }
 
-        public class MeltingFurnaceBuild extends GenericCrafterBuild{
+        public class MeltingFurnaceBuild extends AttributeCrafterBuild implements fire.world.consumers.ConsumePowerCustom.CustomPowerConsumer{
 
             @Override
             public float getPowerProduction(){
@@ -61,19 +91,24 @@ public class MeltingFurnace{
                         sum[0] += item.flammability;
                 });
 
-                return sum[0] * basePowerProduction / 60.0f;
+                return sum[0] * basePowerProduction;
             }
 
             /** To scale liquid dump amount. */
             @Override
             public float getProgressIncrease(float baseTime){
-                return super.getProgressIncrease(baseTime) * (baseTime == 1.0f ? cons.efficiencyMultiplier(this) : 1.0f);
+                return super.getProgressIncrease(baseTime) * (baseTime == 1.0f ? cons.efficiencyMultiplier(this) : 1.0f / efficiencyMultiplier());
             }
 
             @Override
             public BlockStatus status(){
                 if(efficiency > 0.0f && cons.efficiencyMultiplier(this) == 0.0f) return BlockStatus.noOutput;
                 return super.status();
+            }
+
+            @Override
+            public float consPowerScale(){
+                return items.sum((i, n) -> 1.0f);
             }
         }
     }

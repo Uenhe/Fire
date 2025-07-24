@@ -46,7 +46,7 @@ public class NumbDelusion extends StorageBlock{
         Color[] colBacks = new Color[]{Pal.copperAmmoBack, Pal.graphiteAmmoBack, Pal.surgeAmmoBack, Pal.blastAmmoBack, Pal.thoriumAmmoBack, Pal.plastaniumBack},
             colFronts = new Color[]{Pal.copperAmmoFront, Pal.graphiteAmmoFront, Pal.surgeAmmoFront, Pal.blastAmmoFront, Pal.thoriumAmmoFront, Pal.plastaniumFront};
 
-        for(byte i = 0, n = (byte)content.items().size; i < n; i++){
+        for(int i = 0, n = content.items().size; i < n; i++){
             var it = content.items().get(i);
             if(it.explosiveness == 0.0f && it.flammability == 0.0f && it.radioactivity == 0.0f && it.charge == 0.0f && it.healthScaling == 0.0f){
                 bullets[i] = null;
@@ -90,7 +90,7 @@ public class NumbDelusion extends StorageBlock{
                         }
 
                         rand.setSeed(it.id);
-                        byte i = (byte)rand.random(0, colBacks.length - 1);
+                        int i = rand.random(0, colBacks.length - 1);
                         backColor = trailColor = colBacks[i];
                         frontColor = colFronts[i];
                     }};
@@ -104,7 +104,7 @@ public class NumbDelusion extends StorageBlock{
         var map = new ObjectMap<Item, BulletType>();
         var bullets = this.bullets;
         var items = content.items();
-        for(byte i = 0, n = (byte)bullets.length; i < n; i++){
+        for(int i = 0, n = bullets.length; i < n; i++){
             var type = bullets[i];
             if(type != null) map.put(items.get(i), type);
         }
@@ -137,11 +137,8 @@ public class NumbDelusion extends StorageBlock{
 
             Core.app.post(() -> {
                 final float threshold = 0.1f;
-                byte n = (byte)content.items().size;
-                short tx = (short)tileX(), ty = (short)tileY();
-
-
-
+                int n = content.items().size,
+                tx = tileX(), ty = tileY();
 
                 float[] amounts = new float[n]; //actually it's more like an int[]
                 Queue<Teams.BlockPlan> plansFrom = team.data().plans, plansTo = new Queue<>();
@@ -178,14 +175,14 @@ public class NumbDelusion extends StorageBlock{
                         plan.block.placeEffect.at(tile.drawx(), tile.drawy(), plan.block.size);
                     }
 
-                    for(byte i = 0; i < n; i++)
+                    for(int i = 0; i < n; i++)
                         items.add(content.item(i), (int)-amounts[i]);
 
                     var bullets = NumbDelusion.this.bullets;
-                    for(byte i = 0; i < n; i++){
+                    for(int i = 0; i < n; i++){
                         var type = bullets[i];
                         if(type == null) continue;
-                        for(byte j = 0, m = (byte)(Math.min(items.get(i), itemCapacity) / 50); j < m; j++)
+                        for(int j = 0, m = Math.min(items.get(i), itemCapacity) / 50; j < m; j++)
                             type.create(this, Complex ? Team.derelict : team, x, y, Mathf.random(360.0f), Mathf.random(0.75f, 1.25f) + (Complex ? 0.6f : 0.0f), Mathf.random(0.75f, 1.25f));
                     }
                 });

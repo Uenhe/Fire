@@ -51,7 +51,7 @@ public class LightningBranch{
         if(type == null) type = Bullets.damageLightning;
         var Type = type;
         var lines = new Seq<Vec2>();
-        for(short i = 0; i < length / 2; i++){
+        for(int i = 0; i < length / 2; i++){
             type.create(null, team, x, y, angle, damage * (hitter == null ? 1.0f : Type.damageMultiplier(hitter)), 1.0f, 1.0f, hitter);
             lines.add(new Vec2(x + Mathf.range(3.0f), y + Mathf.range(3.0f)));
             if(lines.size > 1){
@@ -92,7 +92,7 @@ public class LightningBranch{
         if(branchLeft <= 0) return;
         float X = x, Y = y, Angle = angle;
         Time.run(1.5f, () -> {
-            for(byte i = 0; i < branchAmount; i++){
+            for(int i = 0; i < branchAmount; i++){
                 createInternal(hitter, Type, lastSeed++, team, color, damage, X, Y, Angle + random.range(15.0f), length, branchAmount, branchLeft - 1);
             }
         });
