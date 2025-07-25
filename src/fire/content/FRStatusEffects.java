@@ -268,7 +268,7 @@ public class FRStatusEffects{
                 float timer = timerMap.get(unit.id);
                 if((timer += Time.delta) >= 15.0f){
                     timer -= 15.0f;
-                    FRFx.ghostEffect.at(unit.x + Mathf.range(unit.hitSize * 0.8f), unit.y + Mathf.range(unit.hitSize * 0.8f), unit.rotation - 90.0f, colors[Mathf.random(2)], unit.type.region);
+                    FRFx.ghostEffect.at(unit.x + Mathf.range(unit.hitSize * 0.8f), unit.y + Mathf.range(unit.hitSize * 0.8f), unit.rotation - 90.0f, colors[Mathf.random(2)], unit.type.fullIcon);
                 }
                 timerMap.put(unit.id, timer);
             }

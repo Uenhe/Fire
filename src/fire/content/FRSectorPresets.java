@@ -27,6 +27,7 @@ public class FRSectorPresets{
         eteriverStronghold = create("hhys", 34, 8.0f);
         chillyMountains = create("lfsm", 168, 9.0f, 17);
         stormyCoast = create("stormy-coast", 81, 10.0f, 60);
+        stormyCoast.noLighting = true;
         branchedRivers = create("branched-rivers", 158, 10.0f, 14);
         rubbleRidge = create("rubble-ridge", 172, 10.0f, 65);
         taintedEstuary = create("tainted-estuary", 116, 10.0f);

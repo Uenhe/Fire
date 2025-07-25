@@ -5,7 +5,9 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.struct.Seq;
 import mindustry.content.Blocks;
+import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
+import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 
 import static mindustry.Vars.net;
@@ -13,6 +15,7 @@ import static mindustry.Vars.net;
 public final class FRVars{
 
     public static final Seq<Color> colorPool = new Seq<>(48); //hardcoded initial capacity
+    public static final Seq<Unit> spawnedUnits = new Seq<>();
 
     /** Temporary colors. */
     public static final Color
@@ -23,6 +26,7 @@ public final class FRVars{
         mineSand = false, displayRange = true, specialContent = true, showLog = true, noMultiMods = true;
 
     static{
+        var units = spawnedUnits;
         Events.run(EventType.Trigger.update, () -> {
             if(Core.graphics.getFrameId() % 60 == 0){
                 getSettings();
@@ -30,6 +34,18 @@ public final class FRVars{
                     Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
             }
+
+
+            for(var u : units){
+                if(u.hasEffect(StatusEffects.invincible))
+                    u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
+                else
+                    units.remove(u);
+            }
+        });
+
+        Events.on(EventType.UnitSpawnEvent.class, e -> {
+            if(e.unit.type.flying) units.add(e.unit);
         });
     }
 

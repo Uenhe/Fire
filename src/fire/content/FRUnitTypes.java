@@ -36,7 +36,8 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
-import static fire.FRVars.*;
+import static fire.FRVars.find;
+import static fire.FRVars.lancer_a04;
 import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{

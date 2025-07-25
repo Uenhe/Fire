@@ -28,7 +28,10 @@ import fire.world.blocks.distribution.AdaptRouter;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.HydroelectricGenerator;
-import fire.world.blocks.production.*;
+import fire.world.blocks.production.BeamExtractor;
+import fire.world.blocks.production.EnergyCrafter;
+import fire.world.blocks.production.GeneratorCrafter;
+import fire.world.blocks.production.SurgeCrafter;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
@@ -55,7 +58,10 @@ import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.HaloPart;
 import mindustry.entities.part.RegionPart;
 import mindustry.entities.part.ShapePart;
-import mindustry.entities.pattern.*;
+import mindustry.entities.pattern.ShootAlternate;
+import mindustry.entities.pattern.ShootBarrel;
+import mindustry.entities.pattern.ShootMulti;
+import mindustry.entities.pattern.ShootSpread;
 import mindustry.game.EventType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
@@ -100,7 +106,7 @@ import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
 import static fire.FRUtils.colors;
-import static fire.FRVars.*;
+import static fire.FRVars.find;
 import static fire.content.FRItems.*;
 import static mindustry.Vars.*;
 import static mindustry.content.Items.*;
@@ -2000,8 +2006,7 @@ public class FRBlocks{
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
-            final float
-            chargeTime = 150.0f,
+            final float chargeTime = 150.0f,
             baseRange = 1200.0f, extraRange = 400.0f;
 
             Item
@@ -2027,9 +2032,7 @@ public class FRBlocks{
                 splashDamageRadius = 180.0f;
                 splashDamage = 11500.0f;
                 ammoMultiplier = 1.0f;
-                reflectable = false;
-                absorbable = false;
-                hittable = false;
+                reflectable = absorbable = hittable = false;
 
                 backColor = find("ec7458");
                 frontColor = Color.white;
@@ -2049,9 +2052,7 @@ public class FRBlocks{
                         rangeChange = extraRange;
                         splashDamageRadius = 240.0f;
                         splashDamage = 14500.0f;
-                        reflectable = false;
-                        absorbable = false;
-                        hittable = false;
+                        reflectable = absorbable = hittable = false;
 
                         backColor = find("ec7458");
                         frontColor = Color.white;
@@ -2073,11 +2074,11 @@ public class FRBlocks{
                 drag = -0.05f;
                 ammoMultiplier = 1;
                 pierceCap = 30;
+                homingPower = 0.01f;
+                status = StatusEffects.slow;
+                statusDuration = 60.0f;
                 pierceBuilding = true;
-                collidesGround = true;
-                reflectable = false;
-                absorbable = false;
-                hittable = false;
+                reflectable = absorbable = hittable = false;
 
                 backColor = find("ec7458");
                 frontColor = Color.white;
@@ -2192,11 +2193,11 @@ public class FRBlocks{
                 drag = -0.05f;
                 ammoMultiplier = 1;
                 pierceCap = 30;
+                homingPower = 0.02f;
+                status = FRStatusEffects.magnetized;
+                statusDuration = 240.0f;
                 pierceBuilding = true;
-                collidesGround = true;
-                reflectable = false;
-                absorbable = false;
-                hittable = false;
+                reflectable = absorbable = hittable = false;
 
                 backColor = find("ec7458");
                 frontColor = Color.white;
@@ -2358,11 +2359,12 @@ public class FRBlocks{
                 hardenedAlloy, 3600,
                 magneticAlloy, 3200
             ));
-            scaledHealth = 1000;
+            scaledHealth = 1000.0f;
+            armor = 32.0f;
             size = 12;
-            liquidCapacity = 1800f;
+            liquidCapacity = 1800.0f;
             canOverdrive = false;
-            reload = 420f;
+            reload = 420.0f;
             range = baseRange;
             shootCone = 0.5f;
             recoil = 12.0f;
@@ -2380,7 +2382,7 @@ public class FRBlocks{
             );
 
             consumePower(n(300000));
-            consumeCoolant(8.0f);
+            consumeCoolant(n(480));
 
             drawer = new DrawTurret(){{
                 parts.addAll(
@@ -3611,7 +3613,7 @@ public class FRBlocks{
             );
 
             craftTime = 5.0f;
-            basePowerProduction = 15.0f;
+            basePowerProduction = 45.0f;
             boostScale = 4.0f / 37.5f;
             maxBoost = 2.0f;
             outputLiquid = new LiquidStack(Liquids.slag, n(24));
@@ -3622,9 +3624,10 @@ public class FRBlocks{
             requirements(Category.crafting, with(
                 lead, 450,
                 graphite, 220,
-                mirrorglass, 180,
+                mirrorglass, 125,
                 logicAlloy, 320,
-                hardenedAlloy, 225
+                hardenedAlloy, 225,
+                magneticAlloy, 50
             ));
             scaledHealth = 90.0f;
             armor = 16.0f;
@@ -4138,7 +4141,7 @@ public class FRBlocks{
                 titanium, 3250
             ));
             researchCostMultiplier = 0.1f;
-            buildCostMultiplier = 0.5f;
+            buildCostMultiplier = 0.25f;
             size = 5;
             hasPower = true;
 

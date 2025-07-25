@@ -10,7 +10,7 @@ import mindustry.gen.Icon;
 import mindustry.ui.Links;
 import mindustry.ui.Styles;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.ui;
 
 /** @see mindustry.ui.dialogs.AboutDialog AboutDialog */
 public class FRAboutDialog extends mindustry.ui.dialogs.BaseDialog{

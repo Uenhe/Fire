@@ -1,6 +1,5 @@
 package fire.content;
 
-import arc.graphics.Color;
 import mindustry.type.Liquid;
 
 import static fire.FRVars.find;

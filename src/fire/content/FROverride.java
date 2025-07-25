@@ -92,7 +92,8 @@ public class FROverride{
 
         //region unit
         alpha.coreUnitDock = beta.coreUnitDock = gamma.coreUnitDock = true;
-        alpha.defaultCommand = beta.defaultCommand = UnitCommand.mineCommand;
+        alpha.defaultCommand = UnitCommand.mineCommand;
+        beta.defaultCommand = UnitCommand.assistCommand;
 
         flare.speed += 0.5f;
         flare.trailLength += 3;

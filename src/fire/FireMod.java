@@ -84,6 +84,8 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
+        FROverride.load();
+
         //all iterations in one for performance
         for(var block : content.blocks()){
             if(block.isFloor()){
@@ -109,7 +111,6 @@ public class FireMod extends mindustry.mod.Mod{
         if(headless) return;
         loadSetting();
         loadDatabase();
-        FROverride.load();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
             showUpdate();
@@ -181,9 +182,12 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showUpdate(){
-        String ofullv = Core.settings.getString("mod-fire-version"), cv = FIRE.meta.version.substring(0, 3);
-        if(ofullv != null && cv.equals(ofullv.substring(0, 3))) return;
-        Core.settings.put("mod-fire-version", cv);
+        String old = Core.settings.getString("mod-fire-version"), cur = FIRE.meta.version;
+        if(cur.equals(old)) return;
+
+        Core.settings.put("mod-fire-version", cur);
+        Core.settings.put("nomultimods", noMultiMods = true);
+        if(old != null && cur.substring(0, 3).equals(old.substring(0, 3))) return;
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
 
@@ -195,7 +199,7 @@ public class FireMod extends mindustry.mod.Mod{
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content1", "v" + cv)).center();
+            t.add(Core.bundle.format("fire.content1", "v" + cur.substring(0, 3))).center();
         });
     }
 
@@ -248,18 +252,10 @@ public class FireMod extends mindustry.mod.Mod{
         return Core.graphics.getWidth() * 0.8f;
     }
 
-    @SuppressWarnings("all")
     private static void fkgame(){
         var dialog = mulmodDialog = new BaseDialog("What happened");
         setupDialog(mulmodDialog);
         mulmodDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
-
-        Table container;
-        try{
-            container = (Table)field_container.get(ui.menufrag);
-        }catch(IllegalAccessException e){
-            throw new RuntimeException("?", e);
-        }
 
         if(mobile){
             final int m, n;

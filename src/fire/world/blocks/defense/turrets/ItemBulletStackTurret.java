@@ -85,10 +85,8 @@ public class ItemBulletStackTurret extends mindustry.world.blocks.defense.turret
     }
 
     public static class BulletStack{
-
         private final short delay;
         private final BulletType type;
-
         public BulletStack(int delay, BulletType type){
             this.delay = (short)delay;
             this.type = type;
