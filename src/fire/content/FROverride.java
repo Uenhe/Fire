@@ -104,7 +104,11 @@ public class FROverride{
 
 
         //region logic
+        LAssembler.customParsers.put(FRLogicStatements.TransitionEffectStatement.name, FRLogicStatements.TransitionEffectStatement::new);
+        LAssembler.customParsers.put(FRLogicStatements.MaskCutsceneStatement.name, FRLogicStatements.MaskCutsceneStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.TransitionEffectStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.MaskCutsceneStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
     }
 }

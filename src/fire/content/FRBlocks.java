@@ -3609,7 +3609,10 @@ public class FRBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(),
-                new DrawDefault()
+                new DrawRegion("-spinner1", 4.0f, true),
+                new DrawRegion("-spinner2", -4.0f, true),
+                new DrawDefault(),
+                new DrawFade()
             );
 
             craftTime = 5.0f;

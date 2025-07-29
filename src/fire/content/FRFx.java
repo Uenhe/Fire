@@ -10,7 +10,6 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Nullable;
-import arc.util.Tmp;
 import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -18,6 +17,7 @@ import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
+import mindustry.type.UnitType;
 
 import static mindustry.Vars.tilesize;
 
@@ -30,16 +30,17 @@ public class FRFx{
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0.0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0.0f, 0.3f) * e.fin();
             Draw.color(color);
 
+            var v = Fx.v;
             for(int i = 0, interval = (int)(range / spacing); i <= interval; i++){
-                Tmp.v6.trns(e.rotation, i * spacing);
+                v.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
-                Draw.rect("fire-aim-shoot", e.x + Tmp.v6.x, e.y + Tmp.v6.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
+                Draw.rect("fire-aim-shoot", e.x + v.x, e.y + v.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
             }
 
-            Tmp.v6.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
+            v.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
             Lines.stroke(track * 2.0f);
             for(int i : Mathf.signs)
-                Lines.lineAngle(e.x + Tmp.v6.x * i, e.y + Tmp.v6.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
+                Lines.lineAngle(e.x + v.x * i, e.y + v.y * i, e.rotation, range * (0.75f + track * 0.25f) * Mathf.curve(e.fout(Interp.pow5Out), 0.0f, 0.1f));
         });
     }
 
@@ -66,15 +67,11 @@ public class FRFx{
 
             Draw.z(Layer.bullet - 1.0f);
 
-            //DrawFunc.fillCirclePercentFade(e.x, e.y, e.x, e.y, e.rotation * f, e.fin(Interp.pow5), 0, Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f, 0.6f + 0.35f * Interp.pow2InInverse.apply(Mathf.curve(e.fin(), 0, 0.8f)), 1f);
-            //float centerX, float centerY, float x, float y, float rad, float percent, float angle, float aScl, float start , float end
             float p = Mathf.clamp(e.fin(Interp.pow5));
 
             int sides = Lines.circleVertices(rad), i = 0;
 
             float space = 360.0f / sides, len = 2.0f * rad * Mathf.sinDeg(space * 0.5f);
-
-            //Tmp.v6.set(rad, 0.0f);
 
             for(; i < sides * p - 1; i++){
                 float a = space * i;
@@ -83,10 +80,9 @@ public class FRFx{
             }
 
             float a = space * i;
-            Tmp.v6.trns(a, 0.0f, len * (sides * p - i - 1));
+            Fx.v.trns(a, 0.0f, len * (sides * p - i - 1));
             Draw.alpha(Mathf.curve(e.fout(), 0.2f, 0.25f) / 1.5f);
-            Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space) + Tmp.v6.x, e.y + rad * Mathf.sinDeg(a + space) + Tmp.v6.y, e.x, e.y);
-
+            Fill.tri(e.x + rad * Mathf.cosDeg(a), e.y + rad * Mathf.sinDeg(a), e.x + rad * Mathf.cosDeg(a + space) + Fx.v.x, e.y + rad * Mathf.sinDeg(a + space) + Fx.v.y, e.x, e.y);
 
             Draw.z(Layer.effect);
 
@@ -103,6 +99,34 @@ public class FRFx{
             Drawf.light(e.x, e.y, rad * 1.35f * e.fout(0.15f), color, 0.6f);
         });
     }
+
+    /** Special thanks to New Horizon mod. */
+    public static final Effect transitionEffect = new Effect(120.0f, 3000.0f, e -> {
+        if (!(e.data instanceof TransitionFxData data)) return;
+
+        var type = data.type;
+        float angleOffset = data.transOut ? 0.0f : 180.0f;
+
+        Draw.color(type.engineColor == null ? e.color : type.engineColor);
+        Draw.z(type.engineLayer > 0.0f
+            ? type.engineLayer
+            : (type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
+
+        var v = Fx.v;
+        v.trns(e.rotation, type.engineOffset, 0.0f);
+        e.scaled(80.0f, f -> {
+            tri(f.x + v.x, f.y + v.y, type.engineSize * 1.5f * f.fout(Interp.slowFast), 2000.0f * type.engineSize / (type.engineSize + 4.0f), f.rotation + angleOffset);
+            Fill.circle(f.x + v.x, f.y + v.y, type.engineSize * 1.5f * f.fout(Interp.slowFast));
+        });
+        Angles.randLenVectors(e.id, 16, 200.0f * type.engineSize / (type.engineSize + 4.0f), e.rotation + angleOffset, 0.0f, (x, y) ->
+            Lines.lineAngle(e.x + x + v.x, e.y + y + v.y, Mathf.angle(x, y), e.fout() * 60.0f)
+        );
+
+        Draw.color();
+        Draw.mixcol(e.color, 1.0f);
+        Draw.rect(type.fullIcon, e.x, e.y, type.fullIcon.width * e.fout(Interp.pow2Out) * Draw.scl * 1.2f, type.fullIcon.height * e.fout(Interp.pow2Out) * Draw.scl * 1.2f, e.rotation - 90.0f);
+        Draw.reset();
+    });
 
     /** Special thanks to Testing Utilities mod. */
     public static Effect fleshTeleportEffect = new Effect(80.0f, e -> {
@@ -215,13 +239,14 @@ public class FRFx{
     public static final Effect drillSteamFast = new Effect(160.0f, e -> {
         float length = 4.0f + e.finpow() * 24.0f;
         var rand = Fx.rand;
+        var v = Fx.v;
         for(int i = 0; i < 16; i++){
             rand.setSeed(e.id * 2L + i);
-            Fx.v.trns(rand.random(360.0f), rand.random(length));
+            v.trns(rand.random(360.0f), rand.random(length));
 
             e.scaled(e.lifetime * rand.random(0.5f, 1.0f), b -> {
                 Draw.color(Color.gray, b.fslope() * 0.93f);
-                Fill.circle(e.x + Fx.v.x, e.y + Fx.v.y, rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
+                Fill.circle(e.x + v.x, e.y + v.y, rand.random(1.4f, 4.0f) + b.fslope() * 1.4f);
             });
         }
     });
@@ -251,7 +276,7 @@ public class FRFx{
         float spacing = dst / links;
         var rand = Fx.rand;
         rand.setSeed(e.id * 2L);
-        var v = Tmp.v6.set(p).sub(e.x, e.y).nor();
+        var v = Fx.v.set(p).sub(e.x, e.y).nor();
         float nx = v.x, ny = v.y;
 
         Lines.stroke(1.2f * e.fout());
@@ -276,7 +301,7 @@ public class FRFx{
     public static final Effect chainEmpThin = new Effect(15.0f, 200.0f, e -> {
         if(!(e.data instanceof Position p)) return;
         float tx = p.getX(), ty = p.getY(), dst = Mathf.dst(e.x, e.y, tx, ty);
-        var v = Tmp.v6.set(p).sub(e.x, e.y).nor();
+        var v = Fx.v.set(p).sub(e.x, e.y).nor();
         var rand = Fx.rand;
 
         final float range = 6.0f, normx = v.x, normy = v.y;
@@ -354,6 +379,20 @@ public class FRFx{
         Draw.color(e.color, e.fout());
         Draw.rect(region, e.x, e.y, e.rotation);
     });
+    
+    private static void tri(float x, float y, float width, float length, float angle) {
+        float wx = Angles.trnsx(angle + 90, width), wy = Angles.trnsy(angle + 90, width);
+        Fill.tri(x + wx, y + wy, x - wx, y - wy, Angles.trnsx(angle, length) + x, Angles.trnsy(angle, length) + y);
+    }
+
+    public static class TransitionFxData{
+        public final UnitType type;
+        public final boolean transOut;
+        public TransitionFxData(UnitType type, boolean transOut){
+            this.type = type;
+            this.transOut = transOut;
+        }
+    }
 
     public static class TpFxData{
         public final Unit spawned;

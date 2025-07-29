@@ -30,7 +30,6 @@ public class FRPlanets{
 
     static{
         lysetta = new Planet("lst", Planets.sun, 1.0f, 3){
-
             @Override
             public void updateBaseCoverage(){
                 var rand = Mathf.rand;
