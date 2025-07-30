@@ -1,13 +1,14 @@
 package fire.content;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Angles;
-import arc.math.Interp;
 import arc.math.Mathf;
+import arc.struct.IntFloatMap;
 import arc.struct.Seq;
 import arc.util.Reflect;
 import arc.util.Time;
@@ -20,17 +21,14 @@ import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
-import mindustry.entities.effect.MultiEffect;
-import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.units.StatusEntry;
+import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
-
-import static fire.FRVars.find;
 
 public class FRStatusEffects{
 
@@ -242,17 +240,37 @@ public class FRStatusEffects{
 
         informationalProjection = new StatusEffect("informational-projection"){
 
+            private static final Color[] colors = {Color.red, Color.green, Color.blue};
+            private static final IntFloatMap timerMap = new IntFloatMap();
+
+            static{
+                Events.on(EventType.ResetEvent.class, e -> timerMap.clear());
+            }
+
             @Override
             public void setStats(){
                 super.setStats();
-                stats.add(FRStat.percentageHealing, 1);
+                stats.add(FRStat.percentageHealing, 1, FRStatUnit.percentPerSec);
+            }
+
+            @Override
+            public void onRemoved(Unit unit){
+                super.onRemoved(unit);
+                timerMap.remove(unit.id, 0.0f);
             }
 
             @Override
             public void update(Unit unit, float time){
                 super.update(unit,time);
-                unit.heal(unit.maxHealth * Time.delta / 3600f);
                 unit.team = Team.get(4);
+                unit.heal(unit.maxHealth * Time.delta / 3600.0f);
+
+                float timer = timerMap.get(unit.id);
+                if((timer += Time.delta) >= 15.0f){
+                    timer -= 15.0f;
+                    FRFx.ghostEffect.at(unit.x + Mathf.range(unit.hitSize * 0.8f), unit.y + Mathf.range(unit.hitSize * 0.8f), unit.rotation - 90.0f, colors[Mathf.random(2)], unit.type.fullIcon);
+                }
+                timerMap.put(unit.id, timer);
             }
             {
                 healthMultiplier = 3.0f;
@@ -261,47 +279,6 @@ public class FRStatusEffects{
                 speedMultiplier = 1.3f;
                 damage = 1.0f;
                 effectChance = 0.05f;
-                effect = new MultiEffect(
-                    new ParticleEffect(){{
-                        parentizeEffect = true;
-                        lifetime = 300.0f;
-                        particles = 1;
-                        baseLength = 4.0f;
-                        length = 4.0f;
-                        interp = Interp.pow5Out;
-                        sizeInterp = Interp.pow5In;
-                        sizeFrom = 3.0f;
-                        sizeTo = 0.0f;
-                        Color.valueOf(colorFrom, "5555ff00");
-                        Color.valueOf(colorTo, "5555ffff");
-                    }},
-                    new ParticleEffect(){{
-                        parentizeEffect = true;
-                        lifetime = 300.0f;
-                        particles = 1;
-                        baseLength = 4.0f;
-                        length = 4.0f;
-                        interp = Interp.pow5Out;
-                        sizeInterp = Interp.pow5In;
-                        sizeFrom = 3.0f;
-                        sizeTo = 0.0f;
-                        Color.valueOf(colorFrom, "55ff5500");
-                        Color.valueOf(colorTo, "55ff55ff");
-                    }},
-                    new ParticleEffect(){{
-                        parentizeEffect = true;
-                        lifetime = 300.0f;
-                        particles = 1;
-                        baseLength = 4.0f;
-                        length = 4.0f;
-                        interp = Interp.pow5Out;
-                        sizeInterp = Interp.pow5In;
-                        sizeFrom = 3.0f;
-                        sizeTo = 0.0f;
-                        Color.valueOf(colorFrom, "ff555500");
-                        Color.valueOf(colorTo, "ff5555ff");
-                    }}
-                );
             }
         };
     }

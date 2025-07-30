@@ -6,7 +6,10 @@ import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
 import arc.graphics.Pixmaps;
-import arc.graphics.g2d.*;
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.Fill;
+import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
@@ -75,12 +78,12 @@ public class BeamExtractor extends mindustry.world.Block{
     public void load(){
         super.load();
         var barrels = this.barrels;
-        byte len = (byte)barrels.size;
+        int len = barrels.size;
         base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite?
         barrelRegions = new TextureRegion[len];
         heatRegions = new TextureRegion[len];
 
-        for(byte i = 0; i < len; i++){
+        for(int i = 0; i < len; i++){
             var barrel = barrels.get(i);
             barrelRegions[i] = Core.atlas.find(name + barrel.name);
             heatRegions[i] = Core.atlas.find(name + barrel.name + "-heat");
@@ -155,9 +158,7 @@ public class BeamExtractor extends mindustry.world.Block{
         toDispose.add(pixmap);
         pixmap.draw(Core.atlas.getPixmap(base), true);
         pixmap.draw(Core.atlas.getPixmap(region), true);
-
         packer.add(MultiPacker.PageType.main, "block-" + name + "-full", pixmap);
-        packer.add(MultiPacker.PageType.editor, name + "-icon-editor", new PixmapRegion(pixmap));
 
         for(var pm : toDispose) pm.dispose();
     }
@@ -167,10 +168,10 @@ public class BeamExtractor extends mindustry.world.Block{
         Tile closest = null;
         float min = Float.MAX_VALUE;
 
-        short r = range;
-        short mx = (short)Mathf.ceil((wp(x) + r) / tilesize), my = (short)Mathf.ceil((wp(y) + r) / tilesize);
-        for    (short tx = (short)((wp(x) - r) / tilesize); tx <= mx; tx++)
-            for(short ty = (short)((wp(y) - r) / tilesize); ty <= my; ty++){
+        int r = range,
+        mx = Mathf.ceil((wp(x) + r) / tilesize), my = Mathf.ceil((wp(y) + r) / tilesize);
+        for    (int tx = (int)((wp(x) - r) / tilesize); tx <= mx; tx++)
+            for(int ty = (int)((wp(y) - r) / tilesize); ty <= my; ty++){
                 float dst = Mathf.dst(wp(x), wp(y), tx * tilesize, ty * tilesize);
                 if(dst > r || dst <= closeDst()) continue;
                 var tile = world.tile(tx, ty);
@@ -240,7 +241,7 @@ public class BeamExtractor extends mindustry.world.Block{
                 checkOre(tile.x, tile.y, false, null, new Entry(selected, ore -> mining = ore));
             if(!valid()) return;
 
-            for(byte i = 0, len = (byte)barrels.size; i < len; i++){
+            for(int i = 0, len = barrels.size; i < len; i++){
                 var barrel = barrels.get(i);
                 drawrots[i] = Angles.angle(x + barrel.x, y + barrel.y, beamX, beamY) - 90.0f;
             }
@@ -252,7 +253,7 @@ public class BeamExtractor extends mindustry.world.Block{
             }
 
             if(drillTimer >= getDrillTime() && items.total() < itemCapacity){
-                for(byte i = 0, amount = (byte)(drillTimer / getDrillTime()); i < amount; i++)
+                for(int i = 0, amount = (int)(drillTimer / getDrillTime()); i < amount; i++)
                     offload(mining.drop());
 
                 if(wasVisible)
@@ -316,7 +317,7 @@ public class BeamExtractor extends mindustry.world.Block{
             Draw.rect(base, x, y);
             Draw.color();
 
-            for(byte i = 0, len = (byte)barrels.size; i < len; i++){
+            for(int i = 0, len = barrels.size; i < len; i++){
                 var barrel = barrels.get(i);
                 float rot = drawrots[i], bx = x + barrel.x, by = y + barrel.y;
 
@@ -383,7 +384,7 @@ public class BeamExtractor extends mindustry.world.Block{
             drillTimer = read.f();
             warmup = read.f();
             boostWarmup = read.f();
-            for(byte i = 0, len = (byte)barrels.size; i < len; i++) drawrots[i] = read.f();
+            for(int i = 0, len = (byte)barrels.size; i < len; i++) drawrots[i] = read.f();
         }
 
         private void init(){

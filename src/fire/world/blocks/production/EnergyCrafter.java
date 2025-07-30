@@ -124,7 +124,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             var items = outputItems;
             if(items != null)
                 for(var output : items)
-                    for(byte i = 0, n = (byte)output.amount; i < n; i++)
+                    for(int i = 0, n = output.amount; i < n; i++)
                         offload(output.item);
                         
             if(wasVisible) craftEffect.at(x, y, 0.0f, circleColor[counter]);
@@ -150,10 +150,10 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             int round = fragRoundRand ? Mathf.random(Mathf.ceil(fragRound * min), Mathf.floor(fragRound * max)) : fragRound;
             int bullets = fragBulletsRand ? Mathf.random(Mathf.ceil(fragBullets * min), Mathf.floor(fragBullets * max)) : fragBullets;
 
-            for(byte i = 0; i < round; i++){
+            for(int i = 0; i < round; i++){
                 float delay = fragDelayRand ? i * fragDelay * Mathf.random(0.8f, 1.25f) / scl : i * fragDelay;
                 Time.run(delay, () -> {
-                    for(byte j = 0; j < bullets; j++)
+                    for(int j = 0; j < bullets; j++)
                         fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f),
                             Mathf.random(fragBullet.fragVelocityMin, fragBullet.fragVelocityMax)
                         );
@@ -227,12 +227,12 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             craftSound.at(tile, Mathf.random(0.45f, 0.55f));
             if(!specialContent) return;
 
-            byte amount = (byte)(lightningAmount * (1 + instability / maxInstability));
+            int amount = (int)(lightningAmount * (1 + instability / maxInstability));
             if(instability <= maxInstability * 0.5f){
-                for(byte i = 0; i < amount; i++)
+                for(int i = 0; i < amount; i++)
                     Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
             }else{
-                for(byte i = 0; i < amount; i++)
+                for(int i = 0; i < amount; i++)
                     LightningBranch.create(this, circleColor[counter], lightningDamage, i * (360.0f / amount), (int)(size + instability * 0.024f), 2, 2);
             }
         }

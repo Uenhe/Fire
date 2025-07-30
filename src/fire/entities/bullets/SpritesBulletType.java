@@ -28,7 +28,7 @@ public class SpritesBulletType extends mindustry.entities.bullet.BulletType{
     @Override
     public void load(){
         super.load();
-        for(byte i = 0, len = (byte)regions.length; i < len;)
+        for(int i = 0, len = (byte)regions.length; i < len;)
             regions[i] = Core.atlas.find(name + ++i);
     }
 

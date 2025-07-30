@@ -10,13 +10,15 @@ import mindustry.input.Binding;
 
 public class FRUnitCommand extends UnitCommand{
 
-    public FRUnitCommand(String name, String icon, Func<Unit, AIController> controller){
-        super(name, icon, controller);
-    }
-
-    public static void loadAll(){
+    static{
         repairCommand = new UnitCommand("repair", "modeSurvival", Binding.unitCommandRepair, u -> new DashRepairAI());
         rebuildCommand = new UnitCommand("rebuild", "hammer", Binding.unitCommandRebuild, u -> new DashBuilderAI(false));
         assistCommand = new UnitCommand("assist", "players", Binding.unitCommandAssist, u -> new DashBuilderAI(true));
     }
+
+    public FRUnitCommand(String name, String icon, Func<Unit, AIController> controller){
+        super(name, icon, controller);
+    }
+
+    public static void loadAll(){}
 }

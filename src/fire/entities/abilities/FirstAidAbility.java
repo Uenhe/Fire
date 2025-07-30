@@ -35,13 +35,13 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     /** Frames between two detections. */
     private static final byte detectInterval = 5;
 
-    public FirstAidAbility(int cd, int lossP, int healA, int healP, StatusEffect se, int sed, int detectDuration, Effect fx){
+    public FirstAidAbility(int cd, int lossPerc, int healAmount, int healPerc, StatusEffect sfx, int sfxDuration, int detectDuration, Effect fx){
         cooldown = (short)cd;
-        healthLossPercentage = (byte)lossP;
-        healAmount = healA;
-        healPercentage = (byte)healP;
-        status = se;
-        statusDuration = (short)sed;
+        healthLossPercentage = (byte)lossPerc;
+        this.healAmount = healAmount;
+        healPercentage = (byte)healPerc;
+        status = sfx;
+        statusDuration = (short)sfxDuration;
         effect = fx;
         healthArray = new float[(byte)(detectDuration / detectInterval)];
     }
@@ -72,7 +72,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
             detectTimer += Time.delta;
 
             if(detectTimer >= detectInterval){
-                for(byte i = 0, lenm1 = (byte)(healthArray.length - 1); i < lenm1; i++)
+                for(int i = 0, lenm1 = (byte)(healthArray.length - 1); i < lenm1; i++)
                     healthArray[i] = healthArray[i + 1];
                 healthArray[healthArray.length - 1] = unit.health;
 

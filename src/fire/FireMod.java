@@ -5,9 +5,9 @@ import arc.Events;
 import arc.graphics.Texture;
 import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
-import arc.scene.style.Drawable;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.layout.Table;
+import arc.scene.ui.layout.WidgetGroup;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Reflect;
@@ -29,12 +29,14 @@ import mindustry.gen.Icon;
 import mindustry.mod.Mods;
 import mindustry.type.Item;
 import mindustry.type.SectorPreset;
+import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.fragments.MenuFragment;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.Attribute;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -45,10 +47,16 @@ import static mindustry.Vars.*;
 public class FireMod extends mindustry.mod.Mod{
 
     private static Mods.LoadedMod FIRE;
-    private static boolean multiplied;
-    private static byte counter;
-    private static BaseDialog mainDialog;
-    private static final Seq<MenuFragment.MenuButton> menuButtons = new Seq<>(8);
+    private static BaseDialog mainDialog, mulmodDialog;
+    private static final Field field_container;
+
+    static{
+        try{
+            field_container = FRUtils.field(MenuFragment.class, "container");
+        }catch(NoSuchFieldException e){
+            throw new RuntimeException("?", e);
+        }
+    }
 
     public FireMod(){
         if(!headless) FRBinding.init();
@@ -76,6 +84,8 @@ public class FireMod extends mindustry.mod.Mod{
 
     @Override
     public void init(){
+        FROverride.load();
+
         //all iterations in one for performance
         for(var block : content.blocks()){
             if(block.isFloor()){
@@ -101,13 +111,10 @@ public class FireMod extends mindustry.mod.Mod{
         if(headless) return;
         loadSetting();
         loadDatabase();
-        FROverride.load();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
             showUpdate();
             showNoMultipleMods();
-
-            doSomethingUnplayable();
         });
     }
 
@@ -121,14 +128,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
             t.rebuild(); //adapts to MindustryX
-            t.row().button("@setting.fire-showlog", () -> {
-                showLog(true);
-                if(!DEBUG.isDeveloper()) return;
-                if(++counter == 5){
-                    doSomethingPlayable();
-                    ui.announce("ovo!");
-                }
-            }).size(240.0f, 80.0f);
+            t.row().button("@setting.fire-showlog", () -> showLog(true)).size(240.0f, 80.0f);
         });
         getSettings();
     }
@@ -142,7 +142,7 @@ public class FireMod extends mindustry.mod.Mod{
 
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
-        historyDialog.cont.pane(t -> t.add("@fire.history").width(Core.graphics.getWidth() * 0.25f));
+        historyDialog.cont.pane(t -> t.add("@fire.history").center());
 
         var main = mainDialog = new BaseDialog("@fire.maintitle");
         setupDialog(main);
@@ -177,18 +177,17 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showNoMultipleMods(){
-        if(!noMultiMods || !mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
-
-        multiplied = true;
-        doSomethingUnplayable();
-
-        new DelayClosableDialog("Warning", 600.0f).show().cont.add("@fire.nomultimods");
+        if(!noMultiMods || !mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
+        fkgame();
     }
 
     private static void showUpdate(){
-        var ver = FIRE.meta.version.substring(0, 3);
-        if(ver.equals(Core.settings.getString("mod-fire-version").substring(0, 3))) return;
-        Core.settings.put("mod-fire-version", ver);
+        String old = Core.settings.getString("mod-fire-version"), cur = FIRE.meta.version;
+        if(cur.equals(old)) return;
+
+        Core.settings.put("mod-fire-version", cur);
+        Core.settings.put("nomultimods", noMultiMods = true);
+        if(old != null && cur.substring(0, 3).equals(old.substring(0, 3))) return;
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
 
@@ -200,7 +199,7 @@ public class FireMod extends mindustry.mod.Mod{
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content1", "v" + ver)).maxWidth(width()).padRight(200.0f);
+            t.add(Core.bundle.format("fire.content1", "v" + cur.substring(0, 3))).center();
         });
     }
 
@@ -210,7 +209,7 @@ public class FireMod extends mindustry.mod.Mod{
         if(!Core.app.isDesktop()) return;
 
         String[] titles = Core.bundle.get("fire.titles").split("\\|");
-        byte index = (byte)Mathf.random(titles.length - 1);
+        int index = Mathf.random(titles.length - 1);
         String title = titles[index];
 
         if(index == 0) //"Today is the @th Day of God's Creation of Planet Lysetta" picked
@@ -234,7 +233,7 @@ public class FireMod extends mindustry.mod.Mod{
                     t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
                     t.table(info -> {
                         info.left().add("[accent]" + c.localizedName).left().row();
-                        short index = (short)c.description.indexOf(Core.bundle.get("fire.strend"));
+                        int index = c.description.indexOf(Core.bundle.get("fire.strend"));
                         String desc = index == -1 ? c.description : c.description.substring(0, index);
                         if(c instanceof SectorPreset) desc += "...";
                         info.left().add(desc).left();
@@ -253,37 +252,100 @@ public class FireMod extends mindustry.mod.Mod{
         return Core.graphics.getWidth() * 0.8f;
     }
 
-    /** ??? */
-    private static void doSomethingUnplayable(){
+    private static void fkgame(){
+        var dialog = mulmodDialog = new BaseDialog("What happened");
+        setupDialog(mulmodDialog);
+        mulmodDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
+
         if(mobile){
-            Table table = Reflect.get(ui.menufrag, "container");
-            table.getCells().removeRange(0, 4);
+            final int m, n;
+            if(mods.locateMod("mindustryx") != null){
+                m = 2; n = 5;
+            }else{
+                m = 1; n = 3;
+            }
+            ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
+
+            ui.menuGroup.fill(c ->
+                c.pane(Styles.noBarPane, cont -> {
+                    try{
+                        field_container.set(ui.menufrag, cont);
+                    }catch(IllegalAccessException e){
+                        throw new RuntimeException("?", e);
+                    }
+                    cont.name = "menu container";
+
+                    buildMobile();
+                    Events.on(EventType.ResizeEvent.class, event -> buildMobile());
+
+                }).with(pane -> pane.setOverscroll(false, false)).grow()
+            );
 
         }else{
-            var buttons = ui.menufrag.desktopButtons;
+            Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
             for(var b : buttons)
                 if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
-                    menuButtons.add(b);
+                    tmp.add(b);
 
-            buttons.removeAll(menuButtons);
+            buttons.removeAll(tmp);
+            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulmodDialog::show));
         }
+
+        Events.on(EventType.WorldLoadBeginEvent.class, e -> {
+            Log.info("what r u fking doing");
+            Core.app.exit();
+        });
     }
 
-    /** !!! */
-    private static void doSomethingPlayable(){
-        if(multiplied){
-            multiplied = false;
+    private static void buildMobile(){
+        Table container;
+        try{
+            container = (Table)field_container.get(ui.menufrag);
+        }catch(IllegalAccessException e){
+            throw new RuntimeException("?", e);
+        }
+        container.clear();
+        container.name = "buttons";
+        container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
+        container.defaults().size(120.0f).pad(5.0f).padTop(4.0f);
 
-            if(mobile){
+        MobileButton
+        settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+        mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+        what = new MobileButton(Icon.warning, "@fire.what", mulmodDialog::show),
+        exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
+        about = new MobileButton(Icon.info, "@about.button", ui.about::show);
 
-            }else{
-                menuButtons.reverse();
-                for(var b : menuButtons)
-                    ui.menufrag.desktopButtons.insert(0, b);
+        Seq<MenuFragment.MenuButton> customButtons = Reflect.get(ui.menufrag, "customButtons");
+        var customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
 
-                ui.menufrag.build(ui.menuGroup);
-                menuButtons.clear();
+        if(!Core.graphics.isPortrait()){
+            container.marginTop(60.0f);
+
+            for(int i = 1; i < customs.size; i += 2)
+                container.add(customs.get(i));
+
+            container.row();
+
+            container.add(settings);
+            container.add(mods);
+
+            for(int i = 0; i < customs.size; i += 2)
+                container.add(customs.get(i));
+
+        }else{
+            container.marginTop(0.0f);
+            container.add(settings);
+            container.add(mods);
+            container.row();
+
+            for(int i = 0; i < customs.size; i++){
+                container.add(customs.get(i));
+                if(i % 2 == 0) container.row();
             }
         }
+
+        container.add(what);
+        container.add(exit);
     }
 }

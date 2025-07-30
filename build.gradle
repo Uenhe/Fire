@@ -6,7 +6,7 @@ sourceSets.main.java.srcDirs = ["src"]
 
 repositories{
     mavenCentral()
-    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url "https://ghfast.top/https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
     maven{ url 'https://www.jitpack.io' }
 }
 
@@ -16,45 +16,43 @@ java{
 
 ext{
     //the build number that this mod is made for
-    arcHash = '7fce1757dc'
-    mindustryHash = '5615182bc5' //adapts to 25902
-    jabelVersion = '93fde537c7'
+    mindustryVersion = 'v150'
+    jabelVersion = "93fde537c7"
     //windows sucks
     isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
     sdkRoot = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
 }
 
+//java 8 backwards compatibility flag
 allprojects{
-    tasks.withType(JavaCompile).tap{
-        configureEach{
-            options.compilerArgs.addAll(['--release', '17'])
-        }
+    tasks.withType(JavaCompile){
+        options.compilerArgs.addAll(['--release', '17'])
     }
 }
 
 dependencies{
-    compileOnly "com.github.Anuken.Arc:arc-core:$arcHash"
-    compileOnly "com.github.Anuken.Mindustry:core:$mindustryHash"
+    compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 
     annotationProcessor "com.github.Anuken:jabel:$jabelVersion"
 }
 
 //force arc version
-configurations.configureEach{
-    resolutionStrategy.eachDependency{ details ->
-        if('com.github.Anuken.Arc' == details.requested.group){
-            details.useVersion "$arcHash"
+configurations.all{
+    resolutionStrategy.eachDependency { details ->
+        if(details.requested.group == 'com.github.Anuken.Arc'){
+            details.useVersion "$mindustryVersion"
         }
     }
 }
 
-tasks.register('jarAndroid'){
+task jarAndroid{
     dependsOn "jar"
 
     doLast{
-        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.")
+        if(!sdkRoot || !new File(sdkRoot).exists()) throw new GradleException("No valid Android SDK found. Ensure that ANDROID_HOME is set to your Android SDK directory.");
 
-        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{f -> new File(f, "android.jar").exists()}
+        def platformRoot = new File("$sdkRoot/platforms/").listFiles().sort().reverse().find{ f -> new File(f, "android.jar").exists()}
 
         if(!platformRoot) throw new GradleException("No android.jar found. Ensure that you have an Android platform installed.")
 
@@ -85,7 +83,7 @@ jar{
     }
 }
 
-tasks.register('deploy', Jar){
+task deploy(type: Jar){
     dependsOn jarAndroid
     dependsOn jar
     archiveFileName = "${base.archivesBaseName}.jar"

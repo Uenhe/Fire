@@ -42,7 +42,7 @@ public class DrawWeavePlus extends DrawWeave{
             Draw.alpha(build.warmup());
 
             var rnd = rand;
-            for(byte i = 0, lines = this.lines; i < lines; i++){
+            for(int i = 0, lines = this.lines; i < lines; i++){
                 rnd.setSeed(build.id * i * 2L);
 
                 float value = Mathf.sin(build.totalProgress() + rnd.random(10.0f), 8.0f / rotateSpeed * rnd.random(0.8f, 1.25f), build.block.size * tilesize * 0.33f),

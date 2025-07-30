@@ -92,7 +92,8 @@ public class FROverride{
 
         //region unit
         alpha.coreUnitDock = beta.coreUnitDock = gamma.coreUnitDock = true;
-        alpha.defaultCommand = beta.defaultCommand = UnitCommand.mineCommand;
+        alpha.defaultCommand = UnitCommand.mineCommand;
+        beta.defaultCommand = UnitCommand.assistCommand;
 
         flare.speed += 0.5f;
         flare.trailLength += 3;
@@ -103,7 +104,13 @@ public class FROverride{
 
 
         //region logic
+        LAssembler.customParsers.put(FRLogicStatements.TransitionEffectStatement.name, FRLogicStatements.TransitionEffectStatement::new);
+        LAssembler.customParsers.put(FRLogicStatements.MaskCutsceneStatement.name, FRLogicStatements.MaskCutsceneStatement::new);
+        LAssembler.customParsers.put(FRLogicStatements.FetchPlusPlusStatement.name, FRLogicStatements.FetchPlusPlusStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.TransitionEffectStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.MaskCutsceneStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.FetchPlusPlusStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
     }
 }

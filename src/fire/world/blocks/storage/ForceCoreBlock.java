@@ -21,7 +21,9 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
+import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -64,6 +66,15 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     }
 
     @Override
+    public boolean canReplace(Block other){
+        var core = player.core();
+        if(other instanceof CoreBlock && size >= other.size && other != this && core != null && !state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))
+            return false;
+
+        return super.canReplace(other);
+    }
+
+    @Override
     public boolean canPlaceOn(Tile tile, Team team, int rotation){
         return true;
     }
@@ -89,7 +100,6 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
     @Override
     public void drawPlace(int x, int y, int rotation, boolean valid){
         super.drawPlace(x, y, rotation, valid);
-
         Draw.color(Pal.gray);
         Lines.stroke(3.0f);
         Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
@@ -97,14 +107,21 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         Lines.stroke(1.0f);
         Lines.poly(x * tilesize + offset, y * tilesize + offset, sides, radius, shieldRotation);
         Draw.color();
-
         Draw.reset();
+
+        var tile = world.tile(x, y);
+        if(tile == null) return;
+
+        var other = tile.block();
+        var core = player.core();
+        if(other instanceof CoreBlock && size >= other.size && other != this && core != null && !state.rules.infiniteResources && !core.items.has(requirements, state.rules.buildCostMultiplier))
+            drawPlaceText(Core.bundle.get("bar.noresources"), x, y, valid);
     }
 
     public class ForceCoreBuild extends CoreBuild implements mindustry.logic.Ranged, ConsumePowerCustom.CustomPowerConsumer{
 
         private float buildup, scl, hit, warmup, colorWarmup, consPowerScale;
-        private boolean broken, damaging;
+        private boolean broken;
 
         @Override
         public float range(){
@@ -126,6 +143,7 @@ public class ForceCoreBlock extends mindustry.world.blocks.storage.CoreBlock{
         public void updateTile(){
             super.updateTile();
 
+            boolean damaging;
             if(team == state.rules.waveTeam || cheating()){
                 consPowerScale = 0.0f;
                 damaging = false;

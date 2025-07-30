@@ -8,6 +8,8 @@ import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
 import arc.util.Scaling;
+import arc.util.Tmp;
+import fire.world.DEBUG;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
 import fire.world.meta.FRStat;
@@ -16,6 +18,7 @@ import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.gen.Building;
+import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Styles;
@@ -36,7 +39,7 @@ public class Campfire{
         public float updateEffectChance;
         public Effect updateEffect = Fx.none;
         public DrawArrows drawArrows;
-        public final float maxBoost = 3.38f; //hardcoded;
+        public final float maxBoost = 3.38f; //hardcoded
 
         public CampfireBlock(String name){
             super(name);
@@ -55,23 +58,44 @@ public class Campfire{
             stats.add(FRStat.statusEffectApplied, table -> {
                 table.row();
 
-                for(byte i = 0; i < 2; i++){
-                    var s = i == 0 ? allyStatus : enemyStatus;
+                for(int i = 0; i < 2; i++){
+                    var sfx = i == 0 ? allyStatus : enemyStatus;
 
                     table.table(Styles.grayPanel, t -> {
-                        t.left().button(new TextureRegionDrawable(s.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(s)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
+                        t.left().button(new TextureRegionDrawable(sfx.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(sfx)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
                         t.left().table(info -> {
-                            String detail = s == allyStatus
+                            String detail = sfx == allyStatus
                             ? FRStat.allyStatusEffect.localized()
                             : FRStat.enemyStatusEffect.localized();
 
                             info.left().add("[accent]" + detail).left();
                             info.row();
-                            info.left().add(s.localizedName).color(s.color).left();
+                            info.left().add(sfx.localizedName).color(sfx.color).left();
                         });
                     }).growX().pad(5.0f).row();
                 }
             });
+        }
+
+        @Override
+        public void drawPlace(int x, int y, int rotation, boolean valid){
+            if(DEBUG.isDeveloper()){
+                float wx = x * tilesize + offset, wy = y * tilesize + offset;
+                drawPotentialLinks(x, y);
+                drawOverlay(wx, wy, rotation);
+
+                float[] ranges = {range, range + phaseRangeBoost * (2.25f - speedBoost) / speedBoostPhase, range + phaseRangeBoost * (4.2f - speedBoost) / speedBoostPhase};
+                Color[] colors = {baseColor, phaseColor, phaseColor.cpy().mul(1.15f)};
+                for(int i = 0; i < 3; i++)
+                    Drawf.dashCircle(wx, wy, ranges[i], colors[i]);
+                for(int i = 2; i >= 0; i--){
+                    var j = i;
+                    indexer.eachBlock(player.team(), wx, wy, ranges[i], other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(colors[j]).a(Mathf.absin(4.0f, 1.0f))));
+                }
+
+            }else{
+                super.drawPlace(x, y, rotation, valid);
+            }
         }
 
         public class CampfireBuild extends OverdriveBuild implements fire.world.draw.DrawArrows.SmoothCrafter, ConsumeCampfire.CampfireConsume, ConsumePowerCustom.CustomPowerConsumer{
@@ -181,7 +205,7 @@ public class Campfire{
                         Core.bundle.format("stat.consumecampfire", block.speedBoostPhase * 100, block.phaseRangeBoost / tilesize)
                     ).growX().pad(5.0f));
 
-                byte i = 0;
+                int i = 0;
                 for(var item : content.items()){
                     if(item.flammability <= 0.0f || item.isHidden()) continue;
 

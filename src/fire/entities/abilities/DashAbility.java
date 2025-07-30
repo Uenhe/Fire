@@ -65,7 +65,7 @@ public class DashAbility extends mindustry.entities.abilities.Ability{
         Draw.color(Color.white);
         Draw.z((unit.type.lowAltitude ? Layer.flyingUnitLow : Layer.flyingUnit) - 0.001f);
 
-        for(byte i = 0, afterimage = this.afterimage; i < afterimage; i++){
+        for(int i = 0, afterimage = this.afterimage; i < afterimage; i++){
             float offset = unit.type.engineOffset * 0.5f * (1.0f + (unit.type.useEngineElevation ? unit.elevation : 1.0f)) + (i * unit.speedMultiplier * 8.0f * (1.0f - t / invincibleTime));
             Draw.alpha(0.8f * (1.0f - (t / invincibleTime)) * (1.0f - (float)i / afterimage));
             Draw.rect(unit.type.name,

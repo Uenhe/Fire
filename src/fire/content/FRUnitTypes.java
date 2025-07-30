@@ -9,6 +9,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
+import arc.util.Tmp;
 import fire.FRUtils;
 import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
@@ -22,6 +23,7 @@ import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.part.HoverPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
@@ -36,7 +38,8 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
-import static fire.FRVars.*;
+import static fire.FRVars.find;
+import static fire.FRVars.lancer_a04;
 import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
@@ -55,7 +58,7 @@ public class FRUnitTypes{
         omicron, pioneer,
 
         //air kamikaze
-        firefly, candlight, lampryo, lumiflame,
+        firefly, candlight, lampryo, lumiflame, radiance,
 
         //air
         javelin, apollo,
@@ -508,15 +511,15 @@ public class FRUnitTypes{
             isEnemy = false;
             lowAltitude = true;
             faceTarget = true;
-            createWreck = false; //disable damage upon death
+            createWreck = false; //disable crash damage
             coreUnitDock = true;
-            engineOffset = 6f;
+            engineOffset = 6.0f;
             itemCapacity = 90;
             mineTier = 4;
-            mineRange += 40f;
+            mineRange += 40.0f;
             mineSpeed = 8.5f;
-            buildRange += 40f;
-            buildSpeed = 3f;
+            buildRange += 40.0f;
+            buildSpeed = 3.0f;
 
             abilities.add(
                 new RepairFieldAbility(20f, 300f, 40f),
@@ -529,7 +532,7 @@ public class FRUnitTypes{
                     reload = 12.0f;
                     x = 4.0f;
                     y = 0.6f;
-                    inaccuracy = 1.1f;
+                    inaccuracy = 1.0f;
                     top = false;
                     rotate = true;
                     shootSound = Sounds.lasershoot;
@@ -568,10 +571,11 @@ public class FRUnitTypes{
             buildSpeed = 3.4f;
             buildRange += 80.0f;
             lowAltitude = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new DashAbility(6.7f, 15, 120, 6),
-                new FirstAidAbility(2400, 75, 500, 5, FRStatusEffects.sanctuaryGuard, 120, 120, new MultiEffect(
+                new FirstAidAbility(2400, 70, 500, 5, FRStatusEffects.sanctuaryGuard, 120, 60, new MultiEffect(
                     new Effect(45.0f, e -> {
                         Draw.color(Pal.heal);
                         Lines.stroke(e.fout() * 4.0f);
@@ -645,7 +649,7 @@ public class FRUnitTypes{
                             Lines.circle(e.x, e.y, radius);
 
                             float offset = Mathf.randomSeed(e.id, 360f);
-                            for(byte i = 0, points = 8; i < points; i++){
+                            for(int i = 0, points = 8; i < points; i++){
                                 float angle = i * 360f / points + offset;
                                 Drawf.tri(e.x + Angles.trnsx(angle, radius), e.y + Angles.trnsy(angle, radius), 4.0f, 30f * e.fout(), angle);
                             }
@@ -665,7 +669,7 @@ public class FRUnitTypes{
                     rotateSpeed = 4f;
                     rotate = true;
                     shootSound = Sounds.lasershoot;
-                    bullet = new LaserBoltBulletType(8f, 10f){{
+                    bullet = new LaserBoltBulletType(8.0f, 15.0f){{
                         lifetime = 20f;
                         width = 5f;
                         height = 8f;
@@ -679,19 +683,18 @@ public class FRUnitTypes{
                         collidesTeam = true;
                         trailRotation = true;
 
-                        backColor = Pal.heal;
+                        backColor = trailColor = hitColor = Pal.heal;
                         frontColor = Color.white;
-                        trailColor = Pal.heal;
                         trailEffect = Fx.colorSpark;
 
                         fragSpread = 0.0f;
                         fragRandomSpread = 15f;
                         fragBullets = 2;
-                        fragBullet = new LaserBulletType(20f){{
-                            length = 140f;
-                            width = 8f;
-                            lifetime = 15f;
-                            pierceCap = 2;
+                        fragBullet = new LaserBulletType(40.0f){{
+                            length = 140.0f;
+                            width = 8.0f;
+                            lifetime = 15.0f;
+                            pierceCap = 4;
                             pierceBuilding = true;
                             colors(colors, Pal.heal, Pal.heal, Color.white);
                         }};
@@ -717,6 +720,7 @@ public class FRUnitTypes{
             itemCapacity = 15;
             circleTarget = true;
             lowAltitude = false;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(2f, 8, 0.1f, 0.0f, 1.2f, 1.6f, Pal.lancerLaser)
@@ -757,6 +761,7 @@ public class FRUnitTypes{
             itemCapacity = 25;
             circleTarget = true;
             lowAltitude = false;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(2.0f, 12, 0.4f, 8.0f, 1.2f, 2.4f, Pal.lancerLaser)
@@ -799,6 +804,7 @@ public class FRUnitTypes{
             trailLength = 12;
             itemCapacity = 60;
             circleTarget = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(3.0f, 12, 0.3f, 12.0f, 0.8f, 1.8f, Pal.lancerLaser)
@@ -901,6 +907,7 @@ public class FRUnitTypes{
             trailLength = 12;
             itemCapacity = 90;
             circleTarget = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             immunities.addAll(
                 StatusEffects.burning, StatusEffects.melting
@@ -1103,6 +1110,207 @@ public class FRUnitTypes{
                     }};
                 }}
             );
+        }};
+
+        radiance = new UnitType("radiance"){{
+            var shockWave = new ExplosionBulletType(){{
+                splashDamage = 1500f;
+                splashDamageRadius = 80.0f;
+                hitEffect = new WaveEffect(){{
+                    lifetime = 40.0f;
+                    colorFrom = Pal.surge;
+                    colorTo = Color.white;
+                    sizeFrom = 0.0f;
+                    sizeTo = 90.0f;
+                    strokeFrom = 4.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+            }};
+
+            constructor = UnitEntity::create;
+            hovering = true;
+            canDrown = false;
+            flying = false;
+            health = 16500.0f;
+            armor = 23.0f;
+            hitSize = 50.0f;
+            speed = 1f;
+            rotateSpeed = 1f;
+            drag = 0.02f;
+            accel = 0.04f;
+            range = maxRange = 40.0f;
+            engineSize = 12.0f;
+            engineOffset = 44.0f;
+            trailLength = 18;
+            itemCapacity = 250;
+            circleTarget = true;
+
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+
+            parts.add(
+                new HoverPart(){{
+                    x = 20f;
+                    y = 23f;
+                    mirror = true;
+                    radius = 26f;
+                    phase = 90f;
+                    stroke = 3f;
+                    sides = 6;
+                    layerOffset = -0.001f;
+                    color = Pal.lancerLaser;
+                }},
+                    new HoverPart(){{
+                    x = 24f;
+                    y = -29f;
+                    mirror = true;
+                    radius = 34f;
+                    phase = 90f;
+                    stroke = 4f;
+                    sides = 6;
+                    layerOffset = -0.001f;
+                    color = Pal.lancerLaser;
+                }}
+            );
+
+            abilities.add(
+                new RegenAbility(){{amount = 5.0f;}},
+                new ShieldArcAbility(){
+                    @Override
+                    public void update(Unit u){
+                        super.update(u);
+                        if(data >= max - 1.0f)
+                            u.apply(StatusEffects.fast, 10.0f); //faster when shield is in shape
+                        if(data > 0)
+                            u.apply(StatusEffects.shielded, 10.0f); //stronger when shield is alive
+                        if(data <= 0)
+                            u.apply(StatusEffects.slow, 10.0f); //slower when shield is broken
+                    }
+                    {
+                        radius = 90.0f;
+                        regen = 3.0f;
+                        max = 3000.0f;
+                        whenShooting = false;
+                        width = 12.0f;
+                        angle = 135.0f;
+                    }
+                }
+            );
+
+            weapons.add(new Weapon(){{
+                shootOnDeath = true;
+                //controllable = false;
+                x = 0.0f;
+                shootCone = 180.0f;
+                rotateSpeed = 360.0f;
+                mirror = false;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.explosionbig;
+
+                bullet = new BulletType(12.0f, 12900.0f){
+                    public void draw(Bullet b){
+                        super.draw(b);
+                        float length1 = (b.time <= 120.0F ? (b.time >= 30.0F ? 300.0F : (b.time * 10.0F)) : (1500.0F - b.time * 10F)) / 3;
+
+                        Draw.z(Layer.flyingUnit + 0.8f);
+
+                        Fill.light(b.x, b.y, Lines.circleVertices(length1), length1, find("fffff3aa"), Tmp.c2.set(Color.white).lerp(find("ffa439ff"), Mathf.clamp(1f)).a(1f));
+                        Draw.reset();
+                        Draw.color(Pal.surge, Color.white, 0.8f);
+                        Draw.z(Layer.effect);
+                        Lines.stroke(3f);
+                        Lines.circle(b.x, b.y, length1);
+                    }
+                    {
+                        killShooter = true;
+                        collides = false;
+                        rangeOverride = 40.0f;
+
+                        lifetime = 150.0f;
+                        drag = 0.04f;
+                        splashDamage = 2650.0f;
+                        splashDamageRadius = 120.0f;
+                        buildingDamageMultiplier = 2.0f;
+                        status = StatusEffects.melting;
+                        statusDuration = 360.0f;
+
+                        fragBullets = 8;
+                        fragBullet = new BasicBulletType(8.0f, 35.0f){{
+                            lifetime = 90.0f;
+                            width = height = 16.0f;
+                            drag = 0.04f;
+                            splashDamageRadius = 60.0f;
+                            splashDamage = 85.0f;
+                            buildingDamageMultiplier = 2.5f;
+
+                            frontColor = backColor = find("ffa166");
+                            status = StatusEffects.burning;
+                            statusDuration = 600.0f;
+
+                            trailInterval = 3.0f;
+                            trailEffect = new ParticleEffect(){{
+                                particles = 3;
+                                lifetime = 80.0f;
+                                length = 5.0f;
+                                baseLength = 2.0f;
+                                sizeFrom = 6.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow3Out;
+                                sizeInterp = Interp.pow3In;
+                                Color.valueOf(colorFrom, "444444");
+                                Color.valueOf(colorTo, "44444488");
+                            }};
+
+                            hitEffect = despawnEffect = new MultiEffect(new WaveEffect(){{
+                                lifetime = 40.0f;
+                                sizeFrom = 0.0f;
+                                sizeTo = 60.0f;
+                                strokeFrom = 8.0f;
+                                strokeTo = 0.0f;
+                                interp = Interp.pow3Out;
+                                Color.valueOf(colorFrom, "ffa166");
+                            }}, new ParticleEffect(){{
+                                particles = 6;
+                                lifetime = 120.0f;
+                                length = 50.0f;
+                                sizeFrom = 16.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow5Out;
+                                sizeInterp = Interp.pow5In;
+                                Color.valueOf(colorFrom, "ffa166");
+                                Color.valueOf(colorTo, "ffa16670");
+                            }}, new ParticleEffect(){{
+                                particles = 3;
+                                lifetime = 150.0f;
+                                length = 40.0f;
+                                sizeFrom = 20.0f;
+                                sizeTo = 0.0f;
+                                interp = Interp.pow5Out;
+                                sizeInterp = Interp.pow5In;
+                                Color.valueOf(colorFrom, "ffa166");
+                                Color.valueOf(colorTo, "ffa16670");
+                            }});
+                        }};
+                        bulletInterval = 20f;
+                        intervalBullet = new BulletType(7, 800){
+                            public Bullet create(Bullet parent, float x, float y, float angle){
+                                shockWave.create(parent, x, y, angle);
+                                return super.create(parent, x, y, angle);
+                            }
+                            {
+                                lifetime = 80.0f;
+                                weaveMag = 5f;
+                                weaveScale = 70f;
+                                trailLength = 54;
+                                trailWidth = 10f;
+                                trailColor = find("fdffc7");
+                                status = FRStatusEffects.magnetized;
+                                statusDuration = 120f;
+                            }
+                        };
+                    }
+                };
+            }});
         }};
 
         //region air
@@ -1576,8 +1784,8 @@ public class FRUnitTypes{
                             colors(colors, Pal.heal, Pal.heal, Color.white);
                         }});
 
-                        for(byte i = 0; i < 12; i++){
-                            byte j = i;
+                        for(int i = 0; i < 12; i++){
+                            int j = i;
                             spawnBullets.add(new FlakBulletType(20.0f - j * 1.2f, 100.0f + j * 6.0f){{
                                 sprite = "missile-large";
                                 collidesGround = collidesAir = true;

@@ -1,7 +1,9 @@
 package fire.content;
 
 import arc.graphics.Color;
+import arc.math.Mathf;
 import fire.maps.LysettaPlanetGenerator;
+import fire.world.DEBUG;
 import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.g3d.HexMesh;
@@ -24,30 +26,49 @@ public class FRPlanets{
 
     public static final Planet lysetta;
 
-    static{
-        lysetta = new Planet("lst", Planets.sun, 1.0f, 3){{
-            meshLoader = () -> new HexMesh(this, 8);
-            cloudMeshLoader = () -> new MultiMesh(
-                new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, find("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
-                new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(find("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
-            );
-            generator = new LysettaPlanetGenerator();
-            sectorSeed = 3;
-            rotateTime = 6600.0f;
-            clearSectorOnLose = true;
-            prebuildBase = false;
-            allowCampaignRules = true;
-            atmosphereColor = find("1a3db1");
-            atmosphereRadIn = 0.05f;
-            atmosphereRadOut = 0.5f;
-            iconColor = find("5b6fff");
+    private static final float[] threats = {0.4f, 0.6f, 0.8f, 1.0f};
 
-            unlockedOnLand.add(fireCompany);
-            ruleSetter = r -> {
-                r.hideBannedBlocks = true;
-                r.bannedBlocks.addAll(Blocks.launchPad, Blocks.advancedLaunchPad, Blocks.landingPad, Blocks.interplanetaryAccelerator, primaryInterplanetaryAccelerator);
-            };
-        }};
+    static{
+        lysetta = new Planet("lst", Planets.sun, 1.0f, 3){
+            @Override
+            public void updateBaseCoverage(){
+                var rand = Mathf.rand;
+                var threats = FRPlanets.threats;
+                for(var s : sectors){
+                    if(s.preset == null || !s.preset.requireUnlock){
+                        rand.setSeed(s.id);
+                        s.threat = threats[rand.random(threats.length - 1)];
+                    }else{
+                        s.threat = Mathf.clamp(s.preset.difficulty * 0.1f);
+                    }
+                }
+            }
+            {
+                meshLoader = () -> new HexMesh(this, 8);
+                cloudMeshLoader = () -> new MultiMesh(
+                    new HexSkyMesh(this, 11, 0.15f, 0.13f, 5, find("5279f0bb"), 2, 0.45f, 0.9f, 0.38f),
+                    new HexSkyMesh(this, 1, 0.6f, 0.16f, 5, Color.white.cpy().lerp(find("5279f0bb"), 0.55f), 2, 0.45f, 1.0f, 0.41f)
+                );
+                generator = new LysettaPlanetGenerator();
+                sectorSeed = 3;
+                rotateTime = 6000.0f;
+                clearSectorOnLose = true;
+                prebuildBase = false;
+                allowCampaignRules = true;
+                atmosphereRadIn = 0.05f;
+                atmosphereRadOut = 0.5f;
+                defaultCore = Blocks.coreFoundation;
+                Color.valueOf(atmosphereColor, "1a3db1");
+                Color.valueOf(iconColor, "5b6fff");
+                allowWaveSimulation = DEBUG.isDeveloper();
+
+                unlockedOnLand.add(fireCompany);
+                ruleSetter = r -> {
+                    r.hideBannedBlocks = true;
+                    r.bannedBlocks.addAll(Blocks.launchPad, Blocks.advancedLaunchPad, Blocks.landingPad, Blocks.interplanetaryAccelerator, primaryInterplanetaryAccelerator);
+                };
+            }
+        };
     }
 
     public static void load(){}

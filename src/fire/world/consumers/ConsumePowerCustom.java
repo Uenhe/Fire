@@ -18,7 +18,11 @@ public class ConsumePowerCustom extends mindustry.world.consumers.ConsumePower{
         Events.on(EventType.ContentInitEvent.class, e -> { //prevent adding this bar prior to others
             block.addBar("powerscale", build -> {
                 assert build instanceof CustomPowerConsumer;
-                return new Bar(() -> Core.bundle.format("bar.powerscale", Math.round(((CustomPowerConsumer)build).consPowerScale() * 100) + StatUnit.percent.localized()), () -> Pal.accent, () -> 1.0f);
+                return new Bar(
+                    () -> Core.bundle.format("bar.powerscale", Math.round(((CustomPowerConsumer)build).consPowerScale() * 100) + StatUnit.percent.localized()),
+                    () -> Pal.accent,
+                    () -> Mathf.num(((CustomPowerConsumer)build).consPowerScale() > 0.0f)
+                );
             });
         });
     }

@@ -30,10 +30,10 @@ public class MechPad extends mindustry.world.Block{
     @Override
     public void setStats(){
         super.setStats();
-        if(consValid()) stats.add(Stat.powerUse, powerCons);
+        if(consumes()) stats.add(Stat.powerUse, powerCons);
     }
 
-    private boolean consValid(){
+    private boolean consumes(){
         return powerCons > 0.0f;
     }
 
@@ -45,7 +45,7 @@ public class MechPad extends mindustry.world.Block{
             Fx.spawn.at(pad);
 
         //consumes power
-        if(((MechPad)pad.block).consValid() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).powerCons * 60.0f)
+        if(((MechPad)pad.block).consumes() && pad.power.graph.getPowerBalance() < ((MechPad)pad.block).powerCons * 60.0f)
             pad.power.graph.useBatteries(((MechPad)pad.block).powerCons);
 
         pl.set(pad);
