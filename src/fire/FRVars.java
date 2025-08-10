@@ -54,7 +54,7 @@ public final class FRVars{
         displayRange = Core.settings.getBool("displayrange");
         specialContent = net.server() || Core.settings.getBool("specialcontent");
         showLog = Core.settings.getBool("showlog");
-        noMultiMods = Core.settings.getBool("nomultimods");
+        //noMultiMods = Core.settings.getBool("nomultimods");
     }
 
     public static Color find(String hex){

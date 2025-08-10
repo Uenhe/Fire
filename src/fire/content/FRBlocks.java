@@ -27,6 +27,7 @@ import fire.world.blocks.defense.turrets.JackpotTurret;
 import fire.world.blocks.distribution.AdaptRouter;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
+import fire.world.blocks.power.BurstReactor;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.production.BeamExtractor;
 import fire.world.blocks.production.EnergyCrafter;
@@ -3012,33 +3013,36 @@ public class FRBlocks{
             ambientSoundVolume = 0.06f;
         }};
 
-        //TODO...
-        burstReactor = new ImpactReactor("burst-reactor"){{
-            requirements(Category.power, BuildVisibility.hidden, with(
-                magneticAlloy, 500
+        burstReactor = new BurstReactor("burst-reactor"){{
+            requirements(Category.power, with(
+                conductor, 250,
+                logicAlloy, 600,
+                hardenedAlloy, 1000,
+                magneticAlloy, 450
             ));
-            health = 9600;
+            scaledHealth = 270.0f;
+            armor = 22.0f;
             size = 6;
-            itemCapacity = 40;
-            liquidCapacity = 150f;
-            baseExplosiveness = 10.0f;
+            itemCapacity = 54;
+            liquidCapacity = 180.0f;
+            baseExplosiveness = 20.0f;
             ambientSoundVolume = 0.06f;
             ambientSound = Sounds.pulse;
 
-            itemDuration = 240f;
-            powerProduction = 2000f;
-            warmupSpeed = 0.0008f;
+            itemDuration = 180.0f;
+            powerProduction = n(54000);
+            warmupSpeed = 0.002f;
             explosionRadius = 120;
             explosionDamage = 11600;
             explosionShake = 8.0f;
-            explosionShakeDuration = 30f;
+            explosionShakeDuration = 30.0f;
             explodeEffect = new MultiEffect(
                 Fx.impactReactorExplosion
             );
 
-            consumePower(n(5760));
-            consumeItem(detonationCompound, 8);
-            consumeLiquid(FRLiquids.liquidNitrogen, n(50));
+            consumePower(n(2700));
+            consumeItem(detonationCompound, 18);
+            consumeLiquid(FRLiquids.liquidNitrogen, n(120));
         }};
 
         //region defense
@@ -3609,10 +3613,11 @@ public class FRBlocks{
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(),
-                new DrawRegion("-spinner1", 4.0f, true),
-                new DrawRegion("-spinner2", -4.0f, true),
                 new DrawDefault(),
-                new DrawFade()
+                new DrawRegion("-spinner1", 2.0f, true),
+                new DrawRegion("-spinner2", -2.0f, true),
+                new DrawRegion("-top"),
+                new DrawFade(){{suffix="-fade";}}
             );
 
             craftTime = 5.0f;

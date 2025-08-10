@@ -8,26 +8,33 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.util.Time;
+import arc.util.Tmp;
 import fire.FRUtils;
 import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
+import fire.entities.bullets.SpecialIntervalBulletType;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
+import mindustry.entities.Damage;
 import mindustry.entities.Effect;
+import mindustry.entities.Units;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.part.HoverPart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.ItemStack;
+import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
@@ -56,7 +63,7 @@ public class FRUnitTypes{
         omicron, pioneer,
 
         //air kamikaze
-        firefly, candlight, lampryo, lumiflame,
+        firefly, candlight, lampryo, lumiflame, radiance,
 
         //air
         javelin, apollo,
@@ -509,15 +516,15 @@ public class FRUnitTypes{
             isEnemy = false;
             lowAltitude = true;
             faceTarget = true;
-            createWreck = false; //disable damage upon death
+            createWreck = false; //disable crash damage
             coreUnitDock = true;
-            engineOffset = 6f;
+            engineOffset = 6.0f;
             itemCapacity = 90;
             mineTier = 4;
-            mineRange += 40f;
+            mineRange += 40.0f;
             mineSpeed = 8.5f;
-            buildRange += 40f;
-            buildSpeed = 3f;
+            buildRange += 40.0f;
+            buildSpeed = 3.0f;
 
             abilities.add(
                 new RepairFieldAbility(20f, 300f, 40f),
@@ -530,7 +537,7 @@ public class FRUnitTypes{
                     reload = 12.0f;
                     x = 4.0f;
                     y = 0.6f;
-                    inaccuracy = 1.1f;
+                    inaccuracy = 1.0f;
                     top = false;
                     rotate = true;
                     shootSound = Sounds.lasershoot;
@@ -569,6 +576,7 @@ public class FRUnitTypes{
             buildSpeed = 3.4f;
             buildRange += 80.0f;
             lowAltitude = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new DashAbility(6.7f, 15, 120, 6),
@@ -717,6 +725,7 @@ public class FRUnitTypes{
             itemCapacity = 15;
             circleTarget = true;
             lowAltitude = false;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(2f, 8, 0.1f, 0.0f, 1.2f, 1.6f, Pal.lancerLaser)
@@ -757,6 +766,7 @@ public class FRUnitTypes{
             itemCapacity = 25;
             circleTarget = true;
             lowAltitude = false;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(2.0f, 12, 0.4f, 8.0f, 1.2f, 2.4f, Pal.lancerLaser)
@@ -799,6 +809,7 @@ public class FRUnitTypes{
             trailLength = 12;
             itemCapacity = 60;
             circleTarget = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             abilities.add(
                 new MoveLightningAbility(3.0f, 12, 0.3f, 12.0f, 0.8f, 1.8f, Pal.lancerLaser)
@@ -901,6 +912,7 @@ public class FRUnitTypes{
             trailLength = 12;
             itemCapacity = 90;
             circleTarget = true;
+            targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
             immunities.addAll(
                 StatusEffects.burning, StatusEffects.melting
@@ -1103,6 +1115,204 @@ public class FRUnitTypes{
                     }};
                 }}
             );
+        }};
+
+        radiance = new UnitType("radiance"){{
+            var shockWave = new ExplosionBulletType(){{
+                splashDamage = 200f;
+                splashDamageRadius = 200.0f;
+                status = StatusEffects.unmoving;
+                statusDuration = 20f;
+                hitEffect = new WaveEffect(){{
+                    lifetime = 60.0f;
+                    colorFrom = Pal.surge;
+                    colorTo = Color.white;
+                    sizeFrom = 0.0f;
+                    sizeTo = 200.0f;
+                    strokeFrom = 4.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+            }};
+
+            constructor = ElevationMoveUnit::create;
+            hovering = true;
+            canDrown = false;
+            flying = false;
+            useEngineElevation = false;
+            health = 16500.0f;
+            armor = 23.0f;
+            hitSize = 50.0f;
+            speed = 1f;
+            rotateSpeed = 1f;
+            drag = 0.02f;
+            accel = 0.04f;
+            range = maxRange = 40.0f;
+            engineSize = 12.0f;
+            engineOffset = 24.0f;
+            trailLength = 18;
+            itemCapacity = 250;
+
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting);
+
+            parts.add(
+                new HoverPart(){{
+                    x = 20f;
+                    y = 23f;
+                    mirror = true;
+                    radius = 26f;
+                    phase = 90f;
+                    stroke = 3f;
+                    sides = 6;
+                    layerOffset = -0.001f;
+                    color = Pal.lancerLaser;
+                }},
+                    new HoverPart(){{
+                    x = 24f;
+                    y = -29f;
+                    mirror = true;
+                    radius = 34f;
+                    phase = 90f;
+                    stroke = 4f;
+                    sides = 6;
+                    layerOffset = -0.001f;
+                    color = Pal.lancerLaser;
+                }}
+            );
+
+            abilities.add(
+                new RegenAbility(){{amount = 5.0f;}},
+                new ShieldArcAbility(){
+                    @Override
+                    public void update(Unit u){
+                        super.update(u);
+                        if(data >= max - 1.0f)
+                            u.apply(StatusEffects.fast, 10.0f); //faster when shield is in shape
+                        if(data > 0)
+                            u.apply(StatusEffects.shielded, 10.0f); //stronger when shield is alive
+                        if(data <= 0)
+                            u.apply(StatusEffects.slow, 10.0f); //slower when shield is broken
+                    }
+                    {
+                        radius = 90.0f;
+                        regen = 3.0f;
+                        max = 3000.0f;
+                        whenShooting = false;
+                        width = 12.0f;
+                        angle = 135.0f;
+                    }
+                }
+            );
+
+            weapons.add(new Weapon(){{
+                shootOnDeath = true;
+                controllable = false;
+                x = 0.0f;
+                shootCone = 180.0f;
+                rotateSpeed = 360.0f;
+                mirror = false;
+                ejectEffect = Fx.casing1;
+                shootSound = Sounds.explosionbig;
+
+                bullet = new BulletType(12.0f, 12900.0f){
+
+                    final StatusEffect[] sfx = {StatusEffects.burning, StatusEffects.melting, StatusEffects.electrified};
+
+                    public void draw(Bullet b){
+                        super.draw(b);
+                        Draw.color(Pal.surge, Color.white, 0.6f);
+                        Draw.z(Layer.effect);
+                        Lines.stroke((b.time <= b.lifetime - 20F ? (b.time >= 30.0F ? 300.0F : (b.time * 10.0F)) : (b.lifetime - b.time + 10f) * 10F) / 2);
+                        Lines.circle(b.x, b.y, 0f);
+                    }
+
+                    @Override
+                    public void updateBulletInterval(Bullet b){
+                        if(b.time <= lifetime - 80.0f)
+                            super.updateBulletInterval(b);
+                    }
+
+                    public void update(Bullet b){
+                        super.update(b);
+                        for(var s : sfx)
+                            Damage.status(b.team, b.x, b.y, 150f, s, 600f, true, true);
+                    }
+
+                    {
+                        killShooter = true;
+                        collides = false;
+                        collidesTiles = false;
+                        reflectable = false;
+                        absorbable = false;
+                        rangeOverride = 40.0f;
+                        lifetime = 270.0f;
+                        drag = 0.07f;
+                        splashDamage = 350.0f;
+                        splashDamageRadius = 150.0f;
+                        buildingDamageMultiplier = 0.2f;
+                        status = StatusEffects.melting;
+                        statusDuration = 360.0f;
+
+                        fragBullets = 1;
+                        fragBullet = new ExplosionBulletType(1750.0f, 300f){
+                            final float[] ranges = {1.5f, 2.5f, 4f, 5f};
+                            public void despawned(Bullet b){
+                                super.despawned(b);
+                                Units.nearbyEnemies(b.team, b.x, b.y, splashDamageRadius * 2, u -> {
+                                    u.apply(StatusEffects.blasted);
+                                    u.apply(StatusEffects.shocked);
+                                    u.apply(StatusEffects.sapped, 1200f);
+                                    u.apply(StatusEffects.corroded, 600f);
+                                    u.apply(StatusEffects.burning, 6000f);
+                                    u.apply(StatusEffects.melting, 3600f);
+                                    u.apply(FRStatusEffects.magnetized, 300f);
+                                    u.apply(FRStatusEffects.disintegrated, 300f);
+                                    u.damage(400f);
+                                    Tmp.v3.set(u).sub(b).nor().scl(4800.0F);
+                                    FRFx.chainEmpThin.at(b.x, b.y, 0.0f, Pal.surge, new Vec2().set(u));
+                                });
+                                for(float rangeX : ranges)
+                                    Damage.damage(b.team, b.x, b.y, splashDamageRadius / rangeX, splashDamage, true);//What the fuck
+                            }
+                            {
+                                buildingDamageMultiplier = 0.25f;
+                                knockback = 80f;
+                                pierceCap = 5;
+                                pierceBuilding = pierce = pierceArmor = true;
+                                hitSound = Sounds.plasmaboom;
+                                hitEffect = new MultiEffect(
+                                    FRFx.powerfulBlastEffect(180f, 300f,0f,0,Pal.surge,Color.clear),
+                                    FRFx.crossEffect(60.0f, 18.0f, 45.0f, true, Pal.surge)
+                                );
+                        }};
+                        bulletInterval = 20f;
+                        intervalBullet = new SpecialIntervalBulletType(12, 120){
+                            public Bullet create(Bullet parent, float x, float y, float angle){
+                                shockWave.create(parent, x, y, angle);
+                                return super.create(parent, x, y, angle);
+                            }
+                            {
+                                keepVelocity = false;
+                                splashDamage = 100f;
+                                splashDamageRadius = 4f;
+                                buildingDamageMultiplier = 0.5f;
+                                lifetime = 120.0f;
+                                weaveMag = 6f;
+                                weaveScale = 70f;
+                                homingPower = 0.18f;
+                                trailLength = 54;
+                                trailWidth = 10f;
+                                drag = 0.01f;
+                                trailColor = find("fdffc7");
+                                status = FRStatusEffects.magnetized;
+                                statusDuration = 180f;
+                                pierce = true;
+                                pierceBuilding = true;
+                            }
+                        };
+                    }
+                };
+            }});
         }};
 
         //region air

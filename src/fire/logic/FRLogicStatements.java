@@ -107,6 +107,50 @@ public class FRLogicStatements{
         }
     }
 
+    public static class FetchPlusPlusStatement extends LStatement{
+        public static String name = "fpp";
+
+        public String block = "@router";
+
+        @Override
+        public String name(){
+            return "Fetch++";
+        }
+
+        public FetchPlusPlusStatement(){}
+
+        public FetchPlusPlusStatement(String[] tokens){
+            block = tokens[1];
+        }
+
+        @Override
+        public boolean privileged(){
+            return true;
+        }
+
+        @Override
+        public void build(Table table){
+            table.add("block ");
+            field(table, block, str -> block = str);
+        }
+
+        @Override
+        public LExecutor.LInstruction build(LAssembler builder){
+            return new FRLogicExecutor.FetchPlusPlusI(builder.var(block));
+        }
+
+        @Override
+        public LCategory category(){
+            return LCategory.world;
+        }
+
+        @Override
+        public void write(StringBuilder builder){
+            builder.append(name)
+                .append(" ").append(block);
+        }
+    }
+
     public static class RemoveProcessorStatement extends LStatement{
         public static String name = "removeprocessor";
 

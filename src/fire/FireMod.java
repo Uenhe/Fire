@@ -22,6 +22,8 @@ import fire.world.DEBUG;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
+import mindustry.Vars;
+import mindustry.content.Blocks;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
@@ -33,7 +35,9 @@ import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.fragments.MenuFragment;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.meta.Attribute;
 
 import java.lang.reflect.Field;
@@ -41,6 +45,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import static fire.FRVars.*;
+import static fire.content.FRBlocks.primaryInterplanetaryAccelerator;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
@@ -125,7 +130,7 @@ public class FireMod extends mindustry.mod.Mod{
             t.checkPref("displayrange", true, b -> displayRange = b);
             t.checkPref("specialcontent", true, b -> specialContent = b);
             t.checkPref("showlog", true, b -> showLog = b);
-            t.checkPref("nomultimods", true, b -> noMultiMods = b);
+            //t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> showLog(true)).size(240.0f, 80.0f);
@@ -177,7 +182,14 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showNoMultipleMods(){
-        if(!noMultiMods || !mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
+        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) /*|| DEBUG.isDeveloper()*/){
+            return;
+        }
+        fkfire();
+        /*
+        if(!noMultiMods){
+            return;
+        }*/
         fkgame();
     }
 
@@ -295,6 +307,17 @@ public class FireMod extends mindustry.mod.Mod{
             Log.info("what r u fking doing");
             Core.app.exit();
         });
+    }
+
+    public static void fkfire(){
+        FRPlanets.lysetta.visible = false;
+        FRPlanets.lysetta.accessible = false;
+        FRPlanets.lysetta.ruleSetter = r -> {
+            r.hideBannedBlocks = true;
+            content.blocks().each(b->{
+                r.bannedBlocks.add(b);
+            });
+        };
     }
 
     private static void buildMobile(){

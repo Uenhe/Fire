@@ -10,9 +10,11 @@ import arc.scene.ui.Image;
 import fire.content.FRFx;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.gen.Unit;
 import mindustry.logic.LExecutor;
 import mindustry.logic.LVar;
+import mindustry.world.Block;
 import mindustry.world.blocks.environment.StaticWall;
 
 import static mindustry.Vars.state;
@@ -84,6 +86,30 @@ public class FRLogicExecutor{
                     );
                 }
             }
+        }
+    }
+
+    public static class FetchPlusPlusI implements LExecutor.LInstruction{
+
+        public LVar block;
+
+        public FetchPlusPlusI(LVar block){
+            this.block = block;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            if(!(block.obj() instanceof Block b)) return;
+
+            for(int i = 0, sum = 0; i < Team.all.length; i++){
+                var builds = Team.get(i).data().buildingTypes.get(b);
+                if(builds == null) continue;
+
+                sum += builds.size;
+                if(sum > 1) return;
+            }
+
+            exec.counter.numval--;
         }
     }
 
