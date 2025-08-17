@@ -8,6 +8,7 @@ import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
 import arc.util.Strings;
 import fire.content.FRPlanets;
+import mindustry.core.UI;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
@@ -46,24 +47,23 @@ public class MeltingFurnace{
             stats.add(Stat.basePowerGeneration, basePowerProduction * 60.0f, StatUnit.powerSecond);
             stats.add(Stat.input, mt -> {
                 mt.row().table(Styles.grayPanel, t ->
-                    t.row().left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f)
+                    t.left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f)
                 );
 
                 final float size = 32.0f;
                 int i = 0;
-                Cell<Table> tableSlag = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnaceslag").minWidth(size).maxWidth(size).pad(10.0f).row()).left(),
-                            tablePower = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnacepower").minWidth(size).maxWidth(size).pad(10.0f).row()).left();
+                Table tableSlag = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnaceslag").minWidth(size).maxWidth(size).pad(10.0f).row()).left().get(),
+                    tablePower = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnacepower").minWidth(size).maxWidth(size).pad(10.0f).row()).left().get();
                 for(var item : content.items()){
                     if(item.isHidden() || !item.isOnPlanet(FRPlanets.lysetta)) continue;
                     if(item.flammability > cons.value){
-                        tablePower.get().stack(
+                        tablePower.stack(
                             new Table(t -> t.button(new TextureRegionDrawable(item.uiIcon), Styles.emptyi, size, () -> ui.content.show(item)).size(size).pad(10.0f).scaling(Scaling.fit)),
-                            new Table(t -> t.top().right().add("[accent]" + Strings.fixed(basePowerProduction * item.flammability * 0.06f, 1) + "K" + StatUnit.perSecond.localized()).style(Styles.outlineLabel).fontScale(0.8f))
+                            new Table(t -> t.top().right().add("[accent]" + Strings.fixed(basePowerProduction * item.flammability * 0.06f, 1) + UI.thousands + StatUnit.perSecond.localized()).style(Styles.outlineLabel).fontScale(0.8f))
                         );
-
                     }else{
-                        tableSlag.get().button(new TextureRegionDrawable(item.uiIcon), Styles.emptyi, size, () -> ui.content.show(item)).size(size).pad(10.0f).scaling(Scaling.fit);
-                        if(++i % 10 == 0) tableSlag.get().row();
+                        tableSlag.button(new TextureRegionDrawable(item.uiIcon), Styles.emptyi, size, () -> ui.content.show(item)).size(size).pad(10.0f).scaling(Scaling.fit);
+                        if(++i % 10 == 0) tableSlag.row();
                     }
                 }
             });

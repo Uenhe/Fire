@@ -28,7 +28,6 @@ import mindustry.logic.LAccess;
 import mindustry.ui.Bar;
 
 import static fire.FRVars.displayRange;
-import static fire.FRVars.specialContent;
 import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.power.PowerGenerator */
@@ -225,7 +224,6 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
 
         private void createLightning(){
             craftSound.at(tile, Mathf.random(0.45f, 0.55f));
-            if(!specialContent) return;
 
             int amount = (int)(lightningAmount * (1 + instability / maxInstability));
             if(instability <= maxInstability * 0.5f){

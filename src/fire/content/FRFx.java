@@ -1,5 +1,6 @@
 package fire.content;
 
+import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -10,6 +11,7 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Nullable;
+import arc.util.Tmp;
 import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -203,6 +205,32 @@ public class FRFx{
             }
         });
     }
+
+    public static Effect powerfulBlastEffect(float lifetime, float size, float rotation, int sides, @Nullable Color edgeCol, @Nullable Color centralCol){
+        return new Effect(lifetime, e -> {
+            var CentralCol = centralCol == null ? Color.clear : centralCol;
+            var EdgeCol = edgeCol == null ? e.color : edgeCol;
+            float rad = size * e.fin(Interp.pow3Out), a = e.fout(Interp.pow5Out);
+
+            Draw.blend(Blending.additive);
+            Draw.z(Layer.effect + 0.8f);
+
+            if(sides == 0)
+                Fill.light(e.x, e.y, Lines.circleVertices(rad), rad, rotation, CentralCol, Tmp.c1.set(EdgeCol).a(a));
+            else
+                Fill.light(e.x, e.y, sides, rad, rotation, CentralCol, Tmp.c1.set(EdgeCol).a(a));
+
+            Draw.reset();
+            Draw.color(EdgeCol);
+            Draw.z(Layer.effect);
+            Lines.stroke(3f);
+            Draw.alpha(a);
+            Lines.circle(e.x, e.y, rad);
+            Drawf.light(e.x, e.y, rad * 1.25f, EdgeCol, a);
+            Draw.blend();
+        });
+    }
+
 
     /** @see Fx#hitBulletSmall */
     public static Effect hitBulletSmall(Color color){

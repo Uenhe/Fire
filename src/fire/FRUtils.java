@@ -21,6 +21,10 @@ public final class FRUtils{
         return Core.bundle.get("fire.numerals").split("\\|")[n - 1];
     }
 
+    public static int round(float v, int step){
+        return Math.round(v / step) * step;
+    }
+
     public static Field field(Class<?> type, String name) throws NoSuchFieldException{
         var field = type.getDeclaredField(name);
         field.setAccessible(true);

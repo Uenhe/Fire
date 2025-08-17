@@ -4,7 +4,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
-import arc.util.Log;
 import arc.util.Time;
 import arc.util.Tmp;
 import mindustry.content.Fx;
@@ -21,6 +20,9 @@ public class BurstReactor extends ImpactReactor{
 
     protected final byte statusRadius = 72;
     protected final short detectRadius = 640;
+
+    private final float
+        warmupMin = Mathf.pow(1.4f, 0.2f), warmupMax = Mathf.pow(2.0f, 0.2f); //140% - 200% power gen
 
     public BurstReactor(String name){
         super(name);
@@ -43,7 +45,8 @@ public class BurstReactor extends ImpactReactor{
         private final Vec2[] burstPos = new Vec2[3];
 
         {
-            for(int i = 0; i < burstPos.length; i++) burstPos[i] = new Vec2();
+            for(int i = 0; i < burstPos.length; i++)
+                burstPos[i] = new Vec2();
         }
 
         @Override
@@ -55,7 +58,7 @@ public class BurstReactor extends ImpactReactor{
             if(warmup != 1.0f || healthf() <= 0.5f) return;
 
             if(Mathf.chanceDelta(0.005)){
-                warmup += Mathf.random(0.07f, 0.15f); //140% - 200% power gen
+                warmup += Mathf.random(warmupMin, warmupMax);
                 burstAlpha = 0.8f;
                 for(var pos : burstPos){
                     float x = this.x + Mathf.range(size * 10.0f), y = this.y + Mathf.range(size * 10.0f);

@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
 import arc.struct.Seq;
+import fire.content.FRUnitTypes;
 import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
@@ -23,7 +24,7 @@ public final class FRVars{
 
     /** Setting. */
     public static boolean
-        mineSand = false, displayRange = true, specialContent = true, showLog = true, noMultiMods = true;
+        mineSand = false, displayRange = true, showLog = true, noMultiMods = true;
 
     static{
         var units = spawnedUnits;
@@ -45,14 +46,13 @@ public final class FRVars{
         });
 
         Events.on(EventType.UnitSpawnEvent.class, e -> {
-            if(e.unit.type.flying) units.add(e.unit);
+            if(e.unit.type.flying && e.unit.type != FRUnitTypes.pioneer) units.add(e.unit);
         });
     }
 
     public static void getSettings(){
         mineSand = Core.settings.getBool("minesand");
         displayRange = Core.settings.getBool("displayrange");
-        specialContent = net.server() || Core.settings.getBool("specialcontent");
         showLog = Core.settings.getBool("showlog");
         noMultiMods = Core.settings.getBool("nomultimods");
     }

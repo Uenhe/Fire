@@ -123,7 +123,6 @@ public class FireMod extends mindustry.mod.Mod{
 
             t.checkPref("minesand", false, b -> mineSand = b);
             t.checkPref("displayrange", true, b -> displayRange = b);
-            t.checkPref("specialcontent", true, b -> specialContent = b);
             t.checkPref("showlog", true, b -> showLog = b);
             t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
@@ -177,7 +176,7 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showNoMultipleMods(){
-        if(!noMultiMods || !mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
+        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
         fkgame();
     }
 
@@ -253,48 +252,49 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void fkgame(){
-        var dialog = mulmodDialog = new BaseDialog("What happened");
-        setupDialog(mulmodDialog);
-        mulmodDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
-
-        if(mobile){
-            final int m, n;
-            if(mods.locateMod("mindustryx") != null){
-                m = 2; n = 5;
-            }else{
-                m = 1; n = 3;
-            }
-            ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
-
-            ui.menuGroup.fill(c ->
-                c.pane(Styles.noBarPane, cont -> {
-                    try{
-                        field_container.set(ui.menufrag, cont);
-                    }catch(IllegalAccessException e){
-                        throw new RuntimeException("?", e);
-                    }
-                    cont.name = "menu container";
-
-                    buildMobile();
-                    Events.on(EventType.ResizeEvent.class, event -> buildMobile());
-
-                }).with(pane -> pane.setOverscroll(false, false)).grow()
-            );
-
-        }else{
-            Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
-            for(var b : buttons)
-                if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
-                    tmp.add(b);
-
-            buttons.removeAll(tmp);
-            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulmodDialog::show));
-        }
-
         Events.on(EventType.WorldLoadBeginEvent.class, e -> {
+            if(!noMultiMods && state.getPlanet() != FRPlanets.lysetta) return;
             Log.info("what r u fking doing");
             Core.app.exit();
         });
+
+        if(noMultiMods){
+            var dialog = mulmodDialog = new BaseDialog("What happened");
+            setupDialog(dialog);
+            dialog.cont.pane(t -> t.add("@fire.nomultimods").center());
+
+            if(mobile){
+                int m = 1, n = 3;
+                if(mods.locateMod("mindustryx") != null){
+                    m += 1; n += 2;
+                }
+                ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
+
+                ui.menuGroup.fill(c ->
+                    c.pane(Styles.noBarPane, cont -> {
+                        try{
+                            field_container.set(ui.menufrag, cont);
+                        }catch(IllegalAccessException e){
+                            throw new RuntimeException("?", e);
+                        }
+                        cont.name = "menu container";
+
+                        buildMobile();
+                        Events.on(EventType.ResizeEvent.class, event -> buildMobile());
+
+                    }).with(pane -> pane.setOverscroll(false, false)).grow()
+                );
+
+            }else{
+                Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
+                for(var b : buttons)
+                    if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
+                        tmp.add(b);
+
+                buttons.removeAll(tmp);
+                buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, dialog::show));
+            }
+        }
     }
 
     private static void buildMobile(){

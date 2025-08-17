@@ -8,15 +8,19 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.FRUtils;
 import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
+import fire.entities.bullets.SpecialIntervalBulletType;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
+import mindustry.entities.Damage;
 import mindustry.entities.Effect;
+import mindustry.entities.Units;
 import mindustry.entities.abilities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.ExplosionEffect;
@@ -30,6 +34,7 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.ItemStack;
+import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
@@ -1114,24 +1119,27 @@ public class FRUnitTypes{
 
         radiance = new UnitType("radiance"){{
             var shockWave = new ExplosionBulletType(){{
-                splashDamage = 1500f;
-                splashDamageRadius = 80.0f;
+                splashDamage = 200f;
+                splashDamageRadius = 200.0f;
+                status = StatusEffects.unmoving;
+                statusDuration = 20f;
                 hitEffect = new WaveEffect(){{
-                    lifetime = 40.0f;
+                    lifetime = 60.0f;
                     colorFrom = Pal.surge;
                     colorTo = Color.white;
                     sizeFrom = 0.0f;
-                    sizeTo = 90.0f;
+                    sizeTo = 200.0f;
                     strokeFrom = 4.0f;
                     interp = Interp.pow5Out;
                     lightInterp = Interp.pow5Out;
                 }};
             }};
 
-            constructor = UnitEntity::create;
+            constructor = ElevationMoveUnit::create;
             hovering = true;
             canDrown = false;
             flying = false;
+            useEngineElevation = false;
             health = 16500.0f;
             armor = 23.0f;
             hitSize = 50.0f;
@@ -1141,10 +1149,9 @@ public class FRUnitTypes{
             accel = 0.04f;
             range = maxRange = 40.0f;
             engineSize = 12.0f;
-            engineOffset = 44.0f;
+            engineOffset = 24.0f;
             trailLength = 18;
             itemCapacity = 250;
-            circleTarget = true;
 
             immunities.addAll(StatusEffects.burning, StatusEffects.melting);
 
@@ -1199,7 +1206,7 @@ public class FRUnitTypes{
 
             weapons.add(new Weapon(){{
                 shootOnDeath = true;
-                //controllable = false;
+                controllable = false;
                 x = 0.0f;
                 shootCone = 180.0f;
                 rotateSpeed = 360.0f;
@@ -1208,104 +1215,99 @@ public class FRUnitTypes{
                 shootSound = Sounds.explosionbig;
 
                 bullet = new BulletType(12.0f, 12900.0f){
+
+                    final StatusEffect[] sfx = {StatusEffects.burning, StatusEffects.melting, StatusEffects.electrified};
+
                     public void draw(Bullet b){
                         super.draw(b);
-                        float length1 = (b.time <= 120.0F ? (b.time >= 30.0F ? 300.0F : (b.time * 10.0F)) : (1500.0F - b.time * 10F)) / 3;
-
-                        Draw.z(Layer.flyingUnit + 0.8f);
-
-                        Fill.light(b.x, b.y, Lines.circleVertices(length1), length1, find("fffff3aa"), Tmp.c2.set(Color.white).lerp(find("ffa439ff"), Mathf.clamp(1f)).a(1f));
-                        Draw.reset();
-                        Draw.color(Pal.surge, Color.white, 0.8f);
+                        Draw.color(Pal.surge, Color.white, 0.6f);
                         Draw.z(Layer.effect);
-                        Lines.stroke(3f);
-                        Lines.circle(b.x, b.y, length1);
+                        Lines.stroke((b.time <= b.lifetime - 20F ? (b.time >= 30.0F ? 300.0F : (b.time * 10.0F)) : (b.lifetime - b.time + 10f) * 10F) / 2);
+                        Lines.circle(b.x, b.y, 0f);
                     }
+
+                    @Override
+                    public void updateBulletInterval(Bullet b){
+                        if(b.time <= lifetime - 80.0f)
+                            super.updateBulletInterval(b);
+                    }
+
+                    public void update(Bullet b){
+                        super.update(b);
+                        for(var s : sfx)
+                            Damage.status(b.team, b.x, b.y, 150f, s, 600f, true, true);
+                    }
+
                     {
                         killShooter = true;
                         collides = false;
+                        collidesTiles = false;
+                        reflectable = false;
+                        absorbable = false;
                         rangeOverride = 40.0f;
-
-                        lifetime = 150.0f;
-                        drag = 0.04f;
-                        splashDamage = 2650.0f;
-                        splashDamageRadius = 120.0f;
-                        buildingDamageMultiplier = 2.0f;
+                        lifetime = 270.0f;
+                        drag = 0.07f;
+                        splashDamage = 350.0f;
+                        splashDamageRadius = 150.0f;
+                        buildingDamageMultiplier = 0.2f;
                         status = StatusEffects.melting;
                         statusDuration = 360.0f;
 
-                        fragBullets = 8;
-                        fragBullet = new BasicBulletType(8.0f, 35.0f){{
-                            lifetime = 90.0f;
-                            width = height = 16.0f;
-                            drag = 0.04f;
-                            splashDamageRadius = 60.0f;
-                            splashDamage = 85.0f;
-                            buildingDamageMultiplier = 2.5f;
-
-                            frontColor = backColor = find("ffa166");
-                            status = StatusEffects.burning;
-                            statusDuration = 600.0f;
-
-                            trailInterval = 3.0f;
-                            trailEffect = new ParticleEffect(){{
-                                particles = 3;
-                                lifetime = 80.0f;
-                                length = 5.0f;
-                                baseLength = 2.0f;
-                                sizeFrom = 6.0f;
-                                sizeTo = 0.0f;
-                                interp = Interp.pow3Out;
-                                sizeInterp = Interp.pow3In;
-                                Color.valueOf(colorFrom, "444444");
-                                Color.valueOf(colorTo, "44444488");
-                            }};
-
-                            hitEffect = despawnEffect = new MultiEffect(new WaveEffect(){{
-                                lifetime = 40.0f;
-                                sizeFrom = 0.0f;
-                                sizeTo = 60.0f;
-                                strokeFrom = 8.0f;
-                                strokeTo = 0.0f;
-                                interp = Interp.pow3Out;
-                                Color.valueOf(colorFrom, "ffa166");
-                            }}, new ParticleEffect(){{
-                                particles = 6;
-                                lifetime = 120.0f;
-                                length = 50.0f;
-                                sizeFrom = 16.0f;
-                                sizeTo = 0.0f;
-                                interp = Interp.pow5Out;
-                                sizeInterp = Interp.pow5In;
-                                Color.valueOf(colorFrom, "ffa166");
-                                Color.valueOf(colorTo, "ffa16670");
-                            }}, new ParticleEffect(){{
-                                particles = 3;
-                                lifetime = 150.0f;
-                                length = 40.0f;
-                                sizeFrom = 20.0f;
-                                sizeTo = 0.0f;
-                                interp = Interp.pow5Out;
-                                sizeInterp = Interp.pow5In;
-                                Color.valueOf(colorFrom, "ffa166");
-                                Color.valueOf(colorTo, "ffa16670");
-                            }});
+                        fragBullets = 1;
+                        fragBullet = new ExplosionBulletType(1750.0f, 300f){
+                            final float[] ranges = {1.5f, 2.5f, 4f, 5f};
+                            public void despawned(Bullet b){
+                                super.despawned(b);
+                                Units.nearbyEnemies(b.team, b.x, b.y, splashDamageRadius * 2, u -> {
+                                    u.apply(StatusEffects.blasted);
+                                    u.apply(StatusEffects.shocked);
+                                    u.apply(StatusEffects.sapped, 1200f);
+                                    u.apply(StatusEffects.corroded, 600f);
+                                    u.apply(StatusEffects.burning, 6000f);
+                                    u.apply(StatusEffects.melting, 3600f);
+                                    u.apply(FRStatusEffects.magnetized, 300f);
+                                    u.apply(FRStatusEffects.disintegrated, 300f);
+                                    u.damage(400f);
+                                    Tmp.v3.set(u).sub(b).nor().scl(4800.0F);
+                                    FRFx.chainEmpThin.at(b.x, b.y, 0.0f, Pal.surge, new Vec2().set(u));
+                                });
+                                for(float rangeX : ranges)
+                                    Damage.damage(b.team, b.x, b.y, splashDamageRadius / rangeX, splashDamage, true);//What the fuck
+                            }
+                            {
+                                buildingDamageMultiplier = 0.25f;
+                                knockback = 80f;
+                                pierceCap = 5;
+                                pierceBuilding = pierce = pierceArmor = true;
+                                hitSound = Sounds.plasmaboom;
+                                hitEffect = new MultiEffect(
+                                    FRFx.powerfulBlastEffect(180f, 300f,0f,0,Pal.surge,Color.clear),
+                                    FRFx.crossEffect(60.0f, 18.0f, 45.0f, true, Pal.surge)
+                                );
                         }};
                         bulletInterval = 20f;
-                        intervalBullet = new BulletType(7, 800){
+                        intervalBullet = new SpecialIntervalBulletType(12, 120){
                             public Bullet create(Bullet parent, float x, float y, float angle){
                                 shockWave.create(parent, x, y, angle);
                                 return super.create(parent, x, y, angle);
                             }
                             {
-                                lifetime = 80.0f;
-                                weaveMag = 5f;
+                                keepVelocity = false;
+                                splashDamage = 100f;
+                                splashDamageRadius = 4f;
+                                buildingDamageMultiplier = 0.5f;
+                                lifetime = 120.0f;
+                                weaveMag = 6f;
                                 weaveScale = 70f;
+                                homingPower = 0.18f;
                                 trailLength = 54;
                                 trailWidth = 10f;
+                                drag = 0.01f;
                                 trailColor = find("fdffc7");
                                 status = FRStatusEffects.magnetized;
-                                statusDuration = 120f;
+                                statusDuration = 180f;
+                                pierce = true;
+                                pierceBuilding = true;
                             }
                         };
                     }
