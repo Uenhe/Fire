@@ -104,11 +104,10 @@ public class FRPlanets{
                     node(timberBurner, () -> {});
                     node(treeFarm, with(new OnSector(beachLanding)), () -> {});
                 });
-                node(fissionDrill, with(new OnSector(darkWorkshop)), () -> {
-                    node(constraintExtractor, with(new OnSector(rubbleRidge)), () -> 
-                        node(focusingExtractor, with(new OnSector(rubbleRidge)), () -> {})
-                );
-            );
+            node(fissionDrill, with(new OnSector(darkWorkshop)), () -> {
+                node(constraintExtractor, with(new OnSector(rubbleRidge)), () -> 
+                node(focusingExtractor, with(new OnSector(rubbleRidge)), () -> {}));
+                });
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {});
                     node(fleshSynthesizer, with(new OnSector(stormyCoast)), () -> {});
