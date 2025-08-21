@@ -163,7 +163,7 @@ public class FRBlocks{
         //region environment
 
         neoplasm = new Floor("pooled-neoplasm", 0){{
-            speedMultiplier = 0.5f;
+            speedMultiplier = 0.6f;
             liquidDrop = Liquids.neoplasm;
             isLiquid = true;
             status = FRStatusEffects.overgrown;
