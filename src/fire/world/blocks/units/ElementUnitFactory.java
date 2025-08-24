@@ -46,6 +46,7 @@ import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import static fire.FRVars.equivalentWidth;
 import static fire.content.FRItems.*;
 import static fire.content.FRUnitTypes.*;
 import static mindustry.Vars.*;
@@ -54,7 +55,7 @@ import static mindustry.content.Items.*;
 import static mindustry.content.Items.sand;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
-public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock{
+public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
     protected final byte tier;
     protected float base;
@@ -66,6 +67,10 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
     private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
 
     static{
+        var factories = ElementUnitFactory.factories;
+        var unitValues = ElementUnitFactory.unitValues;
+        var rand = Mathf.rand;
+
         putAllValues(
             copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f,
             lead,             0.04f, 1.7f,  0.15f, 1.0f, 0.05f, 0.6f,
@@ -73,10 +78,10 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
             graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f,
             scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f,
             coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f,
-            titanium,         0.5f,  3.9f,  0.4f,  2.6f, 0.1f,  1.5f,
-            thorium,          0.95f, 4.3f,  1.2f,  3.1f, 0.0f,  0.0f,
+            titanium,         0.5f,  3.2f,  0.4f,  2.6f, 0.1f,  1.5f,
+            thorium,          0.95f, 3.75f, 1.2f,  3.1f, 0.0f,  0.0f,
             silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f,
-            plastanium,       1.8f,  3.6f,  1.8f,  4.55f, 0.0f, 0.0f,
+            plastanium,       1.8f,  4.85f, 1.8f,  4.55f, 0.0f, 0.0f,
             phaseFabric,      2.5f,  5.3f,  1.4f,  2.4f, 5.5f,  5.4f,
             surgeAlloy,       3.0f,  5.5f,  2.7f,  5.95f, 0.0f, 0.0f,
             sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f,
@@ -88,7 +93,7 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
             mirrorglass,      3.3f,  4.0f,  3.2f,  3.5f, 0.1f,  2.5f,
             sulflameAlloy,    0.0f,  0.0f,  10.0f, 5.5f, 0.0f,  0.0f,
             kindlingAlloy,    0.0f,  0.0f,  4.5f,  5.6f, 0.0f,  0.0f,
-            conductor,        0.0f,  0.0f,  2.5f,  4.8f, 0.8f,  5.4f,
+            conductor,        0.0f,  0.0f,  2.5f,  3.85f, 0.8f, 5.4f,
             detonationCompound,0.1f, 1.3f,  18.3f, 6.25f, 0.4f, 2.9f,
             flamefluidCrystal, 0.0f, 0.0f,  12.5f, 5.8f, 0.0f,  0.0f,
             timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f,
@@ -98,7 +103,6 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
             logicAlloy,       1.4f,  3.5f,  1.1f,  3.1f, 6.9f,  5.2f
         );
 
-        var rand = Mathf.rand;
         for(int i = 0, n = factories.length; i < n; i++)
             for(var upgrade : ((Reconstructor)factories[i]).upgrades)
                 for(int j = 0; j < 2; j++){
@@ -120,21 +124,24 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
                     else if(unit==blessing) {u=5.95f;v=5.95f;w=5.95f;}
                     else{
                         rand.setSeed(unit.id * 1000L);
-                        u = Mathf.round(i + j + 0.8f + rand.random(0.0f, 0.4f), 0.05f);
-                        v = Mathf.round(i + j + 0.8f + rand.random(0.0f, 0.4f), 0.05f);
-                        w = Mathf.round(i + j + 0.8f + rand.random(0.0f, 0.4f), 0.05f);
+                        u = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
+                        v = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
+                        w = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
+                        if(unit.naval) u += 0.5f;
+                        if(unit.flying || unit.speed >= 4.65f/*arkyid's speed*/) v += 0.5f;
+                        if(unit.buildSpeed > 0.0f || unit.mineTier > 0) w += 0.5f;
                     }
                     unitValues.put(unit, new UnitValue(u, v, w));
                 }
     }
 
     private static void putAllValues(Object... values){
-        var itemValues = ElementalUnitFactory.itemValues;
+        var itemValues = ElementUnitFactory.itemValues;
         for(int i = 0; i < values.length; i += 7)
             itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6]));
     }
 
-    public ElementalUnitFactory(String name, int t){
+    public ElementUnitFactory(String name, int t){
         super(name);
         tier = (byte)t;
         hasPower = true;
@@ -144,12 +151,12 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
         regionRotated1 = 1;
         commandable = true;
         ambientSound = Sounds.respawning;
-        buildType = ElementalUnitFactoryBuild::new;
+        buildType = ElementUnitFactoryBuild::new;
 
         var plans = this.plans;
-        var factories = ElementalUnitFactory.factories;
+        var factories = ElementUnitFactory.factories;
 
-        config(Byte.class, (ElementalUnitFactoryBuild build, Byte i) -> {
+        config(Byte.class, (ElementUnitFactoryBuild build, Byte i) -> {
             if(build.currentPlan == i) return;
             build.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             build.progress = 0.0f;
@@ -157,7 +164,7 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
                 build.command = null;
         });
 
-        config(UnitType.class, (ElementalUnitFactoryBuild build, UnitType val) -> {
+        config(UnitType.class, (ElementUnitFactoryBuild build, UnitType val) -> {
             byte next = (byte)plans.indexOf(p -> p == val);
             if(build.currentPlan == next) return;
             build.currentPlan = next;
@@ -166,9 +173,9 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
                 build.command = null;
         });
 
-        config(UnitCommand.class, (ElementalUnitFactoryBuild build, UnitCommand command) -> build.command = command);
+        config(UnitCommand.class, (ElementUnitFactoryBuild build, UnitCommand command) -> build.command = command);
 
-        configClear((ElementalUnitFactoryBuild build) -> {
+        configClear((ElementUnitFactoryBuild build) -> {
             build.currentPlan = -1;
             build.command = null;
         });
@@ -193,6 +200,9 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
     @Override
     public void setStats(){
         super.setStats();
+        var itemValues = ElementUnitFactory.itemValues;
+        var unitValues = ElementUnitFactory.unitValues;
+        var plans = this.plans;
         stats.add(FRStat.elementLevel, tier);
 
         stats.add(Stat.input, table -> {
@@ -216,8 +226,10 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
         });
 
         stats.add(Stat.output, table -> {
+            int r = equivalentWidth > 2560.0f ? 8 : 4;
+
             table.row();
-            for(int i = 0, n = plans.size; i < n; i++){
+            for(int i = 0, n = plans.size; i < n;){
                 var unit = plans.get(i);
                 var value = unitValues.get(unit);
                 boolean banned = unit.isBanned(), unlocked = unit.unlockedNowHost();
@@ -241,7 +253,7 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
                     t.row();
                     t.add(Core.bundle.format("stat.logiclv", unlocked ? Strings.fixed(value.logicLv, 2) : "???")).left();
                 }).growX().pad(5.0f).margin(10.0f);
-                if((i + 1) % 4 == 0) table.row();
+                if(++i % r == 0) table.row();
             }
         });
     }
@@ -249,9 +261,9 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
     @Override
     public void setBars(){
         super.setBars();
-        addBar("progress", (ElementalUnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
+        addBar("progress", (ElementUnitFactoryBuild e) -> new Bar("bar.progress", Pal.ammo, e::fraction));
 
-        addBar("units", (ElementalUnitFactoryBuild e) -> new Bar(
+        addBar("units", (ElementUnitFactoryBuild e) -> new Bar(
             () -> e.unit() == null ? "[lightgray]" + Iconc.cancel :
                 Core.bundle.format("bar.unitcap",
                     Fonts.getUnicodeStr(e.unit().name),
@@ -262,10 +274,19 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
             () -> e.unit() == null ? 0.0f : (e.unit().useUnitCap ? (float)e.team.data().countType(e.unit()) / Units.getCap(e.team) : 1.0f)
         ));
 
-        float m = tier + 0.9f;
-        addBar("armor", (ElementalUnitFactoryBuild b) -> new Bar(() -> Core.bundle.format("bar.armorlv", Strings.fixed(xpToLv(b.armorXp), 1)), () -> Pal.powerBar, () -> xpToLv(b.armorXp) / m));
-        addBar("energy", (ElementalUnitFactoryBuild b) -> new Bar(() -> Core.bundle.format("bar.energylv", Strings.fixed(xpToLv(b.energyXp), 1)), () -> Pal.powerBar, () -> xpToLv(b.energyXp) / m));
-        addBar("logic", (ElementalUnitFactoryBuild b) -> new Bar(() -> Core.bundle.format("bar.logiclv", Strings.fixed(xpToLv(b.logicXp), 1)), () -> Pal.powerBar, () -> xpToLv(b.logicXp) / m));
+        addBar("armor", (ElementUnitFactoryBuild b) -> new Bar(
+            () -> Core.bundle.format("bar.armorlv", Strings.fixed(b.armorXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).armorLv, 1))),
+            () -> Pal.powerBar,
+            () -> b.currentPlan == -1 ? 0.0f : b.armorXpToLv() / unitValues.get(b.unit()).armorLv));
+        addBar("energy", (ElementUnitFactoryBuild b) -> new Bar(
+            () -> Core.bundle.format("bar.energylv", Strings.fixed(b.energyXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).energyLv, 1))),
+            () -> Pal.reactorPurple,
+            () -> b.currentPlan == -1 ? 0.0f : b.energyXpToLv() / unitValues.get(b.unit()).energyLv));
+        addBar("logic", (ElementUnitFactoryBuild b) -> new Bar(
+            () -> Core.bundle.format("bar.logiclv", Strings.fixed(b.logicXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).logicLv, 1))),
+            () -> Pal.logicControl,
+            () -> b.currentPlan == -1 ? 0.0f : b.logicXpToLv() / unitValues.get(b.unit()).logicLv)
+        );
     }
 
     @Override
@@ -296,20 +317,28 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
         return FRUtils.round((Mathf.sqr(value.armorLv) + Mathf.sqr(value.energyLv) + Mathf.sqr(value.logicLv)) * timeScl, 300);
     }
 
-    private float xpToLv(float xp){
-        return Mathf.log(base, xp + 1.0f);
-    }
-
     private float lvToXp(float lv){
         return Mathf.pow(base, lv) - 1.0f;
     }
 
-    public class ElementalUnitFactoryBuild extends UnitBuild{
+    public class ElementUnitFactoryBuild extends UnitBuild{
 
         private @Nullable Vec2 commandPos;
         private @Nullable UnitCommand command;
         private byte currentPlan = -1;
         private float armorXp, energyXp, logicXp;
+
+        private float armorXpToLv(){
+            return Mathf.log(base, armorXp + 1.0f);
+        }
+
+        private float energyXpToLv(){
+            return Mathf.log(base, energyXp + 1.0f);
+        }
+
+        private float logicXpToLv(){
+            return Mathf.log(base, logicXp + 1.0f);
+        }
 
         public float fraction(){
             if(currentPlan == -1) return 0.0f;
@@ -361,7 +390,7 @@ public class ElementalUnitFactory extends mindustry.world.blocks.units.UnitBlock
         public void buildConfiguration(Table table){
             var units = Seq.with(plans).map(u -> u).retainAll(u -> u.unlockedNow() && !u.isBanned());
             if(units.any()){
-                ItemSelection.buildTable(ElementalUnitFactory.this, table, units, this::unit, unit -> configure((byte)plans.indexOf(u -> u == unit)), selectionRows, selectionColumns);
+                ItemSelection.buildTable(ElementUnitFactory.this, table, units, this::unit, unit -> configure((byte)plans.indexOf(u -> u == unit)), selectionRows, selectionColumns);
 
                 table.row();
 

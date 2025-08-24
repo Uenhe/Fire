@@ -11,7 +11,9 @@ import mindustry.game.EventType;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 
-import static mindustry.Vars.net;
+import java.awt.*;
+
+import static mindustry.Vars.headless;
 
 public final class FRVars{
 
@@ -26,7 +28,19 @@ public final class FRVars{
     public static boolean
         mineSand = false, displayRange = true, showLog = true, noMultiMods = true;
 
+    public static float equivalentWidth;
+
+    private static final Toolkit toolkit;
+
     static{
+        Toolkit tk;
+        try{ //java.awt is not available on JRE but JDK
+            tk = Toolkit.getDefaultToolkit();
+        }catch(Throwable e){
+            tk = null;
+        }
+        toolkit = tk;
+
         var units = spawnedUnits;
         Events.run(EventType.Trigger.update, () -> {
             if(Core.graphics.getFrameId() % 60 == 0){
@@ -36,12 +50,18 @@ public final class FRVars{
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
             }
 
-
             for(var u : units){
                 if(u.hasEffect(StatusEffects.invincible))
                     u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
                 else
                     units.remove(u);
+            }
+        });
+
+        if(!headless) Events.run(EventType.Trigger.draw, () -> {
+            if(Core.graphics.getFrameId() % 60 == 0){
+                float winScl = toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f;
+                equivalentWidth = 100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / winScl;
             }
         });
 

@@ -1962,7 +1962,7 @@ public class FRUnitTypes{
         );
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
-            new UnitType[]{UnitTypes.beta, FRUnitTypes.omicron},
+            new UnitType[]{UnitTypes.beta, UnitTypes.gamma},
             new UnitType[]{FRUnitTypes.resisting, FRUnitTypes.garrison},
             new UnitType[]{FRUnitTypes.hatchet, FRUnitTypes.castle},
             new UnitType[]{FRUnitTypes.candlight, FRUnitTypes.lampryo}

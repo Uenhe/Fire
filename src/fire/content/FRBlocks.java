@@ -37,7 +37,7 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.storage.NumbDelusion;
-import fire.world.blocks.units.ElementalUnitFactory;
+import fire.world.blocks.units.ElementUnitFactory;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
@@ -3924,7 +3924,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.neoplasm, n(48));
         }};
 
-        vectorialReconstructor = new ElementalUnitFactory("vectorial-reconstructor", 4){{
+        vectorialReconstructor = new ElementUnitFactory("vectorial-reconstructor", 4){{
             requirements(Category.units, with(
                 lead, 2000,
                 titanium, 1000,
