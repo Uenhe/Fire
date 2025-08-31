@@ -7,8 +7,6 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Sounds;
 
-import static fire.FRVars.specialContent;
-
 public class SurgeCrafter extends mindustry.world.blocks.production.GenericCrafter{
 
     protected byte fragBullets;
@@ -38,9 +36,9 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         @Override
         public void craft(){
             super.craft();
-            byte n = fragBullets;
             craftSound.at(tile, Mathf.random(0.9f, 1.1f));
-            if(n == 0 || !specialContent) return;
+            byte n = fragBullets;
+            if(n == 0) return;
 
             for(byte i = 0; i < n; i++){
                 var bullet = fragBullet.create(this, x, y, 360.0f * i / n);

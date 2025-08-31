@@ -299,12 +299,14 @@ public class FRPlanets{
                 dnode(landingBase, () -> {
                     dnode(smasher);
                     dnode(nightmare);
+                    dnode(firefly);
 
                     dnode(darksandPeakforest, () -> {
 
                         dnode(frozenGround, () -> {
                             dnode(compositeConveyor);
                             dnode(electrothermalSiliconFurnace);
+                            dnode(candlight);
 
                             dnode(beachLanding, () -> {
                                 dnode(blossom);

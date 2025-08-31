@@ -55,6 +55,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
     public float getEfficiency(Tile tile){
         if(tile == null) return 0.0f;
 
+        int sqr = size * size;
         float efficiencyCountingDoubled = 0.0f, efficiencyCounting = 0.0f;
         var tiles = tile.getLinkedTilesAs(this, tempTiles);
         for(var other : tiles){
@@ -65,11 +66,7 @@ public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGe
             efficiencyCountingDoubled += efficiencyCurrent * efficiencyCurrent;
         }
 
-        return (efficiencyCountingDoubled / sqr() - efficiencyCounting * efficiencyCounting / (sqr() * sqr())) * 4.0f;
-    }
-
-    private short sqr(){
-        return (short)(size * size);
+        return (efficiencyCountingDoubled / sqr - efficiencyCounting * efficiencyCounting / (sqr * sqr)) * 4.0f;
     }
 
     public class HydroelectricGeneratorBuild extends GeneratorBuild{

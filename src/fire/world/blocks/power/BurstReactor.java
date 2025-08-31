@@ -80,8 +80,7 @@ public class BurstReactor extends ImpactReactor{
             float[] powerConsSum = {0.0f};
             indexer.eachBlock(this, detectRadius, other -> other.block.consPower != null && other != this, other -> {
                 var cons = other.block.consPower;
-                float aa = other.efficiency * cons.efficiency(other) * cons.requestedPower(other);
-                powerConsSum[0] += aa;
+                powerConsSum[0] += other.efficiency * cons.efficiency(other) * cons.requestedPower(other);
             });
             return super.getPowerProduction() + powerConsSum[0] * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
         }

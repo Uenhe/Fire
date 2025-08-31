@@ -22,9 +22,8 @@ public class FleshUnitType extends UnitType{
     public FleshUnitType(String name, UnitType origin){
         super(name);
         healColor = Pal.neoplasm1;
-        if((this.origin = origin) != null){
+        if((this.origin = origin) != null)
             origin.abilities.add(new DrownRespawnAbility(this));
-        }
     }
 
     @Override
@@ -40,6 +39,7 @@ public class FleshUnitType extends UnitType{
 
         private DrownRespawnAbility(UnitType flesh){
             this.flesh = flesh;
+            display = false;
         }
 
         @Override
@@ -69,8 +69,7 @@ public class FleshUnitType extends UnitType{
             Unit spawned;
             if(min == Float.MAX_VALUE){
                 spawned = flesh.spawn(team, unit.x, unit.y);
-            }
-            else{
+            }else{
                 spawned = flesh.spawn(team, ttx * tilesize, tty * tilesize, Angles.angle(unit.tileX(), unit.tileY(), ttx, tty));
                 FRFx.fleshTeleportEffect.at(unit.x, unit.y, unit.rotation - 90.0f, new FRFx.TpFxData(spawned, spawned.x, spawned.y));
             }

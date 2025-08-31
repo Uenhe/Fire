@@ -15,9 +15,7 @@ public class FRStat{
     neoHealthMultiplier = new Stat("neoHealthMultiplier"),
     neoHealing = new Stat("neoHealing"),
     percentageHealing = new Stat("percentageHealing"),
-    armorLevel = new Stat("armorLevel"),
-    powerLevel = new Stat("powerLevel"),
-    logicLevel = new Stat("logicLevel"),
+    elementLevel = new Stat("elementLevel"),
 
     statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
     maxTargets = new Stat("maxTargets", StatCat.function),

@@ -22,8 +22,6 @@ import fire.world.DEBUG;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
-import mindustry.Vars;
-import mindustry.content.Blocks;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
@@ -35,9 +33,7 @@ import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.fragments.MenuFragment;
-import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.meta.Attribute;
 
 import java.lang.reflect.Field;
@@ -45,7 +41,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 import static fire.FRVars.*;
-import static fire.content.FRBlocks.primaryInterplanetaryAccelerator;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
@@ -128,9 +123,8 @@ public class FireMod extends mindustry.mod.Mod{
 
             t.checkPref("minesand", false, b -> mineSand = b);
             t.checkPref("displayrange", true, b -> displayRange = b);
-            t.checkPref("specialcontent", true, b -> specialContent = b);
             t.checkPref("showlog", true, b -> showLog = b);
-            //t.checkPref("nomultimods", true, b -> noMultiMods = b);
+            t.checkPref("nomultimods", true, b -> noMultiMods = b);
 
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> showLog(true)).size(240.0f, 80.0f);
@@ -182,14 +176,7 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showNoMultipleMods(){
-        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) /*|| DEBUG.isDeveloper()*/){
-            return;
-        }
-        fkfire();
-        /*
-        if(!noMultiMods){
-            return;
-        }*/
+        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
         fkgame();
     }
 
@@ -265,59 +252,49 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void fkgame(){
-        var dialog = mulmodDialog = new BaseDialog("What happened");
-        setupDialog(mulmodDialog);
-        mulmodDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
-
-        if(mobile){
-            final int m, n;
-            if(mods.locateMod("mindustryx") != null){
-                m = 2; n = 5;
-            }else{
-                m = 1; n = 3;
-            }
-            ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
-
-            ui.menuGroup.fill(c ->
-                c.pane(Styles.noBarPane, cont -> {
-                    try{
-                        field_container.set(ui.menufrag, cont);
-                    }catch(IllegalAccessException e){
-                        throw new RuntimeException("?", e);
-                    }
-                    cont.name = "menu container";
-
-                    buildMobile();
-                    Events.on(EventType.ResizeEvent.class, event -> buildMobile());
-
-                }).with(pane -> pane.setOverscroll(false, false)).grow()
-            );
-
-        }else{
-            Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
-            for(var b : buttons)
-                if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
-                    tmp.add(b);
-
-            buttons.removeAll(tmp);
-            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulmodDialog::show));
-        }
-
         Events.on(EventType.WorldLoadBeginEvent.class, e -> {
+            if(!noMultiMods && state.getPlanet() != FRPlanets.lysetta) return;
             Log.info("what r u fking doing");
             Core.app.exit();
         });
-    }
 
-    public static void fkfire(){
-        FRPlanets.lysetta.visible = false;
-        FRPlanets.lysetta.accessible = false;
-        FRPlanets.lysetta.ruleSetter = r -> {
-            r.hideBannedBlocks = true;
-            content.blocks().each(b->{
-                r.bannedBlocks.add(b);
-            });
-        };
+        if(noMultiMods){
+            var dialog = mulmodDialog = new BaseDialog("What happened");
+            setupDialog(dialog);
+            dialog.cont.pane(t -> t.add("@fire.nomultimods").center());
+
+            if(mobile){
+                int m = 1, n = 3;
+                if(mods.locateMod("mindustryx") != null){
+                    m += 1; n += 2;
+                }
+                ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
+
+                ui.menuGroup.fill(c ->
+                    c.pane(Styles.noBarPane, cont -> {
+                        try{
+                            field_container.set(ui.menufrag, cont);
+                        }catch(IllegalAccessException e){
+                            throw new RuntimeException("?", e);
+                        }
+                        cont.name = "menu container";
+
+                        buildMobile();
+                        Events.on(EventType.ResizeEvent.class, event -> buildMobile());
+
+                    }).with(pane -> pane.setOverscroll(false, false)).grow()
+                );
+
+            }else{
+                Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
+                for(var b : buttons)
+                    if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
+                        tmp.add(b);
+
+                buttons.removeAll(tmp);
+                buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, dialog::show));
+            }
+        }
     }
 
     private static void buildMobile(){

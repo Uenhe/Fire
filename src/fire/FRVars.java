@@ -4,13 +4,16 @@ import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
 import arc.struct.Seq;
+import fire.content.FRUnitTypes;
 import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 
-import static mindustry.Vars.net;
+import java.awt.*;
+
+import static mindustry.Vars.headless;
 
 public final class FRVars{
 
@@ -23,9 +26,21 @@ public final class FRVars{
 
     /** Setting. */
     public static boolean
-        mineSand = false, displayRange = true, specialContent = true, showLog = true, noMultiMods = true;
+        mineSand = false, displayRange = true, showLog = true, noMultiMods = true;
+
+    public static short equivalentWidth;
+
+    private static final Toolkit toolkit;
 
     static{
+        Toolkit tk;
+        try{ //java.awt is not available on JRE but JDK
+            tk = Toolkit.getDefaultToolkit();
+        }catch(Throwable e){
+            tk = null;
+        }
+        toolkit = tk;
+
         var units = spawnedUnits;
         Events.run(EventType.Trigger.update, () -> {
             if(Core.graphics.getFrameId() % 60 == 0){
@@ -35,7 +50,6 @@ public final class FRVars{
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
             }
 
-
             for(var u : units){
                 if(u.hasEffect(StatusEffects.invincible))
                     u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
@@ -44,17 +58,21 @@ public final class FRVars{
             }
         });
 
+        if(!headless) Events.run(EventType.Trigger.draw, () -> {
+            if(Core.graphics.getFrameId() % 60 == 0)
+                equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
+        });
+
         Events.on(EventType.UnitSpawnEvent.class, e -> {
-            if(e.unit.type.flying) units.add(e.unit);
+            if(e.unit.type.flying && e.unit.type != FRUnitTypes.pioneer) units.add(e.unit);
         });
     }
 
     public static void getSettings(){
         mineSand = Core.settings.getBool("minesand");
         displayRange = Core.settings.getBool("displayrange");
-        specialContent = net.server() || Core.settings.getBool("specialcontent");
         showLog = Core.settings.getBool("showlog");
-        //noMultiMods = Core.settings.getBool("nomultimods");
+        noMultiMods = Core.settings.getBool("nomultimods");
     }
 
     public static Color find(String hex){

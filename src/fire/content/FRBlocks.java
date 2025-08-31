@@ -37,6 +37,7 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.storage.NumbDelusion;
+import fire.world.blocks.units.ElementUnitFactory;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
@@ -97,7 +98,6 @@ import mindustry.world.blocks.liquid.LiquidRouter;
 import mindustry.world.blocks.payloads.PayloadConveyor;
 import mindustry.world.blocks.payloads.PayloadRouter;
 import mindustry.world.blocks.power.ConsumeGenerator;
-import mindustry.world.blocks.power.ImpactReactor;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.units.RepairTower;
 import mindustry.world.blocks.units.UnitFactory;
@@ -154,7 +154,7 @@ public class FRBlocks{
     hardenedAlloyCrucible,
 
     //units
-    fleshReconstructor, unitHealer, payloadConveyorLarge, payloadRouterLarge,
+    fleshReconstructor, vectorialReconstructor, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
     buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator;
@@ -743,7 +743,7 @@ public class FRBlocks{
         }};
 
         gambler = new JackpotTurret("gambler"){{
-            var colors = new Color[]{Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
+            Color[] colors = {Pal.lightOrange, Pal.thoriumPink, Pal.surge, Pal.sapBulletBack};
             var chargeFx = FRFx.jackpotChargeEffect(shoot.firstShotDelay = 120.0f, 0.17f, 40.0f, 4, colors);
 
             requirements(Category.turret, with(
@@ -3924,6 +3924,25 @@ public class FRBlocks{
             consumeLiquid(Liquids.neoplasm, n(48));
         }};
 
+        vectorialReconstructor = new ElementUnitFactory("vectorial-reconstructor", 4){{
+            requirements(Category.units, with(
+                lead, 2000,
+                titanium, 1000,
+                logicAlloy, 1000,
+                hardenedAlloy, 500,
+                phaseFabric, 500
+            ));
+            health = 4500;
+            armor = 22.0f;
+            size = 7;
+            liquidCapacity = 90.0f;
+
+            base = 4.0f;
+            timeScl = 90.0f;
+            consumePower(n(5400));
+            consumeLiquid(Liquids.cryofluid, n(60));
+        }};
+
         unitHealer = new RepairTower("unit-healer"){{
             requirements(Category.units, with(
                 copper, 45,
@@ -4171,6 +4190,9 @@ public class FRBlocks{
         //region env
         //no references needed
 
+        /* Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
+        Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f), specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
+
         new EnvBlock("env-eteriver-stronghold", () -> new EnvBlock.EnvBlockBuild(){
             /** Apollo spawn. */
             @Override
@@ -4191,10 +4213,6 @@ public class FRBlocks{
         });
 
         new EnvBlock("env-stormy-coast1", () -> new EnvBlock.EnvBlockBuild(){
-            /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-            private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-            private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
-
             /** Wave 41-47 / 60. */
             @Override
             protected void updateStart(){
@@ -4241,10 +4259,6 @@ public class FRBlocks{
         });
 
         new EnvBlock("env-stormy-coast2", () -> new EnvBlock.EnvBlockBuild(){
-            /** Default color -> according to {@link mindustry.game.Rules#ambientLight ambientLight}. */
-            private static final Color defaultColor = new Color(0.01f, 0.01f, 0.04f, 0.99f);
-            private static final Color specificColor = new Color(0.1f, 0.1f, 0.1f, 0.0f);
-
             /** Wave 59 / 60. */
             @Override
             protected void updateStart(){

@@ -145,8 +145,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                 break;
             }
 
-            float delta = Time.delta * (isOverloaded ? 1.2f : 1.0f);
-            timer += delta;
+            timer += Time.delta * (isOverloaded ? 1.2f : 1.0f);
 
             if(!isOverloaded && ext_node.checkBelonging(timer, 0)){
                 Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, bullet -> {
@@ -160,7 +159,6 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         bullet.damage *= ext_counterBulletDamageFactor;
                         bullet.time = 0.0f;
                         bullet.lifetime = ext_node.last() + tt;
-                        bullet.drag = 0.0f;
 
                         if(bulletMap.containsValue(bullet.type.id)){
                             bullet.type = content.bullet(bulletMap.get(bullet.type.id));
@@ -231,8 +229,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
                                     }else{
                                         b.lifetime = mark;
-                                        b.drag = 0.024f;
                                         b.vel.rnd(6.0f * ext_counterBulletSpeedFactor);
+                                        b.mover = bb -> bb.vel.scl(Math.max(1.0f - 0.024f * Time.delta, 0.0f));
                                     }
                                 }
                             }
@@ -252,8 +250,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         return radius * radiusScale;
     }
 
-    private EnergyForceFieldAbility setBullets(Seq<Bullet> set){
-        bullets = set;
+    private EnergyForceFieldAbility setBullets(Seq<Bullet> seq){
+        bullets = seq;
         return this;
     }
 

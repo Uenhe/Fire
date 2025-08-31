@@ -4,7 +4,6 @@ import arc.Core;
 import arc.func.Boolf;
 import arc.graphics.Color;
 import arc.math.Mathf;
-import arc.math.Rand;
 import arc.struct.ObjectMap;
 import arc.struct.Queue;
 import arc.util.Time;
@@ -41,10 +40,9 @@ public class NumbDelusion extends StorageBlock{
         super(name);
         buildType = NumbDelusionBuild::new;
 
-        //all items should have been loaded when loading blocks... right?
-        var rand = new Rand();
-        Color[] colBacks = new Color[]{Pal.copperAmmoBack, Pal.graphiteAmmoBack, Pal.surgeAmmoBack, Pal.blastAmmoBack, Pal.thoriumAmmoBack, Pal.plastaniumBack},
-            colFronts = new Color[]{Pal.copperAmmoFront, Pal.graphiteAmmoFront, Pal.surgeAmmoFront, Pal.blastAmmoFront, Pal.thoriumAmmoFront, Pal.plastaniumFront};
+        var rand = Mathf.rand;
+        Color[] colBacks = {Pal.copperAmmoBack, Pal.graphiteAmmoBack, Pal.surgeAmmoBack, Pal.blastAmmoBack, Pal.thoriumAmmoBack, Pal.plastaniumBack},
+            colFronts = {Pal.copperAmmoFront, Pal.graphiteAmmoFront, Pal.surgeAmmoFront, Pal.blastAmmoFront, Pal.thoriumAmmoFront, Pal.plastaniumFront};
 
         for(int i = 0, n = content.items().size; i < n; i++){
             var it = content.items().get(i);
@@ -152,12 +150,12 @@ public class NumbDelusion extends StorageBlock{
 
                     //TODO iterates twice here would be bad
                     boolean enough = true;
-                    for(var stack : plan.block.requirements){
+                    for(var stack : plan.block.requirements)
                         if(items.get(stack.item) - amounts[stack.item.id] < stack.amount * threshold){
                             enough = false;
                             break;
                         }
-                    }
+
                     if(enough){
                         plansTo.add(plan);
                         for(var stack : plan.block.requirements)
@@ -183,7 +181,7 @@ public class NumbDelusion extends StorageBlock{
                         var type = bullets[i];
                         if(type == null) continue;
                         for(int j = 0, m = Math.min(items.get(i), itemCapacity) / 50; j < m; j++)
-                            type.create(this, Complex ? Team.derelict : team, x, y, Mathf.random(360.0f), Mathf.random(0.75f, 1.25f) + (Complex ? 0.6f : 0.0f), Mathf.random(0.75f, 1.25f));
+                            type.create(this, Complex ? Team.derelict : team, x, y, Mathf.random(360.0f), Mathf.random(0.75f, 1.33f) + (Complex ? 0.6f : 0.0f), Mathf.random(0.75f, 1.33f));
                     }
                 });
 
