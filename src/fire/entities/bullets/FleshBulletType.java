@@ -42,7 +42,7 @@ public class FleshBulletType extends SpritesBulletType{
         adhereType = type;
     }
 
-    public void afterAssignment(){
+    protected void afterAssignment(){
         adhereType.removeAmount = removeAmount;
         adhereType.maxSpread = maxSpread;
         adhereType.spreadIntensity = spreadIntensity;

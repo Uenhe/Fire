@@ -3,7 +3,6 @@ package fire.world.kits;
 import arc.Core;
 import arc.math.Mathf;
 import arc.scene.style.TextureRegionDrawable;
-import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.util.Scaling;
 import arc.util.Strings;
@@ -44,13 +43,14 @@ public class MeltingFurnace{
         @Override
         public void setStats(){
             super.setStats();
+            final float size = 32.0f;
+
             stats.add(Stat.basePowerGeneration, basePowerProduction * 60.0f, StatUnit.powerSecond);
             stats.add(Stat.input, mt -> {
                 mt.row().table(Styles.grayPanel, t ->
                     t.left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f)
                 );
 
-                final float size = 32.0f;
                 int i = 0;
                 Table tableSlag = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnaceslag").minWidth(size).maxWidth(size).pad(10.0f).row()).left().get(),
                     tablePower = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnacepower").minWidth(size).maxWidth(size).pad(10.0f).row()).left().get();

@@ -1933,7 +1933,7 @@ public class FRUnitTypes{
         //put these there instead of FROverride or automatic unlocking
 
         ((UnitFactory)Blocks.groundFactory).plans.add(
-            new UnitFactory.UnitPlan(FRUnitTypes.guarding, 1500.0f, ItemStack.with(
+            new UnitFactory.UnitPlan(guarding, 1500.0f, ItemStack.with(
                 Items.lead, 20,
                 Items.titanium, 25,
                 Items.silicon, 30
@@ -1946,7 +1946,7 @@ public class FRUnitTypes{
                 Items.lead, 40,
                 Items.silicon, 30
             )),
-            new UnitFactory.UnitPlan(FRUnitTypes.firefly, 2400.0f, ItemStack.with(
+            new UnitFactory.UnitPlan(firefly, 2400.0f, ItemStack.with(
                 Items.lead, 20,
                 Items.metaglass, 10,
                 Items.coal, 10,
@@ -1954,28 +1954,28 @@ public class FRUnitTypes{
             ))
         );
 
-        ((Reconstructor)Blocks.additiveReconstructor).upgrades.addAll(
+        ((Reconstructor)Blocks.additiveReconstructor).upgrades.add(
             new UnitType[]{UnitTypes.alpha, UnitTypes.beta},
-            new UnitType[]{FRUnitTypes.guarding, FRUnitTypes.resisting},
-            new UnitType[]{FRUnitTypes.blade, FRUnitTypes.hatchet},
-            new UnitType[]{FRUnitTypes.firefly, FRUnitTypes.candlight}
+            new UnitType[]{guarding, resisting},
+            new UnitType[]{blade, hatchet},
+            new UnitType[]{firefly, candlight}
         );
 
-        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.addAll(
-            new UnitType[]{UnitTypes.beta, UnitTypes.gamma},
-            new UnitType[]{FRUnitTypes.resisting, FRUnitTypes.garrison},
-            new UnitType[]{FRUnitTypes.hatchet, FRUnitTypes.castle},
-            new UnitType[]{FRUnitTypes.candlight, FRUnitTypes.lampryo}
+        ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
+            new UnitType[]{UnitTypes.beta, omicron},
+            new UnitType[]{resisting, garrison},
+            new UnitType[]{hatchet, castle},
+            new UnitType[]{candlight, lampryo}
         );
 
-        ((Reconstructor)Blocks.exponentialReconstructor).upgrades.addAll(
-            new UnitType[]{FRUnitTypes.omicron, FRUnitTypes.pioneer},
-            new UnitType[]{FRUnitTypes.garrison, FRUnitTypes.shelter},
-            new UnitType[]{FRUnitTypes.lampryo, FRUnitTypes.lumiflame}
+        ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
+            new UnitType[]{omicron, pioneer},
+            new UnitType[]{garrison, shelter},
+            new UnitType[]{lampryo, lumiflame}
         );
 
-        ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.addAll(
-            new UnitType[]{FRUnitTypes.shelter, FRUnitTypes.blessing}
+        ((Reconstructor)Blocks.tetrativeReconstructor).upgrades.add(
+            new UnitType[]{shelter, blessing}
         );
     }
 }

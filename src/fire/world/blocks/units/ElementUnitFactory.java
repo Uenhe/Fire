@@ -53,6 +53,7 @@ import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.Items.*;
 import static mindustry.content.Items.sand;
+import static mindustry.content.UnitTypes.arkyid;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
 public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
@@ -128,7 +129,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                         v = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
                         w = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
                         if(unit.naval) u += 0.5f;
-                        if(unit.flying || unit.speed >= 4.65f/*arkyid's speed*/) v += 0.5f;
+                        if(unit.flying || unit.speed >= arkyid.speed) v += 0.5f;
                         if(unit.buildSpeed > 0.0f || unit.mineTier > 0) w += 0.5f;
                     }
                     unitValues.put(unit, new UnitValue(u, v, w));

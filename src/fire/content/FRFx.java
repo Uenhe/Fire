@@ -1,5 +1,6 @@
 package fire.content;
 
+import arc.Core;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -15,12 +16,15 @@ import arc.util.Tmp;
 import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.entities.effect.ParticleEffect;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 
+import static arc.math.Mathf.cos;
+import static arc.math.Mathf.sin;
 import static mindustry.Vars.tilesize;
 
 public class FRFx{
@@ -166,8 +170,8 @@ public class FRFx{
             for(int i = 0; i < amount; i++){
                 float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * (float)i / amount / speed,
                     mag = radius * e.fout(),
-                    x = Mathf.cos(theta, 1.0f / speed, mag) + e.x,
-                    y = Mathf.sin(theta, 1.0f / speed, mag) + e.y;
+                    x = cos(theta, 1.0f / speed, mag) + e.x,
+                    y = sin(theta, 1.0f / speed, mag) + e.y;
 
                 Draw.color(colors[i]);
                 Lines.circle(x, y, orbSize);

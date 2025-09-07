@@ -4,12 +4,11 @@ import arc.math.Angles;
 import arc.math.geom.Vec2;
 import arc.util.Time;
 import fire.content.FRFx;
-import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
 
 /** @author fy */
-public class SegmentalBulletType extends BasicBulletType{
+public class SegmentalBulletType extends mindustry.entities.bullet.BasicBulletType{
 
     public float radius = 100f;
     public float damageMultiplier;
@@ -40,7 +39,7 @@ public class SegmentalBulletType extends BasicBulletType{
         if(b.absorbed) return;
 
         Groups.bullet.intersect(x - radius, y - radius, radius * 2.0f, radius * 2.0f, other -> {
-            if(b.team != other.team && b.type.hittable){
+            if(b != other && b.team != other.team && b.type.hittable){
                 FRFx.chainEmpThin.at(x, y, 0.0f, hitColor, new Vec2().set(other));
 
                 float v = splashDamage * damageMultiplier;

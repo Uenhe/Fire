@@ -28,7 +28,7 @@ public final class FRVars{
     public static boolean
         mineSand = false, displayRange = true, showLog = true, noMultiMods = true;
 
-    public static float equivalentWidth;
+    public static short equivalentWidth;
 
     private static final Toolkit toolkit;
 
@@ -59,10 +59,8 @@ public final class FRVars{
         });
 
         if(!headless) Events.run(EventType.Trigger.draw, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0){
-                float winScl = toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f;
-                equivalentWidth = 100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / winScl;
-            }
+            if(Core.graphics.getFrameId() % 60 == 0)
+                equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
         });
 
         Events.on(EventType.UnitSpawnEvent.class, e -> {

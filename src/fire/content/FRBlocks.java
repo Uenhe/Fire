@@ -106,6 +106,7 @@ import mindustry.world.draw.*;
 import mindustry.world.meta.Attribute;
 import mindustry.world.meta.BuildVisibility;
 
+import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
 import static fire.FRVars.find;
 import static fire.content.FRItems.*;
@@ -154,7 +155,7 @@ public class FRBlocks{
     hardenedAlloyCrucible,
 
     //units
-    fleshReconstructor, vectorialReconstructor, unitHealer, payloadConveyorLarge, payloadRouterLarge,
+    fleshReconstructor, vectorialUnitFactory, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
     buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, compositeUnloader, primaryInterplanetaryAccelerator;
@@ -1765,14 +1766,7 @@ public class FRBlocks{
         }};
 
         obstruction = new ItemDefenseTurret("obstruction"){{
-            requirements(Category.turret, with(
-                plastanium, 1200,
-                phaseFabric, 600,
-                logicAlloy, 500,
-                surgeAlloy, 800,
-                hardenedAlloy, 800,
-                magneticAlloy, 500
-            ));
+            requirements(Category.turret, with(plastanium, 1200, phaseFabric, 600, logicAlloy, 500, surgeAlloy, 800, hardenedAlloy, 800, magneticAlloy, 500));
             health = 12000;
             size = 6;
             armor = 22.0f;
@@ -1801,46 +1795,40 @@ public class FRBlocks{
 
             drawer = new DrawTurret(){{
                 var circleProgress = DrawPart.PartProgress.warmup.delay(0.9f);
-                parts.addAll(
-                    new RegionPart("-main"){{
-                        progress = PartProgress.warmup;
-                        under = true;
-                    }},
-                    new RegionPart("-barrel-in"){{
-                        progress = PartProgress.warmup;
-                        mirror = true;
-                        moves.add(new PartMove(PartProgress.warmup, 0.0f, -1.6f, -20.0f));
-                    }},
-                    new RegionPart("-barrel-out"){{
-                        progress = PartProgress.warmup;
-                        mirror = true;
-                        moves.add(new PartMove(PartProgress.warmup, 1.0f, 2.4f, -30.0f));
-                    }},
-                    new ShapePart(){{
-                        progress = circleProgress;
-                        rotateSpeed = -2f;
-                        color = Pal.surge;
-                        sides = 3;
-                        hollow = true;
-                        stroke = 0f;
-                        strokeTo = 3f;
-                        radius = 8f;
-                        layer = Layer.effect;
-                        y = -18;
-                    }},
-                    new ShapePart(){{
-                        progress = circleProgress;
-                        rotateSpeed = 2f;
-                        color = Pal.surge;
-                        sides = 3;
-                        hollow = true;
-                        stroke = 0f;
-                        strokeTo = 3f;
-                        radius = 8f;
-                        layer = Layer.effect;
-                        y = -18;
-                    }}
-                );
+                parts.addAll(new RegionPart("-main"){{
+                    progress = PartProgress.warmup;
+                    under = true;
+                }}, new RegionPart("-barrel-in"){{
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.warmup, 0.0f, -1.6f, -20.0f));
+                }}, new RegionPart("-barrel-out"){{
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.warmup, 1.0f, 2.4f, -30.0f));
+                }}, new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = -2f;
+                    color = Pal.surge;
+                    sides = 3;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 3f;
+                    radius = 8f;
+                    layer = Layer.effect;
+                    y = -18;
+                }}, new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = 2f;
+                    color = Pal.surge;
+                    sides = 3;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 3f;
+                    radius = 8f;
+                    layer = Layer.effect;
+                    y = -18;
+                }});
             }};
 
             consumeCoolant(0.8f);
@@ -1864,35 +1852,118 @@ public class FRBlocks{
                     status = StatusEffects.shocked;
                     frontColor = Color.white;
                     backColor = trailColor = hitColor = Pal.surge;
-                    trailWidth = 2f;
-                    trailLength = 8;
-
-                    hitEffect = new MultiEffect(
-                        new WaveEffect(){{
-                            lifetime = 40.0f;
-                            colorFrom = Pal.surge;
-                            colorTo = Color.white;
-                            sizeFrom = 0.0f;
-                            sizeTo = 60.0f;
-                            sides = 4;
-                            rotation = 0.0f;
-                            strokeFrom = 4.0f;
-                            interp = Interp.pow5Out;
-                            lightInterp = Interp.pow5Out;
-                        }},
-                        new WaveEffect(){{
-                            lifetime = 40.0f;
-                            colorFrom = Pal.surge;
-                            colorTo = Color.white;
-                            sizeFrom = 0.0f;
-                            sizeTo = 60.0f;
-                            sides = 4;
-                            rotation = 45.0f;
-                            strokeFrom = 4.0f;
-                            interp = Interp.pow5Out;
-                            lightInterp = Interp.pow5Out;
-                        }}
-                    );
+                    trailWidth = 3f;
+                    trailLength = 11;
+                    trailChance = 0.3f;
+                    trailEffect = new MultiEffect(new ParticleEffect(){{
+                        lifetime = 50.0f;
+                        particles = 2;
+                        baseLength = 14.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 4.5f;
+                        region = "fire-obstruction-ammoEffect-1";
+                        colorFrom.set(Pal.surge);
+                        Color.valueOf(colorTo, "f3e97900");
+                    }}, new ParticleEffect(){{
+                        lifetime = 45.0f;
+                        particles = 1;
+                        baseLength = 16.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 4.0f;
+                        region = "fire-obstruction-ammoEffect-2";
+                        colorFrom.set(Pal.surge);
+                        Color.valueOf(colorTo, "f3e97900");
+                    }}, new ParticleEffect(){{
+                        lifetime = 40.0f;
+                        particles = 1;
+                        baseLength = 18.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 3.5f;
+                        region = "fire-obstruction-ammoEffect-3";
+                        colorFrom.set(Pal.surge);
+                        Color.valueOf(colorTo, "f3e97900");
+                    }});
+                    hitEffect = new MultiEffect(new WaveEffect(){{
+                        lifetime = 40.0f;
+                        colorFrom = Pal.surge;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 60.0f;
+                        sides = 4;
+                        rotation = 0.0f;
+                        strokeFrom = 4.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }}, new WaveEffect(){{
+                        lifetime = 40.0f;
+                        colorFrom = Pal.surge;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 60.0f;
+                        sides = 4;
+                        rotation = 45.0f;
+                        strokeFrom = 4.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }}, new ParticleEffect(){{
+                        lifetime = 60.0f;
+                        particles = 24;
+                        baseLength = 0f;
+                        length = 45.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 6.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-1";
+                        colorFrom.set(Color.white);
+                        colorTo.set(Pal.surge);
+                    }}, new ParticleEffect(){{
+                        lifetime = 55.0f;
+                        particles = 12;
+                        baseLength = 0f;
+                        length = 50.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 5.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-2";
+                        colorFrom.set(Color.white);
+                        colorTo.set(Pal.surge);
+                    }}, new ParticleEffect(){{
+                        lifetime = 50.0f;
+                        particles = 6;
+                        baseLength = 0f;
+                        length = 55.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 4.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-3";
+                        colorFrom.set(Color.white);
+                        colorTo.set(Pal.surge);
+                    }}, new ParticleEffect(){{
+                        useRotation = false;
+                        lifetime = 90.0f;
+                        particles = 1;
+                        baseLength = 0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow10Out;
+                        sizeFrom = 0f;
+                        sizeTo = 30.0f;
+                        region = "fire-obstruction-ammoEffect-1";
+                        colorFrom.set(Pal.surge);
+                        Color.valueOf(colorTo, "f3e97900");
+                    }});
 
                     lightning = 3;
                     lightningLength = 6;
@@ -1919,60 +1990,267 @@ public class FRBlocks{
                     backColor = trailColor = hitColor = find("f4ba6e");
                     trailWidth = 3f;
                     trailLength = 8;
+                    trailChance = 0.3f;
+                    trailEffect = new MultiEffect(new ParticleEffect(){{
+                        lifetime = 50.0f;
+                        particles = 2;
+                        baseLength = 14.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 4.5f;
+                        region = "fire-obstruction-ammoEffect-2";
+                        colorFrom.set(find("f4ba6e"));
+                        Color.valueOf(colorTo, "f4ba6e00");
+                    }}, new ParticleEffect(){{
+                        lifetime = 45.0f;
+                        particles = 1;
+                        baseLength = 16.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 4.0f;
+                        region = "fire-obstruction-ammoEffect-1";
+                        colorFrom.set(find("f4ba6e"));
+                        Color.valueOf(colorTo, "f4ba6e00");
+                    }}, new ParticleEffect(){{
+                        lifetime = 40.0f;
+                        particles = 1;
+                        baseLength = 18.0f;
+                        length = 0f;
+                        interp = Interp.pow5In;
+                        sizeInterp = Interp.pow5Out;
+                        sizeFrom = 0f;
+                        sizeTo = 3.5f;
+                        region = "fire-obstruction-ammoEffect-3";
+                        colorFrom.set(find("f4ba6e"));
+                        Color.valueOf(colorTo, "f4ba6e00");
+                    }});
 
-                    hitEffect = new MultiEffect(
-                        new WaveEffect(){{
-                            lifetime = 50.0f;
-                            colorFrom = find("f4ba6e");
-                            colorTo = Color.white;
-                            sizeFrom = 0.0f;
-                            sizeTo = 90.0f;
-                            sides = 3;
-                            rotation = 0.0f;
-                            strokeFrom = 5.0f;
-                            interp = Interp.pow5Out;
-                            lightInterp = Interp.pow5Out;
-                        }},
-                        new WaveEffect(){{
-                            lifetime = 50.0f;
-                            colorFrom = find("f4ba6e");
-                            colorTo = Color.white;
-                            sizeFrom = 0.0f;
-                            sizeTo = 90.0f;
-                            sides = 3;
-                            rotation = 180.0f;
-                            strokeFrom = 5.0f;
-                            interp = Interp.pow5Out;
-                            lightInterp = Interp.pow5Out;
-                        }}
-                    );
+                    hitEffect = new MultiEffect(new WaveEffect(){{
+                        lifetime = 50.0f;
+                        colorFrom = find("f4ba6e");
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 90.0f;
+                        sides = 3;
+                        rotation = 0.0f;
+                        strokeFrom = 5.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }}, new WaveEffect(){{
+                        lifetime = 50.0f;
+                        colorFrom = find("f4ba6e");
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 90.0f;
+                        sides = 3;
+                        rotation = 180.0f;
+                        strokeFrom = 5.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }}, new ParticleEffect(){{
+                        lifetime = 60.0f;
+                        particles = 24;
+                        baseLength = 0f;
+                        length = 45.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 6.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-2";
+                        colorFrom.set(Color.white);
+                        colorTo.set(find("f4ba6e"));
+                    }}, new ParticleEffect(){{
+                        lifetime = 55.0f;
+                        particles = 12;
+                        baseLength = 0f;
+                        length = 50.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 5.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-1";
+                        colorFrom.set(Color.white);
+                        colorTo.set(find("f4ba6e"));
+                    }}, new ParticleEffect(){{
+                        lifetime = 50.0f;
+                        particles = 6;
+                        baseLength = 0f;
+                        length = 55.0f;
+                        interp = Interp.pow5Out;
+                        sizeInterp = Interp.pow5In;
+                        sizeFrom = 4.0f;
+                        sizeTo = 0f;
+                        region = "fire-obstruction-ammoEffect-3";
+                        colorFrom.set(Color.white);
+                        colorTo.set(find("f4ba6e"));
+                    }}, new ParticleEffect(){{
+                        useRotation = false;
+                        lifetime = 90.0f;
+                        particles = 1;
+                        baseLength = 0f;
+                        length = 0f;
+                        interp = Interp.pow10In;
+                        sizeInterp = Interp.pow10Out;
+                        sizeFrom = 0f;
+                        sizeTo = 30.0f;
+                        region = "fire-obstruction-ammoEffect-2";
+                        colorFrom.set(find("f4ba6e"));
+                        Color.valueOf(colorTo, "f4ba6e00");
+                    }});
                 }},
 
-                magneticAlloy, new SegmentalBulletType(23.0f, 250.0f, 435.0f){{
-                    lifetime = 80.0f;
-                    drag = 0.03f;
-                    rangeChange = 164.0f;
-                    homingDelay = 15.0f;
-                    homingPower = 0.16f;
-                    homingRange = 200.0f;
-                    damageMultiplier = 0.1f;
-                    speedMultiplier = 0.3f;
-                    buildingDamageMultiplier = 0.1f;
-                    reloadMultiplier = 0.6f;
-                    width = 20.0f;
-                    height = 16.0f;
-                    knockback = 12.0f;
-                    splashDamageRadius = 100.0f;
-                    ammoMultiplier = 6.0f;
-                    status = FRStatusEffects.magnetized;
-                    statusDuration = 90.0f;
-                    frontColor = Color.white;
-                    backColor = trailColor = hitColor = Pal.surge;
-                    trailWidth = 3.5f;
-                    trailLength = 12;
+                magneticAlloy, new BasicBulletType(23.0f, 250.0f){
+                    final Effect stopEffect = new WaveEffect(){{
+                        lifetime = 60.0f;
+                        colorFrom = find("f4ba6e");
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 150.0f;
+                        strokeFrom = 6.0f;
+                        strokeTo = 0.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }};
+                    final BulletType smallIntervalBullet = new PointBulletType(){{
+                        knockback = 2.0f;
+                        damage = 40.0f;
+                        speed = 3.0f;
+                        splashDamage = 60.0f;
+                        splashDamageRadius = 40.0f;
+                        status = StatusEffects.electrified;
+                        statusDuration = 180f;
+                        trailSpacing = 40.0f;
+                        trailEffect = new MultiEffect(new ParticleEffect(){{
+                            lifetime = 45.0f;
+                            particles = 1;
+                            baseLength = 14.0f;
+                            length = 0f;
+                            interp = Interp.pow5In;
+                            sizeInterp = Interp.pow5Out;
+                            sizeFrom = 0f;
+                            sizeTo = 3.5f;
+                            region = "fire-obstruction-ammoEffect-3";
+                            colorFrom.set(Pal.surge);
+                            Color.valueOf(colorTo, "f3e97900");
+                        }}, new ParticleEffect(){{
+                            particles = 1;
+                            lifetime = 30.0f;
+                            randLength = false;
+                            line = true;
+                            baseLength = length = 0.1f;
+                            lenFrom = lenTo = 20.0f;
+                            strokeFrom = 2.0f;
+                            cone = 0.0f;
+                            colorFrom.set(Pal.surge);
+                            colorTo.set(Color.white);
+                        }});
+                        hitEffect = new ParticleEffect(){{
+                            particles = 1;
+                            lifetime = 30.0f;
+                            length = 0.0f;
+                            sizeFrom = 8.0f;
+                            colorFrom.set(Pal.surge);
+                            colorTo.set(Color.white);
+                        }};
+                    }};
 
-                    hitEffect = new MultiEffect(
-                        new WaveEffect(){{
+                    boolean shot;
+
+                    @Override
+                    public void updateBulletInterval(Bullet b){
+                        if(b.time >= 20f){
+                            shot = true;
+                            if(b.vel.x != 0 || b.vel.y != 0){
+                                Groups.unit.intersect(b.x - 100f, b.y - 100f, 200.0f, 200.0f, other -> {
+                                    if(b.team != other.team){
+                                        b.vel.x = 0;
+                                        b.vel.y = 0;
+                                        b.lifetime += 220f;
+                                        stopEffect.at(b.x, b.y);
+                                    }
+                                });
+                            }
+                            if(b.timer.get(2, 45f)){
+                                Groups.unit.intersect(b.x - 150f, b.y - 150f, 300.0f, 300.0f, other -> {
+                                    if(b.team != other.team){
+                                        if(shot){
+                                            shot = false;
+                                            intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
+                                            other.apply(StatusEffects.slow, 60.0f);
+                                            other.apply(FRStatusEffects.magnetized, 60.0f);
+                                        }else{
+                                            smallIntervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    {
+                        lifetime = 80.0f;
+                        drag = 0.03f;
+                        rangeChange = 164.0f;
+                        homingDelay = 15.0f;
+                        homingPower = 0.16f;
+                        homingRange = 200.0f;
+                        splashDamage = 435.0f;
+                        buildingDamageMultiplier = 0.1f;
+                        reloadMultiplier = 0.6f;
+                        width = 20.0f;
+                        height = 16.0f;
+                        knockback = 12.0f;
+                        splashDamageRadius = 120.0f;
+                        ammoMultiplier = 6.0f;
+                        status = FRStatusEffects.magnetized;
+                        statusDuration = 90.0f;
+                        frontColor = Color.white;
+                        backColor = trailColor = hitColor = Pal.surge;
+                        trailWidth = 3.5f;
+                        trailLength = 12;
+                        trailChance = 0.5f;
+                        trailEffect = new MultiEffect(new ParticleEffect(){{
+                            lifetime = 50.0f;
+                            particles = 2;
+                            baseLength = 14.0f;
+                            length = 0f;
+                            interp = Interp.pow5In;
+                            sizeInterp = Interp.pow5Out;
+                            sizeFrom = 0f;
+                            sizeTo = 4.5f;
+                            region = "fire-obstruction-ammoEffect-3";
+                            colorFrom.set(Pal.surge);
+                            Color.valueOf(colorTo, "f3e97900");
+                        }}, new ParticleEffect(){{
+                            lifetime = 45.0f;
+                            particles = 1;
+                            baseLength = 16.0f;
+                            length = 0f;
+                            interp = Interp.pow5In;
+                            sizeInterp = Interp.pow5Out;
+                            sizeFrom = 0f;
+                            sizeTo = 4.0f;
+                            region = "fire-obstruction-ammoEffect-1";
+                            colorFrom.set(Pal.surge);
+                            Color.valueOf(colorTo, "f3e97900");
+                        }}, new ParticleEffect(){{
+                            lifetime = 40.0f;
+                            particles = 1;
+                            baseLength = 18.0f;
+                            length = 0f;
+                            interp = Interp.pow5In;
+                            sizeInterp = Interp.pow5Out;
+                            sizeFrom = 0f;
+                            sizeTo = 3.5f;
+                            region = "fire-obstruction-ammoEffect-2";
+                            colorFrom.set(Pal.surge);
+                            Color.valueOf(colorTo, "f3e97900");
+                        }});
+
+                        hitEffect = new MultiEffect(new WaveEffect(){{
                             lifetime = 60.0f;
                             colorFrom = Pal.surge;
                             colorTo = Color.white;
@@ -1983,8 +2261,7 @@ public class FRBlocks{
                             strokeFrom = 5.0f;
                             interp = Interp.pow5Out;
                             lightInterp = Interp.pow5Out;
-                        }},
-                        new WaveEffect(){{
+                        }}, new WaveEffect(){{
                             lifetime = 60.0f;
                             colorFrom = Pal.surge;
                             colorTo = Color.white;
@@ -1995,15 +2272,118 @@ public class FRBlocks{
                             strokeFrom = 5.0f;
                             interp = Interp.pow5Out;
                             lightInterp = Interp.pow5Out;
-                        }}
-                    );
+                        }}, new ParticleEffect(){{
+                            lifetime = 65.0f;
+                            particles = 24;
+                            baseLength = 0f;
+                            length = 50.0f;
+                            interp = Interp.pow5Out;
+                            sizeInterp = Interp.pow5In;
+                            sizeFrom = 6.0f;
+                            sizeTo = 0f;
+                            region = "fire-obstruction-ammoEffect-3";
+                            colorFrom.set(Color.white);
+                            colorTo.set(Pal.surge);
+                        }}, new ParticleEffect(){{
+                            lifetime = 60.0f;
+                            particles = 12;
+                            baseLength = 0f;
+                            length = 55.0f;
+                            interp = Interp.pow5Out;
+                            sizeInterp = Interp.pow5In;
+                            sizeFrom = 5.0f;
+                            sizeTo = 0f;
+                            region = "fire-obstruction-ammoEffect-1";
+                            colorFrom.set(Color.white);
+                            colorTo.set(Pal.surge);
+                        }}, new ParticleEffect(){{
+                            lifetime = 55.0f;
+                            particles = 6;
+                            baseLength = 0f;
+                            length = 60.0f;
+                            interp = Interp.pow5Out;
+                            sizeInterp = Interp.pow5In;
+                            sizeFrom = 4.0f;
+                            sizeTo = 0f;
+                            region = "fire-obstruction-ammoEffect-2";
+                            colorFrom.set(Color.white);
+                            colorTo.set(Pal.surge);
+                        }}, new ParticleEffect(){{
+                            useRotation = false;
+                            lifetime = 100.0f;
+                            particles = 1;
+                            baseLength = 0f;
+                            length = 0f;
+                            interp = Interp.pow10In;
+                            sizeInterp = Interp.pow10Out;
+                            sizeFrom = 0f;
+                            sizeTo = 35.0f;
+                            region = "fire-obstruction-ammoEffect-3";
+                            colorFrom.set(Pal.surge);
+                            Color.valueOf(colorTo, "f3e97900");
+                        }});
 
-                    lightning = 5;
-                    lightningLength = 12;
-                    lightningLengthRand = 4;
-                    lightningDamage = 20.0f;
-                }}
-            );
+                        intervalBullet = new PointBulletType(){{
+                            knockback = 4.0f;
+                            damage = 60.0f;
+                            speed = 3.0f;
+                            splashDamage = 90.0f;
+                            splashDamageRadius = 40.0f;
+                            status = StatusEffects.electrified;
+                            statusDuration = 180f;
+                            trailSpacing = 28.0f;
+                            trailEffect = new MultiEffect(new ParticleEffect(){{
+                                lifetime = 45.0f;
+                                particles = 1;
+                                baseLength = 14.0f;
+                                length = 0f;
+                                interp = Interp.pow5In;
+                                sizeInterp = Interp.pow5Out;
+                                sizeFrom = 0f;
+                                sizeTo = 3.5f;
+                                region = "fire-obstruction-ammoEffect-3";
+                                colorFrom.set(Pal.surge);
+                                Color.valueOf(colorTo, "f3e97900");
+                            }}, new ParticleEffect(){{
+                                lifetime = 40.0f;
+                                particles = 1;
+                                baseLength = 10.0f;
+                                length = 0f;
+                                interp = Interp.pow5In;
+                                sizeInterp = Interp.pow5Out;
+                                sizeFrom = 0f;
+                                sizeTo = 3f;
+                                region = "fire-obstruction-ammoEffect-2";
+                                colorFrom.set(Pal.surge);
+                                Color.valueOf(colorTo, "f3e97900");
+                            }}, new ParticleEffect(){{
+                                particles = 1;
+                                lifetime = 30.0f;
+                                randLength = false;
+                                line = true;
+                                baseLength = length = 0.1f;
+                                lenFrom = lenTo = 15.0f;
+                                strokeFrom = 5.0f;
+                                cone = 0.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }});
+                            hitEffect = new ParticleEffect(){{
+                                particles = 1;
+                                lifetime = 30.0f;
+                                length = 0.0f;
+                                sizeFrom = 8.0f;
+                                colorFrom.set(Pal.surge);
+                                colorTo.set(Color.white);
+                            }};
+                        }};
+
+                        lightning = 5;
+                        lightningLength = 12;
+                        lightningLengthRand = 4;
+                        lightningDamage = 20.0f;
+                    }
+                });
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
@@ -3924,7 +4304,7 @@ public class FRBlocks{
             consumeLiquid(Liquids.neoplasm, n(48));
         }};
 
-        vectorialReconstructor = new ElementUnitFactory("vectorial-reconstructor", 4){{
+        vectorialUnitFactory = new ElementUnitFactory("vectorial-unit-factory", 4){{
             requirements(Category.units, with(
                 lead, 2000,
                 titanium, 1000,

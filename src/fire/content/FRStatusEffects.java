@@ -123,7 +123,7 @@ public class FRStatusEffects{
 
             @SuppressWarnings("unchecked")
             @Override
-            public void update(Unit unit, float time){
+            public void update(Unit unit, StatusEntry entry){
                 var clazz = unit.getClass();
                 while(Unit.class != clazz.getSuperclass())
                     clazz = (Class<? extends Unit>)clazz.getSuperclass();
@@ -185,10 +185,10 @@ public class FRStatusEffects{
             }
 
             @Override
-            public void update(Unit unit, float time){
-                super.update(unit, time);
+            public void update(Unit unit, StatusEntry entry){
+                super.update(unit, entry);
 
-                if(time >= 60.0f)
+                if(entry.time >= 60.0f)
                     //linearly reduces armor in 1s
                     unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f, unit.type.armor - maxArmorReduction);
 
@@ -213,8 +213,8 @@ public class FRStatusEffects{
 
         magnetized = new StatusEffect("magnetized"){
             @Override
-            public void update(Unit unit, float time){
-                super.update(unit, time);
+            public void update(Unit unit, StatusEntry entry){
+                super.update(unit, entry);
                 if(unit.dead)
                     unit.vel.scl(1.0f - 0.05f * Time.delta);
                 else if(unit.moving() && Mathf.chanceDelta(0.06))
@@ -260,8 +260,8 @@ public class FRStatusEffects{
             }
 
             @Override
-            public void update(Unit unit, float time){
-                super.update(unit,time);
+            public void update(Unit unit, StatusEntry entry){
+                super.update(unit, entry);
                 unit.team = Team.get(4);
                 unit.heal(unit.maxHealth * Time.delta / 3600.0f);
 
