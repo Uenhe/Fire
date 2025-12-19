@@ -151,7 +151,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         itemCapacity = 0;
         regionRotated1 = 1;
         commandable = true;
-        ambientSound = Sounds.respawning;
+        ambientSound = Sounds.loopUnitBuilding;
         buildType = ElementUnitFactoryBuild::new;
 
         var plans = this.plans;

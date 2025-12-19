@@ -344,7 +344,7 @@ public class FRUnitTypes{
                     shootX = 10.0f;
                     shootY = 4.0f;
                     top = false;
-                    shootSound = Sounds.flame;
+                    shootSound = Sounds.shootFlame;
 
                     bullet = new BulletType(6.0f, 60.0f){{
                         lifetime = 20.0f;
@@ -402,7 +402,7 @@ public class FRUnitTypes{
                     shake = 3.0f;
                     top = false;
                     ejectEffect = Fx.casing2;
-                    shootSound = Sounds.artillery;
+                    shootSound = Sounds.shootArtillery;
                     targetAir = false;
 
                     shoot.shots = 2;
@@ -462,7 +462,7 @@ public class FRUnitTypes{
                     y = -5.0f;
                     rotateSpeed = 6.0f;
                     rotate = true;
-                    shootSound = Sounds.sap;
+                    shootSound = Sounds.shootSap;
                     bullet = new SapBulletType(){{
                         damage = 165.0f;
                         length = 128.0f;
@@ -487,7 +487,7 @@ public class FRUnitTypes{
                     rotateSpeed = 2f;
                     rotate = true;
                     top = false;
-                    shootSound = Sounds.shootBig;
+                    shootSound = Sounds.shootSpectre;
                     shoot.shots = 3;
                     shoot.shotDelay = 8f;
                     bullet = new ShrapnelBulletType(){{
@@ -540,7 +540,7 @@ public class FRUnitTypes{
                     inaccuracy = 1.0f;
                     top = false;
                     rotate = true;
-                    shootSound = Sounds.lasershoot;
+                    shootSound = Sounds.shootLaser;
                     bullet = new LaserBoltBulletType(10.0f, 22.0f){{
                         lifetime = 25.0f;
                         healPercent = 4.0f;
@@ -601,7 +601,7 @@ public class FRUnitTypes{
                     rotateSpeed = 2.5f;
                     mirror = false;
                     rotate = true;
-                    shootSound = Sounds.laser;
+                    shootSound = Sounds.shootNavanax;
 
                     bullet = new EmpBulletType(){{
                         sprite = "circle-bullet";
@@ -629,7 +629,7 @@ public class FRUnitTypes{
                         powerSclDecrease = 0.5f;
                         unitDamageScl = 1.0f;
 
-                        hitSound = Sounds.plasmaboom;
+                        shootSound = Sounds.explosionNavanax;
                         hitColor = Pal.heal;
                         lightColor = Pal.heal;
                         backColor = Pal.heal;
@@ -673,7 +673,7 @@ public class FRUnitTypes{
                     y = 10f;
                     rotateSpeed = 4f;
                     rotate = true;
-                    shootSound = Sounds.lasershoot;
+                    shootSound = Sounds.shootLaser;
                     bullet = new LaserBoltBulletType(8.0f, 15.0f){{
                         lifetime = 20f;
                         width = 5f;
@@ -929,7 +929,7 @@ public class FRUnitTypes{
                     reload = 10.0f / 3.0f;
                     baseRotation = 180.0f;
                     minShootVelocity = speed * 0.6f;
-                    shootSound = Sounds.flame;
+                    shootSound = Sounds.shootFlame;
 
                     bullet = new LiquidBulletType(Liquids.slag){{
                         speed = 2.0f;
@@ -949,7 +949,7 @@ public class FRUnitTypes{
                     reload = 4.0f / 3.0f;
                     baseRotation = 180.0f;
                     minShootVelocity = speed * 3.0f;
-                    shootSound = Sounds.flame;
+                    shootSound = Sounds.shootFlame;
 
                     bullet = new LiquidBulletType(Liquids.slag){{
                         speed = 4.0f;
@@ -970,7 +970,7 @@ public class FRUnitTypes{
                     rotateSpeed = 360.0f;
                     mirror = false;
                     ejectEffect = Fx.casing1;
-                    shootSound = Sounds.explosionbig;
+                    shootSound = Sounds.explosionQuad;
 
                     bullet = new BulletType(8.0f, 600.0f){{
                         killShooter = true;
@@ -1212,7 +1212,7 @@ public class FRUnitTypes{
                 rotateSpeed = 360.0f;
                 mirror = false;
                 ejectEffect = Fx.casing1;
-                shootSound = Sounds.explosionbig;
+                shootSound = Sounds.explosionReactor2;
 
                 bullet = new BulletType(12.0f, 12900.0f){
 
@@ -1279,7 +1279,7 @@ public class FRUnitTypes{
                                 knockback = 80f;
                                 pierceCap = 5;
                                 pierceBuilding = pierce = pierceArmor = true;
-                                hitSound = Sounds.plasmaboom;
+                                hitSound = Sounds.shootBeamPlasma;
                                 hitEffect = new MultiEffect(
                                     FRFx.powerfulBlastEffect(180f, 300f,0f,0,Pal.surge,Color.clear),
                                     FRFx.crossEffect(60.0f, 18.0f, 45.0f, true, Pal.surge)
@@ -1345,7 +1345,7 @@ public class FRUnitTypes{
                     inaccuracy = 3f;
                     velocityRnd = 0.2f;
                     top = false;
-                    shootSound = Sounds.missile;
+                    shootSound = Sounds.shootMissile;
                     shoot.shots = 4;
                     bullet = new MissileBulletType(5f, 21f){{
                         lifetime = 36f;
@@ -1404,7 +1404,7 @@ public class FRUnitTypes{
                     recoilTime = 360.0f;
                     rotate = true;
                     mirror = false;
-                    shootSound = Sounds.release;
+                    shootSound = Sounds.shootQuad;
 
                     bullet = new BasicBulletType(5.1f, 720.0f){{
                         lifetime = 65.0f;
@@ -1470,7 +1470,7 @@ public class FRUnitTypes{
                     rotateSpeed = 3.0f;
                     recoil = 2.0f;
                     rotate = true;
-                    shootSound = Sounds.laser;
+                    shootSound = Sounds.shootLaser;
                     bullet = new LaserBulletType(288.0f){{
                         length = 288.0f;
                         width = 12.0f;
@@ -1520,7 +1520,7 @@ public class FRUnitTypes{
                     shootY = 6.0f;
                     rotateSpeed = 3.0f;
                     rotate = true;
-                    shootSound = Sounds.laser;
+                    shootSound = Sounds.shootLaser;
                     bullet = new PointBulletType(){{
                         damage = 40.0f;
                         speed = 3.0f;
@@ -1574,7 +1574,7 @@ public class FRUnitTypes{
                         maxRange = 225.0f;
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
-                        shootSound = Sounds.spark;
+                        shootSound = Sounds.shootArc;
                     }};
                 }}
             );
@@ -1712,7 +1712,7 @@ public class FRUnitTypes{
                     mirror = false;
                     rotateSpeed = 1.2f;
                     inaccuracy = 0.1f;
-                    shootSound = Sounds.laser;
+                    shootSound = Sounds.shootNavanax;
                     shootStatusDuration = 56.0f;
                     shoot.firstShotDelay = 50.0f;
                     shootStatus = StatusEffects.unmoving;
@@ -1848,7 +1848,7 @@ public class FRUnitTypes{
                     mirror = true;
                     rotateSpeed = 4f;
                     inaccuracy = 0.2f;
-                    shootSound = Sounds.laser;
+                    shootSound = Sounds.shootLancer;
 
                     bullet = new BasicBulletType(40f, 980f){{
                         width = height = 0.0f;
@@ -1885,14 +1885,11 @@ public class FRUnitTypes{
                     mirror = false;
                     autoTarget = true;
                     controllable = false;
-                    outlineRegion = Core.atlas.white();
-                    region = Core.atlas.white();
-                    cellRegion = Core.atlas.white();
-                    heatRegion = Core.atlas.white();
+                    outlineRegion = region = cellRegion = heatRegion = Core.atlas.white();
                     reload = 600f;
                     shootX = 0;
                     shootY = 0;
-                    shootSound = Sounds.plasmadrop;
+                    shootSound = Sounds.shootQuad;
                     inaccuracy = 360;
                     shootCone = 360;
                     bullet = new MissileBulletType(3f, 400f){{
@@ -1920,7 +1917,7 @@ public class FRUnitTypes{
                         ignoreRotation = true;
 
                         healPercent = 5f;
-                        hitSound = Sounds.plasmaboom;
+                        hitSound = Sounds.explosionQuad;
                         despawnEffect = Fx.greenBomb;
                         hitEffect = Fx.massiveExplosion;
                     }};

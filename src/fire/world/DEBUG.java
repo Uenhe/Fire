@@ -44,7 +44,7 @@ public class DEBUG{
             range = 1600.0f;
             rotateSpeed = 60.0f;
             targetInterval = 0.01f;
-            shootSound = Sounds.railgun;
+            shootSound = Sounds.shootForeshadow;
             targetable = false;
             canOverdrive = false;
             predictTarget = false;

@@ -3,9 +3,7 @@ package fire.entities.bullets;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Position;
-import arc.util.Nullable;
 import arc.util.Time;
-import mindustry.entities.Mover;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.gen.Bullet;
 
@@ -17,7 +15,7 @@ public class SpecialIntervalBulletType extends BasicBulletType {
 
     @Override
     public Bullet create(Bullet parent, float x, float y, float angle) {
-        return this.create(parent, parent.shooter, parent.team, x, y, angle, -1.0F, Mathf.random(0.8f, 1.2f), 1.0F, (Object)null, (Mover)null, -1.0F, -1.0F);
+        return this.create(parent, parent.shooter, parent.team, x, y, angle, -1.0F, Mathf.random(0.8f, 1.2f), 1.0F, null, null, -1.0F, -1.0F);
     }
 
     @Override

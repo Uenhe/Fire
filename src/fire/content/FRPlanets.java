@@ -3,7 +3,6 @@ package fire.content;
 import arc.graphics.Color;
 import arc.math.Mathf;
 import fire.maps.LysettaPlanetGenerator;
-import fire.world.DEBUG;
 import mindustry.content.*;
 import mindustry.ctype.UnlockableContent;
 import mindustry.graphics.g3d.HexMesh;
@@ -60,7 +59,6 @@ public class FRPlanets{
                 defaultCore = Blocks.coreFoundation;
                 Color.valueOf(atmosphereColor, "1a3db1");
                 Color.valueOf(iconColor, "5b6fff");
-                allowWaveSimulation = DEBUG.isDeveloper();
 
                 unlockedOnLand.add(fireCompany);
                 ruleSetter = r -> {

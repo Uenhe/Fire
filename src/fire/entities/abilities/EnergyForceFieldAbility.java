@@ -126,7 +126,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         u.shield -= cooldown * regen;
                         Fx.shieldBreak.at(u.x, u.y, radius, u.team.color, u);
 
-                        Sounds.spark.at(u, Mathf.random(0.45f, 0.55f));
+                        Sounds.shootArc.at(u, Mathf.random(0.45f, 0.55f));
                         for(int i = 0, lightningAmount = this.lightningAmount; i < lightningAmount; i++)
                             Lightning.create(u.team, lightningColor, lightningDamage, u.x, u.y, i * (360.0f / lightningAmount), lightningLength);
                     }
