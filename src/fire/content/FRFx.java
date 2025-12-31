@@ -21,8 +21,6 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 
-import static arc.math.Mathf.cos;
-import static arc.math.Mathf.sin;
 import static mindustry.Vars.tilesize;
 
 public class FRFx{
@@ -168,8 +166,8 @@ public class FRFx{
             for(int i = 0; i < amount; i++){
                 float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * (float)i / amount / speed,
                     mag = radius * e.fout(),
-                    x = cos(theta, 1.0f / speed, mag) + e.x,
-                    y = sin(theta, 1.0f / speed, mag) + e.y;
+                    x = Mathf.cos(theta, 1.0f / speed, mag) + e.x,
+                    y = Mathf.sin(theta, 1.0f / speed, mag) + e.y;
 
                 Draw.color(colors[i]);
                 Lines.circle(x, y, orbSize);
@@ -233,6 +231,56 @@ public class FRFx{
         });
     }
 
+    public static Effect lineTrailEffect(float lifetime, float length, float width, float rotation, Color color, int lines){
+        return new Effect(lifetime, e -> {
+            float rot = rotation + e.rotation;
+            Tmp.v1.trns(rot, 1.0F).nor();
+            float totalX = Tmp.v1.x * length,totalY = Tmp.v1.y * length;
+            Draw.color(color);
+            Lines.stroke(e.fout(Interp.pow5Out) * width * 1.25f);
+
+            Mathf.rand.setSeed(e.id);
+            for(int i = 0; i < lines; i++){
+                float maxRand = 1.0f / lines;
+                float phase1 = Mathf.random(maxRand) + maxRand * i, phase2 = phase1 + Mathf.random(maxRand * 0.3f);
+                Lines.line(e.x + totalX * phase1, e.y + totalY * phase1, e.x + totalX * phase2, e.y + totalY * phase2);
+            }
+
+            if(lines != 0){
+                e.scaled(lifetime - 10.0f, b -> {
+                    Draw.color(color);
+                    Lines.stroke(width * b.fout(Interp.pow5Out));
+                    Lines.line(b.x, b.y, b.x + totalX, b.y + totalY);
+                    Drawf.light(b.x, b.y, 60f * b.fout(), color, 0.5f);
+                });
+            }
+        });
+    }
+
+    public static Effect lineTrailEffect(float lifetime, float x1, float y1, float x2, float y2, float width, Color color, int lines){
+        return new Effect(lifetime, e -> {
+            float totalX = x2 - x1, totalY = y2 - y1;
+            Draw.color(color);
+            Lines.stroke(e.fout(Interp.pow5Out) * width * 1.25f);
+
+            Mathf.rand.setSeed(e.id);
+            for(int i = 0; i < lines; i++){
+                float maxRand = 1.0f / lines;
+                float phase1 = Mathf.random(maxRand) + maxRand * i, phase2 = phase1 + Mathf.random(maxRand * 0.3f);
+                Lines.line(e.x + totalX * phase1, e.y + totalY * phase1, e.x + totalX * phase2, e.y + totalY * phase2);
+            }
+
+            if(lines != 0){
+                e.scaled(lifetime - 10.0f, b -> {
+                    Draw.color(color);
+                    Lines.stroke(width * b.fout(Interp.pow5Out));
+                    Lines.line(x1, y1, x1 + totalX, y1 + totalY);
+                    Drawf.light(x1, y1, 60f * b.fout(), color, 0.5f);
+                });
+            }
+        });
+
+    }
 
     /** @see Fx#hitBulletSmall */
     public static Effect hitBulletSmall(Color color){

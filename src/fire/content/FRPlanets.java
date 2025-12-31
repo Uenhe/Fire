@@ -92,6 +92,7 @@ public class FRPlanets{
                 node(omicron, () ->
                     node(pioneer, with(new OnSector(desolateFortification)), () -> {})
                 );
+                node(vectorialUnitFactory, with(new SectorComplete(desolateFortification), new SectorComplete(desertWastes)),()-> {});
                 node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
                     node(javelin, () -> {})
                 );
@@ -105,7 +106,7 @@ public class FRPlanets{
                 node(fissionDrill, with(new OnSector(darkWorkshop)), () ->
                     node(constraintExtractor, with(new OnSector(rubbleRidge)), () ->
                         node(focusingExtractor, with(new SectorComplete(rubbleRidge)), () -> {})
-                ));
+                    ));
                 node(biomassCultivator, with(new OnSector(sporeFiord)), () -> {
                     node(vapourCondenser, with(new SectorComplete(scorchingVolcano)), () -> {});
                     node(fleshSynthesizer, with(new OnSector(stormyCoast)), () -> {});
@@ -123,7 +124,9 @@ public class FRPlanets{
                 );
                 node(sulflameExtractor, with(new OnSector(frozenGround)), () -> {
                     node(crusher, with(new SectorComplete(sporeFiord)), () ->
-                        node(slagCooler, with(new SectorComplete(scorchingVolcano)), () -> {})
+                        node(slagCooler, with(new SectorComplete(scorchingVolcano)), () ->
+                            node(meltingFurnace, with(new SectorComplete(desertWastes)), () -> {})
+                        )
                     );
                     node(kindlingExtractor, () -> {
                         node(liquidNitrogenCompressor, with(new SectorComplete(scorchingVolcano)), () ->
@@ -145,9 +148,9 @@ public class FRPlanets{
                 node(hydroelectricGenerator, with(new SectorComplete(beachLanding)), () ->
                     node(hydroelectricGeneratorLarge, () -> {})
                 );
-                
+
                 node(flameGenerator, with(new OnSector(chillyMountains)), () -> {});
-                
+
                 node(campfire, with(new SectorComplete(beachLanding)), () ->
                     node(buildingHealer, with(new OnSector(darkWorkshop)), () ->
                         node(buildIndicator, with(new SectorComplete(darkWorkshop)), () -> {})
@@ -171,7 +174,11 @@ public class FRPlanets{
                         node(distance, with(new SectorComplete(eteriverStronghold)), () ->
                             node(aerolite, with(new SectorComplete(desolateFortification)), () -> {})
                         );
-                        node(grudge, with(new SectorComplete(desolateFortification)), () -> {});
+                        node(grudge, with(new SectorComplete(desolateFortification)), () -> {
+                            node(obstruction, with(new OnSector(frozenWall)), () -> {});
+                            node(cumulonimbus, with(new SectorComplete(frozenWall)),() -> {});
+                            node(magneticRail, with(new SectorComplete(frozenWall)),() -> {});
+                        });
                     });
 
                     node(fulmination, with(new OnSector(darksandPeakforest)), () ->
@@ -203,7 +210,9 @@ public class FRPlanets{
                 node(firefly, () ->
                     node(candlight, with(new SectorComplete(frozenGround)), () ->
                         node(lampryo, with(new SectorComplete(chillyMountains)), () ->
-                            node(lumiflame, with(new SectorComplete(branchedRivers)), () -> {})
+                            node(lumiflame, with(new SectorComplete(branchedRivers)), () ->
+                                node(radiance, with(new SectorComplete(frozenWall)), () -> {})
+                            )
                         )
                     )
                 );
@@ -215,6 +224,8 @@ public class FRPlanets{
                         )
                     )
                 );
+
+                node(vectorialUnitFactory, with(new SectorComplete(desertWastes),new SectorComplete(desolateFortification)), () -> {});
 
                 node(payloadConveyorLarge, with(new SectorComplete(scorchingVolcano)), () ->
                     node(payloadRouterLarge)
@@ -250,6 +261,9 @@ public class FRPlanets{
                             node(rubbleRidge, with(
                                 new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticSphere), new Research(magneticRingPump), new Research(hardenedLiquidTank),
                                 new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(javelinPad), new Research(javelin)
+                            ), () -> {});
+                            node(frozenWall, with(
+                                new SectorComplete(branchedRivers), new Research(magneticSphere), new Research(lumiflame)
                             ), () -> {});
                             node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticRingPump), new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill)), () -> {
                             });

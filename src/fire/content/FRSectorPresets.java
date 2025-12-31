@@ -7,8 +7,9 @@ public class FRSectorPresets{
     public static final SectorPreset
         landingBase, darksandPeakforest,
         frozenGround, beachLanding, darkWorkshop, desolateFortification, glaciatedPeaks,
-        sporeFiord, scorchingVolcano, /*desertWastes,*/ lavaStronghold,
-        eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, rubbleRidge, taintedEstuary;
+        sporeFiord, scorchingVolcano, desertWastes, lavaStronghold,
+        eteriverStronghold, chillyMountains, stormyCoast, branchedRivers, rubbleRidge, taintedEstuary,
+        frozenWall;
 
     static{
         landingBase = create("jljd", 0, 6.0f);
@@ -22,7 +23,7 @@ public class FRSectorPresets{
 
         sporeFiord = create("bzxw", 199, 8.0f, 40);
         scorchingVolcano = create("zrhs", 180, 8.0f, 50);
-        //desertWastes = create("desert-wastes", 205, 8.0f, 28);
+        desertWastes = create("desert-wastes", 205, 8.0f, 28);
         lavaStronghold = create("lava-stronghold", 232, 9.0f);
 
         eteriverStronghold = create("hhys", 34, 8.0f);
@@ -32,6 +33,8 @@ public class FRSectorPresets{
         branchedRivers = create("branched-rivers", 158, 10.0f, 14);
         rubbleRidge = create("rubble-ridge", 172, 10.0f, 65);
         taintedEstuary = create("tainted-estuary", 116, 10.0f);
+
+        frozenWall = create("frozen-wall", 245,10.0f,116);
     }
     
     public static void load(){}

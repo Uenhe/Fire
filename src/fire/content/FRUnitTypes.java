@@ -1959,13 +1959,14 @@ public class FRUnitTypes{
         );
 
         ((Reconstructor)Blocks.multiplicativeReconstructor).upgrades.add(
-            new UnitType[]{UnitTypes.beta, omicron},
+            new UnitType[]{UnitTypes.beta, UnitTypes.gamma},
             new UnitType[]{resisting, garrison},
             new UnitType[]{hatchet, castle},
             new UnitType[]{candlight, lampryo}
         );
 
         ((Reconstructor)Blocks.exponentialReconstructor).upgrades.add(
+            new UnitType[]{UnitTypes.gamma, pioneer},
             new UnitType[]{omicron, pioneer},
             new UnitType[]{garrison, shelter},
             new UnitType[]{lampryo, lumiflame}

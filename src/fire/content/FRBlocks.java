@@ -21,10 +21,12 @@ import fire.world.DEBUG;
 import fire.world.blocks.campaign.AcceleratorCutscene;
 import fire.world.blocks.defense.ArmorWall;
 import fire.world.blocks.defense.FleshWall;
+import fire.world.blocks.defense.turrets.ItemBulletAdaptingTurret;
 import fire.world.blocks.defense.turrets.ItemBulletStackTurret;
 import fire.world.blocks.defense.turrets.ItemDefenseTurret;
 import fire.world.blocks.defense.turrets.JackpotTurret;
 import fire.world.blocks.distribution.AdaptRouter;
+import fire.world.blocks.distribution.LiquidUnloader;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.BurstReactor;
@@ -129,7 +131,7 @@ public class FRBlocks{
     smasher, nightmare, fulmination,
     ignition, blossom, gambler, seaquake, distance, magneticDomain,
     grudge, aerolite, magneticSphere, scab,
-    obstruction,
+    obstruction, cumulonimbus,
     magneticRail,
 
     //production
@@ -139,7 +141,7 @@ public class FRBlocks{
     compositeConveyor, hardenedAlloyConveyor, compositeBridgeConveyor, compositeRouter, compositeUnloader,
 
     //liquid
-    magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit,
+    magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit, liquidUnloader,
 
     //power
     conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, burstReactor,
@@ -2428,6 +2430,401 @@ public class FRBlocks{
             );
         }};
 
+        cumulonimbus = new ItemBulletAdaptingTurret("cumulonimbus"){{
+            requirements(Category.turret, with(
+                logicAlloy, 500,
+                phaseFabric, 250,
+                surgeAlloy, 500,
+                hardenedAlloy, 1150,
+                magneticAlloy, 600
+            ));
+            health = 13500;
+            size = 6;
+            armor = 24.0f;
+            liquidCapacity = 180.0f;
+            reload = 15.0f;
+            range = 640.0f;
+            trackingRange = 400.0f;
+            inaccuracy = 0.5f;
+            maxAmmo = 60;
+            recoil = 3.6f;
+            recoilTime = 40.0f;
+            shake = 3.0f;
+            rotateSpeed = 2.0f;
+            shootCone = 90.0f;
+            shootY = 12.5f;
+            ammoPerShot = 4;
+            consumeAmmoOnce = false;
+            canOverdrive = false;
+
+            shoot = new ShootAlternate(23.5f);
+            shoot.shotDelay = 12.0f;
+            shootSound = Sounds.shootLocus;
+            coolantMultiplier = 0.5f;
+
+            warmupMaintainTime = 120.0f;
+            minWarmup = 0.96f;
+            shootWarmupSpeed = 0.1f;
+
+
+            drawer = new DrawTurret(){{
+                //var circleProgress = DrawPart.PartProgress.warmup.delay(0.9f);
+                parts.addAll(new RegionPart("-main"){{
+                    progress = PartProgress.warmup;
+                    under = true;
+                }}, new RegionPart("-barrel"){{
+                    progress = PartProgress.warmup;
+                    mirror = true;
+                    moves.add(new PartMove(PartProgress.warmup, 3.0f, 1.0f, 0.0f));
+                }}/*, new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = -2f;
+                    color = Pal.surge;
+                    sides = 3;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 3f;
+                    radius = 8f;
+                    layer = Layer.effect;
+                    y = -18;
+                }}, new ShapePart(){{
+                    progress = circleProgress;
+                    rotateSpeed = 2f;
+                    color = Pal.surge;
+                    sides = 3;
+                    hollow = true;
+                    stroke = 0f;
+                    strokeTo = 3f;
+                    radius = 8f;
+                    layer = Layer.effect;
+                    y = -18;
+                }}*/);
+            }};
+
+            Item item_1 = magneticAlloy, item_2 = surgeAlloy;
+            BulletType bullet_1_1, bullet_1_2, bullet_1_3, bullet_1_4, bullet_1_EX, bullet_2_1, bullet_2_2, bullet_2_EX, bullet_2_mini;
+
+            bullet_2_1 = new BasicBulletType(12.8f, 80.0f){{
+                lifetime = 52.0f;
+                drag = 0.002f;
+                knockback = 1.2f;
+                width = 8.0f;
+                height = 12.0f;
+                hitSize = 6.0f;
+                trailLength = 8;
+                trailWidth = 1.2f;
+                trailColor = Pal.surge;
+                pierceCap = 2;
+                pierceBuilding = true;
+                pierceArmor = true;
+                ammoMultiplier = 8;
+                status = StatusEffects.electrified;
+                statusDuration = 180.0f;
+                reloadMultiplier = 0.65f;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.surgeAmmoBack;
+                frontColor = Pal.surgeAmmoFront;
+
+                lightning = 3;
+                lightningColor = Pal.surge;
+                lightningLength = 6;
+                lightningDamage = 7.0f;
+                lightningLengthRand = 3;
+            }};
+
+            bullet_2_mini = new BasicBulletType(5.0f, 40.0f){{
+                lifetime = 60.0f;
+                drag = 0.05f;
+                knockback = 0.2f;
+                width = 8.0f;
+                height = 12.0f;
+                hitSize = 6.0f;
+                trailLength = 5;
+                trailWidth = 1.2f;
+                trailColor = Pal.surge;
+                pierceCap = 2;
+                pierceBuilding = true;
+                pierceArmor = true;
+                ammoMultiplier = 8;
+                status = StatusEffects.electrified;
+                statusDuration = 90.0f;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.surgeAmmoBack;
+                frontColor = Pal.surgeAmmoFront;
+
+                fragRandomSpread = 0;
+
+                fragBullets = 1;
+                fragBullet = new BasicBulletType(6.0f, 40.0f){{
+                    lifetime = 90.0f;
+                    drag = 0.004f;
+                    knockback = 0.5f;
+                    width = 8.0f;
+                    height = 12.0f;
+                    hitSize = 6.0f;
+                    trailLength = 5;
+                    trailWidth = 1.2f;
+                    trailColor = Pal.surge;
+                    status = StatusEffects.electrified;
+                    statusDuration = 90.0f;
+                    shootEffect = Fx.shootBig;
+                    backColor = hitColor = Pal.surgeAmmoBack;
+                    frontColor = Pal.surgeAmmoFront;
+
+                    homingRange = 150.0f;
+                    homingPower = 0.1f;
+
+                    lightning = 3;
+                    lightningColor = Pal.surge;
+                    lightningLength = 4;
+                    lightningDamage = 10.0f;
+                    lightningLengthRand = 2;
+                }};
+            }};
+
+            bullet_2_2 = new BasicBulletType(16f, 120.0f){{
+                lifetime = 40.0f;
+                drag = 0.002f;
+                knockback = 1.8f;
+                width = 16.0f;
+                height = 25.0f;
+                hitSize = 6.0f;
+                trailLength = 10;
+                trailWidth = 1.4f;
+                trailColor = Pal.surge;
+                pierceCap = 2;
+                pierceBuilding = true;
+                pierceArmor = true;
+                ammoMultiplier = 7;
+                status = StatusEffects.electrified;
+                statusDuration = 220.0f;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.surgeAmmoBack;
+                frontColor = Pal.surgeAmmoFront;
+
+                lightning = 4;
+                lightningColor = Pal.surge;
+                lightningLength = 6;
+                lightningDamage = 12.0f;
+                lightningLengthRand = 3;
+            }};
+
+            bullet_2_EX = new BasicBulletType(7.2f, 600.0f){{
+                lifetime = 180.0f;
+                drag = 0.01f;
+                knockback = 12f;
+                width = 23.0f;
+                height = 38.0f;
+                hitSize = 12.0f;
+                trailLength = 15;
+                trailWidth = 2.2f;
+                trailColor = Pal.surge;
+                pierceCap = 2;
+                pierceArmor = true;
+                status = FRStatusEffects.magnetized;
+                statusDuration = 60.0f;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.surgeAmmoBack;
+                frontColor = Pal.surgeAmmoFront;
+
+                lightning = 5;
+                lightningColor = Pal.surge;
+                lightningLength = 10;
+                lightningDamage = 90.0f;
+                lightningLengthRand = 3;
+
+                fragBullets = 5;
+                fragBullet = bullet_2_mini;
+            }};
+
+            bullet_1_1 = new RailBulletType(){{
+                damage = 200.0f;
+                pierceDamageFactor = 1.0f;
+                length = 640.0f;
+                status = StatusEffects.electrified;
+                statusDuration = 60.0f;
+                reloadMultiplier = 0.5f;
+                ammoMultiplier = 10.0f;
+                pointEffectSpace = 40.0f;
+                pointEffect = FRFx.lineTrailEffect(16.0f, pointEffectSpace + 1, 2.0f, 0.0f, Pal.surge, 1);
+            }};
+
+            bullet_1_2 = new RailBulletType(){{
+                damage = 350.0f;
+                pierceDamageFactor = 0.65f;
+                length = 640.0f;
+                status = StatusEffects.electrified;
+                statusDuration = 120.0f;
+                reloadMultiplier = 0.75f;
+                ammoMultiplier = 8.0f;
+                pointEffectSpace = 40.0f;
+                pointEffect = FRFx.lineTrailEffect(18.0f, pointEffectSpace + 1, 3.0f, 0.0f, Color.sky, 1);
+            }};
+
+            bullet_1_3 = new RailBulletType(){{
+                damage = 500.0f;
+                pierceDamageFactor = 0.55f;
+                length = 660.0f;
+                rangeChange = 20.0f;
+                status = StatusEffects.melting;
+                statusDuration = 600.0f;
+                ammoMultiplier = 6.0f;
+                pointEffectSpace = 60.0f;
+                pointEffect = FRFx.lineTrailEffect(20.0f, pointEffectSpace + 1, 5.0f, 0.0f, Pal.blastAmmoFront, 1);
+            }};
+
+            bullet_1_4 = new RailBulletType(){{
+                damage = 600.0f;
+                pierceDamageFactor = 0.45f;
+                length = 700.0f;
+                rangeChange = 60.0f;
+                status = FRStatusEffects.magnetized;
+                statusDuration = 90.0f;
+                reloadMultiplier = 1.25f;
+                ammoMultiplier = 5.0f;
+                pointEffectSpace = 35.0f;
+                pointEffect = FRFx.lineTrailEffect(24.0f, pointEffectSpace + 1, 6.0f, 0.0f, Pal.reactorPurple, 1);
+            }};
+
+            bullet_1_EX = new BasicBulletType(){
+                final float range = 300.0f;
+                final Effect stopEffect = new WaveEffect(){{
+                    lifetime = 60.0f;
+                    colorFrom = Color.sky;
+                    colorTo = Color.white;
+                    sizeFrom = 0.0f;
+                    sizeTo = 300.0f;
+                    strokeFrom = 6.0f;
+                    strokeTo = 0.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+                final Effect echoEffect = new WaveEffect(){{
+                    lifetime = 60.0f;
+                    colorFrom = Color.sky;
+                    colorTo = Color.white;
+                    sizeFrom = 30.0f;
+                    sizeTo = 30.0f;
+                    strokeFrom = 6.0f;
+                    strokeTo = 0.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+                final Effect noEchoEffect = FRFx.powerfulBlastEffect(120.0f, 150.0f, 0, 0, Color.sky, null);
+
+                public boolean isDifferentBullets(Bullet a, Bullet b){
+                    return (a.id != b.id && a.type == b.type && a.team == b.team && a.isAdded() && b.isAdded());
+                }
+
+                @Override
+                public void update(Bullet b){
+                    Groups.bullet.intersect(b.x - range, b.y - range, range * 2.0f, range * 2.0f, other -> {
+                        if(isDifferentBullets(b, other)){
+                            FRFx.lineTrailEffect(10.0f, b.x, b.y, other.x, other.y, 3.0f, Color.sky, 4).at(b.x, b.y);
+                            other.lifetime = b.lifetime = Math.max(b.lifetime, other.lifetime);
+                        }
+                    });
+                    super.update(b);
+                }
+
+                @Override
+                public void removed(Bullet b){
+                    int[] cnt = {0};
+
+                    Groups.bullet.intersect(b.x - range, b.y - range, range * 2.0f, range * 2.0f, other -> {
+                        if(isDifferentBullets(b, other)){
+                            echoEffect.at(other.x, other.y);
+                            FRFx.lineTrailEffect(40.0f, b.x, b.y, other.x, other.y, 3.0f, Color.sky, 4).at(b.x, b.y);
+                            cnt[0]++;
+                        }
+                    });
+                    if(cnt[0] == 0){
+                        noEchoEffect.at(b.x, b.y);
+                        return;
+                    }
+                    stopEffect.at(b.x, b.y);
+                    echoEffect.at(b.x, b.y);
+
+                    Units.nearbyEnemies(b.team, b.x, b.y, range, u -> {
+                        if(u.health + u.shield >= 600.0f){
+                            u.apply(StatusEffects.blasted);
+                            u.apply(StatusEffects.shocked);
+                            u.apply(StatusEffects.electrified, 600f * cnt[0]);
+                            u.apply(StatusEffects.corroded, 300f * cnt[0]);
+                            u.apply(StatusEffects.unmoving, 20f * cnt[0]);
+                            u.apply(StatusEffects.melting, 1200f * cnt[0]);
+                            u.apply(FRStatusEffects.magnetized, 120f * cnt[0]);
+                            u.apply(FRStatusEffects.disintegrated, 120f * cnt[0]);
+                            u.damage(u.maxHealth * 0.008f + 5000.0f + 1500f * cnt[0]);
+                            if(u.hasEffect(StatusEffects.wet)){
+                                u.damage(500f * cnt[0]);
+                            }
+                            if(u.hasEffect(StatusEffects.freezing)){
+                                u.damage(600f * cnt[0]);
+                            }
+                            if(u.hasEffect(FRStatusEffects.frostbite)){
+                                u.damage(1000f * cnt[0]);
+                            }
+                            Tmp.v3.set(u).sub(b).nor().scl(4000.0F);
+                            if(u.maxHealth >= 5000){
+                                FRFx.lineTrailEffect(90.0f, 2400.0f, 12.0f, 0.0f, Color.sky, 24).at(u.x, u.y, 105);
+                                FRFx.crossEffect(20.0f, u.hitSize / 4.0f, 0.0f, true, Color.sky).at(u.x, u.y);
+                            }
+                        }else{
+                            u.remove();
+                        }
+                    });
+                    super.removed(b);
+                }
+
+                {
+                    splashDamage = 6750.0f;
+                    splashDamageRadius = 150.0f;
+                    damage = 2400.0f;
+                    buildingDamageMultiplier = 0.15f;
+                    ammoMultiplier = 4.0f;
+                    speed = 14.5f;
+                    drag = 0.02f;
+                    homingRange = 120.0f;
+                    homingPower = 0.14f;
+                    homingDelay = 30.0f;
+                    lifetime = 240f;
+                    shootEffect = new WaveEffect(){{
+                        lifetime = 60f;
+                        colorFrom = Color.sky;
+                        colorTo = Color.white;
+                        sizeFrom = 0;
+                        sizeTo = 180f;
+                        strokeFrom = 3f;
+                        strokeTo = 0.2f;
+                        interp = Interp.pow5Out;
+                    }};
+                    backColor = frontColor = trailColor = Color.sky;
+                    trailLength = 40;
+                    trailWidth = 12f;
+                    width = 48;
+                    height = 32;
+                    weaveScale = 20f;
+                    weaveMag = 0.5f;
+
+                    lightning = 7;
+                    lightningColor = Color.sky;
+                    lightningLength = 15;
+                    lightningDamage = 400.0f;
+                    lightningLengthRand = 4;
+
+                    hitSound = Sounds.explosionQuad;
+                }
+            };
+
+            stack((int)surgeAlloy.id, Seq.with(new ItemBulletAdaptingTurret.BulletStack(180, bullet_2_1, item_2), new ItemBulletAdaptingTurret.BulletStack(360, bullet_2_2, item_2), new ItemBulletAdaptingTurret.BulletStack(120, bullet_2_EX, item_2)), (int)magneticAlloy.id, Seq.with(new ItemBulletAdaptingTurret.BulletStack(90, bullet_1_1, item_1), new ItemBulletAdaptingTurret.BulletStack(180, bullet_1_2, item_1), new ItemBulletAdaptingTurret.BulletStack(270, bullet_1_3, item_1), new ItemBulletAdaptingTurret.BulletStack(600, bullet_1_4, item_1), new ItemBulletAdaptingTurret.BulletStack(300, bullet_1_EX, item_1)));
+
+            consumePower(n(6000));
+            consumeCoolant(n(120));
+
+            ammo(item_2, bullet_2_1.copy(), item_1, bullet_1_1.copy());
+        }};
+
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{
             final float chargeTime = 150.0f,
             baseRange = 1200.0f, extraRange = 400.0f;
@@ -3360,6 +3757,17 @@ public class FRBlocks{
             compositeMap.put(this, Blocks.bridgeConduit);
         }};
 
+        liquidUnloader = new LiquidUnloader("liquid-unloader"){{
+            requirements(Category.liquid, with(
+                mirrorglass, 10,
+                logicAlloy, 15,
+                hardenedAlloy, 10,
+                magneticAlloy, 5
+            ));
+            health = 300;
+            armor = 14.0f;
+        }};
+
         //region power
 
         conductorPowerNode = new BatteryNode("zjjd"){{
@@ -3458,7 +3866,7 @@ public class FRBlocks{
                 hardenedAlloy, 1000,
                 magneticAlloy, 450
             ));
-            scaledHealth = 270.0f;
+            health = 10000;
             armor = 22.0f;
             size = 6;
             itemCapacity = 54;
@@ -3469,9 +3877,9 @@ public class FRBlocks{
 
             itemDuration = 180.0f;
             powerProduction = n(54000);
-            warmupSpeed = 0.002f;
-            explosionRadius = 120;
-            explosionDamage = 11600;
+            warmupSpeed = 0.004f;
+            explosionRadius = 15;
+            explosionDamage = 9600;
             explosionShake = 8.0f;
             explosionShakeDuration = 30.0f;
             explodeEffect = new MultiEffect(

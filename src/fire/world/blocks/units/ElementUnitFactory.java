@@ -62,6 +62,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected float base;
     protected float timeScl;
     protected final Seq<UnitType> plans = new Seq<>();
+    private boolean pioneered;
 
     public static final Block[] factories = {additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor};
     private static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
@@ -74,34 +75,34 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
         putAllValues(
             copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f,
-            lead,             0.04f, 1.7f,  0.15f, 1.0f, 0.05f, 0.6f,
+            lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f,
             metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f,
             graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f,
             scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f,
             coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f,
-            titanium,         0.5f,  3.2f,  0.4f,  2.6f, 0.1f,  1.5f,
-            thorium,          0.95f, 3.75f, 1.2f,  3.1f, 0.0f,  0.0f,
+            titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f,
+            thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f,
             silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f,
-            plastanium,       1.8f,  4.85f, 1.8f,  4.55f, 0.0f, 0.0f,
-            phaseFabric,      2.5f,  5.3f,  1.4f,  2.4f, 5.5f,  5.4f,
-            surgeAlloy,       3.0f,  5.5f,  2.7f,  5.95f, 0.0f, 0.0f,
+            plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f,
+            phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f,
+            surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f,
             sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f,
             sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f,
-            blastCompound,    0.0f,  0.0f,  2.4f,  5.3f, 0.0f,  0.0f,
-            pyratite,         0.0f,  0.0f,  1.3f,  4.2f, 0.0f,  0.0f,
+            blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f,
+            pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f,
 
             glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f,
-            mirrorglass,      3.3f,  4.0f,  3.2f,  3.5f, 0.1f,  2.5f,
-            sulflameAlloy,    0.0f,  0.0f,  10.0f, 5.5f, 0.0f,  0.0f,
-            kindlingAlloy,    0.0f,  0.0f,  4.5f,  5.6f, 0.0f,  0.0f,
-            conductor,        0.0f,  0.0f,  2.5f,  3.85f, 0.8f, 5.4f,
-            detonationCompound,0.1f, 1.3f,  18.3f, 6.25f, 0.4f, 2.9f,
-            flamefluidCrystal, 0.0f, 0.0f,  12.5f, 5.8f, 0.0f,  0.0f,
+            mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f,
+            sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f,
+            kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f,
+            conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f,
+            detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f,
+            flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f,
             timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f,
-            flesh,            0.01f, 6.1f,  0.05f, 1.2f, 8.8f,  6.3f,
-            hardenedAlloy,    9.0f,  6.3f,  4.0f,  5.8f, 0.0f,  0.0f,
-            magneticAlloy,    9.0f,  6.3f,  14.0f, 6.4f, 2.0f,  5.7f,
-            logicAlloy,       1.4f,  3.5f,  1.1f,  3.1f, 6.9f,  5.2f
+            flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.15f,  6.3f,
+            hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f,
+            magneticAlloy,    2.2f,  6.3f,  14.0f, 6.4f, 0.75f,  5.7f,
+            logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f
         );
 
         for(int i = 0, n = factories.length; i < n; i++)
@@ -111,8 +112,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
                     var unit = upgrade[j];
                     float u, v, w;
-                         if(unit==omicron)  {u=2.5f; v=3.9f ;w=3.2f;}
-                    else if(unit==pioneer)  {u=3.8f; v=4.4f ;w=4.6f;}
+                         if(unit==pioneer)  {u=3.8f; v=4.4f ;w=4.6f;}
                     else if(unit==firefly)  {u=1.2f; v=1.4f ;w=0.5f;}
                     else if(unit==candlight){u=2.3f; v=2.5f ;w=1.8f;}
                     else if(unit==lampryo)  {u=3.4f; v=3.85f;w=3.2f;}
@@ -121,8 +121,8 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                     else if(unit==guarding) {u=1.2f; v=0.5f ;w=1.3f;}
                     else if(unit==resisting){u=2.6f; v=2.8f ;w=2.9f;}
                     else if(unit==garrison) {u=3.3f; v=3.4f ;w=2.95f;}
-                    else if(unit==shelter)  {u=4.5f; v=4.95f;w=4.75f;}
-                    else if(unit==blessing) {u=5.95f;v=5.95f;w=5.95f;}
+                    else if(unit==shelter)  {u=4.5f; v=4.9f;w=4.75f;}
+                    else if(unit==blessing) {u=5.9f;v=5.9f;w=5.9f;}
                     else{
                         rand.setSeed(unit.id * 1000L);
                         u = Mathf.round(i + j + 0.6f + rand.random(0.0f, 0.4f), 0.05f);
@@ -134,6 +134,9 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                     }
                     unitValues.put(unit, new UnitValue(u, v, w));
                 }
+
+        //omicron is removed from T3 recipe so put it here
+        unitValues.put(omicron, new UnitValue(2.5f, 3.9f, 3.2f));
     }
 
     private static void putAllValues(Object... values){
@@ -188,6 +191,10 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
                     var unit = upgrade[j];
                     if(unit == blade || unit == hatchet || unit == castle) continue;
+                    if(unit == pioneer && !pioneered){
+                        unit = omicron;
+                        pioneered = true;
+                    }
                     plans.add(unit);
                 }
     }

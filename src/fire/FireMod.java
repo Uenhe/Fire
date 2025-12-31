@@ -25,7 +25,9 @@ import fire.world.meta.FRAttribute;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.gen.Icon;
+import mindustry.mod.Mod;
 import mindustry.mod.Mods;
 import mindustry.type.Item;
 import mindustry.type.SectorPreset;
@@ -33,7 +35,11 @@ import mindustry.ui.MobileButton;
 import mindustry.ui.Styles;
 import mindustry.ui.dialogs.BaseDialog;
 import mindustry.ui.fragments.MenuFragment;
+import mindustry.world.Block;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.payloads.PayloadSource;
+import mindustry.world.blocks.sandbox.ItemSource;
+import mindustry.world.blocks.sandbox.PowerSource;
 import mindustry.world.meta.Attribute;
 
 import java.lang.reflect.Field;
@@ -44,17 +50,19 @@ import static fire.FRVars.*;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
-public class FireMod extends mindustry.mod.Mod{
+public class FireMod extends Mod{
 
     private static Mods.LoadedMod FIRE;
     private static BaseDialog mainDialog, mulmodDialog;
     private static final Field field_container;
+    private static final Seq<Block> cheatBlocks = new Seq<>();
+    public static boolean multipleMods = false;
 
     static{
         try{
             field_container = FRUtils.field(MenuFragment.class, "container");
         }catch(NoSuchFieldException e){
-            throw new RuntimeException("?", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -113,14 +121,70 @@ public class FireMod extends mindustry.mod.Mod{
         loadDatabase();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
+            loadCheatBlocks();
             showUpdate();
             showNoMultipleMods();
         });
+
+        Events.on(EventType.TapEvent.class, e -> {
+            if(isCheating() || multipleMods){
+                showCheatingLog();
+            }
+        });
+
+        Events.on(EventType.BlockBuildBeginEvent.class, e -> {
+            if(isCheating() || multipleMods){
+                showCheatingLog();
+            }
+        });
+    }
+
+    public static void loadCheatBlocks(){
+        for(var block : content.blocks()){
+            if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
+                cheatBlocks.add(block);
+            }
+        }
+    }
+
+    public static boolean isCheating(){
+        if(!state.isCampaign()) return false;
+        if(DEBUG.isDeveloper())return false;
+
+        boolean isCheating = false;
+
+        if(state != null && state.rules != null) {
+            isCheating = state.rules.infiniteResources ||
+                state.rules.instantBuild ||
+                state.rules.allowEditRules ||
+                state.rules.allowEditWorldProcessors ||
+                state.rules.buildCostMultiplier < 0.01f;
+        }
+        if(isCheating) return true;
+
+        for(var block : cheatBlocks){
+            for(int i = 0, sum = 0; i < Team.all.length; i++){
+                var builds = Team.get(i).data().buildingTypes.get(block);
+                if(builds == null) continue;
+
+                sum += builds.size;
+                if(sum > 1) isCheating = true;
+            }
+        }
+        return isCheating;
+    }
+
+    private static void showCheatingLog(){
+        new BaseDialog("o.o?!!!"){
+            {
+                cont.add("@fire.nocheating");
+                show();
+            }
+        };
     }
 
     private static void loadSetting(){
         ui.settings.addCategory("@setting.fire", "fire-setting", t -> {
-
             t.checkPref("minesand", false, b -> mineSand = b);
             t.checkPref("displayrange", true, b -> displayRange = b);
             t.checkPref("showlog", true, b -> showLog = b);
@@ -137,7 +201,7 @@ public class FireMod extends mindustry.mod.Mod{
     }
 
     private static void showLog(boolean forces){
-        if(!FRVars.showLog && !forces) return;
+        if(!showLog && !forces) return;
 
         var historyDialog = new BaseDialog("@fire.historytitle");
         setupDialog(historyDialog);
@@ -153,16 +217,11 @@ public class FireMod extends mindustry.mod.Mod{
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
-                "[#F4BA6E]v1.4.2:",
-                FRBlocks.fulmination, FRBlocks.compositeRouter, FRBlocks.unitHealer, FRBlocks.payloadConveyorLarge,
-                "[#F4BA6E]v1.4.0:",
-                FRSectorPresets.branchedRivers, FRSectorPresets.rubbleRidge, FRSectorPresets.taintedEstuary,
-                FRBlocks.magneticDomain, FRBlocks.aerolite,
-                FRBlocks.stackedCultivator, FRBlocks.constraintExtractor,
-                FRBlocks.magneticRingPump, FRBlocks.hardenedLiquidTank, FRBlocks.hydroelectricGenerator,
-                FRBlocks.cryofluidMixerLarge, FRBlocks.magnetismConcentratedRollingMill, FRBlocks.magneticRingSynthesizer,
-                FRBlocks.primaryInterplanetaryAccelerator,
-                FRUnitTypes.hatchet, FRUnitTypes.castle, FRUnitTypes.mechanicalTide
+                "[#F4BA6E]v1.5.0:",
+                FRSectorPresets.desertWastes, FRSectorPresets.frozenWall,
+                FRBlocks.obstruction, FRBlocks.cumulonimbus, FRBlocks.magneticRail,
+                FRBlocks.liquidUnloader, FRBlocks.meltingFurnace, FRBlocks.vectorialUnitFactory,
+                FRUnitTypes.radiance
             );
             t.row();
 
@@ -172,11 +231,15 @@ public class FireMod extends mindustry.mod.Mod{
 
         }).maxWidth(width());
 
+
+
         main.show();
     }
 
     private static void showNoMultipleMods(){
-        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden) || DEBUG.isDeveloper()) return;
+        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
+        if(DEBUG.isDeveloper()) return;
+        multipleMods = true;
         fkgame();
     }
 
@@ -275,7 +338,7 @@ public class FireMod extends mindustry.mod.Mod{
                         try{
                             field_container.set(ui.menufrag, cont);
                         }catch(IllegalAccessException e){
-                            throw new RuntimeException("?", e);
+                            throw new RuntimeException(e);
                         }
                         cont.name = "menu container";
 
@@ -288,7 +351,7 @@ public class FireMod extends mindustry.mod.Mod{
             }else{
                 Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
                 for(var b : buttons)
-                    if("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text))
+                    if(b != null && ("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text)))
                         tmp.add(b);
 
                 buttons.removeAll(tmp);
@@ -302,7 +365,7 @@ public class FireMod extends mindustry.mod.Mod{
         try{
             container = (Table)field_container.get(ui.menufrag);
         }catch(IllegalAccessException e){
-            throw new RuntimeException("?", e);
+            throw new RuntimeException(e);
         }
         container.clear();
         container.name = "buttons";
@@ -310,11 +373,11 @@ public class FireMod extends mindustry.mod.Mod{
         container.defaults().size(120.0f).pad(5.0f).padTop(4.0f);
 
         MobileButton
-        settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
-        mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-        what = new MobileButton(Icon.warning, "@fire.what", mulmodDialog::show),
-        exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
-        about = new MobileButton(Icon.info, "@about.button", ui.about::show);
+            settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+            mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
+            what = new MobileButton(Icon.warning, "@fire.what", mulmodDialog::show),
+            exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
+            about = new MobileButton(Icon.info, "@about.button", ui.about::show);
 
         Seq<MenuFragment.MenuButton> customButtons = Reflect.get(ui.menufrag, "customButtons");
         var customs = customButtons.map(b -> new MobileButton(b.icon, b.text, b.runnable == null ? () -> {} : b.runnable));
