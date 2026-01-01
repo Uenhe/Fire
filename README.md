@@ -18,18 +18,17 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 
 #### Campaign:
 
-- Adds a new planet - Lysetta, with its own tech tree and extra 16 sector presets
+- Adds a new planet - Lysetta, with its own tech tree and extra 18 sector presets
 - To learn how to begin your journey on Lysetta, why not first go checking out Serpulo...
 
 #### Blocks:
 
-- 13 new powerful turrets with their unique shoot patterns
+- 16 new powerful turrets with their unique shoot patterns
 - 20+ new cool factories with their special effects
 - Brand-new mender, overdrive projector, core, build tower
 - More practical drills, generators, walls and distribution facilities
 - More blocks as superior of some vanilla blocks
-- Javelin Pad from Mindustry v5
-- Totally 70+ new blocks
+- Totally ~80 new blocks
 
 #### Units:
 
@@ -38,7 +37,7 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 - Adds new unit line: Ground Flesh, basically similar to the vanilla but mutated and strengthened
 - 3 new boss units
 - Javelin Ship from Mindustry v5
-- Totally 18 new units
+- Totally 19 new units
 
 #### Others:
 

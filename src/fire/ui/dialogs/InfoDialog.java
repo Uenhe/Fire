@@ -61,7 +61,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
         titleTable.remove();
         titleTable.clear();
         titleTable.top().button(b -> {
-            b.imageDraw(() -> new TextureRegionDrawable(root.node.content.uiIcon)).padRight(8).size(iconMed);
+            b.imageDraw(() -> new TextureRegionDrawable(root.node.content.uiIcon)).padRight(8.0f).size(iconMed);
             b.add().growX();
             b.label(() -> root.node.content.localizedName).color(Pal.accent);
             b.add().growX();
@@ -97,7 +97,9 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
                         container.setPosition(pos.x, pos.y, Align.topLeft);
                         container.setOrigin(0.0f, element.getHeight());
                     }
-                    {allowMobile = true;}
+                    {
+                        allowMobile = true;
+                    }
                 });
         }).row();
 
@@ -168,8 +170,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
 
         node.selectable = !locked(node.node);
 
-        var children = node.children;
-        for(var n : children){
+        for(var n : node.children){
             n.visible = !locked && n.parent.visible;
             checkNodes(n);
         }
@@ -194,7 +195,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
         float lastY = node.y;
 
         if(rightHalf.length > 0){
-
             node.children = rightHalf;
             new BranchTreeLayout(){{
                 gapBetweenLevels = gapBetweenNodes = nodeSpacing;
@@ -209,7 +209,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
         float minX = 0f, minY = 0f, maxX = 0f, maxY = 0f;
         copyInfo(node);
 
-        var nodes = this.nodes;
         for(var n : nodes){
             if(!n.visible) continue;
 
@@ -235,11 +234,9 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
         node.node.x = node.x;
         node.node.y = node.y;
 
-        if(node.children != null){
-            var children = node.children;
-            for(var child : children)
+        if(node.children != null)
+            for(var child : node.children)
                 copyInfo(child);
-        }
     }
 
     private class View extends Group{
@@ -257,7 +254,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
             infoTable.clear();
             infoTable.touchable = Touchable.enabled;
 
-            var nodes = InfoDialog.this.nodes;
             for(var node : nodes){
                 var button = new ImageButton(node.node.content.uiIcon, Styles.nodei);
 
@@ -389,7 +385,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
                 if(locked(node))
                     t.minWidth(120.0f);
                 else if(hasInfo(node))
-                    t.minWidth(360.0f);
+                    t.minWidth(400.0f * fontScale);
             });
 
             infoTable.row();
@@ -416,8 +412,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
             for(var node : nodes){
                 if(!node.visible) continue;
 
-                var children = node.children;
-                for(var child : children){
+                for(var child : node.children){
                     if(!child.visible) continue;
 
                     boolean lock = locked(node.node) || locked(child.node);
@@ -442,7 +437,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
     }
 
     private class LayoutNode extends TreeLayout.TreeNode<LayoutNode>{
-
         private final InfoTreeNode node;
 
         private LayoutNode(InfoTreeNode node, LayoutNode parent){
@@ -456,7 +450,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
     }
 
     public class InfoTreeNode extends TreeLayout.TreeNode<InfoTreeNode>{
-
         private final InfoNode node;
         private boolean visible = true, selectable = true;
 
@@ -466,9 +459,9 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
             this.width = this.height = nodeSize;
 
             nodes.add(this);
-            children = new InfoTreeNode[node.children.size];
-
-            for(int i = 0, len = children.length; i < len; i++)
+            int len = node.children.size;
+            children = new InfoTreeNode[len];
+            for(int i = 0; i < len; i++)
                 children[i] = new InfoTreeNode(node.children.get(i), this);
         }
     }
@@ -481,7 +474,6 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
     }
 
     public static class InfoNode{
-
         private final short depth;
         private final UnlockableContent content;
         private final Seq<InfoNode> children = new Seq<>();
@@ -496,9 +488,7 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
         }
 
         public static InfoNode dnode(UnlockableContent content){
-            return dnode(content, () -> {
-
-            });
+            return dnode(content, () -> {});
         }
 
         public static InfoNode dnode(UnlockableContent content, Runnable children){

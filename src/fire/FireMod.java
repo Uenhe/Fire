@@ -220,7 +220,7 @@ public class FireMod extends Mod{
                 "[#F4BA6E]v1.5.0:",
                 FRSectorPresets.desertWastes, FRSectorPresets.frozenWall,
                 FRBlocks.obstruction, FRBlocks.cumulonimbus, FRBlocks.magneticRail,
-                FRBlocks.liquidUnloader, FRBlocks.meltingFurnace, FRBlocks.vectorialUnitFactory,
+                FRBlocks.liquidUnloader, FRBlocks.meltingFurnace, FRBlocks.vectorialUnitFactory, FRBlocks.numbDelusion,
                 FRUnitTypes.radiance
             );
             t.row();

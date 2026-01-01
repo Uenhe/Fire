@@ -84,6 +84,7 @@ public class FRPlanets{
                     node(compositeBridgeConduit, with(new SectorComplete(darkWorkshop)), () -> {
                         node(magneticRingPump, with(new SectorComplete(branchedRivers)), () -> {});
                         node(hardenedLiquidTank, with(new SectorComplete(branchedRivers)), () -> {});
+                        node(liquidUnloader, with(new SectorComplete(frozenWall)), () -> {});
                     })
                 );
             });
@@ -92,10 +93,10 @@ public class FRPlanets{
                 node(omicron, () ->
                     node(pioneer, with(new OnSector(desolateFortification)), () -> {})
                 );
-                node(vectorialUnitFactory, with(new SectorComplete(desolateFortification), new SectorComplete(desertWastes)),()-> {});
                 node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
                     node(javelin, () -> {})
                 );
+                node(numbDelusion, with(new SectorComplete(frozenWall)), () -> {});
             });
 
             node(thermalKiln, with(new OnSector(landingBase)), () -> {
@@ -228,7 +229,9 @@ public class FRPlanets{
                 node(vectorialUnitFactory, with(new SectorComplete(desertWastes),new SectorComplete(desolateFortification)), () -> {});
 
                 node(payloadConveyorLarge, with(new SectorComplete(scorchingVolcano)), () ->
-                    node(payloadRouterLarge)
+                    node(payloadRouterLarge, () ->
+                        node(vectorialUnitFactory, with(new SectorComplete(desertWastes)), () -> {})
+                    )
                 );
             });
 
@@ -351,7 +354,9 @@ public class FRPlanets{
                                 dnode(slagCooler);
                                 dnode(seaquake);
 
-                                dnode(lavaStronghold, () -> {});
+                                dnode(lavaStronghold, () ->
+                                    dnode(javelinPad)
+                                );
                             });
                         });
 
@@ -367,6 +372,14 @@ public class FRPlanets{
                                 dnode(flesh);
                                 dnode(scab);
                             });
+
+                            dnode(branchedRivers, () ->
+                                dnode(frozenWall, () -> {
+                                    dnode(obstruction);
+                                    dnode(magneticRail);
+                                    dnode(numbDelusion);
+                                })
+                            );
                         });
                     });
                 })
