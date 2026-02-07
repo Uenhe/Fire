@@ -127,51 +127,47 @@ public class FireMod extends Mod{
         });
 
         Events.on(EventType.TapEvent.class, e -> {
-            if(isCheating() || multipleMods){
+            if(isCheating()){
                 showCheatingLog();
             }
         });
 
         Events.on(EventType.BlockBuildBeginEvent.class, e -> {
-            if(isCheating() || multipleMods){
+            if(isCheating()){
                 showCheatingLog();
             }
         });
     }
 
-    public static void loadCheatBlocks(){
-        for(var block : content.blocks()){
-            if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
+    private static void loadCheatBlocks(){
+        for(var block : content.blocks())
+            if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource)
                 cheatBlocks.add(block);
-            }
-        }
     }
 
-    public static boolean isCheating(){
+    private static boolean isCheating(){
         if(!state.isCampaign()) return false;
-        if(DEBUG.isDeveloper())return false;
+        if(DEBUG.isDeveloper()) return false;
+        if(multipleMods) return true;
 
-        boolean isCheating = false;
-
-        if(state != null && state.rules != null) {
-            isCheating = state.rules.infiniteResources ||
-                state.rules.instantBuild ||
-                state.rules.allowEditRules ||
-                state.rules.allowEditWorldProcessors ||
-                state.rules.buildCostMultiplier < 0.01f;
+        if(state != null && state.rules != null && (
+            state.rules.infiniteResources ||
+            state.rules.instantBuild ||
+            state.rules.allowEditRules ||
+            state.rules.allowEditWorldProcessors ||
+            state.rules.buildCostMultiplier < 0.01f)
+        ){
+            return true;
         }
-        if(isCheating) return true;
 
         for(var block : cheatBlocks){
-            for(int i = 0, sum = 0; i < Team.all.length; i++){
+            for(int i = 0, n = Team.all.length; i < n; i++){
                 var builds = Team.get(i).data().buildingTypes.get(block);
                 if(builds == null) continue;
-
-                sum += builds.size;
-                if(sum > 1) isCheating = true;
+                if(builds.size > 0) return true;
             }
         }
-        return isCheating;
+        return false;
     }
 
     private static void showCheatingLog(){
@@ -230,8 +226,6 @@ public class FireMod extends Mod{
             t.add("@fire.content2").left().maxWidth(width()).pad(4.0f);
 
         }).maxWidth(width());
-
-
 
         main.show();
     }
@@ -385,7 +379,7 @@ public class FireMod extends Mod{
         if(!Core.graphics.isPortrait()){
             container.marginTop(60.0f);
 
-            for(int i = 1; i < customs.size; i += 2)
+            for(int i = 1, n = customs.size; i < n; i += 2)
                 container.add(customs.get(i));
 
             container.row();
@@ -393,7 +387,7 @@ public class FireMod extends Mod{
             container.add(settings);
             container.add(mods);
 
-            for(int i = 0; i < customs.size; i += 2)
+            for(int i = 0, n = customs.size; i < n; i += 2)
                 container.add(customs.get(i));
 
         }else{
@@ -402,7 +396,7 @@ public class FireMod extends Mod{
             container.add(mods);
             container.row();
 
-            for(int i = 0; i < customs.size; i++){
+            for(int i = 0, n = customs.size; i < n; i++){
                 container.add(customs.get(i));
                 if(i % 2 == 0) container.row();
             }
