@@ -93,6 +93,7 @@ public class FRPlanets{
                 node(omicron, () ->
                     node(pioneer, with(new OnSector(desolateFortification)), () -> {})
                 );
+                node(vectorialUnitFactory, with(new SectorComplete(desolateFortification), new SectorComplete(desertWastes)), () -> {});
                 node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
                     node(javelin, () -> {})
                 );
