@@ -88,6 +88,8 @@ public class FireMod extends Mod{
         FRSectorPresets.load();
         FRPlanets.loadTree();
         FRWeathers.load();
+
+        FROverride.loadDebug();
     }
 
     @Override

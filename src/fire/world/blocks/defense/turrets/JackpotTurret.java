@@ -22,7 +22,6 @@ public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTu
     @Override
     public void init(){
         super.init();
-        var jackpotAmmo = this.jackpotAmmo;
         for(var ammo : jackpotAmmo){
             ammo.type.ammoMultiplier = 1.0f;
             ammoTypes.put(ammo.item, ammo.type);

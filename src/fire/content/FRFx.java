@@ -279,7 +279,23 @@ public class FRFx{
                 });
             }
         });
+    }
 
+    public static Effect swordMarkEffect(float lifetime, float x1, float y1, float x2, float y2, float width, float moveTime, Color color){
+        return new Effect(lifetime, e->{
+            float progress = Math.min(e.time / moveTime, 1.0f);
+            float totalX = x2 - x1, totalY = y2 - y1;
+            float realX = x1 + totalX * progress, realY = y1 + totalY * progress;
+            float len = Mathf.sqrt(totalX * progress * totalX * progress + totalY * progress * totalY * progress);
+            float angle = Angles.angle(x1,y1,x2,y2);
+            Draw.color(color);
+            Lines.stroke(width);
+            Draw.alpha(1.0f - e.fin(Interp.pow5In));
+            Drawf.tri(x1, y1, width, len * 0.1f, angle + 180.0f);
+            Drawf.tri(realX, realY, width, len * 0.1f, angle);
+            Lines.line(x1, y1, realX, realY);
+            Drawf.light(x1, y1, realX, realY);
+        });
     }
 
     /** @see Fx#hitBulletSmall */

@@ -10,9 +10,8 @@ import mindustry.graphics.Layer;
 public class SpriteBulletType extends mindustry.entities.bullet.BulletType{
 
     public final float width, height;
-
     private final String name;
-    private TextureRegion region = new TextureRegion();
+    protected TextureRegion region = new TextureRegion();
 
     public SpriteBulletType(float speed, float damage, float w, float h, String name){
         super(speed, damage);
@@ -24,13 +23,17 @@ public class SpriteBulletType extends mindustry.entities.bullet.BulletType{
     @Override
     public void load(){
         super.load();
-        region=(Core.atlas.find(name, "error"));
+        region = Core.atlas.find(name);
     }
 
     @Override
     public void draw(Bullet b){
         super.draw(b);
         Draw.z(Layer.effect + 1.0f); //not affected by bloom
+        handleDrawRect(b);
+    }
+
+    protected void handleDrawRect(Bullet b){
         Draw.rect(region, b.x, b.y, width, height, b.rotation() - 90.0f);
     }
 }

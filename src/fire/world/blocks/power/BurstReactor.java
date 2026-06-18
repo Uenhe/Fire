@@ -100,7 +100,7 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
                 var cons = other.block.consPower;
                 powerConsSum[0] += other.efficiency * cons.efficiency(other) * cons.requestedPower(other);
             });
-            return super.getPowerProduction() + powerConsSum[0] * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
+            return super.getPowerProduction() <= 0 ? 0 : super.getPowerProduction() + powerConsSum[0] * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
         }
 
         @Override
@@ -135,7 +135,8 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
             bullet.set(x, y);
             bullet.lastX = x;
             bullet.lastY = y;
-            bullet.lifetime = 120.0f;
+            bullet.lifetime = 105.0f;
+            bullet.hitSize = 0.0f;
             bullet.add();
         }
     }
@@ -168,25 +169,18 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
         @Override
         public void update(){
             super.update();
-            final int n = 12;
-            final float interval = 2.4f;
-            if((timer += Time.delta) < interval) return;
+            final float interval = 3.0f;
 
+            if((timer += Time.delta) < interval) return;
             timer -= interval;
-            for(int i = 0; i < n; i++)
-                burstType.create(this, x, y, ((float)i / n) * 360.0f + time * (time - 1.0f) * 1.2f);
+            for(int i = 0, n = 12; i < n; i++)
+                burstType.create(this, x, y, ((float)i / n) * 360.0f + time * (time - 1.0f) * 0.7f);
         }
 
         @Override
         public void remove(){
             super.remove();
             FRUnitTypes.radiance.weapons.get(0).bullet.create(this, team, x, y, 0.0f, 0.0f);
-        }
-
-        @Override
-        public void reset(){
-            super.reset();
-            timer = 0.0f;
         }
     }
 }

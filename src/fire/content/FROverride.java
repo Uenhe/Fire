@@ -1,13 +1,26 @@
 package fire.content;
 
+import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
+import arc.math.Interp;
+import arc.math.Mathf;
+import arc.util.Time;
+import fire.FRUtils;
+import fire.entities.bullets.SpriteBulletType;
 import fire.logic.FRLogicStatements;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
+import mindustry.content.Fx;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.entities.bullet.LiquidBulletType;
+import mindustry.entities.pattern.ShootSpread;
+import mindustry.gen.Bullet;
 import mindustry.gen.LogicIO;
+import mindustry.gen.Unit;
+import mindustry.graphics.Pal;
 import mindustry.logic.LAssembler;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.MassDriver;
@@ -23,6 +36,97 @@ import static mindustry.content.UnitTypes.*;
 
 public class FROverride{
 
+    public static void loadDebug(){
+        final float tDecel = 60, tFire = 80, tSafe = tFire + 20/* =100 */, tLife = 140;
+
+        var weapon = corvus.weapons.get(0);
+        weapon.reload = 120;
+        weapon.shoot = new ShootSpread(15, 7){{
+            shotDelay = 4;
+        }};
+        weapon.bullet = new SpriteBulletType(10, 200, 34, 34, "fire-alt"){
+
+            final SpriteBulletType despawnBullet = new SpriteBulletType(5, 200, 20, 20, "fire-alt2"){
+                @Override
+                protected void handleDrawRect(Bullet b){
+                    Draw.alpha(0.2f + 0.8f * Interp.slope.apply(b.time / b.lifetime));
+                    Draw.rect(region, b.x, b.y, width, height, b.rotation() - 45);
+                }
+                {
+                    lifetime = 20;
+                    drag = -0.02f;
+                    pierceBuilding = true;
+                    pierceCap = 50;
+                    despawnEffect = hitEffect = Fx.none;
+                }
+            };
+
+            @Override
+            protected void handleDrawRect(Bullet b){
+                if(b.time < tDecel)
+                    Draw.alpha(Interp.pow2Out.apply(b.time / tDecel));
+                else if(b.time >= tSafe)
+                    Draw.alpha(0.2f + 0.8f * Interp.pow2Out.apply((tLife - b.time) / (tLife - tSafe)));
+
+                Draw.rect(region, b.x, b.y, width, height, b.rotation() - 45);
+            }
+
+            @Override
+            public void update(Bullet b){
+                //hack: bullet.time doesn't increment until this method finishes
+                if(b.time == 0){
+                    //no one else will use bullet.timer
+                    b.timer.getTimes()[0] = Mathf.atan2(b.vel.x, b.vel.y);
+                    b.timer.getTimes()[1] = Mathf.range(180) + 720;
+                    b.vel.setZero();
+
+                }else if(b.time < tSafe){
+                    assert b.owner instanceof Unit;
+                    final float d = 108.0f;
+                    float dx = d * Mathf.cos(b.timer.getTimes()[0]),
+                        dy = d * Mathf.sin(b.timer.getTimes()[0]);
+                    float destX = ((Unit)b.owner).x + dx,
+                        destY = ((Unit)b.owner).y + dy;
+                    float angle = Mathf.angle(b.aimX - destX, b.aimY - destY);
+
+                    if(b.time < tDecel){
+                        float frac = Interp.pow2Out.apply(b.time / tDecel);
+                        b.set(((Unit)b.owner).x + frac * dx, ((Unit)b.owner).y + frac * dy);
+                        b.rotation(b.timer.getTimes()[1] * (1 - frac) + frac * angle);
+
+                    }else if(b.time >= tFire){
+                        b.time = tSafe;
+                        b.initVel(angle - 180, 12);
+                        float accel = 1.6f * Time.delta;
+                        b.mover = bl -> bl.vel.add(Mathf.cosDeg(angle) * accel, Mathf.sinDeg(angle) * accel);
+                    }
+                }
+                super.update(b);
+            }
+
+            @Override
+            public void despawned(Bullet b){
+                final float d = 90.0f;
+                float randTheta = Mathf.range(Mathf.halfPi);
+                float x = b.x + d * Mathf.cos(randTheta),
+                    y = b.y + d * Mathf.sin(randTheta);
+                despawnBullet.create(b, x, y, Mathf.angle(b.x - x, b.y - y));
+            }
+            {
+                lifetime = tLife;
+                velocityScaleRandMin = velocityScaleRandMax = -1;
+                lightning = 3;
+                lightningColor = Pal.heal;
+                lightningDamage = 40;
+                lightningLength = 6;
+                pierceBuilding = true;
+                pierceCap = 50;
+                keepVelocity = false;
+                despawnEffect = hitEffect = Fx.none;
+            }
+        };
+    }
+
     public static void load(){
 
         //region block environment
@@ -36,6 +140,10 @@ public class FROverride{
         grass.asFloor().wall = shrubs;
 
         //region block turret
+        var scorchAmmoP = ((ItemTurret)scorch).ammoTypes.get(Items.pyratite);
+        scorchAmmoP.damage = 60;
+        scorchAmmoP.ammoMultiplier = 6.0f;
+
         wave.liquidCapacity += 10.0f;
         ((LiquidTurret)wave).ammoTypes.put(FRLiquids.liquidNitrogen, new LiquidBulletType(FRLiquids.liquidNitrogen){{
             damage = 4.55f;

@@ -1900,11 +1900,12 @@ public class FRBlocks{
                         colorFrom.set(Pal.surge);
                         Color.valueOf(colorTo, "f3e97900");
                     }});
-                    hitEffect = new MultiEffect(new WaveEffect(){{
-                        lifetime = 40.0f;
-                        colorFrom = Pal.surge;
-                        colorTo = Color.white;
-                        sizeFrom = 0.0f;
+                    hitEffect = new MultiEffect(
+                        new WaveEffect(){{
+                            lifetime = 40.0f;
+                            colorFrom = Pal.surge;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
                             sizeTo = 60.0f;
                             sides = 4;
                             rotation = 0.0f;
@@ -2446,7 +2447,7 @@ public class FRBlocks{
             range = 640.0f;
             trackingRange = 400.0f;
             inaccuracy = 0.5f;
-            maxAmmo = 60;
+            maxAmmo = 240;
             recoil = 3.6f;
             recoilTime = 40.0f;
             shake = 3.0f;
@@ -2501,8 +2502,128 @@ public class FRBlocks{
                 }}*/);
             }};
 
-            Item item_1 = magneticAlloy, item_2 = surgeAlloy;
-            BulletType bullet_1_1, bullet_1_2, bullet_1_3, bullet_1_4, bullet_1_EX, bullet_2_1, bullet_2_2, bullet_2_EX, bullet_2_mini;
+            Item item_1 = magneticAlloy, item_2 = surgeAlloy, item_3 = detonationCompound;
+            BulletType bullet_1_1, bullet_1_2, bullet_1_3, bullet_1_4, bullet_1_EX,
+                bullet_2_1, bullet_2_2, bullet_2_EX, bullet_2_mini,
+                bullet_3_1, bullet_3_2, bullet_3_EX;
+
+            bullet_3_1 = new MissileBulletType(1.71f, 40.0f){{
+                lifetime = 90.0f;
+                drag = -0.03f;
+                width = 2.0f;
+                height = 3.0f;
+                splashDamage = 120.0f;
+                splashDamageRadius = 32.0f;
+                hitSize = 9.0f;
+                trailLength = 8;
+                trailWidth = 1.3f;
+                trailColor = Pal.blastAmmoBack;
+                ammoMultiplier = 12;
+                rangeChange = 120;
+                hitEffect = new WaveEffect(){{
+                    startDelay = 2f;
+                    lifetime = 30.0f;
+                    colorFrom = Pal.blastAmmoFront;
+                    colorTo = Color.white;
+                    sizeFrom = 0.0f;
+                    sizeTo = 32.0f;
+                    sides = 4;
+                    strokeFrom = 21.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+                status = StatusEffects.blasted;
+                reloadMultiplier = 3.5f;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.blastAmmoBack;
+                frontColor = Pal.blastAmmoFront;
+            }};
+
+            bullet_3_2 = new MissileBulletType(1.5f, 50.0f){{
+                lifetime = 120.0f;
+                drag = -0.02f;
+                width = 3.0f;
+                height = 6.0f;
+                splashDamage = 130.0f;
+                splashDamageRadius = 48.0f;
+                hitSize = 9.0f;
+                trailLength = 9;
+                trailWidth = 1.4f;
+                trailColor = Pal.blastAmmoBack;
+                ammoMultiplier = 12;
+                rangeChange = 110;
+                hitEffect = new WaveEffect(){{
+                    startDelay = 2f;
+                    lifetime = 30.0f;
+                    colorFrom = Pal.blastAmmoFront;
+                    colorTo = Color.white;
+                    sizeFrom = 0.0f;
+                    sizeTo = 48.0f;
+                    sides = 4;
+                    strokeFrom = 21.0f;
+                    interp = Interp.pow5Out;
+                    lightInterp = Interp.pow5Out;
+                }};
+                status = StatusEffects.blasted;
+                shootEffect = Fx.shootBig;
+                backColor = hitColor = Pal.blastAmmoBack;
+                frontColor = Pal.blastAmmoFront;
+            }};
+
+            bullet_3_EX = new MissileBulletType(0.8f, 120.0f){{
+                lifetime = 240.0f;
+                drag = -0.01f;
+                width = 16.0f;
+                height = 24.0f;
+                splashDamage = 600.0f;
+                splashDamageRadius = 160.0f;
+                hitSize = 18.0f;
+                trailLength = 9;
+                trailWidth = 1.4f;
+                trailColor = Pal.graphiteAmmoBack;
+                status = StatusEffects.freezing;
+                statusDuration = 600.0f;
+                shootEffect = Fx.shootBig;
+                hitEffect = new MultiEffect(
+                    new WaveEffect(){{
+                        lifetime = 30.0f;
+                        colorFrom = Pal.graphiteAmmoFront;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 90.0f;
+                        sides = 4;
+                        strokeFrom = 32.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }},
+                    new WaveEffect(){{
+                        startDelay = 2f;
+                        lifetime = 30.0f;
+                        colorFrom = Pal.graphiteAmmoFront;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 60.0f;
+                        sides = 4;
+                        strokeFrom = 21.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }},
+                    new WaveEffect(){{
+                        startDelay = 2f;
+                        lifetime = 30.0f;
+                        colorFrom = Pal.graphiteAmmoFront;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 40.0f;
+                        sides = 4;
+                        strokeFrom = 21.0f;
+                        interp = Interp.pow5Out;
+                        lightInterp = Interp.pow5Out;
+                    }}
+                );
+                backColor = hitColor = Pal.graphiteAmmoBack;
+                frontColor = Pal.graphiteAmmoFront;
+            }};
 
             bullet_2_1 = new BasicBulletType(12.8f, 80.0f){{
                 lifetime = 52.0f;
@@ -2729,7 +2850,7 @@ public class FRBlocks{
 
                 @Override
                 public void removed(Bullet b){
-                    int[] cnt = {0};
+                    float[] cnt = {0};
 
                     Groups.bullet.intersect(b.x - range, b.y - range, range * 2.0f, range * 2.0f, other -> {
                         if(isDifferentBullets(b, other)){
@@ -2744,6 +2865,8 @@ public class FRBlocks{
                     }
                     stopEffect.at(b.x, b.y);
                     echoEffect.at(b.x, b.y);
+
+                    cnt[0] = Mathf.sqrt(cnt[0]);
 
                     Units.nearbyEnemies(b.team, b.x, b.y, range, u -> {
                         if(u.health + u.shield >= 600.0f){
@@ -2817,12 +2940,29 @@ public class FRBlocks{
                 }
             };
 
-            stack((int)surgeAlloy.id, Seq.with(new ItemBulletAdaptingTurret.BulletStack(180, bullet_2_1, item_2), new ItemBulletAdaptingTurret.BulletStack(360, bullet_2_2, item_2), new ItemBulletAdaptingTurret.BulletStack(120, bullet_2_EX, item_2)), (int)magneticAlloy.id, Seq.with(new ItemBulletAdaptingTurret.BulletStack(90, bullet_1_1, item_1), new ItemBulletAdaptingTurret.BulletStack(180, bullet_1_2, item_1), new ItemBulletAdaptingTurret.BulletStack(270, bullet_1_3, item_1), new ItemBulletAdaptingTurret.BulletStack(600, bullet_1_4, item_1), new ItemBulletAdaptingTurret.BulletStack(300, bullet_1_EX, item_1)));
+            stack(
+                (int)detonationCompound.id, Seq.with(
+                    new ItemBulletAdaptingTurret.BulletStack(90, bullet_3_1, item_3),
+                    new ItemBulletAdaptingTurret.BulletStack(250, bullet_3_2, item_3),
+                    new ItemBulletAdaptingTurret.BulletStack(120, bullet_3_EX, item_3)
+                ),
+                (int)surgeAlloy.id, Seq.with(
+                    new ItemBulletAdaptingTurret.BulletStack(180, bullet_2_1, item_2),
+                    new ItemBulletAdaptingTurret.BulletStack(360, bullet_2_2, item_2),
+                    new ItemBulletAdaptingTurret.BulletStack(120, bullet_2_EX, item_2)
+                ), (int)magneticAlloy.id, Seq.with(
+                    new ItemBulletAdaptingTurret.BulletStack(90, bullet_1_1, item_1),
+                    new ItemBulletAdaptingTurret.BulletStack(180, bullet_1_2, item_1),
+                    new ItemBulletAdaptingTurret.BulletStack(270, bullet_1_3, item_1),
+                    new ItemBulletAdaptingTurret.BulletStack(600, bullet_1_4, item_1),
+                    new ItemBulletAdaptingTurret.BulletStack(300, bullet_1_EX, item_1)
+                )
+            );
 
             consumePower(n(6000));
             consumeCoolant(n(120));
 
-            ammo(item_2, bullet_2_1.copy(), item_1, bullet_1_1.copy());
+            ammo(item_3, bullet_3_1.copy(), item_2, bullet_2_1.copy(), item_1, bullet_1_1.copy());
         }};
 
         magneticRail = new ItemBulletStackTurret("magnetic-rail"){{

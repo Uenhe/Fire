@@ -1,6 +1,7 @@
 package fire.content;
 
 import arc.Core;
+import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
@@ -8,6 +9,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Position;
 import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
@@ -27,8 +29,11 @@ import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
+import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.HoverPart;
+import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootSpread;
+import mindustry.entities.units.WeaponMount;
 import mindustry.gen.*;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
@@ -42,6 +47,9 @@ import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
 
+import java.awt.*;
+
+import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
 import static fire.FRVars.find;
 import static fire.FRVars.lancer_a04;
@@ -57,7 +65,7 @@ public class FRUnitTypes{
         blade, hatchet, castle,
 
         //ground
-        error,
+        error, pluto,
 
         //air support
         omicron, pioneer,
@@ -497,6 +505,474 @@ public class FRUnitTypes{
                         toColor = find("990003");
                     }};
                 }}
+            );
+        }};
+
+        pluto = new UnitType("pluto"){{
+            constructor = LegsUnit::create;
+            hovering = true;
+            health = 63400;
+            armor = 26;
+            hitSize = 36f;
+            speed = 0.32f;
+            drag = 0.1f;
+            rotateSpeed = 0.9f;
+            buildSpeed = 4f;
+            itemCapacity = 320;
+            drownTimeMultiplier = 3.8f;
+
+            stepShake = 1.2f;
+            shadowElevation = 0.8f;
+            groundLayer = Layer.legUnit;
+            legCount = 6;
+            legLength = 23.0f;
+            legSpeed = 0.2f;
+            legBaseOffset = 16.0f;
+            legLengthScl = 1f;
+            legMoveSpace = 1.2f;
+            legGroupSize = 4;
+            legExtension = 1.0f;
+            rippleScale = 2.4f;
+            lockLegBase = true;
+            legContinuousMove = true;
+            allowLegStep = true;
+
+            abilities.add(new RepairFieldAbility(800.0f, 8 * 60.0f, 120.0f){{
+                activeEffect = new WaveEffect(){{
+                    lifetime = 120.0f;
+                    colorFrom = colorTo = healColor;
+                    sizeFrom = 0.0f;
+                    sizeTo = 120.0f;
+                    strokeFrom = 4.0f;
+                    strokeTo = 0.0f;
+                    sides = 6;
+                    interp = Interp.pow5Out;
+                }};
+                healEffect = new WaveEffect(){{
+                    lifetime = 30.0f;
+                    colorFrom = colorTo = healColor;
+                    sizeFrom = 40.0f;
+                    sizeTo = 80.0f;
+                    strokeFrom = 4.0f;
+                    strokeTo = 0;
+                    sides = 6;
+                    interp = Interp.pow3In;
+                }};
+            }}, new ShieldArcAbility(){
+                @Override
+                public void update(Unit u){
+                    super.update(u);
+                    if(u.health >= u.maxHealth - 1.0f){
+                        data = Math.min(max, data + Time.delta * regen * 9);
+                    }
+                    if(data >= max - 1.0f){
+                        u.apply(StatusEffects.fast, 10.0f); //faster when shield is in shape
+                        u.health = Math.min(u.maxHealth, u.health + Time.delta * regen);
+                    }
+                    if(data >= max * 0.5f){
+                        u.apply(StatusEffects.overclock, 10.0f); //quicker when shield is well
+                        u.apply(StatusEffects.overdrive, 10.0f);
+                    }
+                    if(data <= 0){
+                        u.apply(StatusEffects.slow, 300.0f); //slower when shield is broken
+                        u.apply(StatusEffects.sapped, 300.0f); //weaker when shield is broken
+                        u.unapply(StatusEffects.overdrive);
+                    }
+                }
+
+                {
+                    radius = 55.0f;
+                    regen = 2.0f;
+                    max = 6000.0f;
+                    width = 15.0f;
+                    angle = 135.0f;
+                }
+            });
+            weapons.addAll(new Weapon("FUCK ALL!"){
+                final BulletType mainBullet = new BasicBulletType(){
+                    @Override
+                    public void update(Bullet b){
+                        super.update(b);
+                        if(b.time >= 80.0f) return;
+
+                        assert b.owner instanceof Unit;
+                        float sX = ((Unit)b.owner).x, dX = ((Unit)b.owner).aimX;
+                        float sY = ((Unit)b.owner).y, dY = ((Unit)b.owner).aimY;
+                        final float ps = Mathf.sqrt((sX - dX) * (sX - dX) + (sY - dY) * (sY - dY)) / 480.0f;
+                        if(ps > 1f){
+                            dX = sX + (dX - sX) / ps;
+                            dY = sY + (dY - sY) / ps;
+                        }
+                        b.set(dX, dY);
+                    }
+
+                    @Override
+                    public void removed(Bullet b){
+                        FRFx.lineTrailEffect(30.0f, b.x, b.y, ((Unit)b.owner).x, ((Unit)b.owner).y, 6.0f, Pal.heal, 8).at(b.x, b.y);
+                        super.removed(b);
+                    }
+
+                    {
+                        lifetime = 160.0f;
+                        collidesTiles = collides = hittable = reflectable = absorbable = false;
+                        damage = speed = 0;
+                        despawnEffect = hitEffect = Fx.none;
+                        parts.add(new ShapePart(){{
+                            progress = PartProgress.life;
+                            rotateSpeed = -2f;
+                            color = Color.sky;
+                            colorTo = Pal.heal;
+                            sides = 3;
+                            hollow = true;
+                            stroke = 0;
+                            strokeTo = 12.0f;
+                            radius = 60.0f;
+                            radiusTo = 0;
+                            shrinkInterp = Interp.pow5In;
+                            layer = Layer.effect;
+                        }}, new ShapePart(){{
+                            progress = PartProgress.life;
+                            rotateSpeed = 2f;
+                            color = Color.sky;
+                            colorTo = Pal.heal;
+                            sides = 3;
+                            hollow = true;
+                            stroke = 0;
+                            strokeTo = 12.0f;
+                            radius = 60.0f;
+                            radiusTo = 0;
+                            shrinkInterp = Interp.pow5In;
+                            layer = Layer.effect;
+                        }});
+                        fragRandomSpread = 0;
+                        fragBullets = 1;
+                        fragBullet = new BombBulletType(){
+                            @Override
+                            public void removed(Bullet b){
+                                boolean[] hitted = {false};
+                                Units.nearbyEnemies(b.team, b.x, b.y, splashDamageRadius * 2, u -> {
+                                    u.apply(StatusEffects.blasted);
+                                    u.apply(StatusEffects.shocked);
+                                    u.apply(FRStatusEffects.magnetized, 120f);
+                                    u.apply(FRStatusEffects.disintegrated, 180f);
+                                    u.health -= 400.0f;
+                                    if(!hitted[0]){
+                                        u.damage(2200f);
+                                        u.apply(StatusEffects.sapped, 300f);
+                                    }
+                                    ((Unit)b.owner).heal(150.0f);
+                                    if(((Unit)b.owner).health <= ((Unit)b.owner).maxHealth * 0.5f){
+                                        ((Unit)b.owner).heal(450.0f);
+                                    }
+                                    FRFx.chainEmpThin.at(b.x, b.y, 0.0f, Pal.heal, new Vec2().set(u));
+                                    hitted[0] = true;
+                                });
+                                if(((Unit)b.owner).health <= ((Unit)b.owner).maxHealth * 0.5f){
+                                    new MultiEffect(new WaveEffect(){{
+                                        lifetime = 60.0f;
+                                        colorFrom = Pal.heal;
+                                        colorTo = Color.sky;
+                                        sizeFrom = 0.0f;
+                                        sizeTo = 150.0f;
+                                        strokeFrom = 9.0f;
+                                        strokeTo = 0.0f;
+                                        sides = 6;
+                                        interp = Interp.pow5Out;
+                                    }}, new WaveEffect(){{
+                                        lifetime = 70.0f;
+                                        colorFrom = Pal.heal;
+                                        colorTo = Color.sky;
+                                        sizeFrom = 0.0f;
+                                        sizeTo = 100.0f;
+                                        strokeFrom = 12.0f;
+                                        strokeTo = 0.0f;
+                                        sides = 6;
+                                        interp = Interp.pow5Out;
+                                    }}).at(((Unit)b.owner).x, ((Unit)b.owner).y);
+                                    if(!hitted[0])
+                                        ((Unit)b.owner).heal(2500.0f);
+                                    ((Unit)b.owner).heal(1500.0f);
+                                }
+                                super.removed(b);
+                            }
+
+                            {
+                                absorbable = reflectable = hittable = false;
+                                splashDamage = 2600.0f;
+                                splashDamageRadius = 150.0f;
+                                hitEffect = FRFx.powerfulBlastEffect(120.0f, 120.0f, 0f, 0, Pal.heal, null);
+                                hitSound = Sounds.explosionReactor2;
+                            }
+                        };
+                    }
+                };
+
+                @Override
+                protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
+                    super.shoot(unit, mount, shootX, shootY, rotation);
+                    new MultiEffect(new WaveEffect(){{
+                        lifetime = 80.0f;
+                        colorFrom = healColor;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 216.0f;
+                        strokeFrom = 8.0f;
+                        strokeTo = 0.0f;
+                        sides = 6;
+                        rotation = 30.0f;
+                        interp = Interp.pow5Out;
+                    }}, new WaveEffect(){{
+                        lifetime = 120.0f;
+                        colorFrom = healColor;
+                        colorTo = Color.white;
+                        sizeFrom = 0.0f;
+                        sizeTo = 144.0f;
+                        strokeFrom = 12.0f;
+                        strokeTo = 0.0f;
+                        sides = 6;
+                        rotation = 30.0f;
+                        interp = Interp.pow5Out;
+                    }}).at(shootX, shootY);
+                    if(!unit.hasEffect(StatusEffects.overdrive) || unit.health <= unit.maxHealth * 0.5f){
+                        mainBullet.create(unit, unit.aimX, unit.aimY, 0f);
+                    }else if(unit.health == unit.maxHealth){
+                        unit.health -= 4500.0f;
+                        unit.apply(StatusEffects.shielded, 960.0f);
+                        mainBullet.create(unit, unit.aimX, unit.aimY, 0f);
+                    }
+                }
+
+                {
+                    mirror = false;
+                    maxRange = 480.0f;
+                    shootStatus = StatusEffects.unmoving;
+                    shootStatusDuration = 90.0f;
+                    reload = 720f;
+                    shoot = new ShootSpread(){{
+                        shots = 12;
+                        spread = 8.0f;
+                        shotDelay = 2.0f;
+                    }};
+
+                    bullet = new BasicBulletType(){
+                        public float getTrangle(float time){
+                            float countTime = 0.1f * (time > 20.0f ? time : time - 40.0f);
+                            return Mathf.pow(countTime, 2);
+                        }
+
+                        @Override
+                        public void init(Bullet b){
+                            super.init(b);
+                            b.vel.x = -b.vel.x;
+                            b.vel.y = -b.vel.y;
+                        }
+
+                        @Override
+                        public void draw(Bullet b){
+                            super.draw(b);
+                            if(b.time <= 40.0f){
+                                Draw.color(Pal.heal);
+                                Draw.alpha(0.3f + b.time * 0.7f / 40.0f);
+                                Draw.blend(Blending.additive);
+                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 1.0f + b.time * 0.5f, 3.0f + b.time * 1.5f, Mathf.atan2(b.aimX - b.x, b.aimY - b.y) * 57.295776F + getTrangle(b.time) / 8.0f * 360.0f + 270.0f);
+                                Draw.blend();
+                            }else{
+                                Draw.color(Pal.heal);
+                                Draw.alpha(1.0f);
+                                Draw.blend(Blending.additive);
+                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 21.0f, 63.0f, b.rotation() - 90.0f);
+                                Draw.blend();
+                            }
+                            Draw.reset();
+                        }
+
+                        @Override
+                        public void removed(Bullet b){
+                            Mathf.rand.setSeed(b.id);
+                            final float spawnRotate = Mathf.random(360.0f);
+                            final float spawnX = 120.0f * Mathf.cos(0.0f - spawnRotate);
+                            final float spawnY = 120.0f * Mathf.sin(0.0f - spawnRotate);
+                            final float aimX = b.aimX + Mathf.random(-8.0f, 8.0f), aimY = b.aimY + Mathf.random(-8.0f, 8.0f);
+                            b.type.fragBullet.create(b, b, b.team, aimX + spawnX, aimY + spawnY, spawnRotate, -1, 1f, 1f, null, null, aimX - spawnX, aimY - spawnY);
+                            super.removed(b);
+                        }
+
+                        @Override
+                        public void updateHoming(Bullet b){
+                            if(b.time <= 40.0f) return;
+                            if(b.time <= 80.0f){
+                                b.aimX = ((Unit)b.owner).aimX;
+                                b.aimY = ((Unit)b.owner).aimY;
+                                final float ps = Mathf.sqrt((b.aimX - b.x) * (b.aimX - b.x) + (b.aimY - b.y) * (b.aimY - b.y)) / 480.0f;
+                                if(ps > 1f){
+                                    b.aimX = b.x + (b.aimX - b.x) / ps;
+                                    b.aimY = b.y + (b.aimY - b.y) / ps;
+                                }
+                                b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
+                                return;
+                            }
+                            b.remove();
+                            /*
+                            b.vel.x = 0;
+                            b.vel.y = 10.0f;
+                            b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo(b.aimX,b.aimY), 6000.0f));
+                            if(b.within(b.aimX,b.aimY,20.0f))b.remove();*/
+                        }
+
+                        {
+                            rangeOverride = 480.0f;
+                            sprite = "fire-pluto-bullet";
+                            width = height = 0.0f;
+                            hitSize = 0.0f;
+                            damage = 120.0f;
+                            splashDamage = 350.0f;
+                            splashDamageRadius = 60.0f;
+                            speed = 15.0f;
+                            lifetime = 900.0f;
+                            drag = 0.08f;
+                            trailColor = frontColor = backColor = Pal.heal;
+                            trailLength = 6;
+                            trailWidth = 3.0f;
+                            absorbable = collides = false;
+                            healPercent = 15.0f;
+                            shootEffect = Fx.none;
+                            hitSound = Sounds.none;
+                            hitEffect = Fx.none;
+                            fragBullets = 0;
+                            fragRandomSpread = 0;
+                            fragBullet = new BasicBulletType(){
+                                @Override
+                                public void init(Bullet b){
+                                    super.init(b);
+                                    b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
+                                    FRFx.swordMarkEffect(20.0f, b.x, b.y, b.aimX, b.aimY, 8.0f, 8.0f, Pal.heal).at(b.x, b.y);
+                                    Sounds.shootLancer.at(b.x, b.y);
+                                }
+
+                                {
+                                    width = height = 0;
+                                    hitSize = 12.0f;
+                                    damage = 120.0f;
+                                    speed = 15.0f;
+                                    lifetime = 16.0f;
+                                    trailColor = frontColor = backColor = Pal.heal;
+                                    absorbable = hittable = reflectable = false;
+                                    healPercent = 15.0f;
+                                    shootEffect = Fx.none;
+                                    pierce = true;
+                                    pierceBuilding = true;
+                                }
+                            };
+                        }
+                    };
+                }
+            },
+            new Weapon("fire-pluto-weapon1"){{
+                shootCone = 180.0f;
+                reload = 15f;
+                x = 21.0f;
+                y = -1.5f;
+                bullet = new BasicBulletType(7.0f, 125.0f){
+                    byte counter;
+
+                    @Override
+                    public void updateBulletInterval(Bullet b){
+                        if(b.timer.get(2, bulletInterval)){
+                            counter = 0;
+                            Groups.unit.intersect(b.x - 150f, b.y - 150f, 300.0f, 300.0f, other -> {
+                                if(b.team != other.team && counter < intervalBullet.pierceCap){
+                                    counter++;
+                                    FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2().set(other));
+                                    other.damagePierce(intervalBullet.damage);
+                                    //intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
+                                    other.apply(StatusEffects.electrified, 120.0f);
+                                    other.apply(StatusEffects.shocked);
+                                }
+                            });
+                                /*
+                                Groups.build.intersect(b.x - 150f, b.y - 150f, 300.0f, 300.0f, other -> {
+                                    if(counter[0] < intervalBullet.pierceCap){
+                                        if(b.team != other.team){
+                                            FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2().set(other));
+                                            other.damagePierce(intervalBullet.damage * intervalBullet.buildingDamageMultiplier);
+                                            counter[0]++;
+                                        }
+                                        else if(other.health < other.maxHealth - 0.1f){
+                                            FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), Pal.heal, new Vec2().set(other));
+                                            other.heal(intervalBullet.damage * intervalBullet.buildingDamageMultiplier);
+                                            counter[0]++;
+                                        }
+                                        //intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
+                                    }
+                                });*/
+                        }
+                    }
+
+                    {
+                        shootSound = Sounds.shootMissile;
+                        splashDamage = 75.0f;
+                        splashDamageRadius = 36.0f;
+                        lifetime = 75.0f;
+                        width = 9f;
+                        height = 9f;
+                        pierce = true;
+                        trailColor = frontColor = Pal.heal;
+                        backColor = Pal.heal;
+                        trailLength = 8;
+                        trailWidth = 2.0f;
+                        bulletInterval = 6f;
+                        weaveScale = 5.0f;
+                        weaveMag = 1.0f;
+                        collidesTiles = true;
+                        collidesTeam = true;
+                        healPercent = 5.0f;
+                        intervalBullet = new BasicBulletType(){{
+                            damage = 11.0f;
+                            pierce = true;
+                            pierceCap = 12;
+                            buildingDamageMultiplier = 1.5f;
+                            healPercent = 1.0f;
+                        }};
+                        hitEffect = new MultiEffect(new WaveEffect(){{
+                            lifetime = 30.0f;
+                            colorFrom = healColor;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 36.0f;
+                            strokeFrom = 16.0f;
+                            strokeTo = 0.0f;
+                            sides = 6;
+                            interp = Interp.pow5Out;
+                        }}, new WaveEffect(){{
+                            lifetime = 40.0f;
+                            colorFrom = healColor;
+                            colorTo = Color.white;
+                            sizeFrom = 0.0f;
+                            sizeTo = 18.0f;
+                            strokeFrom = 12.0f;
+                            strokeTo = 0.0f;
+                            sides = 6;
+                            interp = Interp.pow5Out;
+                        }});
+                    }
+                };
+            }},
+            new PointDefenseWeapon("fire-pluto-weapon2"){{
+                reload = 3.0f;
+                x = 10.0f;
+                y = 3.0f;
+                targetInterval = 1.0f;
+                targetSwitchInterval = 1.0f;
+                color = Pal.heal;
+                beamEffect = FRFx.chainLightningThin;
+
+                bullet = new BulletType(1.0f, 65.0f){{
+                    maxRange = 225.0f;
+                    shootEffect = Fx.sparkShoot;
+                    hitEffect = Fx.pointHit;
+                    shootSound = Sounds.shootArc;
+                }};
+            }}
             );
         }};
 
