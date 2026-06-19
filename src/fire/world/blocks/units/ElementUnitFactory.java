@@ -23,7 +23,6 @@ import arc.util.io.Writes;
 import fire.FRUtils;
 import fire.content.FRMath;
 import fire.world.meta.FRStat;
-import mindustry.Vars;
 import mindustry.ai.UnitCommand;
 import mindustry.content.UnitTypes;
 import mindustry.ctype.UnlockableContent;
@@ -46,7 +45,6 @@ import mindustry.world.Block;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.payloads.Payload;
 import mindustry.world.blocks.payloads.UnitPayload;
-import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
@@ -57,7 +55,6 @@ import static mindustry.Vars.*;
 import static mindustry.content.Blocks.*;
 import static mindustry.content.Items.*;
 import static mindustry.content.Items.sand;
-import static mindustry.content.UnitTypes.*;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
 public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
@@ -66,13 +63,10 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected float base;
     protected float timeScl;
     protected final Seq<UnitType> plans = new Seq<>();
-    private boolean pioneered;
 
     public static final Block[] factories = {additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor};
     private static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
     private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
-
-
 
     private static void putAllValues(Object... values){
         var itemValues = ElementUnitFactory.itemValues;
@@ -91,9 +85,6 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         commandable = true;
         ambientSound = Sounds.loopUnitBuilding;
         buildType = ElementUnitFactoryBuild::new;
-
-        var plans = this.plans;
-        var factories = ElementUnitFactory.factories;
 
         config(Byte.class, (ElementUnitFactoryBuild build, Byte i) -> {
             if(build.currentPlan == i) return;
@@ -118,89 +109,59 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
             build.currentPlan = -1;
             build.command = null;
         });
-
-
-        /*
-        for(int i = 0, n = t != 0 ? Math.min(t - 1, 4) : factories.length; i < n; i++)
-            for(var upgrade : ((Reconstructor)factories[i]).upgrades)
-                for(int j = 0; j < 2; j++){
-                    if(i != 0 && j == 0) continue; //for T3 and above, j must be 1
-
-                    var unit = upgrade[j];
-                    if(unit == blade || unit == hatchet || unit == castle) continue;
-                    if(unit == pioneer && !pioneered){
-                        unit = omicron;
-                        pioneered = true;
-                    }
-                    plans.add(unit);
-                }
-
-        if(t >= 6){
-            plans.addAll(
-                apollo, pluto, mechanicalTide
-            );
-        }*/
     }
 
     @Override
     public void init(){
         super.init();
-        for(UnitType unitType : content.units()){
-            if(!unitType.hidden && FRMath.getValue(unitType).getMaxLv() <= tier + 0.99f && !(unitType instanceof ErekirUnitType))plans.add(unitType);
-        }
+        for(var unitType : content.units())
+            if(!unitType.hidden && FRMath.getValue(unitType).getMaxLv() <= tier + 0.99f && !(unitType instanceof ErekirUnitType))
+                plans.add(unitType);
 
         plans.sort(u -> u.id);
-        {
-            var unitValues = ElementUnitFactory.unitValues;
-            var rand = Mathf.rand;
 
-            putAllValues(
-                copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f,
-                lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f,
-                metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f,
-                graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f,
-                scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f,
-                coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f,
-                titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f,
-                thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f,
-                silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f,
-                plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f,
-                phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f,
-                surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f,
-                sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f,
-                sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f,
-                blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f,
-                pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f,
+        putAllValues(
+            copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f,
+            lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f,
+            metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f,
+            graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f,
+            scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f,
+            coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f,
+            titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f,
+            thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f,
+            silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f,
+            plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f,
+            phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f,
+            surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f,
+            sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f,
+            sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f,
+            blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f,
+            pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f,
 
-                glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f,
-                mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f,
-                sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f,
-                kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f,
-                conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f,
-                detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f,
-                flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f,
-                timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f,
-                flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.65f,  6.4f,
-                hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f,
-                magneticAlloy,    2.2f,  6.3f,  14.0f, 6.6f, 0.75f,  5.7f,
-                logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f
-            );
+            glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f,
+            mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f,
+            sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f,
+            kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f,
+            conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f,
+            detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f,
+            flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f,
+            timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f,
+            flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.65f,  6.4f,
+            hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f,
+            magneticAlloy,    2.2f,  6.3f,  14.0f, 6.6f, 0.75f,  5.7f,
+            logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f
+        );
 
-            for(var unit : this.plans){
-                unitValues.put(unit, FRMath.getValue(unit));
-            }
+        for(var unit : plans)
+            unitValues.put(unit, FRMath.getValue(unit));
 
-            //omicron is removed from T3 recipe so put it here
-            unitValues.put(omicron, new UnitValue(2.5f, 3.9f, 3.2f));
-        }
+        //omicron is removed from T3 recipe so put it here
+        unitValues.put(omicron, new UnitValue(2.5f, 3.9f, 3.2f));
     }
 
     @Override
     public void setStats(){
         super.setStats();
-        var itemValues = ElementUnitFactory.itemValues;
-        var unitValues = ElementUnitFactory.unitValues;
-        var plans = this.plans;
         stats.add(FRStat.elementLevel, tier);
 
         stats.add(Stat.input, table -> {

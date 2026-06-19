@@ -815,16 +815,15 @@ public class FRUnitTypes{
                         shotDelay = 2.0f;
                     }};
                     bullet = new BasicBulletType(){
-                        public float getTrangle(float time){
+                        float getTrangle(float time){
                             float countTime = 0.1f * (time > 20.0f ? time : time - 40.0f);
-                            return Mathf.pow(countTime, 2);
+                            return countTime * countTime;
                         }
 
                         @Override
                         public void init(Bullet b){
                             super.init(b);
-                            b.vel.x = -b.vel.x;
-                            b.vel.y = -b.vel.y;
+                            b.vel.inv();
                         }
 
                         @Override
@@ -840,7 +839,7 @@ public class FRUnitTypes{
                                 Draw.color(Pal.heal);
                                 Draw.alpha(1.0f);
                                 Draw.blend(Blending.additive);
-                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 63.0f, 21.0f, Angles.angle(b.x,b.y,b.aimX,b.aimY));
+                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 63.0f, 21.0f, Angles.angle(b.x, b.y, b.aimX, b.aimY));
                                 Draw.blend();
                             }
                             Draw.reset();

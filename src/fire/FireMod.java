@@ -56,7 +56,7 @@ public class FireMod extends Mod{
     private static BaseDialog mainDialog, mulmodDialog;
     private static final Field field_container;
     private static final Seq<Block> cheatBlocks = new Seq<>();
-    public static boolean multipleMods = false;
+    public static boolean multipleMods;
 
     static{
         try{
@@ -115,6 +115,8 @@ public class FireMod extends Mod{
                     item = keys.next();
                 assert item != null;
                 AdaptiveSource.turretItemMap.put(block.id, item.id);
+            }else if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
+                cheatBlocks.add(block);
             }
         }
 
@@ -123,44 +125,15 @@ public class FireMod extends Mod{
         loadDatabase();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
-            loadCheatBlocks();
             showUpdate();
             showNoMultipleMods();
         });
-
-        Events.on(EventType.TapEvent.class, e -> {
-            if(isCheating()){
-                showCheatingLog();
-            }
-        });
-
-        Events.on(EventType.BlockBuildBeginEvent.class, e -> {
-            if(isCheating()){
-                showCheatingLog();
-            }
-        });
     }
 
-    private static void loadCheatBlocks(){
-        for(var block : content.blocks())
-            if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource)
-                cheatBlocks.add(block);
-    }
-
-    private static boolean isCheating(){
+    static boolean isCheating(){
         if(!state.isCampaign()) return false;
         if(DEBUG.isDeveloper()) return false;
         if(multipleMods) return true;
-
-        if(state != null && state.rules != null && (
-            state.rules.infiniteResources ||
-            state.rules.instantBuild ||
-            state.rules.allowEditRules ||
-            state.rules.allowEditWorldProcessors ||
-            state.rules.buildCostMultiplier < 0.01f)
-        ){
-            return true;
-        }
 
         for(var block : cheatBlocks){
             for(int i = 0, n = Team.all.length; i < n; i++){
@@ -170,15 +143,6 @@ public class FireMod extends Mod{
             }
         }
         return false;
-    }
-
-    private static void showCheatingLog(){
-        new BaseDialog("Warning"){
-            {
-                cont.add("@fire.nocheating");
-                show();
-            }
-        };
     }
 
     private static void loadSetting(){
@@ -242,12 +206,12 @@ public class FireMod extends Mod{
     }
 
     private static void showUpdate(){
-        String old = Core.settings.getString("mod-fire-version"), cur = FIRE.meta.version;
-        if(cur.equals(old)) return;
+        String old = Core.settings.getString("mod-fire-version"), now = FIRE.meta.version;
+        if(now.equals(old)) return;
 
-        Core.settings.put("mod-fire-version", cur);
+        Core.settings.put("mod-fire-version", now);
         Core.settings.put("nomultimods", noMultiMods = true);
-        if(old != null && cur.substring(0, 3).equals(old.substring(0, 3))) return;
+        if(old != null && now.substring(0, 3).equals(old.substring(0, 3))) return;
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
 
@@ -259,7 +223,7 @@ public class FireMod extends Mod{
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content1", "v" + cur.substring(0, 3))).center();
+            t.add(Core.bundle.format("fire.content1", "v" + now.substring(0, 3))).center();
         });
     }
 
@@ -319,42 +283,42 @@ public class FireMod extends Mod{
             Core.app.exit();
         });
 
-        if(noMultiMods){
-            var dialog = mulmodDialog = new BaseDialog("What happened");
-            setupDialog(dialog);
-            dialog.cont.pane(t -> t.add("@fire.nomultimods").center());
+        if(!noMultiMods) return;
 
-            if(mobile){
-                int m = 1, n = 3;
-                if(mods.locateMod("mindustryx") != null){
-                    m += 1; n += 2;
-                }
-                ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
+        var dialog = mulmodDialog = new BaseDialog("What happened");
+        setupDialog(dialog);
+        dialog.cont.pane(t -> t.add("@fire.nomultimods").center());
 
-                ui.menuGroup.fill(c ->
-                    c.pane(Styles.noBarPane, cont -> {
-                        try{
-                            field_container.set(ui.menufrag, cont);
-                        }catch(IllegalAccessException e){
-                            throw new RuntimeException(e);
-                        }
-                        cont.name = "menu container";
-
-                        buildMobile();
-                        Events.on(EventType.ResizeEvent.class, event -> buildMobile());
-
-                    }).with(pane -> pane.setOverscroll(false, false)).grow()
-                );
-
-            }else{
-                Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
-                for(var b : buttons)
-                    if(b != null && ("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text)))
-                        tmp.add(b);
-
-                buttons.removeAll(tmp);
-                buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, dialog::show));
+        if(mobile){
+            int m = 1, n = 3;
+            if(mods.locateMod("mindustryx") != null){
+                m += 1; n += 2;
             }
+            ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
+
+            ui.menuGroup.fill(c ->
+                c.pane(Styles.noBarPane, cont -> {
+                    try{
+                        field_container.set(ui.menufrag, cont);
+                    }catch(IllegalAccessException e){
+                        throw new RuntimeException(e);
+                    }
+                    cont.name = "menu container";
+
+                    buildMobile();
+                    Events.on(EventType.ResizeEvent.class, event -> buildMobile());
+
+                }).with(pane -> pane.setOverscroll(false, false)).grow()
+            );
+
+        }else{
+            Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
+            for(var b : buttons)
+                if(b != null && ("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text)))
+                    tmp.add(b);
+
+            buttons.removeAll(tmp);
+            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, dialog::show));
         }
     }
 

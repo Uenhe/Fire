@@ -10,9 +10,11 @@ import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
+import mindustry.ui.dialogs.BaseDialog;
 
 import java.awt.*;
 
+import static fire.FireMod.*;
 import static mindustry.Vars.headless;
 
 public final class FRVars{
@@ -41,30 +43,37 @@ public final class FRVars{
         }
         toolkit = tk;
 
-        var units = spawnedUnits;
         Events.run(EventType.Trigger.update, () -> {
             if(Core.graphics.getFrameId() % 60 == 0){
                 getSettings();
                 Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable =
                     Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+
+                if(isCheating())
+                    new BaseDialog("Warning"){{
+                        cont.add("@fire.nocheating");
+                        show();
+                    }};
             }
 
-            for(var u : units){
+            for(var u : spawnedUnits){
                 if(u.hasEffect(StatusEffects.invincible))
                     u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
                 else
-                    units.remove(u);
+                    spawnedUnits.remove(u);
             }
         });
 
-        if(!headless) Events.run(EventType.Trigger.draw, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0)
-                equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
-        });
+        if(!headless)
+            Events.run(EventType.Trigger.draw, () -> {
+                if(Core.graphics.getFrameId() % 60 == 0)
+                    equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
+            });
 
         Events.on(EventType.UnitSpawnEvent.class, e -> {
-            if(e.unit.type.flying && e.unit.type != FRUnitTypes.pioneer) units.add(e.unit);
+            if(e.unit.type.flying && e.unit.type != FRUnitTypes.pioneer)
+                spawnedUnits.add(e.unit);
         });
     }
 

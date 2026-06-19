@@ -37,7 +37,7 @@ There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me
 - Adds new unit line: Ground Flesh, basically similar to the vanilla but mutated and strengthened
 - 3 new boss units
 - Javelin Ship from Mindustry v5
-- Totally 19 new units
+- Totally 20 new units
 
 #### Others:
 
