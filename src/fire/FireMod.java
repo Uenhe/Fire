@@ -89,7 +89,7 @@ public class FireMod extends Mod{
         FRPlanets.loadTree();
         FRWeathers.load();
 
-        FROverride.loadDebug();
+        //FROverride.loadDebug();
     }
 
     @Override
@@ -173,7 +173,7 @@ public class FireMod extends Mod{
     }
 
     private static void showCheatingLog(){
-        new BaseDialog("o.o?!!!"){
+        new BaseDialog("Warning"){
             {
                 cont.add("@fire.nocheating");
                 show();
@@ -215,6 +215,8 @@ public class FireMod extends Mod{
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
+                "[#F4BA6E]v1.5.1:",
+                FRBlocks.fractalUnitFactory, FRUnitTypes.pluto,
                 "[#F4BA6E]v1.5.0:",
                 FRSectorPresets.desertWastes, FRSectorPresets.frozenWall,
                 FRBlocks.obstruction, FRBlocks.cumulonimbus, FRBlocks.magneticRail,

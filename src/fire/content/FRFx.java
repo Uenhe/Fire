@@ -231,6 +231,24 @@ public class FRFx{
         });
     }
 
+    public static void scanLineWithTrail(float x, float y, float length, float startRot, float endRot, Color Col){
+            float sides = Lines.circleVertices(length);
+            float sides2 = sides * Math.abs(startRot - endRot) / 360.0F;
+            sides = Mathf.ceil(sides / 2.0F) * 2;
+            sides2 = Mathf.ceil(sides2 / 2.0F) * 2;
+            float space = 360.0F / sides;
+            if(startRot >= endRot)space = 0 - space;
+            float L = length * 2 * 3.1415926f;
+
+            for(int i = 0; i < sides2; i += 1) {
+                float px = Angles.trnsx(space * (float)i + startRot, length);
+                float py = Angles.trnsy(space * (float)i + startRot, length);
+                Draw.color(Col.r,Col.g,Col.b,(float)i / sides2);
+                Draw.z(Layer.effect * 0.8f);
+                Drawf.tri(x + px, y + py, L / sides, length, space * (float)i + startRot + 180.0f);
+            }
+    }
+
     public static Effect lineTrailEffect(float lifetime, float length, float width, float rotation, Color color, int lines){
         return new Effect(lifetime, e -> {
             float rot = rotation + e.rotation;
@@ -281,22 +299,34 @@ public class FRFx{
         });
     }
 
-    public static Effect swordMarkEffect(float lifetime, float x1, float y1, float x2, float y2, float width, float moveTime, Color color){
+    public static Effect swordMarkEffect(float lifetime, float x1, float y1, float x2, float y2, float width, float moveTime, Color color, boolean hasHeart){
         return new Effect(lifetime, e->{
             float progress = Math.min(e.time / moveTime, 1.0f);
             float totalX = x2 - x1, totalY = y2 - y1;
             float realX = x1 + totalX * progress, realY = y1 + totalY * progress;
+            float midX = (realX + x1) / 2, midY = (realY + y1) / 2;
             float len = Mathf.sqrt(totalX * progress * totalX * progress + totalY * progress * totalY * progress);
             float angle = Angles.angle(x1,y1,x2,y2);
             Draw.color(color);
             Lines.stroke(width);
             Draw.alpha(1.0f - e.fin(Interp.pow5In));
+
+            Drawf.tri(midX, midY, width, len * 0.7f, angle + 180.0f);
+            Drawf.tri(midX, midY, width, len * 0.7f, angle);
+            if(hasHeart){
+                Draw.color(Color.black);
+                Draw.z(Layer.effect + 0.8f);
+                Drawf.tri(midX, midY, width * 0.7f * e.fout(Interp.pow5Out), len * 0.66f, angle + 180.0f);
+                Drawf.tri(midX, midY, width * 0.7f * e.fout(Interp.pow5Out), len * 0.66f, angle);
+            }
+            /*
             Drawf.tri(x1, y1, width, len * 0.1f, angle + 180.0f);
             Drawf.tri(realX, realY, width, len * 0.1f, angle);
             Lines.line(x1, y1, realX, realY);
-            Drawf.light(x1, y1, realX, realY);
+            Drawf.light(x1, y1, realX, realY);*/
         });
     }
+
 
     /** @see Fx#hitBulletSmall */
     public static Effect hitBulletSmall(Color color){

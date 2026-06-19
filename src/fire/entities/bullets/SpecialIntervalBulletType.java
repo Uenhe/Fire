@@ -25,8 +25,7 @@ public class SpecialIntervalBulletType extends BasicBulletType {
         this.updateBulletInterval(b);
         if(b.time <= 30f){
             this.updateWeaving(b);
-        }
-        else{
+        }else{
             b.vel.setAngle(Angles.moveToward(b.rotation(), b.angleTo((Position) b.owner), homingPower * Time.delta * 50.0f));
             if(b.within((Position) b.owner, splashDamageRadius)) b.remove();
         }

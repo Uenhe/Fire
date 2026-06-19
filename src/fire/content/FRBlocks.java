@@ -122,7 +122,7 @@ public class FRBlocks{
     public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(6); //composite one -> its inferior
     public static final Block
     //environment
-    neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, hardenedCovering, oreGraphite, orePyratite,
+    neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite,
 
     //sandbox & misc
     adaptiveSource, fireCompany,
@@ -157,7 +157,7 @@ public class FRBlocks{
     hardenedAlloyCrucible,
 
     //units
-    fleshReconstructor, vectorialUnitFactory, unitHealer, payloadConveyorLarge, payloadRouterLarge,
+    fleshReconstructor, vectorialUnitFactory, fractalUnitFactory, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
     buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, primaryInterplanetaryAccelerator;
@@ -185,6 +185,10 @@ public class FRBlocks{
 
         granite = new Floor("granite", 3);
 
+        meltedSand = new Floor("melted-sand", 3);
+        meltedSand.itemDrop = glass;
+        meltedSand.attributes.set(Attribute.water, -0.8f);
+
         graniteWall = new StaticWall("granite-wall");
         graniteWall.variants = 3;
         granite.asFloor().wall = graniteWall;
@@ -194,6 +198,9 @@ public class FRBlocks{
 
         oreGraphite = new OreBlock(graphite);
         graphite.hardness = 2;
+
+        oreSilicon = new OreBlock(silicon);
+        silicon.hardness = 2;
 
         orePyratite = new OreBlock(pyratite);
         pyratite.hardness = 2;
@@ -4927,6 +4934,25 @@ public class FRBlocks{
             timeScl = 90.0f;
             consumePower(n(5400));
             consumeLiquid(Liquids.cryofluid, n(60));
+        }};
+
+        fractalUnitFactory = new ElementUnitFactory("fractal-unit-factory", 6){{
+            requirements(Category.units, with(
+                plastanium, 1300,
+                phaseFabric, 1300,
+                logicAlloy, 2500,
+                hardenedAlloy, 5500,
+                magneticAlloy, 2300
+            ));
+            health = 9500;
+            armor = 42.0f;
+            size = 11;
+            liquidCapacity = 9178.0f;
+
+            base = 3.0f;
+            timeScl = 90.0f;
+            consumePower(1850);
+            consumeLiquid(FRLiquids.liquidNitrogen, n(150));
         }};
 
         unitHealer = new RepairTower("unit-healer"){{

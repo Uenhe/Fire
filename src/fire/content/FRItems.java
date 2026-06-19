@@ -14,7 +14,8 @@ public class FRItems{
         timber, flesh, hardenedAlloy, magneticAlloy;
 
     static{
-        glass = new FRItem("bl", Color.white);
+        glass = new FRItem("bl", Color.white)
+            .hardness(2);
 
         mirrorglass = new FRItem("jmbl", Color.white);
 
@@ -68,6 +69,11 @@ public class FRItems{
         public FRItem(String name, String hex){
             super(name, find(hex));
             Items.serpuloItems.add(this);
+        }
+
+        private FRItem hardness(int v){
+            hardness = v;
+            return this;
         }
 
         private FRItem explosiveness(float v){

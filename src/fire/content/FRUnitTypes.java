@@ -53,6 +53,7 @@ import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
 import static fire.FRVars.find;
 import static fire.FRVars.lancer_a04;
+import static mindustry.Vars.indexer;
 import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
@@ -511,8 +512,8 @@ public class FRUnitTypes{
         pluto = new UnitType("pluto"){{
             constructor = LegsUnit::create;
             hovering = true;
-            health = 63400;
-            armor = 26;
+            health = 65400;
+            armor = 23;
             hitSize = 36f;
             speed = 0.32f;
             drag = 0.1f;
@@ -562,6 +563,15 @@ public class FRUnitTypes{
                 @Override
                 public void update(Unit u){
                     super.update(u);
+
+                    if(u.health <= u.maxHealth * 0.5f){
+                        data = -100.0f;
+                        u.unapply(StatusEffects.sapped);
+                        u.unapply(StatusEffects.slow);
+                        u.heal(Time.delta * regen * 2.0f);
+                        return;
+                    }
+
                     if(u.health >= u.maxHealth - 1.0f){
                         data = Math.min(max, data + Time.delta * regen * 9);
                     }
@@ -582,13 +592,58 @@ public class FRUnitTypes{
 
                 {
                     radius = 55.0f;
-                    regen = 2.0f;
-                    max = 6000.0f;
+                    regen = 1.2f;
+                    max = 4000.0f;
                     width = 15.0f;
                     angle = 135.0f;
+                    whenShooting = false;
                 }
             });
             weapons.addAll(new Weapon("FUCK ALL!"){
+                final BulletType EXSwordBulletARC = new LightningBulletType(){{
+                    damage = 32.0f;
+                    lightningColor = Pal.missileYellowBack;
+                    lightningLength = 18;
+                    status = StatusEffects.melting;
+                    statusDuration = 600.0f;
+                }};
+                final BulletType EXSwordBullet = new BasicBulletType(){
+                    @Override
+                    public void init(Bullet b){
+                        super.init(b);
+                        b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
+                        if(((Unit)b.owner).health >= ((Unit)b.owner).maxHealth * 0.5f)FRFx.swordMarkEffect(20.0f, b.x, b.y, b.aimX, b.aimY, 8.0f, 8.0f, Pal.heal, true).at(b.x, b.y);
+                        else FRFx.swordMarkEffect(20.0f, b.x, b.y, b.aimX, b.aimY, 8.0f, 8.0f, Pal.meltdownHit, true).at(b.x, b.y);
+                        Sounds.shootLancer.at(b.x, b.y);
+                    }
+                    @Override
+                    public void handlePierce(Bullet b, float initialHealth, float x, float y){
+                        if(!b.hit()) ((Unit)b.owner).heal(190.0f);
+                        ((Unit)b.owner).heal(10.0f);
+                        if(((Unit)b.owner).health < ((Unit)b.owner).maxHealth * 0.5f){
+                            if(!b.hit()) ((Unit)b.owner).heal(100.0f);
+                            Sounds.shootArc.at(b.x, b.y);
+                            EXSwordBulletARC.create(b, b, b.team, b.x, b.y, b.rotation(), -1, 1f, 1f, null, null, b.aimX, b.aimY);
+                        }
+                        super.handlePierce( b, initialHealth, x, y);
+                    }
+                    {
+                        width = height = 0;
+                        hitSize = 12.0f;
+                        damage = 135.0f;
+                        speed = 15.0f;
+                        lifetime = 16.0f;
+                        knockback = 22.0f;
+                        trailColor = frontColor = backColor = Pal.heal;
+                        absorbable = hittable = reflectable = false;
+                        healPercent = 15.0f;
+                        shootEffect = Fx.none;
+                        pierce = true;
+                        pierceBuilding = true;
+                        pierceArmor = true;
+                    }
+                };
+                /*
                 final BulletType mainBullet = new BasicBulletType(){
                     @Override
                     public void update(Bullet b){
@@ -705,7 +760,7 @@ public class FRUnitTypes{
                             }
                         };
                     }
-                };
+                };*/
 
                 @Override
                 protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
@@ -733,13 +788,19 @@ public class FRUnitTypes{
                         rotation = 30.0f;
                         interp = Interp.pow5Out;
                     }}).at(shootX, shootY);
+
+                    if(unit.health >= unit.maxHealth - 100.0f){
+                        unit.health -= 4500.0f;
+                        unit.apply(StatusEffects.shielded, 900.0f);
+                    }
+                    /*
                     if(!unit.hasEffect(StatusEffects.overdrive) || unit.health <= unit.maxHealth * 0.5f){
                         mainBullet.create(unit, unit.aimX, unit.aimY, 0f);
                     }else if(unit.health == unit.maxHealth){
                         unit.health -= 4500.0f;
                         unit.apply(StatusEffects.shielded, 960.0f);
                         mainBullet.create(unit, unit.aimX, unit.aimY, 0f);
-                    }
+                    }*/
                 }
 
                 {
@@ -753,7 +814,6 @@ public class FRUnitTypes{
                         spread = 8.0f;
                         shotDelay = 2.0f;
                     }};
-
                     bullet = new BasicBulletType(){
                         public float getTrangle(float time){
                             float countTime = 0.1f * (time > 20.0f ? time : time - 40.0f);
@@ -769,21 +829,30 @@ public class FRUnitTypes{
 
                         @Override
                         public void draw(Bullet b){
-                            super.draw(b);
+                            //super.draw(b);
                             if(b.time <= 40.0f){
                                 Draw.color(Pal.heal);
                                 Draw.alpha(0.3f + b.time * 0.7f / 40.0f);
                                 Draw.blend(Blending.additive);
-                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 1.0f + b.time * 0.5f, 3.0f + b.time * 1.5f, Mathf.atan2(b.aimX - b.x, b.aimY - b.y) * 57.295776F + getTrangle(b.time) / 8.0f * 360.0f + 270.0f);
+                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 3.0f + b.time * 1.5f, 1.0f + b.time * 0.5f, Mathf.atan2(b.aimX - b.x, b.aimY - b.y) * 57.295776F + getTrangle(b.time) / 8.0f * 360.0f);
                                 Draw.blend();
-                            }else{
+                            }else if(b.time <= 140.0f){
                                 Draw.color(Pal.heal);
                                 Draw.alpha(1.0f);
                                 Draw.blend(Blending.additive);
-                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 21.0f, 63.0f, b.rotation() - 90.0f);
+                                Draw.rect(((BasicBulletType)b.type).sprite, b.x, b.y, 63.0f, 21.0f, Angles.angle(b.x,b.y,b.aimX,b.aimY));
                                 Draw.blend();
                             }
                             Draw.reset();
+                        }
+
+                        public float getXY(Bullet b, boolean isX){
+                            Mathf.rand.setSeed(b.id);
+                            final float r = 120.0f;
+                            float spawnRotate = Mathf.random(360.0f);
+
+                            if(isX) return b.aimX + r * Mathf.cos(-spawnRotate);
+                            else    return b.aimY + r * Mathf.sin(-spawnRotate);
                         }
 
                         @Override
@@ -792,8 +861,8 @@ public class FRUnitTypes{
                             final float spawnRotate = Mathf.random(360.0f);
                             final float spawnX = 120.0f * Mathf.cos(0.0f - spawnRotate);
                             final float spawnY = 120.0f * Mathf.sin(0.0f - spawnRotate);
-                            final float aimX = b.aimX + Mathf.random(-8.0f, 8.0f), aimY = b.aimY + Mathf.random(-8.0f, 8.0f);
-                            b.type.fragBullet.create(b, b, b.team, aimX + spawnX, aimY + spawnY, spawnRotate, -1, 1f, 1f, null, null, aimX - spawnX, aimY - spawnY);
+                            if(!((Unit)b.owner).hasEffect(StatusEffects.shielded) && ((Unit)b.owner).health > ((Unit)b.owner).maxHealth * 0.5f)b.type.fragBullet.create(b.owner, b, b.team, b.x, b.y, spawnRotate, -1, 1f, 1f, null, null, b.x - spawnX * 2, b.y - spawnY * 2);
+                            else EXSwordBullet.create(b.owner, b, b.team, b.x, b.y, spawnRotate, -1, 1f, 1f, null, null, b.x - spawnX * 2, b.y - spawnY * 2);
                             super.removed(b);
                         }
 
@@ -803,11 +872,26 @@ public class FRUnitTypes{
                             if(b.time <= 80.0f){
                                 b.aimX = ((Unit)b.owner).aimX;
                                 b.aimY = ((Unit)b.owner).aimY;
-                                final float ps = Mathf.sqrt((b.aimX - b.x) * (b.aimX - b.x) + (b.aimY - b.y) * (b.aimY - b.y)) / 480.0f;
+                                final float sx = ((Unit)b.owner).x;
+                                final float sy = ((Unit)b.owner).y;
+                                final float ps = Mathf.sqrt((b.aimX - sx) * (b.aimX - sx) + (b.aimY - sy) * (b.aimY - sy)) / 480.0f;
                                 if(ps > 1f){
-                                    b.aimX = b.x + (b.aimX - b.x) / ps;
-                                    b.aimY = b.y + (b.aimY - b.y) / ps;
+                                    b.aimX = sx + (b.aimX - sx) / ps;
+                                    b.aimY = sy + (b.aimY - sy) / ps;
                                 }
+                                b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
+                                return;
+                            }
+                            float aimX = getXY(b, true), aimY = getXY(b, false);
+                            if(b.time <= 110.0f){
+                                b.vel.x = (aimX - b.x) * (0.15f + (b.time - 80.0f) * 0.005f);
+                                b.vel.y = (aimY - b.y) * (0.15f + (b.time - 80.0f) * 0.005f);
+                                b.vel.setAngle(Angles.angle(b.x, b.y, aimX, aimY));
+                                return;
+                            }
+                            if(b.time <= 140.0f){
+                                b.x = aimX;
+                                b.y = aimY;
                                 b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
                                 return;
                             }
@@ -830,14 +914,15 @@ public class FRUnitTypes{
                             speed = 15.0f;
                             lifetime = 900.0f;
                             drag = 0.08f;
+
                             trailColor = frontColor = backColor = Pal.heal;
                             trailLength = 6;
                             trailWidth = 3.0f;
-                            absorbable = collides = false;
+                            hittable = absorbable = collides = false;
                             healPercent = 15.0f;
                             shootEffect = Fx.none;
                             hitSound = Sounds.none;
-                            hitEffect = Fx.none;
+                            hitEffect = despawnEffect = Fx.none;
                             fragBullets = 0;
                             fragRandomSpread = 0;
                             fragBullet = new BasicBulletType(){
@@ -845,20 +930,27 @@ public class FRUnitTypes{
                                 public void init(Bullet b){
                                     super.init(b);
                                     b.vel.setAngle(Angles.angle(b.x, b.y, b.aimX, b.aimY));
-                                    FRFx.swordMarkEffect(20.0f, b.x, b.y, b.aimX, b.aimY, 8.0f, 8.0f, Pal.heal).at(b.x, b.y);
+                                    FRFx.swordMarkEffect(20.0f, b.x, b.y, b.aimX, b.aimY, 8.0f, 8.0f, Pal.heal, false).at(b.x, b.y);
                                     Sounds.shootLancer.at(b.x, b.y);
+                                }
+                                @Override
+                                public void handlePierce(Bullet b, float initialHealth, float x, float y){
+                                    if(!b.hit())((Unit)b.owner).heal(55.0f);
+                                    ((Unit)b.owner).heal(5.0f);
+                                    super.handlePierce( b, initialHealth, x, y);
                                 }
 
                                 {
                                     width = height = 0;
                                     hitSize = 12.0f;
-                                    damage = 120.0f;
+                                    damage = 70.0f;
                                     speed = 15.0f;
                                     lifetime = 16.0f;
                                     trailColor = frontColor = backColor = Pal.heal;
                                     absorbable = hittable = reflectable = false;
                                     healPercent = 15.0f;
                                     shootEffect = Fx.none;
+                                    hitEffect = despawnEffect = Fx.none;
                                     pierce = true;
                                     pierceBuilding = true;
                                 }
@@ -867,7 +959,12 @@ public class FRUnitTypes{
                     };
                 }
             },
-            new Weapon("fire-pluto-weapon1"){{
+            new Weapon("fire-pluto-weapon1"){
+                @Override
+                protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
+                    if(unit.health >= unit.maxHealth * 0.5f)super.shoot(unit, mount, shootX, shootY, rotation);
+                }
+                {
                 shootCone = 180.0f;
                 reload = 15f;
                 x = 21.0f;
@@ -883,31 +980,14 @@ public class FRUnitTypes{
                                 if(b.team != other.team && counter < intervalBullet.pierceCap){
                                     counter++;
                                     FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2().set(other));
-                                    other.damagePierce(intervalBullet.damage);
+                                    other.damage(intervalBullet.damage);
                                     //intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
                                     other.apply(StatusEffects.electrified, 120.0f);
                                     other.apply(StatusEffects.shocked);
                                 }
                             });
-                                /*
-                                Groups.build.intersect(b.x - 150f, b.y - 150f, 300.0f, 300.0f, other -> {
-                                    if(counter[0] < intervalBullet.pierceCap){
-                                        if(b.team != other.team){
-                                            FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2().set(other));
-                                            other.damagePierce(intervalBullet.damage * intervalBullet.buildingDamageMultiplier);
-                                            counter[0]++;
-                                        }
-                                        else if(other.health < other.maxHealth - 0.1f){
-                                            FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), Pal.heal, new Vec2().set(other));
-                                            other.heal(intervalBullet.damage * intervalBullet.buildingDamageMultiplier);
-                                            counter[0]++;
-                                        }
-                                        //intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
-                                    }
-                                });*/
                         }
                     }
-
                     {
                         shootSound = Sounds.shootMissile;
                         splashDamage = 75.0f;
@@ -927,12 +1007,13 @@ public class FRUnitTypes{
                         collidesTeam = true;
                         healPercent = 5.0f;
                         intervalBullet = new BasicBulletType(){{
-                            damage = 11.0f;
+                            damage = 12.0f;
                             pierce = true;
-                            pierceCap = 12;
+                            pierceCap = 16;
                             buildingDamageMultiplier = 1.5f;
                             healPercent = 1.0f;
                         }};
+                        despawnEffect = Fx.none;
                         hitEffect = new MultiEffect(new WaveEffect(){{
                             lifetime = 30.0f;
                             colorFrom = healColor;
@@ -957,6 +1038,147 @@ public class FRUnitTypes{
                     }
                 };
             }},
+            new Weapon("pluto-sword"){
+//                public static void light2(float x, float y, int sides, float radius, float rotation, Color center, Color edge) {
+//                    float centerf = center.toFloatBits();
+//                    float edgef = edge.toFloatBits();
+//                    sides = Mathf.ceil((float)sides / 2.0F) * 2;
+//                    float space = 240.0F / (float)sides;
+//
+//                    for(int i = 0; i < sides; i += 2) {
+//                        float px = Angles.trnsx(space * (float)i + rotation, radius);
+//                        float py = Angles.trnsy(space * (float)i + rotation, radius);
+//                        float px2 = Angles.trnsx(space * (float)(i + 1) + rotation, radius);
+//                        float py2 = Angles.trnsy(space * (float)(i + 1) + rotation, radius);
+//                        float px3 = Angles.trnsx(space * (float)(i + 2) + rotation, radius);
+//                        float py3 = Angles.trnsy(space * (float)(i + 2) + rotation, radius);
+//                        Fill.quad(x, y, centerf, x + px, y + py, edgef, x + px2, y + py2, edgef, x + px3, y + py3, edgef);
+//                    }
+//                }
+
+                boolean shouldAttack(float x1,float y1,float x2, float y2,float rot, float rotX){
+                    if(!Angles.within(Math.abs(x1-x2),Math.abs(x1-x2),300.0f))return false;
+                    return Angles.angleDist(Angles.angle(x1,y1,x2,y2),rot) <= rotX;
+                }
+
+                @Override
+                protected void shoot(Unit unit, WeaponMount mount, float shootX, float shootY, float rotation){
+                    if(unit.health <= unit.maxHealth * 0.5f){
+                        super.shoot(unit, mount, shootX, shootY, rotation);
+                        Time.run(43.0f, () -> {
+                            Effect.shake(2, 20.0f, shootX,shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
+                            Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
+                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
+                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y + 48.0f, other.x - 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y + 48.0f, other.x + 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    other.damagePierce(3000.0f);
+                                    other.apply(FRStatusEffects.disintegrated, 180.0f);
+                                }
+                            });
+                            indexer.allBuildings(shootX, shootY, 300.0f, b -> {
+                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
+                                    float rang = 18.0f + b.block.size * 8.0f;
+                                    if(rang >= 28.0f){
+                                        float tri = (b.block.size % 2) * 45.0f + 45.0f;
+                                        FRFx.swordMarkEffect(40.0f, b.x + rang * Mathf.cosDeg(tri), b.y + rang * Mathf.sinDeg(tri), b.x - rang * Mathf.cosDeg(tri), b.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(b.x, b.y);
+                                        tri += 90.0f;
+                                        FRFx.swordMarkEffect(40.0f, b.x + rang * Mathf.cosDeg(tri), b.y + rang * Mathf.sinDeg(tri), b.x - rang * Mathf.cosDeg(tri), b.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(b.x, b.y);
+                                    }
+                                    b.damagePierce(500.0f * b.block.size);
+                                }
+                            });
+                        });
+                        Time.run(94.0f, () -> {
+                            Effect.shake(2,20.0f, shootX,shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
+                            Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
+                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
+                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y - 48.0f, other.x - 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y - 48.0f, other.x + 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    other.damagePierce(3000.0f);
+                                    other.apply(FRStatusEffects.disintegrated, 180.0f);
+                                }
+                            });
+                            indexer.allBuildings(shootX, shootY, 300.0f, b -> {
+                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
+                                    float rang = 18.0f + b.block.size * 8.0f;
+                                    if(rang >= 28.0f){
+                                        float tri = (b.block.size % 2) * 45.0f + 45.0f;
+                                        FRFx.swordMarkEffect(40.0f, b.x + rang * Mathf.cosDeg(tri), b.y + rang * Mathf.sinDeg(tri), b.x - rang * Mathf.cosDeg(tri), b.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(b.x, b.y);
+                                        tri += 90.0f;
+                                        FRFx.swordMarkEffect(40.0f, b.x + rang * Mathf.cosDeg(tri), b.y + rang * Mathf.sinDeg(tri), b.x - rang * Mathf.cosDeg(tri), b.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(b.x, b.y);
+                                    }
+                                    b.damagePierce(500.0f * b.block.size);
+                                }
+                            });
+                        });
+                    }
+                }
+                {
+                    shootCone = 180.0f;
+                    reload = 420.0f;
+                    mirror = false;
+                    bullet = new ContinuousLaserBulletType(){
+                        final float firstTime = 30.0f, lastTime = 30.0f;
+
+                        @Override
+                        public void draw(Bullet b){
+                            final float progress = b.time <= firstTime ? b.time / firstTime : b.time >= b.type.lifetime - lastTime ? (b.type.lifetime - b.time) / lastTime : 1.0f;
+                            Draw.color(Pal.meltdownHit);
+                            Draw.alpha(progress * 0.6f);
+                            Draw.z(Layer.effect);
+                            Drawf.tri(b.x, b.y, width * 1.2f * (0.7f + 0.3f * progress), frontLength * 1.2f * progress, b.rotation());
+                            Draw.color(Pal.surge);
+                            Draw.alpha(progress);
+                            Drawf.tri(b.x, b.y, width * (0.7f + 0.3f * progress), frontLength * progress, b.rotation());
+                            Draw.color(Color.black);
+                            Drawf.tri(b.x, b.y, width * 1.2f * (0.7f + 0.3f * progress), frontLength * progress * 0.05f, b.rotation());
+                            Drawf.tri(b.x, b.y, width * 0.5f * (0.7f + 0.3f * progress), frontLength * progress * 0.45f, b.rotation());
+                            float rotChange;
+                            float tme = b.time - 10.0f;
+                            if(tme <= firstTime || tme >= 110.0f){
+                                rotChange = -120.0f;
+                            }else if(tme >= 45.0f && tme <= 95.0f){
+                                rotChange = 120.0f;
+                            }else if(tme >= firstTime && tme <= 45.0f){
+                                rotChange = 120.0f - Mathf.pow(15.0f - (tme - firstTime), 2f) / 0.9375f;
+                            }else{
+                                rotChange = Mathf.pow(15.0f - (tme - 95.0f), 2f) / 0.9375f - 120.0f;
+                            }
+                            if(Math.abs(((Unit)b.owner).rotation + rotChange - b.rotation()) >= 2.0f)
+                                FRFx.scanLineWithTrail(b.x, b.y, 300.0f, ((Unit)b.owner).rotation + rotChange, b.rotation(), Pal.surge);
+                        }
+
+                        @Override
+                        public void update(Bullet b){
+                            super.update(b);
+                            float rotChange = 0;
+                            if(b.time <= firstTime || b.time >= b.type.lifetime - lastTime){
+                                rotChange = -120.0f;
+                            }else if(b.time >= 45.0f&&b.time <= 95.0f){
+                                rotChange = 120.0f;
+                            }else if(b.time >= firstTime && b.time <= 45.0f){
+                                rotChange = 120.0f - Mathf.pow(15.0f - (b.time - firstTime) , 2f) / 0.9375f;
+                            }else if(b.time >= 95.0f){
+                                rotChange = Mathf.pow(15.0f - (b.time - 95.0f) , 2f) / 0.9375f - 120.0f;
+                            }
+                            b.rotation(((Unit)b.owner).rotation + rotChange);
+                            b.x = ((Unit)b.owner).x + 30.0f * Mathf.cosDeg(b.rotation());
+                            b.y = ((Unit)b.owner).y + 30.0f * Mathf.sinDeg(b.rotation());
+                        }
+                        {
+                            shootSound = Sounds.shootMeltdown;
+                            damage = 1290;
+                            frontLength = 300.0f;
+                            lifetime = 140.0f;
+                            width = 30.0f;
+                            trailLength = 12;
+                            hitEffect = despawnEffect = Fx.none;
+                        }
+                    };
+                }
+            },
             new PointDefenseWeapon("fire-pluto-weapon2"){{
                 reload = 3.0f;
                 x = 10.0f;
@@ -970,6 +1192,7 @@ public class FRUnitTypes{
                     maxRange = 225.0f;
                     shootEffect = Fx.sparkShoot;
                     hitEffect = Fx.pointHit;
+                    despawnEffect = Fx.none;
                     shootSound = Sounds.shootArc;
                 }};
             }}

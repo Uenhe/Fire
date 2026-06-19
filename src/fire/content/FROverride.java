@@ -1,11 +1,9 @@
 package fire.content;
 
 import arc.graphics.g2d.Draw;
-import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.util.Time;
-import fire.FRUtils;
 import fire.entities.bullets.SpriteBulletType;
 import fire.logic.FRLogicStatements;
 import fire.world.meta.FRAttribute;
@@ -37,7 +35,7 @@ import static mindustry.content.UnitTypes.*;
 public class FROverride{
 
     public static void loadDebug(){
-        final float tDecel = 60, tFire = 80, tSafe = tFire + 20/* =100 */, tLife = 140;
+        final float tDecel = 60, tFire = 80, tSafe = tFire + 20, tLife = 140;
 
         var weapon = corvus.weapons.get(0);
         weapon.reload = 120;
