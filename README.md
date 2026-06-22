@@ -3,7 +3,7 @@
 
 A Mindustry Mod that adds many unique things...
 
-There are two author, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me).
+There are two authors, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (me).
 
 ## Content
 
