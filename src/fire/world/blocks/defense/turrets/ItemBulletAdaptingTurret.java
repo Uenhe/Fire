@@ -2,15 +2,11 @@ package fire.world.blocks.defense.turrets;
 
 import arc.struct.IntMap;
 import arc.struct.Seq;
-import arc.util.Nullable;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Building;
 import mindustry.gen.Teamc;
 import mindustry.type.Item;
-import mindustry.type.ammo.ItemAmmoType;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatValues;
 
 public class ItemBulletAdaptingTurret extends ItemTurret{
     public static IntMap<Seq<BulletStack>> bulletStack;

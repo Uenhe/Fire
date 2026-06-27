@@ -17,6 +17,7 @@ import fire.FRUtils;
 import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
 import fire.entities.bullets.SpecialIntervalBulletType;
+import fire.entities.weapons.MinerLikedWeapon;
 import fire.type.FleshUnitType;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
@@ -43,6 +44,7 @@ import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
+import mindustry.world.Block;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
@@ -53,8 +55,7 @@ import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
 import static fire.FRVars.find;
 import static fire.FRVars.lancer_a04;
-import static mindustry.Vars.indexer;
-import static mindustry.Vars.tilePayload;
+import static mindustry.Vars.*;
 
 public class FRUnitTypes{
 
@@ -64,6 +65,9 @@ public class FRUnitTypes{
 
         //mech mutated
         blade, hatchet, castle,
+
+        //flying mutated
+        wanderer,
 
         //ground
         error, pluto,
@@ -428,6 +432,39 @@ public class FRUnitTypes{
                         backColor = find("f9a27a");
                         frontColor = find("ffd8e8");
                     }};
+                }}
+            );
+        }};
+
+        //region flying mutated
+        wanderer = new FleshUnitType("wanderer", UnitTypes.mono){
+            @Override
+            public void draw(Unit unit){
+                super.draw(unit);
+            }
+            {
+            constructor = UnitEntity::create;
+            flying = true;
+            health = 550.0f;
+            armor = 4;
+            hitSize = 12;
+            speed = 3.4f;
+            drag = 0.2f;
+            accel = 0.25f;
+            rotateSpeed = 12f;
+            faceTarget = true;
+            coreUnitDock = true;
+            engineOffset = 6.0f;
+            itemCapacity = 60;
+            weapons.add(
+                new MinerLikedWeapon("Unrealistic miner", 120.0f){
+                    {
+                    reload = 10.0f;
+                    mirror = false;
+                    rotate = false;
+                    minWarmup = 0.9f;
+                    shootWarmupSpeed = 0.08f;
+                    shootSound = Sounds.shootLaser;
                 }}
             );
         }};

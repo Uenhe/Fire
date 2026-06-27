@@ -3,19 +3,24 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
+import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import fire.content.FRUnitTypes;
 import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
+import mindustry.game.Team;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.ui.dialogs.BaseDialog;
 
 import java.awt.*;
 
-import static fire.FireMod.*;
+import static fire.FireMod.CheatStatusCode.OK;
+import static fire.FireMod.cheatBlocks;
+import static fire.FireMod.checkCheating;
 import static mindustry.Vars.headless;
+import static mindustry.Vars.player;
 
 public final class FRVars{
 
@@ -32,6 +37,7 @@ public final class FRVars{
 
     public static short equivalentWidth;
 
+    private static BaseDialog cheatDialog;
     private static final Toolkit toolkit;
 
     static{
@@ -50,11 +56,35 @@ public final class FRVars{
                     Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
 
-                if(isCheating())
-                    new BaseDialog("Warning"){{
-                        cont.add("@fire.nocheating");
-                        show();
-                    }};
+                if(cheatDialog == null){
+                    var code = checkCheating();
+                    Table table = null;
+                    if(code != OK){
+                        cheatDialog = new BaseDialog("Warning");
+                        table = cheatDialog.cont.pane(t -> {}).getTable();
+                        table.row();
+                    }
+
+                    switch(code){
+                        case CHEAT_BLOCK:
+                            StringBuilder sb = new StringBuilder();
+                            for(var block : cheatBlocks){
+                                var builds = Team.get(player.team().id).data().buildingTypes.get(block);
+                                if(builds == null) continue;
+                                if(builds.size > 0)
+                                    sb.append("\n").append(block.localizedName);
+                            }
+                            table.add(Core.bundle.format("fire.err1", sb.toString())).center().row();
+                            break;
+
+                        case CHEAT_RULE:
+                            table.add("@fire.err2").center();
+                    }
+                    if(code != OK){
+                        table.row().add("@fire.err9").center();
+                        cheatDialog.show();
+                    }
+                }
             }
 
             for(var u : spawnedUnits){

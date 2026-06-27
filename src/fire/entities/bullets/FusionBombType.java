@@ -1,19 +1,15 @@
 package fire.entities.bullets;
 
 import arc.func.Cons;
-import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.IntFloatMap;
 import arc.util.Time;
-import fire.content.FRFx;
 import fire.content.FRMath;
 import mindustry.content.StatusEffects;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
-import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
-import mindustry.graphics.Pal;
 
 public class FusionBombType extends BulletType{
     private static final IntFloatMap timer1 = new IntFloatMap();

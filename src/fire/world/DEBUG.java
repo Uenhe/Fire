@@ -63,11 +63,6 @@ public class DEBUG{
         }
 
         @Override
-        public void load(){
-            super.load();
-        }
-
-        @Override
         public void setStats(){}
 
         public class DEBUG_TurretBuild extends TurretBuild{

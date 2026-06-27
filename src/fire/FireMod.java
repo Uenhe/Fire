@@ -53,9 +53,10 @@ import static mindustry.Vars.*;
 public class FireMod extends Mod{
 
     private static Mods.LoadedMod FIRE;
-    private static BaseDialog mainDialog, mulmodDialog;
+    private static BaseDialog mainDialog, mulModDialog;
     private static final Field field_container;
-    private static final Seq<Block> cheatBlocks = new Seq<>();
+
+    public static final Seq<Block> cheatBlocks = new Seq<>();
     public static boolean multipleMods;
 
     static{
@@ -115,6 +116,7 @@ public class FireMod extends Mod{
                     item = keys.next();
                 assert item != null;
                 AdaptiveSource.turretItemMap.put(block.id, item.id);
+
             }else if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
                 cheatBlocks.add(block);
             }
@@ -126,23 +128,30 @@ public class FireMod extends Mod{
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
             showUpdate();
-            showNoMultipleMods();
+            checkMultipleMods();
         });
     }
 
-    static boolean isCheating(){
-        if(!state.isCampaign()) return false;
-        if(DEBUG.isDeveloper()) return false;
-        if(multipleMods) return true;
+    static CheatStatusCode checkCheating(){
+        if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
+            return CheatStatusCode.OK;
 
         for(var block : cheatBlocks){
-            for(int i = 0, n = Team.all.length; i < n; i++){
-                var builds = Team.get(i).data().buildingTypes.get(block);
-                if(builds == null) continue;
-                if(builds.size > 0) return true;
-            }
+            var builds = Team.get(player.team().id).data().buildingTypes.get(block);
+            if(builds == null) continue;
+            if(builds.size > 0) return CheatStatusCode.CHEAT_BLOCK;
         }
-        return false;
+
+        var rules = player.team().rules();
+        if(state.rules.infiniteResources ||
+            state.rules.allowEditRules ||
+            rules.cheat ||
+            rules.infiniteResources)
+        {
+            return CheatStatusCode.CHEAT_RULE;
+        }
+
+        return CheatStatusCode.OK;
     }
 
     private static void loadSetting(){
@@ -169,13 +178,13 @@ public class FireMod extends Mod{
         setupDialog(historyDialog);
         historyDialog.cont.pane(t -> t.add("@fire.history").center());
 
-        var main = mainDialog = new BaseDialog("@fire.maintitle");
-        setupDialog(main);
+        mainDialog = new BaseDialog("@fire.maintitle");
+        setupDialog(mainDialog);
 
-        main.buttons.button(Core.bundle.format("fire.historytitle", ""), Icon.list, historyDialog::show).size(210.0f, 64.0f);
-        main.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
+        mainDialog.buttons.button(Core.bundle.format("fire.historytitle", ""), Icon.list, historyDialog::show).size(210.0f, 64.0f);
+        mainDialog.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
 
-        main.cont.pane(t -> {
+        mainDialog.cont.pane(t -> {
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
@@ -195,10 +204,10 @@ public class FireMod extends Mod{
 
         }).maxWidth(width());
 
-        main.show();
+        mainDialog.show();
     }
 
-    private static void showNoMultipleMods(){
+    private static void checkMultipleMods(){
         if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
         if(DEBUG.isDeveloper()) return;
         multipleMods = true;
@@ -272,7 +281,7 @@ public class FireMod extends Mod{
         }
     }
 
-    private static float width(){
+    static float width(){
         return Core.graphics.getWidth() * 0.8f;
     }
 
@@ -285,9 +294,9 @@ public class FireMod extends Mod{
 
         if(!noMultiMods) return;
 
-        var dialog = mulmodDialog = new BaseDialog("What happened");
-        setupDialog(dialog);
-        dialog.cont.pane(t -> t.add("@fire.nomultimods").center());
+        mulModDialog = new BaseDialog("What happened");
+        setupDialog(mulModDialog);
+        mulModDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
 
         if(mobile){
             int m = 1, n = 3;
@@ -318,7 +327,7 @@ public class FireMod extends Mod{
                     tmp.add(b);
 
             buttons.removeAll(tmp);
-            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, dialog::show));
+            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulModDialog::show));
         }
     }
 
@@ -337,7 +346,7 @@ public class FireMod extends Mod{
         MobileButton
             settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
-            what = new MobileButton(Icon.warning, "@fire.what", mulmodDialog::show),
+            what = new MobileButton(Icon.warning, "@fire.what", mulModDialog::show),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
             about = new MobileButton(Icon.info, "@about.button", ui.about::show);
 
@@ -372,5 +381,11 @@ public class FireMod extends Mod{
 
         container.add(what);
         container.add(exit);
+    }
+
+    enum CheatStatusCode{
+        OK,
+        CHEAT_BLOCK,
+        CHEAT_RULE
     }
 }

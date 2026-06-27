@@ -41,7 +41,6 @@ import mindustry.type.unit.ErekirUnitType;
 import mindustry.ui.Bar;
 import mindustry.ui.Fonts;
 import mindustry.ui.Styles;
-import mindustry.world.Block;
 import mindustry.world.blocks.ItemSelection;
 import mindustry.world.blocks.payloads.Payload;
 import mindustry.world.blocks.payloads.UnitPayload;
@@ -50,11 +49,9 @@ import mindustry.world.meta.StatUnit;
 
 import static fire.FRVars.equivalentWidth;
 import static fire.content.FRItems.*;
-import static fire.content.FRUnitTypes.*;
+import static fire.content.FRUnitTypes.omicron;
 import static mindustry.Vars.*;
-import static mindustry.content.Blocks.*;
 import static mindustry.content.Items.*;
-import static mindustry.content.Items.sand;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
 public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
@@ -64,7 +61,6 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected float timeScl;
     protected final Seq<UnitType> plans = new Seq<>();
 
-    public static final Block[] factories = {additiveReconstructor, multiplicativeReconstructor, exponentialReconstructor, tetrativeReconstructor};
     private static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
     private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
 
@@ -487,7 +483,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null;
+            return enabled && payload == null && speedScl > 0.0f;
         }
 
         @Override

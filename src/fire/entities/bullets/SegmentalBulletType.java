@@ -39,7 +39,7 @@ public class SegmentalBulletType extends mindustry.entities.bullet.BasicBulletTy
         if(b.absorbed) return;
 
         Groups.bullet.intersect(x - radius, y - radius, radius * 2.0f, radius * 2.0f, other -> {
-            if(b.isAdded() && b.team != other.team && other.type.hittable){
+            if(b.isAdded() && b != other && b.team != other.team && other.type.hittable){
                 FRFx.chainEmpThin.at(x, y, 0.0f, hitColor, new Vec2().set(other));
 
                 float v = splashDamage * damageMultiplier;
