@@ -63,7 +63,6 @@ public class FRPlanets{
                 unlockedOnLand.add(fireCompany);
                 ruleSetter = r -> {
                     r.hideBannedBlocks = true;
-                    r.worldProcessorPlayerLink = true;
                     r.bannedBlocks.addAll(Blocks.launchPad, Blocks.advancedLaunchPad, Blocks.landingPad, Blocks.interplanetaryAccelerator, primaryInterplanetaryAccelerator);
                 };
             }
