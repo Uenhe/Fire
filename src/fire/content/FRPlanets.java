@@ -94,7 +94,6 @@ public class FRPlanets{
                 node(omicron, () ->
                     node(pioneer, with(new OnSector(desolateFortification)), () -> {})
                 );
-                node(vectorialUnitFactory, with(new SectorComplete(desolateFortification), new SectorComplete(desertWastes)), () -> {});
                 node(javelinPad, with(new SectorComplete(lavaStronghold)), () ->
                     node(javelin, () -> {})
                 );
@@ -228,12 +227,10 @@ public class FRPlanets{
                     )
                 );
 
-                node(vectorialUnitFactory, with(new SectorComplete(desertWastes),new SectorComplete(desolateFortification)), () -> {});
+                node(vectorialUnitFactory, with(new SectorComplete(desertWastes), new SectorComplete(desolateFortification)), () -> {});
 
                 node(payloadConveyorLarge, with(new SectorComplete(scorchingVolcano)), () ->
-                    node(payloadRouterLarge, () ->
-                        node(vectorialUnitFactory, with(new SectorComplete(desertWastes)), () -> {})
-                    )
+                    node(payloadRouterLarge, () -> {})
                 );
             });
 

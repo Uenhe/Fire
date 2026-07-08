@@ -77,7 +77,6 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     public void load(){
         super.load();
-        var barrels = this.barrels;
         int len = barrels.size;
         base = Core.atlas.find("block-" + size); //set() is unavailable when reading vanilla sprite?
         barrelRegions = new TextureRegion[len];
@@ -126,7 +125,6 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     protected TextureRegion[] icons(){
         var regions = Seq.with(base, region);
-        var barrelRegions = this.barrelRegions;
 
         if(barrelRegions.length > 1){
             var names = new Seq<String>(barrelRegions.length);
@@ -146,8 +144,7 @@ public class BeamExtractor extends mindustry.world.Block{
     public void createIcons(MultiPacker packer){
         var toDispose = new Seq<Pixmap>();
 
-        var icons = icons();
-        for(var icon : icons){
+        for(var icon : icons()){
             var region = Pixmaps.outline(Core.atlas.getPixmap(icon), outlineColor, outlineRadius);
             toDispose.add(region);
             Drawf.checkBleed(region);
@@ -282,6 +279,11 @@ public class BeamExtractor extends mindustry.world.Block{
         }
 
         @Override
+        public boolean shouldConsume(){
+            return super.shouldConsume() && items.total() < itemCapacity && selected != -1;
+        }
+
+        @Override
         public boolean shouldAmbientSound(){
             return valid();
         }
@@ -304,11 +306,19 @@ public class BeamExtractor extends mindustry.world.Block{
             warmup *= 0.6f;
         }
 
+        /** Modified from super's one. */
         @Override
         public BlockStatus status(){
-            if(selected != -1 && efficiency <= 0.0f) return BlockStatus.noInput;
-            else if(!valid()) return BlockStatus.noOutput;
-            return super.status();
+            if(!enabled)
+                return BlockStatus.logicDisable;
+
+            if(selected != -1 && efficiency <= 0.0f && items.total() < itemCapacity)
+                return BlockStatus.noInput;
+
+            if(!shouldConsume())
+                return BlockStatus.noOutput;
+
+            return ((state.tick / 30.0f) % 1.0f) < efficiency ? BlockStatus.active : BlockStatus.noInput;
         }
 
         @Override
@@ -384,7 +394,7 @@ public class BeamExtractor extends mindustry.world.Block{
             drillTimer = read.f();
             warmup = read.f();
             boostWarmup = read.f();
-            for(int i = 0, len = (byte)barrels.size; i < len; i++) drawrots[i] = read.f();
+            for(int i = 0, len = barrels.size; i < len; i++) drawrots[i] = read.f();
         }
 
         private void init(){

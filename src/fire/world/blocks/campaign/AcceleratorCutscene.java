@@ -107,26 +107,26 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             super.updateTile();
             if(launchCandidates.size != 1 || !scene) return;
 
-            if(ui.hasAnnouncement()){
+            if(ui.hasAnnouncement())
                 try{
                     Table t = (Table)field_lastAnnouncement.get(ui);
-                    if(t.getCells().any()) ((Cell<Label>)t.getCells().first()).with(label -> {
-                        var texts = label.getText();
-                        if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ //avoids side effect but doesn't work entirely
-                            t.visible = false;
-                        }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
-                            t.update(() -> {
-                                t.setPosition(Core.graphics.getWidth() * 0.5f, Core.graphics.getHeight() * 0.14f, Align.center);
-                                t.toFront();
-                                if(!ui.planet.isShown()) t.remove();
-                            });
-                        }
-                    });
+                    if(t.getCells().any())
+                        ((Cell<Label>)t.getCells().first()).with(label -> {
+                            var texts = label.getText();
+                            if(texts.indexOf(String.valueOf(Iconc.lockOpen)) != -1){ //avoids side effect but doesn't work entirely
+                                t.visible = false;
+                            }else if(texts.indexOf(String.valueOf(Iconc.infoCircle)) != -1){
+                                t.update(() -> {
+                                    t.setPosition(Core.graphics.getWidth() * 0.5f, Core.graphics.getHeight() * 0.14f, Align.center);
+                                    t.toFront();
+                                    if(!ui.planet.isShown()) t.remove();
+                                });
+                            }
+                        });
 
                 }catch(IllegalAccessException e){
                     throw new RuntimeException(e);
                 }
-            }
 
             sceneTimer += Time.delta;
             if(node.checkBelonging(sceneTimer, 1, 2)){
@@ -162,15 +162,16 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
             ui.planet.state.planet.sectors.get(ui.planet.state.planet.startSector).preset.clearUnlock();
             launchCandidates.first().unlock();
 
+            float height = Core.graphics.getHeight(),
+                width = Core.graphics.getWidth();
             for(int i = 0; i < 2; i++){
                 final float p = 0.2f,
-                height = Core.graphics.getHeight(),
                 y1 = i == 0 ? height * -p : height * (1.0f + p);
 
                 var mask = new Image();
                 mask.color.set(Color.black);
                 mask.touchable = Touchable.disabled;
-                mask.setSize(Core.graphics.getWidth(), height * p);
+                mask.setSize(width, height * p);
                 mask.setScaling(Scaling.stretch);
                 mask.y = y1;
 
@@ -189,12 +190,11 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
 
             Time.run(60.0f, () -> {
                 ui.planet.launchSector = null; //cancels the weird line
-                short[] sectors = AcceleratorCutscene.this.sectors;
                 for(short id : sectors)
                     ui.planet.newPresets.add(ui.planet.state.planet.sectors.get(id));
             });
 
-            for(int i = 0, len = (byte)texts.length; i < len; i++){
+            for(int i = 0, len = texts.length; i < len; i++){
                 int j = i;
                 float delay = j != 0
                     ? node.getQuantum(2) + 150.0f * (j - 1)
