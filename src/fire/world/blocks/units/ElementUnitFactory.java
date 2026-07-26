@@ -171,8 +171,9 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 var value = itemValues.get(item);
                 if(value == null) continue;
 
-                itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit)
-                    .tooltip(Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv));
+                var button = itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit)
+                    /*.tooltip(Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv))*/;
+                ui.addDescTooltip(button.get(), Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv));
 
                 if(++i % 10 == 0) itemTable.row();
             }
@@ -186,7 +187,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
             table.row();
             for(int i = 0, n = plans.size; i < n;){
                 var unit = plans.get(i);
-                var value = unitValues.get(unit) == null?unitValues.get(UnitTypes.dagger):unitValues.get(unit);
+                var value = unitValues.get(unit) == null ? unitValues.get(UnitTypes.dagger) : unitValues.get(unit);
                 boolean banned = unit.isBanned(), unlocked = unit.unlockedNowHost();
 
                 table.table(Styles.grayPanel, t -> {

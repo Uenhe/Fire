@@ -60,6 +60,7 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
     public class BurstReactorBuild extends ImpactReactorBuild{
 
         private float burstAlpha;
+        private float powerConsSum;
         private final Vec2[] burstPos = new Vec2[6];
 
         {
@@ -95,12 +96,13 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
 
         @Override
         public float getPowerProduction(){
-            float[] powerConsSum = {0.0f};
+            powerConsSum = 0.0f;
             indexer.eachBlock(this, detectRadius, other -> other.block.consPower != null && other != this, other -> {
-                var cons = other.block.consPower;
-                powerConsSum[0] += other.efficiency * cons.efficiency(other) * cons.requestedPower(other);
+                float powerCons = other.power.status * other.block.consPower.usage * Mathf.num(other.shouldConsume());
+                if(!other.block.canOverdrive) powerCons /= timeScale;
+                powerConsSum += powerCons;
             });
-            return super.getPowerProduction() <= 0 ? 0 : super.getPowerProduction() + powerConsSum[0] * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
+            return super.getPowerProduction() <= 0.0f ? 0.0f : super.getPowerProduction() + powerConsSum * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
         }
 
         @Override

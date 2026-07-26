@@ -114,8 +114,9 @@ public class FireMod extends Mod{
                 var keys = ((ItemTurret)block).ammoTypes.keys();
                 while(keys.hasNext())
                     item = keys.next();
-                assert item != null;
-                AdaptiveSource.turretItemMap.put(block.id, item.id);
+
+                if(item != null)
+                    AdaptiveSource.turretItemMap.put(block.id, item.id);
 
             }else if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
                 cheatBlocks.add(block);
