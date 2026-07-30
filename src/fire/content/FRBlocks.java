@@ -3348,7 +3348,7 @@ public class FRBlocks{
                 (int)item_2.id, Seq.with(new BulletStack(30, bullet_2_2), new BulletStack(60, bullet_2_3))
             );
 
-            consumePower(n(300000));
+            consumePower(n(325000));
             consumeCoolant(n(480));
 
             drawer = new DrawTurret(){{
@@ -4938,20 +4938,20 @@ public class FRBlocks{
 
         fractalUnitFactory = new ElementUnitFactory("fractal-unit-factory", 6){{
             requirements(Category.units, with(
-                plastanium, 1300,
-                phaseFabric, 1300,
+                plastanium, 1250,
+                phaseFabric, 1000,
                 logicAlloy, 2500,
-                hardenedAlloy, 5500,
-                magneticAlloy, 2300
+                hardenedAlloy, 4750,
+                magneticAlloy, 2000
             ));
-            health = 9500;
+            health = 12000;
             armor = 42.0f;
             size = 11;
-            liquidCapacity = 9178.0f;
+            liquidCapacity = 360.0f;
 
             base = 3.0f;
             timeScl = 90.0f;
-            consumePower(1850);
+            consumePower(n(48000));
             consumeLiquid(FRLiquids.liquidNitrogen, n(150));
         }};
 

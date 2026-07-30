@@ -247,11 +247,12 @@ public class FRPlanets{
                         )
                     );
 
-                    node(sporeFiord, with(new SectorComplete(darksandPeakforest)), () ->
-                        node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () ->
-                            node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(desolateFortification), new Research(skyDome)), () -> {
-                            })
-                        )
+                    node(sporeFiord, with(new SectorComplete(darksandPeakforest)), () -> {
+                            node(scorchingVolcano, with(new SectorComplete(sporeFiord), new Research(compositeConveyor)), () ->
+                                node(lavaStronghold, with(new SectorComplete(scorchingVolcano), new SectorComplete(desolateFortification), new Research(skyDome)), () -> {})
+                            );
+                            node(desertWastes, with(new SectorComplete(sporeFiord), new Research(compositeConveyor), new Research(blossom), new Research(biomassCultivator)), () -> {});
+                        }
                     );
 
                     node(eteriverStronghold, with(new SectorComplete(darksandPeakforest), new Research(guarding)), () -> {
@@ -260,15 +261,12 @@ public class FRPlanets{
                         node(stormyCoast, with(new SectorComplete(eteriverStronghold), new Research(biomassCultivator), new Research(seaquake), new Research(distance), new Research(grudge)), () -> {
                         });
                         node(branchedRivers, with(new SectorComplete(eteriverStronghold), new SectorComplete(stormyCoast), new Research(hydroelectricGenerator), new Research(hydroelectricGeneratorLarge)), () -> {
+                            node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticRingPump), new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill)), () -> {});
                             node(rubbleRidge, with(
                                 new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticSphere), new Research(magneticRingPump), new Research(hardenedLiquidTank),
                                 new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill), new Research(javelinPad), new Research(javelin)
                             ), () -> {});
-                            node(frozenWall, with(
-                                new SectorComplete(branchedRivers), new Research(magneticSphere), new Research(lumiflame)
-                            ), () -> {});
-                            node(taintedEstuary, with(new SectorComplete(branchedRivers), new Research(aerolite), new Research(magneticRingPump), new Research(hardenedLiquidTank), new Research(cryofluidMixerLarge), new Research(magnetismConcentratedRollingMill)), () -> {
-                            });
+                            node(frozenWall, with(new SectorComplete(branchedRivers), new Research(magneticSphere), new Research(lumiflame)), () -> {});
                         });
                     });
                 })
@@ -357,6 +355,8 @@ public class FRPlanets{
                                     dnode(javelinPad)
                                 );
                             });
+
+                            dnode(desertWastes);
                         });
 
                         dnode(eteriverStronghold, () -> {
@@ -372,13 +372,15 @@ public class FRPlanets{
                                 dnode(scab);
                             });
 
-                            dnode(branchedRivers, () ->
+                            dnode(branchedRivers, () -> {
+                                dnode(taintedEstuary);
+                                dnode(rubbleRidge);
                                 dnode(frozenWall, () -> {
                                     dnode(obstruction);
                                     dnode(magneticRail);
                                     dnode(numbDelusion);
-                                })
-                            );
+                                });
+                            });
                         });
                     });
                 })

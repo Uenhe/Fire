@@ -34,7 +34,7 @@ public class FRSectorPresets{
         rubbleRidge = create("rubble-ridge", 172, 10.0f, 65);
         taintedEstuary = create("tainted-estuary", 116, 10.0f);
 
-        frozenWall = create("frozen-wall", 245,10.0f,116);
+        frozenWall = create("frozen-wall", 245, 10.0f, 116);
     }
     
     public static void load(){}

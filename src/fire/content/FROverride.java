@@ -20,6 +20,7 @@ import mindustry.graphics.Pal;
 import mindustry.logic.LAssembler;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
+import mindustry.world.blocks.distribution.BufferedItemBridge;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.MassDriver;
 import mindustry.world.blocks.logic.MessageBlock;
@@ -170,6 +171,7 @@ public class FROverride{
 
 
         //region block distribution
+        ((BufferedItemBridge)itemBridge).speed *= 0.92f;
         phaseConveyor.itemCapacity += 5;
         ((ItemBridge)phaseConveyor).transportTime -= 1.0f;
         ((MassDriver)massDriver).rotateSpeed += 5.0f;

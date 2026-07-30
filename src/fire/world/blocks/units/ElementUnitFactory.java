@@ -66,7 +66,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
     private static void putAllValues(Object... values){
         var itemValues = ElementUnitFactory.itemValues;
-        for(int i = 0; i < values.length; i += 7)
+        for(int i = 0, n = values.length; i < n; i += 7)
             itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6]));
     }
 
@@ -171,9 +171,12 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 var value = itemValues.get(item);
                 if(value == null) continue;
 
-                var button = itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit)
-                    /*.tooltip(Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv))*/;
-                ui.addDescTooltip(button.get(), Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv));
+                var buttonCell = itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit);
+                var tip = Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv);
+                if(mobile)
+                    ui.addDescTooltip(buttonCell.get(), tip);
+                else
+                    buttonCell.tooltip(tip);
 
                 if(++i % 10 == 0) itemTable.row();
             }
@@ -440,7 +443,8 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 var plan = plans.get(currentPlan);
                 var value = unitValues.get(plan);
 
-                if(currentPlan != -1 && armorXp >= lvToXp(value.armorLv) && energyXp >= lvToXp(value.energyLv) && logicXp >= lvToXp(value.logicLv)){
+                boolean valid = (armorXp >= lvToXp(value.armorLv) && energyXp >= lvToXp(value.energyLv) && logicXp >= lvToXp(value.logicLv)) || cheating();
+                if(currentPlan != -1 && valid){
                     time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
                     progress += edelta() * state.rules.unitBuildSpeed(team);
                     speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
