@@ -9,8 +9,8 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.math.geom.Position;
 import arc.math.geom.Vec2;
+import arc.scene.ui.layout.Table;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.FRUtils;
@@ -18,7 +18,9 @@ import fire.ai.types.DashBuilderAI;
 import fire.entities.abilities.*;
 import fire.entities.bullets.SpecialIntervalBulletType;
 import fire.entities.weapons.MinerLikedWeapon;
+import fire.type.AirFleshUnitType;
 import fire.type.FleshUnitType;
+import fire.world.meta.FRStat;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Damage;
@@ -30,9 +32,7 @@ import mindustry.entities.effect.ExplosionEffect;
 import mindustry.entities.effect.MultiEffect;
 import mindustry.entities.effect.ParticleEffect;
 import mindustry.entities.effect.WaveEffect;
-import mindustry.entities.part.DrawPart;
 import mindustry.entities.part.HoverPart;
-import mindustry.entities.part.ShapePart;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.entities.units.WeaponMount;
 import mindustry.gen.*;
@@ -44,18 +44,15 @@ import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
 import mindustry.type.weapons.PointDefenseWeapon;
-import mindustry.world.Block;
 import mindustry.world.blocks.units.Reconstructor;
 import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
 
-import java.awt.*;
-
-import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
 import static fire.FRVars.find;
 import static fire.FRVars.lancer_a04;
-import static mindustry.Vars.*;
+import static mindustry.Vars.indexer;
+import static mindustry.Vars.tilePayload;
 
 public class FRUnitTypes{
 
@@ -67,7 +64,7 @@ public class FRUnitTypes{
         blade, hatchet, castle,
 
         //flying mutated
-        wanderer,
+        wanderer, hunter,rioter,
 
         //ground
         error, pluto,
@@ -437,7 +434,7 @@ public class FRUnitTypes{
         }};
 
         //region flying mutated
-        wanderer = new FleshUnitType("wanderer", UnitTypes.mono){
+        wanderer = new AirFleshUnitType("wanderer", UnitTypes.mono){
             @Override
             public void draw(Unit unit){
                 super.draw(unit);
@@ -451,7 +448,7 @@ public class FRUnitTypes{
             speed = 3.4f;
             drag = 0.2f;
             accel = 0.25f;
-            rotateSpeed = 12f;
+            rotateSpeed = 8f;
             faceTarget = true;
             coreUnitDock = true;
             engineOffset = 6.0f;
@@ -464,8 +461,130 @@ public class FRUnitTypes{
                     rotate = false;
                     minWarmup = 0.9f;
                     shootWarmupSpeed = 0.08f;
-                    shootSound = Sounds.shootLaser;
+                    shootSound = Sounds.none;
                 }}
+            );
+        }};
+
+        hunter = new AirFleshUnitType("hunter", UnitTypes.poly){{
+            constructor = UnitEntity::create;
+            flying = true;
+            health = 920.0f;
+            armor = 5;
+            hitSize = 16;
+            speed = 2.8f;
+            drag = 0.2f;
+            accel = 0.25f;
+            rotateSpeed = 6f;
+            faceTarget = true;
+            coreUnitDock = true;
+            engineOffset = 10.0f;
+            itemCapacity = 90;
+            weapons.add(
+                new Weapon("big-missile-weapon"){
+                    @Override
+                    public void addStats(UnitType u, Table t){
+                        super.addStats(u,t);
+                        t.row();
+                        t.add(FRStat.minerweapon3.localized() + "80%");
+                    }
+                    {
+                    reload = 120.0f;
+                    x = 0;
+                    rotate = false;
+                    mirror = false;
+                    shootSound = Sounds.shootLancer;
+                    bullet = new BasicBulletType(){
+                        private final Color color = Color.valueOf("e4ffd6");
+                        @Override
+                        public void removed(Bullet b){
+                            if(b.hit()){
+                                Unit unit = (Unit)b.owner;
+                                if(unit.health >= unit.maxHealth){
+                                    if(unit.shield < unit.maxHealth){
+                                        unit.shield(Math.min(unit.shield + 240.0f, unit.maxHealth));
+                                    }
+                                }else{
+                                    unit.heal(240.0f);
+                                }
+                                unit.apply(StatusEffects.overclock,300.0f);
+                            }
+                            new WaveEffect(){{
+                                lifetime = 16.0f;
+                                sizeFrom = 0.0f;
+                                sizeTo = 40.0f;
+                                strokeFrom = 3.0f;
+                                strokeTo = 0.0f;
+                                interp = Interp.pow3Out;
+                                colorFrom = color;
+                            }}.at(b.x,b.y);
+                            super.removed(b);
+                        }
+
+                        private final Effect trail = new Effect(120.0f,e->{
+                            Draw.color(e.color);
+                            float a = e.fout(Interp.pow5Out);
+                            float move = e.fin(Interp.pow5Out);
+                            float length = 6.0f * a;
+                            Draw.alpha(a * 0.9f);
+                            Draw.z(Layer.effect + 0.8f);
+                            int[] sides ={3,4,5,6,4,36,36};
+                            Fill.poly(e.x + move * 20.0f * Mathf.cosDeg(e.rotation),e.y + move * 4.0f * Mathf.sinDeg(e.rotation),sides[e.id%7],length,e.rotation);
+                            Draw.reset();
+                        });
+                        @Override
+                        public void draw(Bullet b){
+                            if(b.timer.get(2, 1.0f)){
+                                trail.create(b.x + Mathf.random(-6.0f,6.0f),b.y + Mathf.random(-6.0f,6.0f),b.rotation() + Mathf.random(-20.0f,20.0f),color,null);
+                            }
+                        }
+                        {
+                            keepVelocity = false;
+                            damage = 120.0f;
+                            splashDamage = 180.0f;
+                            splashDamageRadius = 40.0f;
+                            height = 12;
+                            width = 12.0f;
+                            status = StatusEffects.corroded;
+                            statusDuration = 180.0f;
+                            lifetime = 60.0f;
+                            speed = 1.0f;
+                            drag = -0.05f;
+                            homingPower = 0.12f;
+                            homingRange = 60.0f;
+                        }
+                    };
+                }}
+            );
+        }};
+
+        rioter = new FleshUnitType("rioter", UnitTypes.zenith){{
+            constructor = UnitEntity::create;
+            flying = true;
+            health = 10800;
+            armor = 6;
+            hitSize = 16;
+            speed = 2.4f;
+            drag = 0.2f;
+            accel = 0.25f;
+            rotateSpeed = 6f;
+            faceTarget = true;
+            coreUnitDock = true;
+            engineOffset = 10.0f;
+            itemCapacity = 60;
+            weapons.add(
+                new Weapon("big laser"){
+                    @Override
+                    public void draw(Unit unit,WeaponMount weapon){
+                        FRFx.circleDraw_3D(unit.x + 12 * Mathf.cosDeg(unit.rotation),unit.y + 12 * Mathf.sinDeg(unit.rotation),
+                            12, 6, 1, unit.rotation + 90.0f);
+                        super.draw(unit,weapon);
+                    }
+                    {
+                        mirror = false;
+                        rotate = false;
+                    }
+                }
             );
         }};
 

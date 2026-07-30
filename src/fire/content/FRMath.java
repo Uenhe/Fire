@@ -1,6 +1,8 @@
 package fire.content;
 
+import arc.Core;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import fire.entities.abilities.RegenFieldAbility;
 import fire.world.blocks.units.ElementUnitFactory;
 import mindustry.entities.abilities.*;
@@ -79,7 +81,15 @@ public class FRMath{
 
     public static ElementUnitFactory.UnitValue getValue(UnitType unit){
         float u, v, w;
-        if(unit == pioneer){
+        if(unit == corvus){
+            u = 4.8f;
+            v = 5.25f;
+            w = 5.05f;
+        }else if(unit == arkyid){
+            u = 4.15f;
+            v = 4.95f;
+            w = 3.80f;
+        }else if(unit == pioneer){
             u = 3.8f;
             v = 4.4f;
             w = 4.6f;
@@ -163,6 +173,14 @@ public class FRMath{
         return new ElementUnitFactory.UnitValue(u, v, w);
     }
 
+    public static Vec2 get3DPos(float x, float y, float h){
+        float cameraX = Core.camera.position.x;
+        float cameraY = Core.camera.position.y;
+        float drawX = x + (x - cameraX) * h / 8;
+        float drawY = y + (y - cameraY) * h / 8;
+        return new Vec2(drawX, drawY);
+    }
+
     public static float getDamage_fusionBomb(float lifetime, float maxTime){
         float damage = maxTime, cnt = 1;
         while(lifetime >= 300.0f){
@@ -178,9 +196,7 @@ public class FRMath{
     }
 
     public static float getReload1_fusionBomb(float lifetime){
-        if(lifetime >= 1200.0f)
-            return 10.0f;
-
+        if(lifetime >= 1200.0f) return 10.0f;
         return 9000.0f / (lifetime - 300.0f);
     }
 }

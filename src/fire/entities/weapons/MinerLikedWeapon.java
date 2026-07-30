@@ -1,6 +1,5 @@
 package fire.entities.weapons;
 
-import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Lines;
@@ -8,8 +7,6 @@ import arc.math.Angles;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
 import arc.struct.ObjectMap;
-import arc.struct.Seq;
-import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.content.FRStatusEffects;
@@ -17,7 +14,6 @@ import fire.world.meta.FRStat;
 import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.content.UnitTypes;
-import mindustry.entities.Effect;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.PointBulletType;
 import mindustry.entities.units.WeaponMount;
@@ -25,13 +21,10 @@ import mindustry.gen.Building;
 import mindustry.gen.Bullet;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
-import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.type.Weapon;
-import mindustry.world.meta.Stat;
-import mindustry.world.meta.StatUnit;
 import mindustry.world.meta.StatValues;
 
 import static fire.FRVars.find;
@@ -43,7 +36,6 @@ public class MinerLikedWeapon extends Weapon{
     public float attackEffectDuration = 180.0f;
     public float healingPercent = 100.0f;
     public float extraShield = 1.0f;
-    public boolean showShield = true;
     public Color baseColor = find("f9a27a");
     public Color boostColor = find("ffd8e8");
 
@@ -134,20 +126,6 @@ public class MinerLikedWeapon extends Weapon{
     @Override
     public void draw(Unit unit, WeaponMount mount){
         super.draw(unit, mount);
-        if(showShield){
-            Draw.z(Layer.turretHeat + 0.5f);
-            Draw.blend(Blending.additive);
-            if(unit.shield > 0.0f){
-                float phase = unit.shield / unit.maxHealth;
-                if(phase > 1.0f)
-                    phase = 1.0f;
-                Lines.stroke(1.0f, unit.team.color);
-                Draw.alpha(phase);
-                Lines.poly(unit.x, unit.y, 4, unit.hitSize * 1.5f * Mathf.sqrt2 * phase, Time.time * 2.0f);
-            }
-            Draw.blend();
-            Draw.color();
-        }
 
         float xx = 0, yy = 0;
         if(mount.target != null){

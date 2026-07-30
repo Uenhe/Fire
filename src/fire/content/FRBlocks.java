@@ -2875,38 +2875,45 @@ public class FRBlocks{
 
                     cnt[0] = Mathf.sqrt(cnt[0]);
 
-                    Units.nearbyEnemies(b.team, b.x, b.y, range, u -> {
-                        if(u.health + u.shield >= 600.0f){
-                            u.apply(StatusEffects.blasted);
-                            u.apply(StatusEffects.shocked);
-                            u.apply(StatusEffects.electrified, 600f * cnt[0]);
-                            u.apply(StatusEffects.corroded, 300f * cnt[0]);
-                            u.apply(StatusEffects.unmoving, 20f * cnt[0]);
-                            u.apply(StatusEffects.melting, 1200f * cnt[0]);
-                            u.apply(FRStatusEffects.magnetized, 120f * cnt[0]);
-                            u.apply(FRStatusEffects.disintegrated, 120f * cnt[0]);
-                            u.damage(u.maxHealth * 0.008f + 5000.0f + 1500f * cnt[0]);
-                            if(u.hasEffect(StatusEffects.wet)){
-                                u.damage(500f * cnt[0]);
+                    Units.nearbyEnemies(b.team, b.x, b.y, range, unit -> {
+                        if(unit.health + unit.shield >= 600.0f){
+                            unit.apply(StatusEffects.blasted);
+                            unit.apply(StatusEffects.shocked);
+                            unit.apply(StatusEffects.electrified, 600f * cnt[0]);
+                            unit.apply(StatusEffects.corroded, 300f * cnt[0]);
+                            unit.apply(StatusEffects.unmoving, 20f * cnt[0]);
+                            unit.apply(StatusEffects.melting, 1200f * cnt[0]);
+                            unit.apply(FRStatusEffects.magnetized, 120f * cnt[0]);
+                            unit.apply(FRStatusEffects.disintegrated, 120f * cnt[0]);
+                            unit.damage(unit.maxHealth * 0.008f + 1500.0f + 400f * cnt[0]);
+                            if(unit.hasEffect(StatusEffects.wet)){
+                                unit.damage(500f * cnt[0]);
                             }
-                            if(u.hasEffect(StatusEffects.freezing)){
-                                u.damage(600f * cnt[0]);
+                            if(unit.hasEffect(StatusEffects.freezing)){
+                                unit.damage(600f * cnt[0]);
                             }
-                            if(u.hasEffect(FRStatusEffects.frostbite)){
-                                u.damage(1000f * cnt[0]);
+                            if(unit.hasEffect(FRStatusEffects.frostbite)){
+                                unit.damage(1000f * cnt[0]);
                             }
-                            Tmp.v3.set(u).sub(b).nor().scl(4000.0F);
-                            if(u.maxHealth >= 5000){
-                                FRFx.lineTrailEffect(90.0f, 2400.0f, 12.0f, 0.0f, Color.sky, 24).at(u.x, u.y, 105);
-                                FRFx.crossEffect(20.0f, u.hitSize / 4.0f, 0.0f, true, Color.sky).at(u.x, u.y);
+                            Tmp.v3.set(unit).sub(b).nor().scl(4000.0F);
+                            if(unit.maxHealth >= 5000){
+                                float ex = 0 + unit.x, ey = 0 + unit.y;
+                                FRFx.cylinderEffect(60.0f, unit.hitSize / 3.0f, Color.sky, 0.4f, -1).at(ex, ey);
+                                FRFx.cylinderEffect(60.0f, unit.hitSize / 6.0f, Color.sky, 0.7f, -1).at(ex, ey);
+                                FRFx.cylinderEffect(60.0f, unit.hitSize / 12.0f, Color.sky, 1f, -1).at(ex, ey);
+                                //FRFx.lineTrailEffect(90.0f, 2400.0f, 12.0f, 0.0f, Color.sky, 24).at(u.x, u.y, 105);
+                                FRFx.crossEffect(30.0f, unit.hitSize / 4.0f, 0.0f, true, Color.sky).at(ex, ey);
                             }
                         }else{
-                            u.remove();
+                            unit.remove();
+//                            if(unit.isAdded()){
+//                                if(net.client()) netClient.addRemovedEntity(unit.id());
+//                                unit.team.data().updateCount(unit.type, -1);
+//                            }
                         }
                     });
                     super.removed(b);
                 }
-
                 {
                     splashDamage = 6750.0f;
                     splashDamageRadius = 150.0f;

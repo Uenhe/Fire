@@ -1,5 +1,6 @@
 package fire.content;
 
+import arc.Core;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
@@ -10,6 +11,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Position;
+import arc.math.geom.Vec2;
 import arc.util.Nullable;
 import arc.util.Tmp;
 import fire.type.FleshUnitType;
@@ -249,6 +251,50 @@ public class FRFx{
         }
     }
 
+    public static void circleDraw_3D(float x, float y, float h, float rad, float stroke, float rot){
+        float space = (360) / (float)Lines.circleVertices(rad);
+        float hstep = stroke / 2.0F / Mathf.cosDeg(space / 2.0F);
+        float r1 = rad - hstep;
+        float r2 = rad + hstep;
+
+
+        for(int i = 0; i < Lines.circleVertices(rad) * 0.5; ++i) {
+            float a = space * (float)i;
+            float cb = Mathf.cosDeg(rot);
+            float sb = Mathf.sinDeg(rot);
+            float cos = Mathf.cosDeg(a);
+            float sin = Mathf.sinDeg(a);
+            float cos2 = Mathf.cosDeg(a + space);
+            float sin2 = Mathf.sinDeg(a + space);
+            Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin),
+                p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2),
+                p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2),
+                p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin);
+
+            quad(p1,p2,p3,p4);
+        }
+        Draw.z(Layer.flyingUnit - 0.5f);
+        for(int i = (int)(Lines.circleVertices(rad) * 0.5); i < Lines.circleVertices(rad); ++i) {
+            float a = space * (float)i;
+            float cb = Mathf.cosDeg(rot);
+            float sb = Mathf.sinDeg(rot);
+            float cos = Mathf.cosDeg(a);
+            float sin = Mathf.sinDeg(a);
+            float cos2 = Mathf.cosDeg(a + space);
+            float sin2 = Mathf.sinDeg(a + space);
+            Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin),
+                p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2),
+                p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2),
+                p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin);
+
+            quad(p1,p2,p3,p4);
+        }
+    }
+
+    public static void quad(Vec2 p1,Vec2 p2,Vec2 p3,Vec2 p4){
+        Fill.quad(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y);
+    }
+
     public static Effect lineTrailEffect(float lifetime, float length, float width, float rotation, Color color, int lines){
         return new Effect(lifetime, e -> {
             float rot = rotation + e.rotation;
@@ -295,6 +341,41 @@ public class FRFx{
                     Lines.line(x1, y1, x1 + totalX, y1 + totalY);
                     Drawf.light(x1, y1, 60f * b.fout(), color, 0.5f);
                 });
+            }
+        });
+    }
+
+    public static Effect cylinderEffect(float lifetime, float w, Color color, float alpha, float circle){
+        return new Effect(lifetime, e -> {
+            float width = w * e.fout(Interp.pow5In);
+            float cameraX = Core.camera.position.x;
+            float cameraY = Core.camera.position.y;
+            float x = e.x, y = e.y;
+            Draw.color(color);
+            Draw.z(Layer.effect);
+            Draw.alpha(alpha);
+            if(Mathf.within(x, y, cameraX, cameraY, width)){
+                Draw.rect();
+            }else{
+                Fill.circle(x, y, width);
+                float projectiveLength = Mathf.dst2(cameraX, cameraY, x, y);
+                final float m = 9999;
+                Vec2 p = FRMath.get3DPos(x, y, m);
+                float drawX = p.x;
+                float drawY = p.y;
+                float rotation = Angles.angle(x, y, cameraX, cameraY);
+
+                float rx1 = Angles.trnsx(rotation - 90f, width), ry1 = Angles.trnsy(rotation - 90f, width), rx2 = Angles.trnsx(rotation - 90f, width * m), ry2 = Angles.trnsy(rotation - 90f, width * m);
+                Fill.quad(x + rx1, y + ry1, x - rx1, y - ry1, drawX - rx2, drawY - ry2, drawX + rx2, drawY + ry2);
+                Fill.circle(drawX, drawY, width * m);
+            }
+            if(circle > 0){
+                float drawX = x + (x - cameraX) * circle;
+                float drawY = y + (y - cameraY) * circle;
+                width = w * e.fin(Interp.pow5Out) * 2f;
+                Draw.alpha(alpha * e.fout(Interp.pow5Out));
+                Lines.stroke(circle * 2.5f * e.fout(Interp.pow5Out));
+                Lines.circle(drawX, drawY, width * circle);
             }
         });
     }
