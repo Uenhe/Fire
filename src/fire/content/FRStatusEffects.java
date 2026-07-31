@@ -453,6 +453,8 @@ public class FRStatusEffects{
             public void onRemoved(Unit unit){
                 super.onRemoved(unit);
                 timerMap.remove(unit.id, 0.0f);
+                timerMap2.remove(unit.id, 0.0f);
+                shootingMap.remove(unit.id, 0);
             }
 
             @Override
@@ -489,7 +491,6 @@ public class FRStatusEffects{
                 timerMap2.put(unit.id, timer2);
                 shootingMap.put(unit.id, shooting);
             }
-
             {
                 healthMultiplier = 3.0f;
                 damageMultiplier = 1.4f;
