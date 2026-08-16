@@ -2964,7 +2964,8 @@ public class FRBlocks{
                     new ItemBulletAdaptingTurret.BulletStack(180, bullet_2_1, item_2),
                     new ItemBulletAdaptingTurret.BulletStack(360, bullet_2_2, item_2),
                     new ItemBulletAdaptingTurret.BulletStack(120, bullet_2_EX, item_2)
-                ), (int)magneticAlloy.id, Seq.with(
+                ),
+                (int)magneticAlloy.id, Seq.with(
                     new ItemBulletAdaptingTurret.BulletStack(90, bullet_1_1, item_1),
                     new ItemBulletAdaptingTurret.BulletStack(180, bullet_1_2, item_1),
                     new ItemBulletAdaptingTurret.BulletStack(270, bullet_1_3, item_1),
@@ -2997,7 +2998,21 @@ public class FRBlocks{
             speed_1_1 = 60.0f,
             lifetime_1_1 = 35.0f;
 
-            bullet_1_1 = new BasicBulletType(speed_1_1, 18000.0f){{
+            bullet_1_1 = new BasicBulletType(speed_1_1, 18000.0f){
+                @Override
+                public void init(Bullet b){
+                    Time.run(5.0f, () -> {
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    Time.run(10.0f, () -> {
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    Time.run(15.0f, () -> {
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    super.init(b);
+                }
+                {
                 lifetime = lifetime_1_1;
                 width = 20.0f;
                 height = 60.0f;
@@ -3156,7 +3171,21 @@ public class FRBlocks{
                 }}.startDelay(45.0f)
             );
 
-            bullet_2_3 = new BasicBulletType(18f, 2400f){{
+            bullet_2_3 = new BasicBulletType(18f, 2400f){
+                @Override
+                public void init(Bullet b){
+                    Time.run(6.0f, () -> {
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    Time.run(12.0f, () -> {
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    Time.run(18.0f, () -> {
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                    });
+                    super.init(b);
+                }
+                {
                 lifetime = 30f;
                 width = 24f;
                 height = 30f;

@@ -134,7 +134,8 @@ public class FireMod extends Mod{
     }
 
     static CheatStatusCode checkCheating(){
-        if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
+        return CheatStatusCode.OK;
+/*        if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
             return CheatStatusCode.OK;
 
         for(var block : cheatBlocks){
@@ -152,7 +153,7 @@ public class FireMod extends Mod{
             return CheatStatusCode.CHEAT_RULE;
         }
 
-        return CheatStatusCode.OK;
+        return CheatStatusCode.OK;*/
     }
 
     private static void loadSetting(){

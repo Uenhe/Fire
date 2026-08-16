@@ -17,7 +17,6 @@ public class ItemBulletAdaptingTurret extends ItemTurret{
     }
 
     public void stack(Object... objects){
-
         bulletStack = IntMap.of(objects);
     }
 

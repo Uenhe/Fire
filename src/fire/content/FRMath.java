@@ -173,11 +173,16 @@ public class FRMath{
         return new ElementUnitFactory.UnitValue(u, v, w);
     }
 
-    public static Vec2 get3DPos(float x, float y, float h){
+    public static Vec2 get3DPos(float x, float y, float h, boolean real){
         float cameraX = Core.camera.position.x;
         float cameraY = Core.camera.position.y;
-        float drawX = x + (x - cameraX) * h / 8;
-        float drawY = y + (y - cameraY) * h / 8;
+        float cameraH = Mathf.dst(Core.camera.width,Core.camera.height);
+        float drawX = x + (x - cameraX) * h / cameraH;
+        float drawY = y + (y - cameraY) * h / cameraH;
+        if(!real){
+            drawX = x + (x - cameraX) * h;
+            drawY = y + (y - cameraY) * h;
+        }
         return new Vec2(drawX, drawY);
     }
 

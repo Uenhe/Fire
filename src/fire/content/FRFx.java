@@ -251,14 +251,13 @@ public class FRFx{
         }
     }
 
-    public static void circleDraw_3D(float x, float y, float h, float rad, float stroke, float rot){
-        float space = (360) / (float)Lines.circleVertices(rad);
+    public static void circleDraw_3D(float x, float y, float h, float rad, float stroke, float rot, boolean asLine){
+        float space = 360.0f / (float)Lines.circleVertices(rad);
         float hstep = stroke / 2.0F / Mathf.cosDeg(space / 2.0F);
         float r1 = rad - hstep;
         float r2 = rad + hstep;
 
-
-        for(int i = 0; i < Lines.circleVertices(rad) * 0.5; ++i) {
+        for(int i = 0; i < Lines.circleVertices(rad) * 0.5; ++i){
             float a = space * (float)i;
             float cb = Mathf.cosDeg(rot);
             float sb = Mathf.sinDeg(rot);
@@ -266,15 +265,22 @@ public class FRFx{
             float sin = Mathf.sinDeg(a);
             float cos2 = Mathf.cosDeg(a + space);
             float sin2 = Mathf.sinDeg(a + space);
-            Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin),
-                p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2),
-                p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2),
-                p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin);
-
-            quad(p1,p2,p3,p4);
+            if(!asLine){
+                Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin, true),
+                    p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2, true),
+                    p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2, true),
+                    p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin, true);
+                quad(p1, p2, p3, p4);
+            }else{
+                Vec2 p1 = FRMath.get3DPos(x + rad * cos * cb, y + rad * cos * sb, h + rad * sin, true),
+                    p2 = FRMath.get3DPos(x + rad * cos2 * cb, y + rad * cos2 * sb, h + rad * sin2, true);
+                Lines.stroke(stroke);
+                Lines.line(p1.x, p1.y, p2.x, p2.y);
+            }
         }
-        Draw.z(Layer.flyingUnit - 0.5f);
-        for(int i = (int)(Lines.circleVertices(rad) * 0.5); i < Lines.circleVertices(rad); ++i) {
+
+        Draw.z(Layer.bullet - 0.5f);
+        for(int i = (int)(Lines.circleVertices(rad) * 0.5); i < Lines.circleVertices(rad); ++i){
             float a = space * (float)i;
             float cb = Mathf.cosDeg(rot);
             float sb = Mathf.sinDeg(rot);
@@ -282,17 +288,36 @@ public class FRFx{
             float sin = Mathf.sinDeg(a);
             float cos2 = Mathf.cosDeg(a + space);
             float sin2 = Mathf.sinDeg(a + space);
-            Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin),
-                p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2),
-                p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2),
-                p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin);
-
-            quad(p1,p2,p3,p4);
+            if(!asLine){
+                Vec2 p1 = FRMath.get3DPos(x + r1 * cos * cb, y + r1 * cos * sb, h + r1 * sin, true),
+                    p2 = FRMath.get3DPos(x + r1 * cos2 * cb, y + r1 * cos2 * sb, h + r1 * sin2, true),
+                    p3 = FRMath.get3DPos(x + r2 * cos2 * cb, y + r2 * cos2 * sb, h + r2 * sin2, true),
+                    p4 = FRMath.get3DPos(x + r2 * cos * cb, y + r2 * cos * sb, h + r2 * sin, true);
+                quad(p1, p2, p3, p4);
+            }else{
+                Vec2 p1 = FRMath.get3DPos(x + rad * cos * cb, y + rad * cos * sb, h + rad * sin, true),
+                    p2 = FRMath.get3DPos(x + rad * cos2 * cb, y + rad * cos2 * sb, h + rad * sin2, true);
+                Lines.stroke(stroke);
+                Lines.line(p1.x, p1.y, p2.x, p2.y);
+            }
         }
+        Drawf.light(x, y, rad, Draw.getColor(), 1.0f);
     }
 
-    public static void quad(Vec2 p1,Vec2 p2,Vec2 p3,Vec2 p4){
-        Fill.quad(p1.x,p1.y,p2.x,p2.y,p3.x,p3.y,p4.x,p4.y);
+    public static void quad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4){
+        Fill.quad(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
+    }
+
+    public static Effect waveEffect_3D(float lifetime, float sizeFrom, float sizeTo, float rot, float strokeFrom, float strokeTo, Color colorFrom, Color colorTo, Interp strokeInterp, Interp sizeInterp, Interp colorInterp){
+        return new Effect(lifetime, e->{
+            float fin = e.fin();
+            float ifin = e.fin(colorInterp);
+            float rad = sizeInterp.apply(sizeFrom, sizeTo, fin);
+            float stroke = strokeInterp.apply(strokeFrom, strokeTo, fin);
+
+            Draw.color(colorFrom, colorTo, ifin);
+            circleDraw_3D(e.x,e.y,0,rad,stroke,rot,true);
+        });
     }
 
     public static Effect lineTrailEffect(float lifetime, float length, float width, float rotation, Color color, int lines){
@@ -303,7 +328,7 @@ public class FRFx{
             Draw.color(color);
             Lines.stroke(e.fout(Interp.pow5Out) * width * 1.25f);
 
-            Mathf.rand.setSeed(e.id);
+            Fx.rand.setSeed(e.id);
             for(int i = 0; i < lines; i++){
                 float maxRand = 1.0f / lines;
                 float phase1 = Mathf.random(maxRand) + maxRand * i, phase2 = phase1 + Mathf.random(maxRand * 0.3f);
@@ -327,7 +352,7 @@ public class FRFx{
             Draw.color(color);
             Lines.stroke(e.fout(Interp.pow5Out) * width * 1.25f);
 
-            Mathf.rand.setSeed(e.id);
+            Fx.rand.setSeed(e.id);
             for(int i = 0; i < lines; i++){
                 float maxRand = 1.0f / lines;
                 float phase1 = Mathf.random(maxRand) + maxRand * i, phase2 = phase1 + Mathf.random(maxRand * 0.3f);
@@ -358,9 +383,8 @@ public class FRFx{
                 Draw.rect();
             }else{
                 Fill.circle(x, y, width);
-                float projectiveLength = Mathf.dst2(cameraX, cameraY, x, y);
-                final float m = 9999;
-                Vec2 p = FRMath.get3DPos(x, y, m);
+                final float m = 99999;
+                Vec2 p = FRMath.get3DPos(x, y, m, false);
                 float drawX = p.x;
                 float drawY = p.y;
                 float rotation = Angles.angle(x, y, cameraX, cameraY);

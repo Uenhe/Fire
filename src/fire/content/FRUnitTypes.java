@@ -572,20 +572,26 @@ public class FRUnitTypes{
             coreUnitDock = true;
             engineOffset = 10.0f;
             itemCapacity = 60;
-            weapons.add(
-                new Weapon("big laser"){
-                    @Override
-                    public void draw(Unit unit,WeaponMount weapon){
-                        FRFx.circleDraw_3D(unit.x + 12 * Mathf.cosDeg(unit.rotation),unit.y + 12 * Mathf.sinDeg(unit.rotation),
-                            12, 6, 1, unit.rotation + 90.0f);
-                        super.draw(unit,weapon);
+            weapons.add(new Weapon("big laser"){
+                @Override
+                public void draw(Unit unit, WeaponMount weapon){
+                    float progress1 = Math.min(0.5f, weapon.warmup) * 2.0f;
+                    Draw.color(Color.white);
+                    FRFx.circleDraw_3D(unit.x + 24 * Mathf.cosDeg(unit.rotation) * progress1, unit.y + 24 * Mathf.sinDeg(unit.rotation) * progress1, 0, 60 - 48 * progress1, progress1 * 3, unit.rotation + 90.0f, true);
+                    if(weapon.warmup > 0.4f){
+                        float progress2 = (weapon.warmup - 0.4f) / 0.6f;
+                        FRFx.circleDraw_3D(unit.x + (16 + 36 * progress2) * Mathf.cosDeg(unit.rotation), unit.y + (16 + 36 * progress2) * Mathf.sinDeg(unit.rotation), 0, 60 - 48 * progress2, progress2 * 3, unit.rotation + 90.0f, true);
                     }
-                    {
-                        mirror = false;
-                        rotate = false;
-                    }
+                    super.draw(unit, weapon);
                 }
-            );
+                {
+                    shootWarmupSpeed = 0.04f;
+                    minWarmup = 0.99f;
+                    reload = 180.0f;
+                    mirror = false;
+                    rotate = false;
+                }
+            });
         }};
 
         //region ground
