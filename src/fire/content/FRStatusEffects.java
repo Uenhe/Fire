@@ -19,6 +19,7 @@ import fire.entities.abilities.DebuffRemoveFieldAbility;
 import fire.type.FleshUnitType;
 import fire.world.meta.FRStat;
 import fire.world.meta.FRStatUnit;
+import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -36,16 +37,20 @@ import mindustry.type.UnitType;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import static fire.entities.abilities.DebuffRemoveFieldAbility.DEBUFFS;
 import static mindustry.Vars.content;
+import static mindustry.Vars.headless;
+import static mindustry.content.StatusEffects.wet;
 
 public class FRStatusEffects{
 
     public static final StatusEffect
-        frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated, magnetized, informationalProjection/*, starfire*/;
+        frostbite, inspired, sanctuaryGuard, mu, overgrown, disintegrated, magnetized, informationalProjection, informationalPerturbation/*, informationalAssimilation, starfire*/;
 
     static{
         frostbite = new StatusEffect("frostbite"){{
             Color.valueOf(color, "ff0000");
+            outline = false;
             damage = 8.0f / 60.0f;
             speedMultiplier = 0.55f;
             healthMultiplier = 0.75f;
@@ -66,6 +71,7 @@ public class FRStatusEffects{
 
         inspired = new StatusEffect("inspired"){{
             color.set(Pal.accent);
+            outline = false;
             healthMultiplier = 1.15f;
             speedMultiplier = 1.4f;
             reloadMultiplier = 1.2f;
@@ -95,6 +101,7 @@ public class FRStatusEffects{
             }
             {
                 color.set(Pal.accent);
+                outline = false;
                 damage = -2.4f;
                 healthMultiplier = 2.25f;
             }
@@ -167,6 +174,7 @@ public class FRStatusEffects{
             }
             {
                 color.set(Liquids.neoplasm.color);
+                outline = false;
                 damage = 0.6f;
                 speedMultiplier = 0.9f;
                 effectChance = 0.1f;
@@ -211,6 +219,7 @@ public class FRStatusEffects{
             }
             {
                 Color.valueOf(color, "989aa4");
+                outline = false;
                 damage = 3.5f;
                 healthMultiplier = 0.85f;
                 effectChance = 0.14f;
@@ -230,6 +239,7 @@ public class FRStatusEffects{
             }
             {
                 Color.valueOf(color, "98ffa8");
+                outline = false;
                 damage = 2.0f;
                 transitionDamage = 10.0f;
                 speedMultiplier = dragMultiplier = 0.95f;
@@ -275,28 +285,29 @@ public class FRStatusEffects{
                 });
 
                 Events.on(EventType.ContentInitEvent.class, e -> {
-                    for(int i = 0, n = content.units().size; i < n; i++){
-                        var u = content.units().get(i);
-                        int type = checkBullet(content.units().get(i));
+                    var units = content.units();
+                    for(int i = 0, n = units.size; i < n; i++){
+                        var u = units.get(i);
+                        int type = checkBullet(units.get(i));
                         float Damage = Math.min(u.health * 0.05f + 40.0f, u.health * 0.01f + 60.0f);
                         float Lifetime = 60.0f + Damage * 0.01f;
                         float Speed = Mathf.sqrt(Damage * 0.5f);
                         if(type == 1){
-                            float Length = Lifetime * Speed * 0.5f;
+                            float len = Lifetime * Speed * 0.5f;
                             bullets[i] = new RailBulletType(){{
                                 damage = Damage * 2.5f;
-                                length = Length;
+                                length = len;
                                 pointEffectSpace = 20f;
                                 despawnEffect = pierceEffect = hitEffect = shootEffect = new ParticleEffect(){{
                                     particles = 1;
                                     lifetime = Lifetime;
                                     length = 0.0f;
-                                    sizeFrom = Length / 80.0f;
+                                    sizeFrom = len / 80.0f;
                                     sizeInterp = Interp.pow5In;
                                     colorFrom = colorTo = Color.green;
                                 }};
-                                pointEffectSpace = Length / 10.0f;
-                                pointEffect = FRFx.lineTrailEffect(Lifetime, pointEffectSpace + 1, Length / 100.0f, 0, Color.green, 1);
+                                pointEffectSpace = len / 10.0f;
+                                pointEffect = FRFx.lineTrailEffect(Lifetime, pointEffectSpace + 1, len / 100.0f, 0, Color.green, 1);
                                 smokeEffect = Fx.shootBig2;
                                 pierceDamageFactor = 0.4f;
                             }};
@@ -492,12 +503,72 @@ public class FRStatusEffects{
                 shootingMap.put(unit.id, shooting);
             }
             {
+                outline = false;
                 healthMultiplier = 3.0f;
                 damageMultiplier = 1.4f;
                 reloadMultiplier = 0.8f;
                 speedMultiplier = 1.3f;
                 damage = 1.0f;
                 effectChance = 0.05f;
+            }
+
+        };
+
+
+
+        informationalPerturbation = new StatusEffect("informational-perturbation"){
+
+            private static final Color[] colors = {Color.red, Color.green, Color.blue};
+            private static final IntIntMap transpedMap = new IntIntMap();
+
+            @Override
+            public void onRemoved(Unit unit){
+                super.onRemoved(unit);
+                transpedMap.remove(unit.id, 0);
+            }
+
+            @Override
+            public void update(Unit unit, StatusEntry entry){
+                super.update(unit, entry);
+
+                if(!headless && Mathf.chanceDelta(0.15f - (0.1f * unit.health / unit.maxHealth)) && !unit.inFogTo(Vars.player.team())){
+                    Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2.0f));
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 20, unit.x + Mathf.random(-0.3f * unit.hitSize, 0.3f * unit.hitSize), unit.y + Mathf.random(-0.3f * unit.hitSize, 0.3f * unit.hitSize), colors[Mathf.random(2)], true).at(unit.x, unit.y);
+                }
+
+                if(unit.health >= unit.maxHealth * 0.95f)
+                    transpedMap.put(unit.id, 1);
+
+                if(unit.health <= unit.maxHealth * 0.3f && transpedMap.get(unit.id) == 1){
+                    transpedMap.remove(unit.id, 0);
+                    unit.health += unit.maxHealth * 0.3f;
+                    float rot = unit.rotation + Mathf.randomSeed(unit.id,-15,15);
+                    float range = Math.min(320.0f, Mathf.randomSeed(unit.id,2 * unit.hitSize) + unit.hitSize * 2 + 80.0f);
+                    float transX = Mathf.cosDeg(rot) * range,
+                        transY = Mathf.sinDeg(rot) * range;
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 20, unit.x + transX,unit.y + transY, Color.green,false).at(unit.x,unit.y);
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 30, unit.x + transX,unit.y + transY, Color.blue,false).at(unit.x,unit.y);
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 50, unit.x + transX,unit.y + transY, Color.red,false).at(unit.x,unit.y);
+                    unit.x += transX;
+                    unit.y += transY;
+                    unit.vel.x = 0;
+                    unit.vel.y = 0;
+                    for(var fx : DEBUFFS){
+                        if(!unit.hasEffect(fx) || (unit.type instanceof FleshUnitType && (fx == wet || fx == overgrown))) continue;
+                        unit.unapply(fx);
+                    }
+                    unit.apply(StatusEffects.unmoving, 50.0f);
+                    unit.apply(StatusEffects.invincible, 30.0f);
+                    unit.apply(StatusEffects.shielded, 300.0f);
+                    unit.apply(StatusEffects.slow, 120.0f);
+                }
+            }
+            {
+                outline = false;
+                healthMultiplier = 1.5f;
+                damageMultiplier = 1.3f;
+                reloadMultiplier = 1.3f;
+                speedMultiplier = 1.2f;
             }
         };
 
@@ -534,6 +605,7 @@ public class FRStatusEffects{
                         Fill.circle(e.x + x, e.y + y, 0.1F + e.fout() * 1.2F);
                     });
                 });
+                outline = false;
                 healthMultiplier = 0.95f;
                 reloadMultiplier = 0.9f;
                 effectChance = 0.05f;

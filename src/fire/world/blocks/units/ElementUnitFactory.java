@@ -61,13 +61,13 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected float timeScl;
     protected final Seq<UnitType> plans = new Seq<>();
 
-    private static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
+    public static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
     private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
 
     private static void putAllValues(Object... values){
         var itemValues = ElementUnitFactory.itemValues;
-        for(int i = 0, n = values.length; i < n; i += 7)
-            itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6]));
+        for(int i = 0, n = values.length; i < n; i += 8)
+            itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6], (int)values[i + 7]));
     }
 
     public ElementUnitFactory(String name, int t){
@@ -82,7 +82,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         ambientSound = Sounds.loopUnitBuilding;
         buildType = ElementUnitFactoryBuild::new;
 
-        config(Byte.class, (ElementUnitFactoryBuild build, Byte i) -> {
+        config(byte.class, (ElementUnitFactoryBuild build, Byte i) -> {
             if(build.currentPlan == i) return;
             build.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             build.progress = 0.0f;
@@ -117,35 +117,35 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         plans.sort(u -> u.id);
 
         putAllValues(
-            copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f,
-            lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f,
-            metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f,
-            graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f,
-            scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f,
-            coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f,
-            titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f,
-            thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f,
-            silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f,
-            plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f,
-            phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f,
-            surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f,
-            sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f,
-            sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f,
-            blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f,
-            pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f,
+            copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f, 0,
+            lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f, 0,
+            metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f, 2,
+            graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f, 3,
+            scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f, 0,
+            coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f, 1,
+            titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f, 4,
+            thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f, 5,
+            silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f, 1,
+            plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f, 4,
+            phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f, 6,
+            surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f, 4,
+            sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f, 2,
+            sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f, 0,
+            blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f, 4,
+            pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f, 3,
 
-            glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f,
-            mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f,
-            sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f,
-            kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f,
-            conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f,
-            detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f,
-            flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f,
-            timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f,
-            flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.65f,  6.4f,
-            hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f,
-            magneticAlloy,    2.2f,  6.3f,  14.0f, 6.6f, 0.75f,  5.7f,
-            logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f
+            glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f, 0,
+            mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f, 6,
+            sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f, 4,
+            kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f, 4,
+            conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f, 3,
+            detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f, 9,
+            flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f, 4,
+            timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f, 5,
+            flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.65f,  6.4f, 12,
+            hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f, 12,
+            magneticAlloy,    2.2f,  6.3f,  14.0f, 6.6f, 0.75f,  5.7f, 18,
+            logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f, 8
         );
 
         for(var unit : plans)
@@ -536,15 +536,17 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         }
     }
 
-    private static class ItemValue{
+    public static class ItemValue{
         private final float armorXp, armorMaxLv, energyXp, energyMaxLv, logicXp, logicMaxLv;
-        private ItemValue(float armorXp, float armorMaxLv, float energyXp, float energyMaxLv, float logicXp, float logicMaxLv){
+        public final int threat;
+        private ItemValue(float armorXp, float armorMaxLv, float energyXp, float energyMaxLv, float logicXp, float logicMaxLv, int threat){
             this.armorXp = armorXp;
             this.armorMaxLv = armorMaxLv;
             this.energyXp = energyXp;
             this.energyMaxLv = energyMaxLv;
             this.logicXp = logicXp;
             this.logicMaxLv = logicMaxLv;
+            this.threat = threat;
         }
     }
 

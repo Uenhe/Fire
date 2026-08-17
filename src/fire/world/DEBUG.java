@@ -5,7 +5,6 @@ import arc.struct.Seq;
 import arc.util.OS;
 import fire.FRUtils;
 import fire.content.FRFx;
-import fire.world.blocks.sandbox.AdaptiveSource;
 import mindustry.ai.BlockIndexer;
 import mindustry.content.Blocks;
 import mindustry.content.Fx;
@@ -20,7 +19,6 @@ import mindustry.graphics.Pal;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Block;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.BuildVisibility;
 
 import java.lang.reflect.Field;
@@ -30,7 +28,6 @@ import static mindustry.Vars.*;
 public class DEBUG{
 
     private static final BuildVisibility DEBUG_BuildVisibility = new BuildVisibility(() -> state.rules.infiniteResources && isDeveloper());
-    private static final BuildVisibility DEBUG_CheatBuildVisibility = new BuildVisibility(() -> player.team().rules().cheat && isDeveloper());
 
     public static class DEBUG_Turret extends mindustry.world.blocks.defense.turrets.Turret{
 
@@ -126,7 +123,7 @@ public class DEBUG{
                 try{
                     field_activeTeams = FRUtils.field(BlockIndexer.class, "activeTeams");
                 }catch(NoSuchFieldException e){
-                    throw new RuntimeException("?", e);
+                    throw new RuntimeException(e);
                 }
             }
 
@@ -135,48 +132,14 @@ public class DEBUG{
             public void placed(){
                 if(!isDeveloper()) return;
                 try{
-                    Seq<Team> activeTeams = (Seq<Team>)field_activeTeams.get(indexer);
+                    var activeTeams = (Seq<Team>)field_activeTeams.get(indexer);
                     for(var team : activeTeams)
                         for(var build : team.data().buildings)
                             build.heal();
                     tile.setNet(Blocks.air);
 
                 }catch(IllegalAccessException e){
-                    throw new RuntimeException("?", e);
-                }
-            }
-        }
-    }
-
-    public static class DEBUG_ItemTurretSupplier extends Block{
-
-        public DEBUG_ItemTurretSupplier(String name){
-            super(name);
-            requirements(Category.logic, DEBUG_CheatBuildVisibility, ItemStack.empty);
-            alwaysUnlocked = true;
-            solid = destructible = update = true;
-            buildType = DEBUG_ItemTurretSupplierBuild::new;
-        }
-
-        @Override
-        public void setStats(){}
-
-        public static class DEBUG_ItemTurretSupplierBuild extends Building{
-
-            @Override
-            public void updateTile(){
-                if(isDeveloper() && cheating() && timer(0, 90.0f)){
-                    for(var build : team.data().buildings){
-                        if(!(build instanceof ItemTurret.ItemTurretBuild)) continue;
-
-                        var ammo = ((ItemTurret.ItemTurretBuild)build).ammo;
-                        var item = content.item(AdaptiveSource.turretItemMap.get(build.block.id));
-                        if(ammo.isEmpty()) build.handleItem(build, item);
-
-                        var entry = (ItemTurret.ItemEntry)ammo.peek();
-                        entry.amount = ((ItemTurret.ItemTurretBuild)build).totalAmmo = 100;
-                        entry.item = item;
-                    }
+                    throw new RuntimeException(e);
                 }
             }
         }

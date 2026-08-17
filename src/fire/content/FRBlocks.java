@@ -129,7 +129,7 @@ public class FRBlocks{
 
     //turret
     smasher, nightmare, fulmination,
-    ignition, blossom, gambler, seaquake, distance, magneticDomain,
+    ignition, blossom, gambler, seaquake, distance, magneticDomain, dawn,
     grudge, aerolite, magneticSphere, scab,
     obstruction, cumulonimbus,
     magneticRail,
@@ -1135,6 +1135,40 @@ public class FRBlocks{
                     status = StatusEffects.electrified;
                     statusDuration = 30.0f;
                 }};
+            }};
+        }};
+
+        dawn = new PowerTurret("dawn"){{
+            requirements(Category.turret, with(
+                plastanium, 275,
+                surgeAlloy, 195,
+                logicAlloy, 225,
+                hardenedAlloy, 80
+            ));
+            health = 1250;
+            size = 3;
+            liquidCapacity = 50.0f;
+            reload = 300.0f;
+            range = 32 * tilesize;
+            shootCone = 6.0f;
+            shootY = 22.0f;
+            recoil = 5.0f;
+            rotateSpeed = 3.2f;
+            coolantMultiplier = 0.8f;
+            moveWhileCharging = true;
+            shootSound = Sounds.shootLancer;
+            shoot.firstShotDelay = 120.0f;
+
+            consumePower(n(1200));
+            consumeCoolant(n(30));
+
+            shootType = new FusionBombType(240.0f){{
+                speed = 4.5f;
+                chargeEffect = new Effect(shoot.firstShotDelay, 0, e -> {
+                    Draw.color(Pal.surge);
+                    Fill.circle(e.x + e.fin(Interp.pow5Out) * 22.0f * Mathf.cosDeg(e.rotation), e.y + e.fin(Interp.pow5Out) * 22.0f * Mathf.sinDeg(e.rotation), e.fin(Interp.pow5Out) * FRMath.getRange_fusionBomb(180.0f));
+                    Draw.color();
+                }).rotWithParent(true);
             }};
         }};
 
@@ -2863,10 +2897,10 @@ public class FRBlocks{
                         if(isDifferentBullets(b, other)){
                             echoEffect.at(other.x, other.y);
                             FRFx.lineTrailEffect(40.0f, b.x, b.y, other.x, other.y, 3.0f, Color.sky, 4).at(b.x, b.y);
-                            cnt[0]++;
+                            cnt[0] += 1.0f;
                         }
                     });
-                    if(cnt[0] == 0){
+                    if(cnt[0] == 0.0f){
                         noEchoEffect.at(b.x, b.y);
                         return;
                     }
@@ -5345,7 +5379,7 @@ public class FRBlocks{
                 super.add();
                 if(!state.isCampaign()) return;
 
-                byte n = (byte)Mathf.random(4, 6);
+                int n = Mathf.random(4, 6);
                 for(var s : state.getPlanet().sectors)
                     if(s.hasBase() && counter++ < n)
                         Events.fire(new EventType.SectorInvasionEvent(s)); //fake invasions, visually only
@@ -5357,7 +5391,6 @@ public class FRBlocks{
         //region debug
         new DEBUG.DEBUG_Turret("DEBUG_TURRET");
         new DEBUG.DEBUG_Mend("DEBUG_MEND");
-        new DEBUG.DEBUG_ItemTurretSupplier("DEBUG_SUPPLIER");
     }
 
     public static void load(){}

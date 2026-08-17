@@ -16,7 +16,7 @@ import static mindustry.content.StatusEffects.*;
 
 public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Ability{
 
-    private static final StatusEffect[] DEBUFFS = {
+    public static final StatusEffect[] DEBUFFS = {
         burning, freezing, unmoving, slow, wet, muddy, melting, sapped, electrified,
         sporeSlowed, tarred, shocked, blasted, corroded, disarmed,
         frostbite, overgrown, disintegrated, magnetized
@@ -56,6 +56,7 @@ public class DebuffRemoveFieldAbility extends mindustry.entities.abilities.Abili
         }
     }
 
+    /** @return Whether unit has any debuff. */
     public static boolean removeDebuff(Unit unit){
         boolean any = false;
         for(var fx : DEBUFFS){

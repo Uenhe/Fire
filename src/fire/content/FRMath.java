@@ -1,6 +1,8 @@
 package fire.content;
 
 import arc.Core;
+import arc.graphics.g2d.Draw;
+import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Vec2;
 import fire.entities.abilities.RegenFieldAbility;
@@ -186,6 +188,18 @@ public class FRMath{
         return new Vec2(drawX, drawY);
     }
 
+    public static float smooth(float progress,float level) {
+        progress = progress * 2;
+        if(progress<=1) {
+            return Mathf.pow(progress,level) * 0.5f;
+        }
+        return 1.0f - 0.5f * Mathf.pow(2 - progress,level);
+    }
+
+    public static float mix(float a,float b, float progress){
+        return a * (1 - smooth(progress,3)) + b * smooth(progress,3);
+    }
+
     public static float getDamage_fusionBomb(float lifetime, float maxTime){
         float damage = maxTime, cnt = 1;
         while(lifetime >= 300.0f){
@@ -197,7 +211,7 @@ public class FRMath{
     }
 
     public static float getRange_fusionBomb(float lifetime){
-        return Mathf.sqrt(lifetime) * 100.0f;
+        return Mathf.pow(lifetime,0.3f) * 4;
     }
 
     public static float getReload1_fusionBomb(float lifetime){

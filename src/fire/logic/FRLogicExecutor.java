@@ -8,7 +8,10 @@ import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.Image;
 import fire.content.FRFx;
+import fire.entities.bullets.FusionBombType;
+import fire.ui.FRUI;
 import mindustry.content.Blocks;
+import mindustry.core.UI;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Unit;
@@ -17,7 +20,7 @@ import mindustry.logic.LVar;
 import mindustry.world.Block;
 import mindustry.world.blocks.environment.StaticWall;
 
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 
 public class FRLogicExecutor{
 
@@ -120,6 +123,64 @@ public class FRLogicExecutor{
         public void run(LExecutor exec){
             var tile = exec.thisv.building().tile;
             tile.setNet(tile.floor().wall instanceof StaticWall w ? w : Blocks.stoneWall);
+        }
+    }
+
+    public static class FusionBombSpawnI implements LExecutor.LInstruction{
+        LVar lifetime;
+        LVar x;
+        LVar y;
+        LVar rotation;
+        LVar team;
+
+        public FusionBombSpawnI(LVar lifetime,LVar x,LVar y,LVar rotation,LVar team){
+            this.lifetime = lifetime;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.team = team;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            new FusionBombType(lifetime.numf() * 60).create(exec.build, Team.get(team.numi()),x.numf() * 8,y.numf() * 8,rotation.numf());
+        }
+    }
+
+    public static class FlushMessagePlusI implements LExecutor.LInstruction{
+        MessageTypePlus type;
+        LVar duration;
+        LVar speaker;
+        LVar x;
+        LVar y;
+
+        public FlushMessagePlusI(MessageTypePlus lifetime, LVar duration, LVar speaker, LVar x, LVar y){
+            this.type = lifetime;
+            this.duration = duration;
+            this.speaker = speaker;
+            this.x = x;
+            this.y = y;
+        }
+
+        @Override
+        public void run(LExecutor exec){
+            String text = UI.formatIcons(exec.textBuffer.toString());
+            if(text.startsWith("@")){
+                String substr = text.substring(1);
+                if(Core.bundle.has(substr)){
+                    text = Core.bundle.get(substr);
+                }
+            }
+
+            switch(type){
+                case ANNOUNCE -> FRUI.announce(text, duration.numf());
+                case BUTTON -> FRUI.bottom(text, duration.numf());
+                case FREE -> FRUI.freeShow(text, duration.numf(), x.numf(), y.numf());
+                case SMOOTH -> FRUI.smoothShow(text, duration.numf(), x.numf(), y.numf());
+                case DIALOGBOXSHOW -> FRUI.tableShow(text, duration.numf());
+            }
+
+            exec.textBuffer.setLength(0);
         }
     }
 }

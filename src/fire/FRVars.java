@@ -5,7 +5,10 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import arc.util.Log;
 import fire.content.FRUnitTypes;
+import fire.world.CheatMode;
+import fire.world.DEBUG;
 import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
@@ -15,6 +18,7 @@ import mindustry.graphics.Pal;
 import mindustry.ui.dialogs.BaseDialog;
 
 import java.awt.*;
+import java.util.HashMap;
 
 import static fire.FireMod.CheatStatusCode.OK;
 import static fire.FireMod.cheatBlocks;
@@ -24,7 +28,7 @@ import static mindustry.Vars.player;
 
 public final class FRVars{
 
-    public static final Seq<Color> colorPool = new Seq<>(48); //hardcoded initial capacity
+    public static final HashMap<String, Color> colorPool = new HashMap<>(64);
     public static final Seq<Unit> spawnedUnits = new Seq<>();
 
     /** Temporary colors. */
@@ -33,7 +37,7 @@ public final class FRVars{
 
     /** Setting. */
     public static boolean
-        mineSand = false, displayRange = true, showLog = true, noMultiMods = true;
+        mineSand = false, displayRange = true, showLog = true, noMultiMods = true, cheatMode = false;
 
     public static short equivalentWidth;
 
@@ -56,6 +60,10 @@ public final class FRVars{
                     Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
                         Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
 
+                CheatMode.update();
+
+                player.team().rules().cheat = cheatMode;
+
                 if(cheatDialog == null){
                     var code = checkCheating();
                     Table table = null;
@@ -67,12 +75,13 @@ public final class FRVars{
 
                     switch(code){
                         case CHEAT_BLOCK:
-                            StringBuilder sb = new StringBuilder();
+                            var sb = new StringBuilder();
+                            var buildingTypes = Team.get(player.team().id).data().buildingTypes;
+
                             for(var block : cheatBlocks){
-                                var builds = Team.get(player.team().id).data().buildingTypes.get(block);
-                                if(builds == null) continue;
-                                if(builds.size > 0)
-                                    sb.append("\n").append(block.localizedName);
+                                var builds = buildingTypes.get(block);
+                                if(builds == null || builds.isEmpty()) continue;
+                                sb.append("\n").append(block.localizedName);
                             }
                             table.add(Core.bundle.format("fire.err1", sb.toString())).center().row();
                             break;
@@ -112,15 +121,21 @@ public final class FRVars{
         displayRange = Core.settings.getBool("displayrange");
         showLog = Core.settings.getBool("showlog");
         noMultiMods = Core.settings.getBool("nomultimods");
+        cheatMode = Core.settings.getBool("cheatmode");
     }
 
     public static Color find(String hex){
-        var result = colorPool.find(c -> (hex.length() == 6 ? hex + "ff" : hex).equals(c.toString()));
-        if(result == null){
-            var color = Color.valueOf(hex);
-            colorPool.add(color);
-            return color;
-        }
-        return result;
+        if(hex.length() == 6) hex += "ff";
+        var color = colorPool.get(hex);
+        if(color != null) return color;
+
+        color = Color.valueOf(hex);
+        colorPool.put(hex, color);
+
+        int size = colorPool.size();
+        if(DEBUG.isDeveloper() && size > 64)
+            Log.info("Resized Color Pool Length: ", size);
+
+        return color;
     }
 }

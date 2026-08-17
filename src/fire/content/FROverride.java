@@ -216,9 +216,13 @@ public class FROverride{
         LAssembler.customParsers.put(FRLogicStatements.MaskCutsceneStatement.name, FRLogicStatements.MaskCutsceneStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.FetchPlusPlusStatement.name, FRLogicStatements.FetchPlusPlusStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
+        LAssembler.customParsers.put(FRLogicStatements.FusionBombSpawn.name, FRLogicStatements.FusionBombSpawn::new);
+        LAssembler.customParsers.put(FRLogicStatements.FlushMessagePlus.name, FRLogicStatements.FlushMessagePlus::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.TransitionEffectStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.MaskCutsceneStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.FetchPlusPlusStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.FusionBombSpawn::new);
+        LogicIO.allStatements.addUnique(FRLogicStatements.FlushMessagePlus::new);
     }
 }

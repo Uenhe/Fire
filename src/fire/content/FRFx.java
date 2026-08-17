@@ -12,18 +12,27 @@ import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.math.geom.Vec2;
+import arc.scene.actions.Actions;
+import arc.scene.event.Touchable;
+import arc.scene.ui.layout.Table;
+import arc.util.Align;
 import arc.util.Nullable;
+import arc.util.Time;
 import arc.util.Tmp;
 import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
+import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
+import mindustry.ui.Styles;
 
-import static mindustry.Vars.tilesize;
+import java.awt.*;
+
+import static mindustry.Vars.*;
 
 public class FRFx{
 
@@ -132,6 +141,7 @@ public class FRFx{
         Draw.reset();
     });
 
+
     /** Special thanks to Testing Utilities mod. */
     public static Effect fleshTeleportEffect = new Effect(80.0f, e -> {
         if(!(e.data instanceof TpFxData data)) return;
@@ -160,6 +170,23 @@ public class FRFx{
             e.x - cos * 0.25f, e.y - sin * 0.25f
         );
     });
+
+
+
+
+    /** Yoshu ...? **/
+    public static Effect errTransitionEffect(TextureRegion image, float rotation, float lifetime, float aimX, float aimY, Color color, boolean fade){
+        return new Effect(lifetime, e -> {
+                float x,y;
+                float progress = e.fin(Interp.pow5Out);
+                x = e.x * (1 - progress) + aimX * progress;
+                y = e.y * (1 - progress) + aimY * progress;
+                Draw.color(color);
+                Draw.z(Layer.darkness + 0.1f);
+                if(fade)Draw.alpha(e.fout(Interp.pow5Out));
+                Draw.rect(image,x,y,rotation - 90.0f);
+        });
+    }
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
@@ -257,6 +284,7 @@ public class FRFx{
         float r1 = rad - hstep;
         float r2 = rad + hstep;
 
+        Draw.z(Layer.flyingUnit + 0.2f);
         for(int i = 0; i < Lines.circleVertices(rad) * 0.5; ++i){
             float a = space * (float)i;
             float cb = Mathf.cosDeg(rot);
@@ -303,6 +331,7 @@ public class FRFx{
         }
         Drawf.light(x, y, rad, Draw.getColor(), 1.0f);
     }
+
 
     public static void quad(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4){
         Fill.quad(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, p4.x, p4.y);
@@ -402,6 +431,44 @@ public class FRFx{
                 Lines.circle(drawX, drawY, width * circle);
             }
         });
+    }
+
+
+    public static Effect threatingEffect(int num, float lifetimeExtra){
+        return new Effect(num * 60.0f + 90.0f + lifetimeExtra,e->{
+            Draw.z(Layer.effect);
+            Draw.color(state.rules.waveTeam.color);
+            Draw.alpha(e.fout(Interp.pow10Out));
+            float x = Core.camera.position.x,y = Core.camera.position.y, r = Core.camera.height, l = Core.camera.width * 0.5f * (1 + 2 * e.fout(Interp.pow5In));
+            Mathf.randomSeed(e.id);
+            float rand1 = Mathf.randomSeed(e.id,0.3f,1.8f);
+            float rand2 = Mathf.randomSeed(e.id,360.0f);
+            float rand3 = Mathf.randomSeed(e.id,0.16f, 1.0f);
+            if(e.lifetime >= 180.0f)rand1 *= (1 + 0.1f * Mathf.sinDeg(Time.time * 5f + e.lifetime) + 0.1f * Mathf.cosDeg(Time.time * 3f));
+            rand3 = Mathf.sqrt(rand3);
+            Draw.rect(Icon.warning.getRegion(),
+                x + l * rand3 * Mathf.cosDeg(rand2), y + l * rand3 * Mathf.sinDeg(rand2),
+                r * 0.1f * rand1 ,  r * 0.1f * rand1);
+
+        });
+    };
+
+    public static void wordDisplay(String words, Color color, float size, float x, float y, float lifetime){
+        Table t = new Table(Styles.none);
+        t.touchable = Touchable.disabled;
+        t.margin(8f).add(words).style(Styles.outlineLabel).labelAlign(Align.center).fontScale(size * Core.graphics.getHeight() / 889).color(color);
+        t.update(() -> {
+            t.setPosition(Core.graphics.getWidth() * x, Core.graphics.getHeight() * y, Align.center);
+            t.toFront();
+
+            if(state.isMenu()){
+                t.remove();
+            }
+        });
+        t.actions(Actions.fadeOut(lifetime, Interp.pow4In), Actions.remove());
+        t.pack();
+        t.act(0.1f);
+        Core.scene.add(t);
     }
 
     public static Effect swordMarkEffect(float lifetime, float x1, float y1, float x2, float y2, float width, float moveTime, Color color, boolean hasHeart){

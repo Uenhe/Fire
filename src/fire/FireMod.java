@@ -18,6 +18,7 @@ import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.FRAboutDialog;
 import fire.ui.dialogs.InfoDialog;
+import fire.world.CheatMode;
 import fire.world.DEBUG;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
@@ -89,6 +90,7 @@ public class FireMod extends Mod{
         FRSectorPresets.load();
         FRPlanets.loadTree();
         FRWeathers.load();
+        CheatMode.load();
 
         //FROverride.loadDebug();
     }
@@ -134,8 +136,7 @@ public class FireMod extends Mod{
     }
 
     static CheatStatusCode checkCheating(){
-        return CheatStatusCode.OK;
-/*        if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
+        if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
             return CheatStatusCode.OK;
 
         for(var block : cheatBlocks){
@@ -147,13 +148,12 @@ public class FireMod extends Mod{
         var rules = player.team().rules();
         if(state.rules.infiniteResources ||
             state.rules.allowEditRules ||
-            rules.cheat ||
             rules.infiniteResources)
         {
             return CheatStatusCode.CHEAT_RULE;
         }
 
-        return CheatStatusCode.OK;*/
+        return CheatStatusCode.OK;
     }
 
     private static void loadSetting(){
@@ -162,6 +162,7 @@ public class FireMod extends Mod{
             t.checkPref("displayrange", true, b -> displayRange = b);
             t.checkPref("showlog", true, b -> showLog = b);
             t.checkPref("nomultimods", true, b -> noMultiMods = b);
+            t.checkPref("cheatmode", false, b -> cheatMode = b);
 
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> showLog(true)).size(240.0f, 80.0f);
