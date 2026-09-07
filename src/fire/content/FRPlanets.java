@@ -32,7 +32,6 @@ public class FRPlanets{
             @Override
             public void updateBaseCoverage(){
                 var rand = Mathf.rand;
-                var threats = FRPlanets.threats;
                 for(var s : sectors){
                     if(s.preset == null || !s.preset.requireUnlock){
                         rand.setSeed(s.id);

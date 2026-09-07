@@ -42,35 +42,19 @@ public class CheatMode{
                     switch(threat){
                         case 0, 1:
                             break;
-                        case 2, 3, 4:
+                        case 2, 3, 4, 5:
                             unit.apply(FRStatusEffects.informationalPerturbation, 3600);
                             break;
-                        case 5:
-                            unit.apply(FRStatusEffects.informationalPerturbation, 3600);
-                            if(!unit.hasItem())
-                                unit.addItem(Items.blastCompound, unit.itemCapacity());
-                            break;
-                        case 6:
+                        case 6, 7:
                             unit.apply(FRStatusEffects.informationalPerturbation, 3600);
                             unit.apply(StatusEffects.overclock, 3600);
                             unit.apply(StatusEffects.overdrive, 3600);
-                            if(!unit.hasItem())
-                                unit.addItem(Items.blastCompound, unit.itemCapacity());
-                            break;
-                        case 7:
-                            unit.apply(FRStatusEffects.informationalPerturbation, 3600);
-                            unit.apply(StatusEffects.overclock, 3600);
-                            unit.apply(StatusEffects.overdrive, 3600);
-                            if(!unit.hasItem())
-                                unit.addItem(FRItems.detonationCompound, unit.itemCapacity());
                             break;
                         case 8:
                             unit.apply(FRStatusEffects.informationalPerturbation, 3600);
                             unit.apply(StatusEffects.overclock, 3600);
                             unit.apply(StatusEffects.overdrive, 3600);
                             unit.apply(StatusEffects.shielded, 3600);
-                            if(!unit.hasItem())
-                                unit.addItem(FRItems.detonationCompound, unit.itemCapacity());
                             if(unit.type instanceof FleshUnitType)
                                 unit.apply(FRStatusEffects.overgrown);
                             break;
@@ -100,7 +84,7 @@ public class CheatMode{
 
     public static void update(){
         var playerRules = player.team().rules();
-        if(playerRules.cheat && !state.rules.editor && state.isCampaign()){
+        if(playerRules.cheat && !state.rules.editor){
             if(threat == 0){
                 threat = getThreatLevel(player.team());
                 if(state.wave == 1){
@@ -154,7 +138,13 @@ public class CheatMode{
                     if(state.wave > 1 && state.wavetime > state.rules.waveSpacing * 0.7f)
                         state.wavetime = state.rules.waveSpacing * 0.7f;
                     break;
-                case 6, 7:
+                case 6:
+                    state.rules.buildCostMultiplier = 2f;
+                    playerRules.buildSpeedMultiplier = 0.5f;
+                    if(state.wave > 1 && state.wavetime > state.rules.waveSpacing * 0.6f)
+                        state.wavetime = state.rules.waveSpacing * 0.6f;
+                    break;
+                case 7:
                     state.rules.buildCostMultiplier = 2f;
                     playerRules.buildSpeedMultiplier = 0.5f;
                     if(state.wave > 1 && state.wavetime > state.rules.waveSpacing * 0.5f)
@@ -187,7 +177,7 @@ public class CheatMode{
                         build.handleItem(build, item);
 
                     var entry = (ItemTurret.ItemEntry)ammo.peek();
-                    entry.amount = ((ItemTurret.ItemTurretBuild)build).totalAmmo = 100;
+                    entry.amount = ((ItemTurret.ItemTurretBuild)build).totalAmmo = 99;
                     entry.item = item;
                 }
             }
@@ -206,8 +196,7 @@ public class CheatMode{
 
         threat += (int)player.team().items().sum((i, a) -> {
             var value = ElementUnitFactory.itemValues.get(i);
-            if(value == null) return 0.0f;
-            return value.threat;
+            return value == null ? 0.0f : value.threat;
         });
 
         for(var block : threateningBlocks){

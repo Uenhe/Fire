@@ -38,8 +38,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static fire.entities.abilities.DebuffRemoveFieldAbility.DEBUFFS;
-import static mindustry.Vars.content;
-import static mindustry.Vars.headless;
+import static mindustry.Vars.*;
 import static mindustry.content.StatusEffects.wet;
 
 public class FRStatusEffects{
@@ -256,16 +255,37 @@ public class FRStatusEffects{
             }
         };
 
-        //Maintained by fy, horrible.
         informationalProjection = new StatusEffect("informational-projection"){
-            private static final Color[] colors = {Color.red, Color.green, Color.blue};
-            private static final IntFloatMap timerMap = new IntFloatMap();
-            private static final IntFloatMap timerMap2 = new IntFloatMap();
-            private static final IntIntMap shootingMap = new IntIntMap();
-            private static final BulletType[] bullets = new BulletType[255];
+            static final Color[] colors = {Color.red, Color.green, Color.blue};
+            static final IntFloatMap timerMap = new IntFloatMap();
+            static final IntFloatMap timerMap2 = new IntFloatMap();
+            static final IntIntMap shootingMap = new IntIntMap();
+            static final BulletType[] bullets = new BulletType[256];
 
-            //Sorry for the shit-liked code :(
-            private static int checkBullet(UnitType unit){
+            static final String censored = Core.bundle.get("fire.censored");
+            static final String brokenOne = "[#ff0000]" + censored.repeat(240);
+
+            @Override
+            public String displayDescription(){
+                StringBuilder sb;
+
+                if(Mathf.chance(0.8))
+                    sb = new StringBuilder().append(censored.repeat(6)); // 80%
+
+                else if(Mathf.chance(0.75))
+                    sb = new StringBuilder().append("[#")
+                        .append(Integer.toHexString(Mathf.random(127, 255)))
+                        .append("0000]")
+                        .append(censored.repeat(Mathf.random(5, 20)))
+                        .append("[]"); // 15%
+
+                else
+                    return brokenOne; // 5%
+
+                return String.format(description, sb) + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
+            }
+
+            static int checkBullet(UnitType unit){
                 for(var weapon : unit.weapons){
                     var b = weapon.bullet;
                     if(b instanceof ArtilleryBulletType || b instanceof ExplosionBulletType){

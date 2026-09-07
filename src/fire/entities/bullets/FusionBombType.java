@@ -42,7 +42,7 @@ public class FusionBombType extends BulletType{
         float actualTime = b.lifetime - b.time;
 
         Draw.color(Pal.surge);
-        Fill.circle(b.x,b.y,FRMath.getRange_fusionBomb(actualTime));
+        Fill.circle(b.x, b.y, FRMath.getRange_fusionBomb(actualTime));
         Draw.color();
     }
 
@@ -52,37 +52,41 @@ public class FusionBombType extends BulletType{
         float size = FRMath.getRange_fusionBomb(actualTime);
         float radius = size * 35.0f;
         final float G = 3.4f;
-        b.damage = Mathf.pow(size,2f) * 20.0f;
+        b.damage = Mathf.pow(size, 2f) * 20.0f;
         if(b.lifetime > 60.0f){
-            Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2.0f, radius * 2.0f, (Cons<? super Bullet>)other -> {
+            Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2.0f, radius * 2.0f, other -> {
                 if(b.isAdded() && b.lifetime >= other.lifetime && other != b){
-                    float force = Time.delta * Mathf.pow(size,2f) * 150.0f * G / Mathf.dst2(b.x, b.y, other.x, other.y) / other.damage;
-                    if(force >= 10.0f)force = 10.0f;
+                    float force = Time.delta * Mathf.pow(size, 2f) * 150.0f * G / Mathf.dst2(b.x, b.y, other.x, other.y) / other.damage;
+                    if(force >= 10.0f)
+                        force = 10.0f;
                     if(other.type instanceof FusionBombType){
                         force *= 3;
-                        if(other.vel.len() >= 3.0f)other.vel.set(other.vel.x / other.vel.len() * 3.0f,other.vel.y / other.vel.len() * 3.0f);
+                        if(other.vel.len() >= 3.0f)
+                            other.vel.set(other.vel.x / other.vel.len() * 3.0f, other.vel.y / other.vel.len() * 3.0f);
                     }
                     float angle = Mathf.angle(other.x - b.x, other.y - b.y);
                     other.vel.x -= force * Mathf.cosDeg(angle);
                     other.vel.y -= force * Mathf.sinDeg(angle);
-                    if(Mathf.within(b.x,b.y,other.x,other.y,size * 0.4f)){
+                    if(Mathf.within(b.x, b.y, other.x, other.y, size * 0.4f)){
                         if(other.team == b.team && other.type instanceof FusionBombType && b.lifetime - b.time >= other.lifetime - other.time){
-                            b.lifetime = Math.min(Math.max(b.lifetime,other.lifetime * 3),b.lifetime - other.time + other.lifetime);
-                            b.time = Math.max(0,b.time - other.lifetime + other.time);
+                            b.lifetime = Math.min(Math.max(b.lifetime, other.lifetime * 3), b.lifetime - other.time + other.lifetime);
+                            b.time = Math.max(0, b.time - other.lifetime + other.time);
                         }
                         other.remove();
                     }
 
-                    if(Mathf.within(b.x,b.y,other.x,other.y,radius * 0.4f)){
+                    if(Mathf.within(b.x, b.y, other.x, other.y, radius * 0.4f)){
                         if(other.team == b.team && other.type instanceof FusionBombType && b.lifetime - b.time >= other.lifetime - other.time){
                             FRFx.lineTrailEffect(30.0f, b.x, b.y, other.x, other.y, 1.0f, Pal.surge, 4).at(b.x, b.y);
                             if(other.lifetime - other.time >= Time.delta * 3){
-                                b.time = Math.max(0,b.time - Time.delta * 3);
+                                b.time = Math.max(0, b.time - Time.delta * 3);
                                 other.time = other.time + Time.delta * 3;
-                                if(other.lifetime * 3 < b.lifetime)b.lifetime += Time.delta * 3;
-                            }else {
-                                b.time = Math.max(0,b.time - other.lifetime + other.time);
-                                if(other.lifetime * 3 < b.lifetime)b.lifetime += other.lifetime - other.time;
+                                if(other.lifetime * 3 < b.lifetime)
+                                    b.lifetime += Time.delta * 3;
+                            }else{
+                                b.time = Math.max(0, b.time - other.lifetime + other.time);
+                                if(other.lifetime * 3 < b.lifetime)
+                                    b.lifetime += other.lifetime - other.time;
                                 other.remove();
                             }
                         }

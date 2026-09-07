@@ -59,7 +59,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
                     for(var item : content.items()){
                         if(other.acceptItem(this, item)){
                             other.handleItem(this, item);
-                            if(other.items != null)
+                            if(oit != null)
                                 oit.set(item, other.getMaximumAccepted(item));
                         }
                     }
@@ -67,9 +67,8 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
                 var oli = other.liquids;
                 for(var liquid : content.liquids()){
-                    if(other.acceptLiquid(this, liquid)){
+                    if(other.acceptLiquid(this, liquid))
                         oli.set(liquid, other.block.liquidCapacity);
-                    }
                 }
             }
         }

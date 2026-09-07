@@ -6,7 +6,10 @@ import arc.graphics.Color;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Time;
+import fire.content.FRStatusEffects;
 import fire.content.FRUnitTypes;
+import fire.ui.dialogs.FRContentInfoDialog;
 import fire.world.CheatMode;
 import fire.world.DEBUG;
 import mindustry.content.Blocks;
@@ -23,8 +26,7 @@ import java.util.HashMap;
 import static fire.FireMod.CheatStatusCode.OK;
 import static fire.FireMod.cheatBlocks;
 import static fire.FireMod.checkCheating;
-import static mindustry.Vars.headless;
-import static mindustry.Vars.player;
+import static mindustry.Vars.*;
 
 public final class FRVars{
 
@@ -41,6 +43,7 @@ public final class FRVars{
 
     public static short equivalentWidth;
 
+    private static float contentDialogTimer;
     private static BaseDialog cheatDialog;
     private static final Toolkit toolkit;
 
@@ -54,53 +57,62 @@ public final class FRVars{
         toolkit = tk;
 
         Events.run(EventType.Trigger.update, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0){
-                getSettings();
-                Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable =
-                    Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
-                        Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
-
-                CheatMode.update();
-
-                player.team().rules().cheat = cheatMode;
-
-                if(cheatDialog == null){
-                    var code = checkCheating();
-                    Table table = null;
-                    if(code != OK){
-                        cheatDialog = new BaseDialog("Warning");
-                        table = cheatDialog.cont.pane(t -> {}).getTable();
-                        table.row();
-                    }
-
-                    switch(code){
-                        case CHEAT_BLOCK:
-                            var sb = new StringBuilder();
-                            var buildingTypes = Team.get(player.team().id).data().buildingTypes;
-
-                            for(var block : cheatBlocks){
-                                var builds = buildingTypes.get(block);
-                                if(builds == null || builds.isEmpty()) continue;
-                                sb.append("\n").append(block.localizedName);
-                            }
-                            table.add(Core.bundle.format("fire.err1", sb.toString())).center().row();
-                            break;
-
-                        case CHEAT_RULE:
-                            table.add("@fire.err2").center();
-                    }
-                    if(code != OK){
-                        table.row().add("@fire.err9").center();
-                        cheatDialog.show();
-                    }
-                }
+            if(!headless && (contentDialogTimer += Time.delta) >= 2.0f){
+                contentDialogTimer -= 2.0f;
+                //a weird way to update the dialog
+                var content = (FRContentInfoDialog)ui.content;
+                if(content.shown && content.current == FRStatusEffects.informationalProjection)
+                    ui.content.show(FRStatusEffects.informationalProjection);
             }
 
-            for(var u : spawnedUnits){
-                if(u.hasEffect(StatusEffects.invincible))
-                    u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
-                else
-                    spawnedUnits.remove(u);
+            long frame = Core.graphics.getFrameId();
+            if(frame % 10 == 0){
+                for(var u : spawnedUnits){
+                    if(u.hasEffect(StatusEffects.invincible))
+                        u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
+                    else
+                        spawnedUnits.remove(u);
+                }
+
+                if(frame % 60 == 0){
+                    getSettings();
+                    Blocks.sand.playerUnmineable = Blocks.darksand.playerUnmineable =
+                        Blocks.sandWater.playerUnmineable = Blocks.darksandWater.playerUnmineable =
+                            Blocks.darksandTaintedWater.playerUnmineable = !mineSand;
+
+                    CheatMode.update();
+
+                    if(cheatDialog == null){
+                        var code = checkCheating();
+                        Table table = null;
+                        if(code != OK){
+                            cheatDialog = new BaseDialog("Warning");
+                            table = cheatDialog.cont.pane(t -> {}).getTable();
+                            table.row();
+                        }
+
+                        switch(code){
+                            case CHEAT_BLOCK:
+                                var sb = new StringBuilder();
+                                var buildingTypes = Team.get(player.team().id).data().buildingTypes;
+
+                                for(var block : cheatBlocks){
+                                    var builds = buildingTypes.get(block);
+                                    if(builds == null || builds.isEmpty()) continue;
+                                    sb.append("\n").append(block.localizedName);
+                                }
+                                table.add(Core.bundle.format("fire.err1", sb.toString())).center().row();
+                                break;
+
+                            case CHEAT_RULE:
+                                table.add("@fire.err2").center();
+                        }
+                        if(code != OK){
+                            table.row().add("@fire.err9").center();
+                            cheatDialog.show();
+                        }
+                    }
+                }
             }
         });
 

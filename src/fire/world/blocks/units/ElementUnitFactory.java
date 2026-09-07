@@ -82,7 +82,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         ambientSound = Sounds.loopUnitBuilding;
         buildType = ElementUnitFactoryBuild::new;
 
-        config(byte.class, (ElementUnitFactoryBuild build, Byte i) -> {
+        config(Integer.class, (ElementUnitFactoryBuild build, Integer i) -> {
             if(build.currentPlan == i) return;
             build.currentPlan = i < 0 || i >= plans.size ? -1 : i;
             build.progress = 0.0f;
@@ -91,7 +91,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         });
 
         config(UnitType.class, (ElementUnitFactoryBuild build, UnitType val) -> {
-            byte next = (byte)plans.indexOf(p -> p == val);
+            int next = plans.indexOf(p -> p == val);
             if(build.currentPlan == next) return;
             build.currentPlan = next;
             build.progress = 0.0f;
@@ -284,7 +284,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
         private @Nullable Vec2 commandPos;
         private @Nullable UnitCommand command;
-        private byte currentPlan = -1;
+        private int currentPlan = -1;
         private float armorXp, energyXp, logicXp;
 
         private float armorXpToLv(){
@@ -313,7 +313,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         @Override
         public void created(){
             if(currentPlan == -1)
-                currentPlan = (byte)plans.indexOf(UnlockableContent::unlockedNow);
+                currentPlan = plans.indexOf(UnlockableContent::unlockedNow);
         }
 
         @Override
@@ -349,7 +349,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         public void buildConfiguration(Table table){
             var units = Seq.with(plans).map(u -> u).retainAll(u -> u.unlockedNow() && !u.isBanned());
             if(units.any()){
-                ItemSelection.buildTable(ElementUnitFactory.this, table, units, this::unit, unit -> configure((byte)plans.indexOf(u -> u == unit)), selectionRows, selectionColumns);
+                ItemSelection.buildTable(ElementUnitFactory.this, table, units, this::unit, unit -> configure(plans.indexOf(u -> u == unit)), selectionRows, selectionColumns);
 
                 table.row();
 

@@ -143,7 +143,7 @@ public class FRLogicExecutor{
 
         @Override
         public void run(LExecutor exec){
-            new FusionBombType(lifetime.numf() * 60).create(exec.build, Team.get(team.numi()),x.numf() * 8,y.numf() * 8,rotation.numf());
+            new FusionBombType(lifetime.numf() * 60).create(exec.build, Team.get(team.numi()), x.numf() * 8, y.numf() * 8, rotation.numf());
         }
     }
 

@@ -28,8 +28,7 @@ public class FRItems{
             .flammability(2.8f);
 
         conductor = new FRItem("dt", "c78872")
-            .charge(1.2f)
-            .setupAnimation(5, 5.0f);
+            .charge(1.2f);
 
         logicAlloy = new FRItem("logic-alloy", "814e25")
             .charge(0.3f);

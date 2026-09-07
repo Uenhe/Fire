@@ -39,7 +39,8 @@ public class Campfire{
         public float updateEffectChance;
         public Effect updateEffect = Fx.none;
         public DrawArrows drawArrows;
-        public final float maxBoost = 3.38f; //hardcoded
+
+        final float maxBoost = 3.38f; //hardcoded
 
         public CampfireBlock(String name){
             super(name);

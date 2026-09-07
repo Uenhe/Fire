@@ -64,7 +64,7 @@ public class FRUnitTypes{
         blade, hatchet, castle,
 
         //flying mutated
-        wanderer, hunter,rioter,
+        wanderer, hunter, rioter,
 
         //ground
         error, pluto,
@@ -558,41 +558,202 @@ public class FRUnitTypes{
             );
         }};
 
-        rioter = new FleshUnitType("rioter", UnitTypes.zenith){{
-            constructor = UnitEntity::create;
-            flying = true;
-            health = 10800;
-            armor = 6;
-            hitSize = 16;
-            speed = 2.4f;
-            drag = 0.2f;
-            accel = 0.25f;
-            rotateSpeed = 6f;
-            faceTarget = true;
-            coreUnitDock = true;
-            engineOffset = 10.0f;
-            itemCapacity = 60;
-            weapons.add(new Weapon("big laser"){
-                @Override
-                public void draw(Unit unit, WeaponMount weapon){
-                    float progress1 = Math.min(0.5f, weapon.warmup) * 2.0f;
-                    Draw.color(Color.white);
-                    FRFx.circleDraw_3D(unit.x + 24 * Mathf.cosDeg(unit.rotation) * progress1, unit.y + 24 * Mathf.sinDeg(unit.rotation) * progress1, 0, 60 - 48 * progress1, progress1 * 3, unit.rotation + 90.0f, true);
-                    if(weapon.warmup > 0.4f){
-                        float progress2 = (weapon.warmup - 0.4f) / 0.6f;
-                        FRFx.circleDraw_3D(unit.x + (16 + 36 * progress2) * Mathf.cosDeg(unit.rotation), unit.y + (16 + 36 * progress2) * Mathf.sinDeg(unit.rotation), 0, 60 - 48 * progress2, progress2 * 3, unit.rotation + 90.0f, true);
+        rioter = new FleshUnitType("rioter", UnitTypes.zenith){
+            void line(Vec2 s,Vec2 e){
+                Lines.line(s.x,s.y,e.x,e.y);
+            }
+
+            @Override
+            public void draw(Unit unit){
+                super.draw(unit);
+                if(unit.shield > 0.0f){
+                    float phase = unit.shield / unit.maxHealth * 0.4f;
+                    if(phase > 0.4f)
+                        phase = 0.4f;
+                    float rad = unit.hitSize * 1.2f * Mathf.sqrt2;
+                    float angle = Time.time;
+                    Vec2 ps = FRMath.get3DPos(unit.x,unit.y,rad,true),
+                        pq = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle),unit.y + rad * Mathf.sinDeg(angle),0,true),
+                        pz = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 90.0f),unit.y + rad * Mathf.sinDeg(angle + 90.0f),0,true),
+                        ph = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 180.0f),unit.y + rad * Mathf.sinDeg(angle + 180.0f),0,true),
+                        py = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 270.0f),unit.y + rad * Mathf.sinDeg(angle + 270.0f),0,true),
+                        px = FRMath.get3DPos(unit.x,unit.y, 0 - rad,true);
+
+                    Draw.z(Layer.flyingUnit + 1f);
+                    Draw.alpha(phase);
+
+                    Draw.color(Color.white, unit.team.color, phase);
+
+                    Lines.stroke(phase * 5.0f);
+                    line(ps,pq);
+                    line(ps,pz);
+                    line(ps,ph);
+                    line(ps,py);
+                    line(pz,pq);
+                    line(py,pq);
+                    line(pz,ph);
+                    line(py,ph);
+                    Draw.z(Layer.flyingUnit - 1f);
+                    line(px,pq);
+                    line(px,pz);
+                    line(px,ph);
+                    line(px,py);
+                }
+                Draw.blend();
+                Draw.color();
+            }
+            {
+                constructor = UnitEntity::create;
+                flying = true;
+                health = 10800;
+                armor = 6;
+                hitSize = 32;
+                speed = 2.4f;
+                drag = 0.2f;
+                accel = 0.25f;
+                rotateSpeed = 2f;
+                faceTarget = true;
+                coreUnitDock = true;
+                engineOffset = 10.0f;
+                itemCapacity = 60;
+                weapons.add(new Weapon("railGun"){
+
+                    @Override
+                    public void addStats(UnitType u, Table t){
+                        super.addStats(u, t);
+                        t.row();
+                        t.add(FRStat.minerweapon3.localized() + "50%");
                     }
-                    super.draw(unit, weapon);
-                }
-                {
-                    shootWarmupSpeed = 0.04f;
-                    minWarmup = 0.99f;
-                    reload = 180.0f;
-                    mirror = false;
-                    rotate = false;
-                }
-            });
-        }};
+
+                    @Override
+                    public void draw(Unit unit, WeaponMount weapon){
+                        float progress1 = Math.min(0.7f, weapon.warmup) * 2.0f;
+                        Draw.blend(Blending.additive);
+                        Draw.color(Color.white);
+                        FRFx.circleDraw_3D(unit.x + 7 * Mathf.cosDeg(unit.rotation) * progress1, unit.y + 7 * Mathf.sinDeg(unit.rotation) * progress1, 0, 60 - 24 * progress1, progress1 * 3, unit.rotation + 90.0f, true);
+                        if(weapon.warmup > 0.4f){
+                            float progress2 = (weapon.warmup - 0.4f) / 0.6f;
+                            FRFx.circleDraw_3D(unit.x + (8 + 14 * progress2) * Mathf.cosDeg(unit.rotation), unit.y + (8 + 14 * progress2) * Mathf.sinDeg(unit.rotation), 0, 60 - 42 * progress2, progress2 * 3, unit.rotation + 90.0f, true);
+                        }
+                        Draw.blend();
+                        super.draw(unit, weapon);
+                    }
+
+                    @Override
+                    public float dps(){
+                        return 777;
+                    }
+                    {
+                        shootWarmupSpeed = 0.04f;
+                        minWarmup = 0.99f;
+                        reload = 180.0f;
+                        mirror = false;
+                        rotate = false;
+                        bullet = new BasicBulletType(16, 100.0f){
+                            final BulletType frag = new BasicBulletType(0.8f, 100){
+
+                                @Override
+                                public void hit(Bullet b){
+                                    super.hit(b);
+
+                                    Unit unit = (Unit)b.owner;
+                                    if(unit.health >= unit.maxHealth){
+                                        if(unit.shield < unit.maxHealth){
+                                            unit.shield(Math.min(unit.shield + b.vel.len() * 15.0f + 50.0f, unit.maxHealth));
+                                        }
+                                    }else{
+                                        unit.heal(b.vel.len() * 15.0f + 50.0f);
+                                    }
+                                    unit.apply(StatusEffects.overclock, 300.0f);
+                                    Damage.damage(b.x, b.y, 12, b.vel.len() * 30.0f);
+                                }
+                                {
+                                    damage = 100.0f;
+                                    height = 24;
+                                    width = 12.0f;
+                                    status = StatusEffects.melting;
+                                    statusDuration = 300.0f;
+                                    lifetime = 20.0f;
+                                    knockback = 5.0f;
+                                    pierceArmor = true;
+                                    pierce = true;
+                                    pierceCap = 2;
+                                    trailWidth = 2.2f;
+                                    trailLength = 12;
+                                    trailColor = find("ffd8e8");
+
+                                }
+                            };
+
+                            @Override
+                            public void init(Bullet b){
+                                Time.run(3.0f, () -> {
+                                    FRFx.waveEffect_3D(90, 0, 40.0f, b.rotation() + 90.0f, 8, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
+                                });
+                                super.init(b);
+                            }
+
+                            @Override
+                            public void handlePierce(Bullet b, float initialHealth, float x, float y){
+                                super.handlePierce(b, initialHealth, x, y);
+                                Damage.damage(x, y, 12, b.vel.len() * 40.0f);
+                                if(b.vel.len() >= 20.0f){
+                                    FRFx.swordMarkEffect(40.0f, x + 16.0f, y + 16.0f, x - 16.0f, y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+                                    FRFx.swordMarkEffect(40.0f, x - 16.0f, y + 16.0f, x + 16.0f, y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+                                }
+
+                                Unit unit = (Unit)b.owner;
+                                if(unit.health >= unit.maxHealth){
+                                    if(unit.shield < unit.maxHealth){
+                                        unit.shield(Math.min(unit.shield + b.vel.len() * 20.0f + 50.0f, unit.maxHealth));
+                                    }
+                                }else{
+                                    unit.heal(b.vel.len() * 20.0f + 50.0f);
+                                }
+
+                                b.vel.x *= 0.5f;
+                                b.vel.y *= 0.5f;
+                                b.lifetime = Math.min(b.lifetime + (b.lifetime - b.time), 40.0f);
+                                frag.create(b, b.x, b.y, b.rotation() + 5.0f * 16.0f / b.vel.len(), b.vel.len());
+                                frag.create(b, b.x, b.y, b.rotation() - 5.0f * 16.0f / b.vel.len(), b.vel.len());
+                            }
+
+                            @Override
+                            public void removed(Bullet b){
+                                if(b.vel.len() <= 1.25f){
+                                    Damage.damage(b.x, b.y, 30.0f, 300.0f);
+                                    FRFx.swordMarkEffect(40.0f, b.x + 16.0f, b.y + 16.0f, b.x - 16.0f, b.y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+                                    FRFx.swordMarkEffect(40.0f, b.x - 16.0f, b.y + 16.0f, b.x + 16.0f, b.y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+                                }else{
+                                    for(int i = 0; i < 5; i++){
+                                        frag.create(b, b.x, b.y, b.rotation() - 10 * 16.0f / b.vel.len() + 5.0f * 16.0f / b.vel.len() * i, b.vel.len());
+                                    }
+                                }
+                                super.removed(b);
+                            }
+                            {
+                                damage = 100.0f;
+                                buildingDamageMultiplier = 2.0f;
+                                height = 24;
+                                width = 12.0f;
+                                status = StatusEffects.melting;
+                                statusDuration = 600.0f;
+                                lifetime = 20.0f;
+                                speed = 20.0f;
+                                knockback = 14.0f;
+                                recoil = 6.0f;
+                                pierceBuilding = true;
+                                pierceArmor = true;
+                                pierce = true;
+                                trailWidth = 2.8f;
+                                trailLength = 18;
+                                trailColor = find("ffd8e8");
+                            }
+                        };
+                    }
+                });
+            }
+        };
 
         //region ground
 

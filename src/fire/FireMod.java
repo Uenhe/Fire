@@ -17,16 +17,17 @@ import fire.content.*;
 import fire.input.FRBinding;
 import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.FRAboutDialog;
+import fire.ui.dialogs.FRContentInfoDialog;
 import fire.ui.dialogs.InfoDialog;
 import fire.world.CheatMode;
 import fire.world.DEBUG;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.meta.FRAttribute;
+import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
-import mindustry.game.Team;
 import mindustry.gen.Icon;
 import mindustry.mod.Mod;
 import mindustry.mod.Mods;
@@ -113,9 +114,13 @@ public class FireMod extends Mod{
 
             }else if(block instanceof ItemTurret){
                 Item item = null;
-                var keys = ((ItemTurret)block).ammoTypes.keys();
-                while(keys.hasNext())
-                    item = keys.next();
+                if(block == FRBlocks.aerolite){
+                    item = Items.plastanium;
+                }else{
+                    var keys = ((ItemTurret)block).ammoTypes.keys();
+                    while(keys.hasNext())
+                        item = keys.next();
+                }
 
                 if(item != null)
                     AdaptiveSource.turretItemMap.put(block.id, item.id);
@@ -128,6 +133,7 @@ public class FireMod extends Mod{
         if(headless) return;
         loadSetting();
         loadDatabase();
+        loadOverwrittenContentDialog();
         Events.on(EventType.ClientLoadEvent.class, e -> {
             showLog(false);
             showUpdate();
@@ -139,16 +145,17 @@ public class FireMod extends Mod{
         if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
             return CheatStatusCode.OK;
 
+        var buildingTypes = player.team().data().buildingTypes;
         for(var block : cheatBlocks){
-            var builds = Team.get(player.team().id).data().buildingTypes.get(block);
+            var builds = buildingTypes.get(block);
             if(builds == null) continue;
             if(builds.size > 0) return CheatStatusCode.CHEAT_BLOCK;
         }
 
-        var rules = player.team().rules();
-        if(state.rules.infiniteResources ||
+        if(!net.server() &&
+            (state.rules.infiniteResources ||
             state.rules.allowEditRules ||
-            rules.infiniteResources)
+            player.team().rules().infiniteResources))
         {
             return CheatStatusCode.CHEAT_RULE;
         }
@@ -156,13 +163,13 @@ public class FireMod extends Mod{
         return CheatStatusCode.OK;
     }
 
-    private static void loadSetting(){
+    static void loadSetting(){
         ui.settings.addCategory("@setting.fire", "fire-setting", t -> {
             t.checkPref("minesand", false, b -> mineSand = b);
             t.checkPref("displayrange", true, b -> displayRange = b);
             t.checkPref("showlog", true, b -> showLog = b);
             t.checkPref("nomultimods", true, b -> noMultiMods = b);
-            t.checkPref("cheatmode", false, b -> cheatMode = b);
+            t.checkPref("cheatmode", false, b -> cheatMode = player.team().rules().cheat = b);
 
             t.rebuild(); //adapts to MindustryX
             t.row().button("@setting.fire-showlog", () -> showLog(true)).size(240.0f, 80.0f);
@@ -170,11 +177,15 @@ public class FireMod extends Mod{
         getSettings();
     }
 
-    private static void loadDatabase(){
+    static void loadDatabase(){
         ui.research.titleTable.row().button(b -> b.add("@fire.showdatabase"), InfoDialog.dialog::show).visible(() -> ui.research.root.node == FRPlanets.lysetta.techTree);
     }
 
-    private static void showLog(boolean forces){
+    static void loadOverwrittenContentDialog(){
+        ui.content = new FRContentInfoDialog();
+    }
+
+    static void showLog(boolean forces){
         if(!showLog && !forces) return;
 
         var historyDialog = new BaseDialog("@fire.historytitle");
@@ -210,14 +221,14 @@ public class FireMod extends Mod{
         mainDialog.show();
     }
 
-    private static void checkMultipleMods(){
+    static void checkMultipleMods(){
         if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
         if(DEBUG.isDeveloper()) return;
         multipleMods = true;
         fkgame();
     }
 
-    private static void showUpdate(){
+    static void showUpdate(){
         String old = Core.settings.getString("mod-fire-version"), now = FIRE.meta.version;
         if(now.equals(old)) return;
 
@@ -241,7 +252,7 @@ public class FireMod extends Mod{
 
     /** See Extra Utilities also.<p></p>
      * Clashes with MindustryX. */
-    private static void setRandTitle(){
+    static void setRandTitle(){
         if(!Core.app.isDesktop()) return;
 
         String[] titles = Core.bundle.get("fire.titles").split("\\|");
@@ -256,12 +267,12 @@ public class FireMod extends Mod{
         Core.graphics.setTitle("Mindustry: " + title);
     }
 
-    private static void setupDialog(BaseDialog dialog){
+    static void setupDialog(BaseDialog dialog){
         dialog.closeOnBack();
         dialog.buttons.button("@close", Icon.cancel, dialog::hide).size(210.0f, 64.0f);
     }
 
-    private static void addContent(Table table, Object... objects){
+    static void addContent(Table table, Object... objects){
         for(var obj : objects){
             if(obj instanceof UnlockableContent c){
 
@@ -288,7 +299,7 @@ public class FireMod extends Mod{
         return Core.graphics.getWidth() * 0.8f;
     }
 
-    private static void fkgame(){
+    static void fkgame(){
         Events.on(EventType.WorldLoadBeginEvent.class, e -> {
             if(!noMultiMods && state.getPlanet() != FRPlanets.lysetta) return;
             Log.info("what r u fking doing");
@@ -334,7 +345,7 @@ public class FireMod extends Mod{
         }
     }
 
-    private static void buildMobile(){
+    static void buildMobile(){
         Table container;
         try{
             container = (Table)field_container.get(ui.menufrag);

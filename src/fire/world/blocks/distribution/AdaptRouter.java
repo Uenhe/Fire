@@ -104,7 +104,6 @@ public class AdaptRouter extends mindustry.world.Block{
                 if(other != null && other != src && other != source && !(src.block.instantTransfer && other.block.instantTransfer) & other.acceptItem(this, item) && team == other.team) return other;
 
             }else{
-                var proximity = this.proximity;
                 if(net.server()){ //byd desync
                     for(int i = 0, c = rotation, n = proximity.size; i < n; i++){
                         var other = proximity.get((i + c) % n);
