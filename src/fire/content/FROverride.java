@@ -160,6 +160,7 @@ public class FROverride{
             puddleSize = 8.0f;
             orbSize = 4.0f;
             drag = 0.001f;
+            boilTime = 120.0f;
         }});
 
 
@@ -171,7 +172,7 @@ public class FROverride{
 
 
         //region block distribution
-        ((BufferedItemBridge)itemBridge).speed *= 0.92f;
+        ((BufferedItemBridge)itemBridge).speed *= 0.82f;
         phaseConveyor.itemCapacity += 5;
         ((ItemBridge)phaseConveyor).transportTime -= 1.0f;
         ((MassDriver)massDriver).rotateSpeed += 5.0f;
@@ -201,7 +202,7 @@ public class FROverride{
         //region unit
         alpha.coreUnitDock = beta.coreUnitDock = gamma.coreUnitDock = true;
         alpha.defaultCommand = UnitCommand.mineCommand;
-        beta.defaultCommand = UnitCommand.assistCommand;
+        beta.defaultCommand = gamma.defaultCommand = UnitCommand.assistCommand;
 
         flare.speed += 0.5f;
         flare.trailLength += 3;
@@ -216,13 +217,11 @@ public class FROverride{
         LAssembler.customParsers.put(FRLogicStatements.MaskCutsceneStatement.name, FRLogicStatements.MaskCutsceneStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.FetchPlusPlusStatement.name, FRLogicStatements.FetchPlusPlusStatement::new);
         LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
-        LAssembler.customParsers.put(FRLogicStatements.FusionBombSpawn.name, FRLogicStatements.FusionBombSpawn::new);
         LAssembler.customParsers.put(FRLogicStatements.FlushMessagePlus.name, FRLogicStatements.FlushMessagePlus::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.TransitionEffectStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.MaskCutsceneStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.FetchPlusPlusStatement::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.FusionBombSpawn::new);
         LogicIO.allStatements.addUnique(FRLogicStatements.FlushMessagePlus::new);
     }
 }

@@ -5,13 +5,11 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import fire.content.FRStatusEffects;
 import fire.content.FRUnitTypes;
 import fire.ui.dialogs.FRContentInfoDialog;
 import fire.world.CheatMode;
-import fire.world.DEBUG;
 import mindustry.content.Blocks;
 import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
@@ -42,6 +40,7 @@ public final class FRVars{
         mineSand = false, displayRange = true, showLog = true, noMultiMods = true, cheatMode = false;
 
     public static short equivalentWidth;
+    public static FRContentInfoDialog moddedContent;
 
     private static float contentDialogTimer;
     private static BaseDialog cheatDialog;
@@ -57,11 +56,11 @@ public final class FRVars{
         toolkit = tk;
 
         Events.run(EventType.Trigger.update, () -> {
-            if(!headless && (contentDialogTimer += Time.delta) >= 2.0f){
+            if(!headless && moddedContent != null && (contentDialogTimer += Time.delta) >= 2.0f){
                 contentDialogTimer -= 2.0f;
                 //a weird way to update the dialog
-                var content = (FRContentInfoDialog)ui.content;
-                if(content.shown && content.current == FRStatusEffects.informationalProjection)
+                //isShown() is unavailable here
+                if(moddedContent.shown && moddedContent.current == FRStatusEffects.informationalProjection)
                     ui.content.show(FRStatusEffects.informationalProjection);
             }
 
@@ -101,7 +100,7 @@ public final class FRVars{
                                     if(builds == null || builds.isEmpty()) continue;
                                     sb.append("\n").append(block.localizedName);
                                 }
-                                table.add(Core.bundle.format("fire.err1", sb.toString())).center().row();
+                                table.add(Core.bundle.format("fire.err1", sb)).center().row();
                                 break;
 
                             case CHEAT_RULE:
@@ -144,9 +143,9 @@ public final class FRVars{
         color = Color.valueOf(hex);
         colorPool.put(hex, color);
 
-        int size = colorPool.size();
-        if(DEBUG.isDeveloper() && size > 64)
-            Log.info("Resized Color Pool Length: ", size);
+//        int size = colorPool.size();
+//        if(DEBUG.isDeveloper() && size > 64)
+//            Log.info("Resized Color Pool Length: ", size);
 
         return color;
     }

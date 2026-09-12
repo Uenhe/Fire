@@ -24,18 +24,18 @@ import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
-import mindustry.type.Weapon;
 import mindustry.world.meta.StatValues;
 
 import static fire.FRVars.find;
 
-public class MinerLikedWeapon extends Weapon{
+public class MinerLikedWeapon extends mindustry.type.Weapon{
     public final float dps;
     public float armorAffection = 5.0f;
     public StatusEffect attackEffect = StatusEffects.overclock;
     public float attackEffectDuration = 180.0f;
     public float healingPercent = 100.0f;
     public float extraShield = 1.0f;
+    public float range = 160.0f;
     public Color baseColor = find("f9a27a");
     public Color boostColor = find("ffd8e8");
 
@@ -49,12 +49,16 @@ public class MinerLikedWeapon extends Weapon{
         reload = 10.0f;
 
         bullet = new PointBulletType(){
+
             @Override
             public void removed(Bullet b){
                 if(b.hit){
                     var owner = (Unit)b.owner;
                     if(b.aimTile != null){
-                        owner.mounts[0].target = b.aimTile.build;
+                        for(var mount : owner.mounts()){
+                            if(mount.weapon instanceof MinerLikedWeapon)
+                                mount.target = b.aimTile.build;
+                        }
                     }else{
                         Unit[] result = {null};
                         float[] cdist = {0.0f};
@@ -70,7 +74,10 @@ public class MinerLikedWeapon extends Weapon{
                                 }
                             }
                         });
-                        owner.mounts[0].target = result[0];
+                        for(var mount : owner.mounts()){
+                            if(mount.weapon instanceof MinerLikedWeapon)
+                                mount.target = result[0];
+                        }
                     }
                     if(owner.health >= owner.maxHealth){
                         Fx.itemTransfer.at(b.x, b.y, 0.0f, Pal.shield, owner);
@@ -88,6 +95,7 @@ public class MinerLikedWeapon extends Weapon{
             }
         };
     }
+
 
     @Override
     public void update(Unit unit, WeaponMount mount){
@@ -128,35 +136,33 @@ public class MinerLikedWeapon extends Weapon{
         super.draw(unit, mount);
 
         float xx = 0, yy = 0;
+        final float rotation = unit.rotation - 90, weaponRotation = rotation + (rotate ? mount.rotation : baseRotation), realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil;
+        final float wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil) + Angles.trnsx(weaponRotation, mount.weapon.shootX, mount.weapon.shootY), wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil) + Angles.trnsy(weaponRotation, mount.weapon.shootX, mount.weapon.shootY);
         if(mount.target != null){
             xx = mount.target.x();
             yy = mount.target.y();
         }
-        if((!Mathf.within(unit.x, unit.y, xx, yy, 165.0f) || !Angles.within(Angles.angle(unit.x, unit.y, xx, yy), unit.rotation(), 5.0f) || !Mathf.within(unit.aimX, unit.aimY, xx, yy, 8.0f)) || mount.target == null){
+        if((!Mathf.within(wx, wy, xx, yy, range) || !Angles.within(Angles.angle(wx, wy, xx, yy), unit.rotation(), 5.0f) || !Mathf.within(unit.aimX, unit.aimY, xx, yy, 8.0f)) || mount.target == null){
             mount.target = null;
             float realX = mount.aimX, realY = mount.aimY;
-            final float sx = unit.x;
-            final float sy = unit.y;
-            final float ps = Mathf.sqrt((realX - sx) * (realX - sx) + (realY - sy) * (realY - sy)) / 160.0f;
+            final float ps = Mathf.sqrt((realX - wx) * (realX - wx) + (realY - wy) * (realY - wy)) / range;
             if(ps > 1f){
-                realX = sx + (realX - sx) / ps;
-                realY = sy + (realY - sy) / ps;
+                realX = wx + (realX - wx) / ps;
+                realY = wy + (realY - wy) / ps;
             }
             Draw.color(Tmp.c1.set(unit.hasEffect(FRStatusEffects.overgrown) ? boostColor : baseColor), mount.warmup * (baseColor.a * (0.5f + Mathf.absin(7.0f, 0.3f))));
-            Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion, unit.x + Angles.trnsx(mount.rotation, 0.0f, 0.0f), unit.y + Angles.trnsy(mount.rotation, 0.0f, 0.0f), realX + Mathf.sin(Time.time, 12.0f, 1.0f), realY + Mathf.sin(Time.time, 14.0f, 1.0f), 0.75f);
+            Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion, wx + Angles.trnsx(mount.rotation, 0.0f, 0.0f), wy + Angles.trnsy(mount.rotation, 0.0f, 0.0f), realX + Mathf.sin(Time.time, 12.0f, 1.0f), realY + Mathf.sin(Time.time, 14.0f, 1.0f), 0.75f);
             return;
         }
         float realX = mount.target.x(), realY = mount.target.y();
-        final float sx = unit.x;
-        final float sy = unit.y;
-        final float ps = Mathf.sqrt((realX - sx) * (realX - sx) + (realY - sy) * (realY - sy)) / 160.0f;
+        final float ps = Mathf.sqrt((realX - wx) * (realX - wx) + (realY - wy) * (realY - wy)) / range;
         if(ps > 1f){
-            realX = sx + (realX - sx) / ps;
-            realY = sy + (realY - sy) / ps;
+            realX = wx + (realX - wx) / ps;
+            realY = wy + (realY - wy) / ps;
         }
 
         Draw.color(Tmp.c1.set(unit.hasEffect(FRStatusEffects.overgrown) ? boostColor : baseColor), mount.warmup * (baseColor.a * (0.5f + Mathf.absin(7.0f, 0.3f))));
-        Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion, unit.x + Angles.trnsx(mount.rotation, 0.0f, 0.0f), unit.y + Angles.trnsy(mount.rotation, 0.0f, 0.0f), realX + Mathf.sin(Time.time, 12.0f, 1.0f), realY + Mathf.sin(Time.time, 14.0f, 1.0f), 0.75f);
+        Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion, wx + Angles.trnsx(mount.rotation, 0.0f, 0.0f), wy + Angles.trnsy(mount.rotation, 0.0f, 0.0f), realX + Mathf.sin(Time.time, 12.0f, 1.0f), realY + Mathf.sin(Time.time, 14.0f, 1.0f), 0.75f);
 
         if(mount.target instanceof Building){
             Building target;
@@ -184,7 +190,7 @@ public class MinerLikedWeapon extends Weapon{
         t.row();
         t.add(FRStat.minerweapon1.localized() + dps * 60.0f + "[red] - " + armorAffection + FRStat.minerweapon2.localized() + "\n" + FRStat.minerweapon3.localized() + healingPercent + "%\n" + FRStat.minerweapon4.localized() + extraShield + "x\n" + FRStat.minerweapon5.localized());
 
-        StatValues.ammo(ObjectMap.of(new Object[]{u, this.bullet})).display(t);
+        StatValues.ammo(ObjectMap.of(new Object[]{u, bullet})).display(t);
     }
 
     @Override

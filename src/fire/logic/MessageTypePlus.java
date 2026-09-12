@@ -8,5 +8,4 @@ public enum MessageTypePlus{
     DIALOGBOXSHOW;
 
     public static final MessageTypePlus[] all = values();
-
 }

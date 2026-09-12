@@ -9,11 +9,10 @@ import arc.math.Mathf;
 import mindustry.gen.Building;
 import mindustry.graphics.Pal;
 import mindustry.world.Block;
-import mindustry.world.draw.DrawWeave;
 
 import static mindustry.Vars.tilesize;
 
-public class DrawWeavePlus extends DrawWeave{
+public class DrawWeavePlus extends mindustry.world.draw.DrawWeave{
 
     public final byte lines;
     public final float rotateSpeed;

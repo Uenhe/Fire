@@ -12,6 +12,7 @@ import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import fire.annotation.Modified;
 import fire.entities.LightningBranch;
 import mindustry.content.Bullets;
 import mindustry.content.Fx;
@@ -116,8 +117,8 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             }
         }
 
-        /** Modified from super's one. */
         @Override
+        @Modified
         public void craft(){
             consume();
             var items = outputItems;

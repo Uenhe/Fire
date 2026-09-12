@@ -182,72 +182,6 @@ public class FRLogicStatements{
         }
     }
 
-    public static class FusionBombSpawn extends LStatement{
-        public static String name = "FusionBombSpawn";
-
-        public String lifetime = "2";
-        public String shootX = "11";
-        public String shootY = "45";
-        public String rot = "14";
-        public String team = "1";
-
-        public FusionBombSpawn(){}
-
-        public FusionBombSpawn(String[] tokens){
-            lifetime = tokens[1];
-            shootX = tokens[2];
-            shootY = tokens[3];
-            rot = tokens[4];
-            team = tokens[5];
-        }
-
-        @Override
-        public boolean privileged(){
-            return true;
-        }
-
-        @Override
-        public void build(Table table){
-            table.clearChildren();
-            table.add("Spawn a fusion bomb for");
-            field(table, lifetime, str -> lifetime = str);
-            table.add(" sec");
-            table.row();
-            table.add("at (");
-            field(table, shootX, str -> shootX = str);
-            table.add(",");
-            field(table, shootY, str -> shootY = str);
-            table.add(") ");
-            table.row();
-            table.add("rot");
-            field(table, rot, str -> rot = str);
-            table.add("team");
-            field(table, team, str -> team = str);
-        }
-
-        @Override
-        public LExecutor.LInstruction build(LAssembler builder){
-            return new FRLogicExecutor.FusionBombSpawnI(builder.var(lifetime),builder.var(shootX),builder.var(shootY),builder.var(rot),builder.var(team));
-        }
-
-        @Override
-        public LCategory category(){
-            return LCategory.world;
-        }
-
-        @Override
-        public void write(StringBuilder builder){
-            builder.append(name)
-                .append(" ").append(lifetime)
-                .append(" ").append(shootX)
-                .append(" ").append(shootY)
-                .append(" ").append(rot)
-                .append(" ").append(team);
-        }
-    }
-
-
-
     public static class FlushMessagePlus extends LStatement{
         public static String name = "FlushMessagePlus";
         public MessageTypePlus type = ANNOUNCE;
@@ -297,7 +231,7 @@ public class FRLogicStatements{
             }, Styles.logict, () -> {}).size(160f, 40f).padLeft(2).color(table.color);
 
             switch(type){
-                case ANNOUNCE, BUTTON, FREE, SMOOTH  -> {
+                case ANNOUNCE, BUTTON, FREE, SMOOTH -> {
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
                     table.add(" sec");
@@ -309,7 +243,7 @@ public class FRLogicStatements{
                         table.add(")");
                     }
                 }
-                case DIALOGBOXSHOW  -> {
+                case DIALOGBOXSHOW -> {
                     table.add(" by ");
                     fields(table, speaker, str -> speaker = str);
                     table.add(" for ");
@@ -317,7 +251,7 @@ public class FRLogicStatements{
                     table.add(" sec");
                 }
             }
-            row(table);
+            if(LCanvas.isCompact()) table.row();
         }
 
         @Override

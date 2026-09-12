@@ -2,6 +2,7 @@ package fire.type;
 
 import arc.math.Angles;
 import arc.math.Mathf;
+import arc.util.Tmp;
 import fire.content.FRBlocks;
 import fire.content.FRFx;
 import fire.content.FRStatusEffects;
@@ -22,14 +23,16 @@ public class FleshUnitType extends UnitType{
     public FleshUnitType(String name, UnitType origin){
         super(name);
         healColor = Pal.neoplasm1;
-        if((this.origin = origin) != null)
+        if((this.origin = origin) != null && !origin.flying)
             origin.abilities.add(new DrownRespawnAbility(this));
     }
 
     @Override
     public void update(Unit unit){
-        if(Mathf.chanceDelta(0.04))
-            FRStatusEffects.overgrown.effect.at(unit.x, unit.y, 0.0f, hitSize);
+        if(Mathf.chanceDelta(0.05)){
+            Tmp.v1.rnd(Mathf.range(hitSize * 0.7f));
+            FRStatusEffects.overgrown.effect.at(unit.x + Tmp.v1.x, unit.y + Tmp.v1.y, 0.0f, hitSize * 0.8f);
+        }
     }
 
     /** {@link mindustry.game.EventType.UnitDrownEvent UnitDrownEvent} is buggy (why???) so I have to use an ability. */

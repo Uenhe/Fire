@@ -14,8 +14,6 @@ import arc.util.Time;
 import fire.content.FRMath;
 import mindustry.ui.Styles;
 
-import java.util.Objects;
-
 import static fire.FRVars.find;
 import static mindustry.Vars.state;
 
@@ -25,7 +23,10 @@ public class FRUI{
     public static void numberDisplay(int number){
         Table t = new Table(Styles.none);
         t.touchable = Touchable.disabled;
-        t.margin(18f).add("[red]" + number + "[white]").style(Styles.techLabel).labelAlign(Align.center).fontScale(4);
+        if(number <= 9)
+            t.margin(18f).add("[red]" + number + "[white]").style(Styles.techLabel).labelAlign(Align.center).fontScale(4);
+        else
+            t.margin(18f).add("[red]X[white]").style(Styles.techLabel).labelAlign(Align.center).fontScale(4);
         t.update(() -> {
             t.setPosition(Core.graphics.getWidth() / 2f, Core.graphics.getHeight() / 2f, Align.center);
             t.toFront();
@@ -91,38 +92,41 @@ public class FRUI{
 
         float tme = 0;
         float tme2 = 0;
-        boolean in;
+
+        StringBuilder col = new StringBuilder();
+
+        col.append("[white]");
 
         for(int i = 0; i < text.length(); i++){
-            StringBuilder buff = null;
             char character = text.charAt(i);
             switch(character){
                 //FIXME a char can't contain Chinese character?
-//                case ',', '，':
-//                    tme += 20.0f;
-//                    break;
-//                case '。', '！', '？':
-//                    tme += 30.0f;
-//                    break;
-//                case '\n' :
-//                    t.row();
-//                    break;
-//                case '[':
-//                    buff = new StringBuilder();
-//                    while(character != ']'){
-//                        character = text.charAt(i);
-//                        buff.append(character);
-//                        i++;
-//                    }
-//                    i--;
-//                    break;
+                case ',', '，':
+                    tme += 20.0f;
+                    break;
+                case '。', '！', '？':
+                    tme += 30.0f;
+                    break;
+                case '\n' :
+                    t.row();
+                    break;
+                case '[':
+                    col = new StringBuilder();
+                    while(character != ']'){
+                        character = text.charAt(i);
+                        col.append(character);
+                        i++;
+                    }
+                    i--;
+                    break;
                 default:
                     tme += 3.0f;
             }
-            StringBuilder finalBuff = buff;
+            if(character == ']') continue;
             char finalCharacter = character;
+            StringBuilder finalCol = col;
             Time.run(tme2, () -> {
-                t.add(Objects.requireNonNullElseGet(finalBuff, () -> finalCharacter + "")).style(Styles.outlineLabel).labelAlign(Align.left);
+                t.add(finalCol.toString() + finalCharacter).style(Styles.outlineLabel).labelAlign(Align.left);
             });
             tme2 = tme;
         }
@@ -135,7 +139,7 @@ public class FRUI{
                 t.remove();
             }
         });
-        t.actions(Actions.delay((duration + tme / 60) * 0.9f), Actions.fadeOut((duration + tme / 60) * 0.1f, Interp.fade), Actions.remove());
+        t.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         t.pack();
         t.act(0.1f);
         Core.scene.add(t);

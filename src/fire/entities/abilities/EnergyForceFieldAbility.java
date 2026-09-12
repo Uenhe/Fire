@@ -73,7 +73,9 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     @Override
     public void displayBars(Unit unit, Table bars){
-        bars.add(new Bar("stat.shieldhealth", wasBroken ? Color.gray : Pal.accent,
+        bars.add(
+            new Bar("stat.shieldhealth",
+            wasBroken ? Color.gray : Pal.accent,
             () -> wasBroken ? 1.0f + unit.shield / (regen * cooldown) : unit.shield / max)
         ).row();
     }

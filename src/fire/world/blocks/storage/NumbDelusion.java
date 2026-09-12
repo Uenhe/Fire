@@ -33,7 +33,6 @@ public class NumbDelusion extends StorageBlock{
     private final short range = 33 * tilesize;
     private final Effect destroyFx = FRFx.scanEffect(delay, Pal.accent, range);
     private final Boolf<Block> wasComplex = block -> block instanceof StorageBlock || block instanceof LogicBlock;
-
     private final BasicBulletType[] bullets = new BasicBulletType[content.items().size];
 
     public NumbDelusion(String name){
@@ -44,7 +43,7 @@ public class NumbDelusion extends StorageBlock{
         Color[] colBacks = {Pal.copperAmmoBack, Pal.graphiteAmmoBack, Pal.surgeAmmoBack, Pal.blastAmmoBack, Pal.thoriumAmmoBack, Pal.plastaniumBack},
             colFronts = {Pal.copperAmmoFront, Pal.graphiteAmmoFront, Pal.surgeAmmoFront, Pal.blastAmmoFront, Pal.thoriumAmmoFront, Pal.plastaniumFront};
 
-        for(int i = 0, n = content.items().size; i < n; i++){
+        for(int i = 0, n = bullets.length; i < n; i++){
             var it = content.items().get(i);
             if(it.explosiveness == 0.0f && it.flammability == 0.0f && it.radioactivity == 0.0f && it.charge == 0.0f && it.healthScaling == 0.0f){
                 bullets[i] = null;
@@ -100,7 +99,6 @@ public class NumbDelusion extends StorageBlock{
     public void setStats(){
         super.setStats();
         var map = new ObjectMap<Item, BulletType>();
-        var bullets = this.bullets;
         var items = content.items();
         for(int i = 0, n = bullets.length; i < n; i++){
             var type = bullets[i];
@@ -130,20 +128,16 @@ public class NumbDelusion extends StorageBlock{
         @Override
         public void onDestroyed(){
             super.onDestroyed();
-            var items = this.items;
             if(!items.any()) return;
 
             Core.app.post(() -> {
                 final float threshold = 0.1f;
-                int n = content.items().size,
-                tx = tileX(), ty = tileY();
-
-                float[] amounts = new float[n]; //actually it's more like an int[]
+                float[] amounts = new float[bullets.length]; //actually it's more like an int[]
                 Queue<Teams.BlockPlan> plansFrom = team.data().plans, plansTo = new Queue<>();
 
                 boolean complex = false;
                 for(var plan : plansFrom){
-                    float dst = Mathf.dst(tx, ty, plan.x, plan.y);
+                    float dst = Mathf.dst(tileX(), tileY(), plan.x, plan.y);
                     if(dst > range || plan.block instanceof NumbDelusion || !Build.validPlace(plan.block, team, plan.x, plan.y, plan.rotation)) continue;
 
                     complex |= wasComplex.get(plan.block);
@@ -173,11 +167,10 @@ public class NumbDelusion extends StorageBlock{
                         plan.block.placeEffect.at(tile.drawx(), tile.drawy(), plan.block.size);
                     }
 
-                    for(int i = 0; i < n; i++)
+                    for(int i = 0; i < bullets.length; i++)
                         items.add(content.item(i), (int)-amounts[i]);
 
-                    var bullets = NumbDelusion.this.bullets;
-                    for(int i = 0; i < n; i++){
+                    for(int i = 0; i < bullets.length; i++){
                         var type = bullets[i];
                         if(type == null) continue;
                         for(int j = 0, m = Math.min(items.get(i), itemCapacity) / 50; j < m; j++)

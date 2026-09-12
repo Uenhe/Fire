@@ -1,10 +1,13 @@
 package fire.content;
 
 import arc.graphics.Color;
+import fire.world.blocks.units.ElementUnitFactory;
 import mindustry.content.Items;
 import mindustry.type.Item;
 
 import static fire.FRVars.find;
+import static mindustry.content.Items.*;
+import static mindustry.content.Items.pyratite;
 
 public class FRItems{
     
@@ -56,7 +59,39 @@ public class FRItems{
             .setupAnimation(22, 2.0f);
     }
 
-    public static void load(){}
+    public static void load(){
+        ElementUnitFactory.putAllValues(
+            copper,             0.08f, 1.5f,  0.1f,  0.9f,  0.0f,  0.0f, 0,
+            lead,               0.06f, 1.55f, 0.15f, 1.0f,  0.05f, 0.6f, 0,
+            metaglass,          0.06f, 3.0f,  0.15f, 2.0f,  0.08f, 2.5f, 2,
+            graphite,           0.0f,  0.0f,  0.1f,  3.0f,  0.4f,  1.5f, 3,
+            scrap,              0.01f, 0.8f,  0.0f,  0.0f,  0.0f,  0.0f, 0,
+            coal,               0.0f,  0.0f,  0.3f,  2.0f,  0.0f,  0.0f, 1,
+            titanium,           0.25f, 3.2f,  0.3f,  2.6f,  0.1f,  1.5f, 4,
+            thorium,            0.45f, 3.75f, 0.55f, 3.1f,  0.0f,  0.0f, 5,
+            silicon,            0.0f,  0.0f,  0.3f,  2.5f,  0.9f,  5.0f, 1,
+            plastanium,         0.85f, 4.85f, 0.75f, 4.55f, 0.0f,  0.0f, 4,
+            phaseFabric,        1.25f, 5.3f,  0.85f, 2.4f,  0.85f, 5.4f, 6,
+            surgeAlloy,         1.25f, 5.5f,  1.35f, 5.95f, 0.0f,  0.0f, 4,
+            sporePod,           0.0f,  0.0f,  0.4f,  2.25f, 0.0f,  0.0f, 2,
+            sand,               0.01f, 0.5f,  0.0f,  0.0f,  0.0f,  0.0f, 0,
+            blastCompound,      0.0f,  0.0f,  1.2f,  5.3f,  0.0f,  0.0f, 4,
+            pyratite,           0.0f,  0.0f,  0.8f,  4.2f,  0.0f,  0.0f, 3,
+
+            glass,              0.01f, 0.3f,  0.05f, 1.2f,  0.1f,  2.5f, 0,
+            mirrorglass,        0.85f, 4.0f,  0.95f, 3.5f,  0.1f,  2.5f, 6,
+            sulflameAlloy,      0.0f,  0.0f,  1.30f, 5.5f,  0.0f,  0.0f, 4,
+            kindlingAlloy,      0.0f,  0.0f,  1.25f, 5.6f,  0.0f,  0.0f, 4,
+            conductor,          0.0f,  0.0f,  0.75f, 3.85f, 0.35f, 3.4f, 3,
+            detonationCompound, 0.05f, 1.3f,  1.35f, 6.25f, 0.3f,  2.9f, 9,
+            flamefluidCrystal,  0.0f,  0.0f,  0.55f, 4.95f, 0.0f,  0.0f, 4,
+            timber,             0.05f, 0.95f, 0.25f, 1.55f, 0.0f,  0.0f, 5,
+            flesh,              1.55f, 6.1f,  0.05f, 1.2f,  2.65f, 6.4f, 12,
+            hardenedAlloy,      2.0f,  6.3f,  1.25f, 5.8f,  0.0f,  0.0f, 12,
+            magneticAlloy,      2.2f,  6.3f,  14.0f, 6.6f,  0.75f, 5.7f, 18,
+            logicAlloy,         0.4f,  3.5f,  0.3f,  3.1f,  1.25f, 5.2f, 8
+        );
+    }
 
     private static class FRItem extends Item{
 

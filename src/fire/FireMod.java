@@ -28,6 +28,7 @@ import mindustry.content.Items;
 import mindustry.content.Liquids;
 import mindustry.ctype.UnlockableContent;
 import mindustry.game.EventType;
+import mindustry.gen.Groups;
 import mindustry.gen.Icon;
 import mindustry.mod.Mod;
 import mindustry.mod.Mods;
@@ -152,7 +153,7 @@ public class FireMod extends Mod{
             if(builds.size > 0) return CheatStatusCode.CHEAT_BLOCK;
         }
 
-        if(!net.server() &&
+        if(Groups.player.size() == 1 &&
             (state.rules.infiniteResources ||
             state.rules.allowEditRules ||
             player.team().rules().infiniteResources))
@@ -181,8 +182,10 @@ public class FireMod extends Mod{
         ui.research.titleTable.row().button(b -> b.add("@fire.showdatabase"), InfoDialog.dialog::show).visible(() -> ui.research.root.node == FRPlanets.lysetta.techTree);
     }
 
+    /** @see tmi.ui.EntryAssigner#assign()  */
     static void loadOverwrittenContentDialog(){
-        ui.content = new FRContentInfoDialog();
+        if(mods.locateMod("tmi") != null) return; //tmi uses an anonymous class, can't extend it
+        ui.content = moddedContent = new FRContentInfoDialog();
     }
 
     static void showLog(boolean forces){
@@ -202,8 +205,8 @@ public class FireMod extends Mod{
             t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
-                "[#F4BA6E]v1.5.1:",
-                FRBlocks.fractalUnitFactory, FRUnitTypes.pluto,
+                "[#F4BA6E]v1.5.7:",
+                FRStatusEffects.informationalPerturbation,
                 "[#F4BA6E]v1.5.0:",
                 FRSectorPresets.desertWastes, FRSectorPresets.frozenWall,
                 FRBlocks.obstruction, FRBlocks.cumulonimbus, FRBlocks.magneticRail,
@@ -273,6 +276,7 @@ public class FireMod extends Mod{
     }
 
     static void addContent(Table table, Object... objects){
+        String strend = Core.bundle.get("fire.strend");
         for(var obj : objects){
             if(obj instanceof UnlockableContent c){
 
@@ -280,7 +284,7 @@ public class FireMod extends Mod{
                     t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
                     t.table(info -> {
                         info.left().add("[accent]" + c.localizedName).left().row();
-                        int index = c.description.indexOf(Core.bundle.get("fire.strend"));
+                        int index = c.description.indexOf(strend);
                         String desc = index == -1 ? c.description : c.description.substring(0, index);
                         if(c instanceof SectorPreset) desc += "...";
                         info.left().add(desc).left();

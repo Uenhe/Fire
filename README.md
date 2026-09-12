@@ -42,4 +42,4 @@ There are two authors, [FlyRain](https://github.com/nuiFghY) and KochiyaUeneh (m
 #### Others:
 
 - 12 new items and 1 new liquid
-- 8 new status effects
+- 9 new status effects

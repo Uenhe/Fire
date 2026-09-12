@@ -1,9 +1,12 @@
 package fire.world.blocks.defense;
 
+import arc.Core;
 import arc.Events;
 import arc.graphics.g2d.Draw;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Mathf;
 import arc.util.Time;
+import fire.annotation.Modified;
 import mindustry.entities.Damage;
 import mindustry.entities.Lightning;
 import mindustry.game.EventType;
@@ -19,13 +22,24 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
 
     protected float healPercent;
     protected float optionalMultiplier;
-    protected byte frames;
+    protected final byte frames;
     protected byte frameTime;
 
-    public FleshWall(String name){
+    private final TextureRegion[] regions;
+
+    public FleshWall(String name, int n){
         super(name);
         update = true;
+        frames = (byte)n;
+        regions = new TextureRegion[n];
         buildType = FleshWallBuild::new;
+    }
+
+    @Override
+    public void load(){
+        super.load();
+        for(int i = 0; i < frames; i++)
+            regions[i] = Core.atlas.find(name + (i + 1));
     }
 
     @Override
@@ -41,8 +55,8 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
 
     public class FleshWallBuild extends WallBuild{
 
-        /** Modified from super's one. */
         @Override
+        @Modified
         public boolean collision(Bullet bullet){
             boolean wasDead = health <= 0.0f;
 
@@ -111,7 +125,7 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
         @Override
         public void draw(){
             super.draw();
-            if(frames > 0) Draw.rect(name + (int)((Time.time / frameTime % frames) + 1), x, y);
+            Draw.rect(regions[(int)(Time.time / frameTime % frames)], x, y);
         }
     }
 }

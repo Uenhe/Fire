@@ -37,6 +37,7 @@ import mindustry.type.UnitType;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
+import static fire.FRVars.moddedContent;
 import static fire.entities.abilities.DebuffRemoveFieldAbility.DEBUFFS;
 import static mindustry.Vars.*;
 import static mindustry.content.StatusEffects.wet;
@@ -48,7 +49,7 @@ public class FRStatusEffects{
 
     static{
         frostbite = new StatusEffect("frostbite"){{
-            Color.valueOf(color, "ff0000");
+            Color.valueOf(color, "8cfffb");
             outline = false;
             damage = 8.0f / 60.0f;
             speedMultiplier = 0.55f;
@@ -263,26 +264,23 @@ public class FRStatusEffects{
             static final BulletType[] bullets = new BulletType[256];
 
             static final String censored = Core.bundle.get("fire.censored");
+            static final String normalOne = censored.repeat(6);
             static final String brokenOne = "[#ff0000]" + censored.repeat(240);
 
             @Override
             public String displayDescription(){
-                StringBuilder sb;
+                String str;
 
-                if(Mathf.chance(0.8))
-                    sb = new StringBuilder().append(censored.repeat(6)); // 80%
+                if(moddedContent != null && Mathf.chance(0.8))
+                    str = normalOne; // 80%
 
                 else if(Mathf.chance(0.75))
-                    sb = new StringBuilder().append("[#")
-                        .append(Integer.toHexString(Mathf.random(127, 255)))
-                        .append("0000]")
-                        .append(censored.repeat(Mathf.random(5, 20)))
-                        .append("[]"); // 15%
-
+                    str = "[#" + Integer.toHexString(Mathf.random(127, 255)) + "0000]" +
+                        censored.repeat(Mathf.random(5, 20)) + "[]"; // 15%
                 else
                     return brokenOne; // 5%
 
-                return String.format(description, sb) + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
+                return String.format(description, str) + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
             }
 
             static int checkBullet(UnitType unit){

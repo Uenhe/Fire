@@ -48,10 +48,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static fire.FRVars.equivalentWidth;
-import static fire.content.FRItems.*;
-import static fire.content.FRUnitTypes.omicron;
 import static mindustry.Vars.*;
-import static mindustry.content.Items.*;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
 public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
@@ -63,9 +60,9 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
     public static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
     private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
+    private static final String[] tooltips = new String[3];
 
-    private static void putAllValues(Object... values){
-        var itemValues = ElementUnitFactory.itemValues;
+    public static void putAllValues(Object... values){
         for(int i = 0, n = values.length; i < n; i += 8)
             itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6], (int)values[i + 7]));
     }
@@ -105,54 +102,23 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
             build.currentPlan = -1;
             build.command = null;
         });
+
+        if(tooltips[0] == null)
+            for(int i = 0; i < 3; i++)
+                tooltips[i] = Core.bundle.get("tooltip.element" + (i + 1));
     }
 
     @Override
     public void init(){
         super.init();
         for(var unitType : content.units())
-            if(!unitType.hidden && FRMath.getValue(unitType).getMaxLv() <= tier + 0.99f && !(unitType instanceof ErekirUnitType))
+            if(!unitType.hidden && FRMath.getValue(unitType).getMaxLv() <= tier + 0.999f && !(unitType instanceof ErekirUnitType))
                 plans.add(unitType);
 
         plans.sort(u -> u.id);
 
-        putAllValues(
-            copper,           0.08f, 1.5f,  0.1f,  0.9f, 0.0f,  0.0f, 0,
-            lead,             0.06f, 1.55f,  0.15f, 1.0f, 0.05f, 0.6f, 0,
-            metaglass,        0.06f, 3.0f,  0.15f, 2.0f, 0.08f, 2.5f, 2,
-            graphite,         0.0f,  0.0f,  0.1f,  3.0f, 0.4f,  1.5f, 3,
-            scrap,            0.01f, 0.8f,  0.0f,  0.0f, 0.0f,  0.0f, 0,
-            coal,             0.0f,  0.0f,  0.3f,  2.0f, 0.0f,  0.0f, 1,
-            titanium,         0.25f,  3.2f,  0.3f,  2.6f, 0.1f,  1.5f, 4,
-            thorium,          0.45f, 3.75f, 0.55f,  3.1f, 0.0f,  0.0f, 5,
-            silicon,          0.0f,  0.0f,  0.3f,  2.5f, 0.9f,  5.0f, 1,
-            plastanium,       0.85f,  4.85f, 0.75f,  4.55f, 0.0f, 0.0f, 4,
-            phaseFabric,      1.25f,  5.3f,  0.85f,  2.4f, 0.85f,  5.4f, 6,
-            surgeAlloy,       1.25f,  5.5f,  1.35f,  5.95f, 0.0f, 0.0f, 4,
-            sporePod,         0.0f,  0.0f,  0.4f,  2.25f, 0.0f, 0.0f, 2,
-            sand,             0.01f, 0.5f,  0.0f,  0.0f, 0.0f,  0.0f, 0,
-            blastCompound,    0.0f,  0.0f,  1.2f,  5.3f, 0.0f,  0.0f, 4,
-            pyratite,         0.0f,  0.0f,  0.8f,  4.2f, 0.0f,  0.0f, 3,
-
-            glass,            0.01f, 0.3f,  0.05f, 1.2f, 0.1f,  2.5f, 0,
-            mirrorglass,      0.85f,  4.0f,  0.95f,  3.5f, 0.1f,  2.5f, 6,
-            sulflameAlloy,    0.0f,  0.0f,  1.30f, 5.5f, 0.0f,  0.0f, 4,
-            kindlingAlloy,    0.0f,  0.0f,  1.25f,  5.6f, 0.0f,  0.0f, 4,
-            conductor,        0.0f,  0.0f,  0.75f,  3.85f, 0.35f, 3.4f, 3,
-            detonationCompound,0.05f, 1.3f,  1.35f, 6.25f, 0.3f, 2.9f, 9,
-            flamefluidCrystal, 0.0f, 0.0f,  0.55f, 4.95f, 0.0f,  0.0f, 4,
-            timber,           0.05f, 0.95f, 0.25f, 1.55f, 0.0f, 0.0f, 5,
-            flesh,            1.55f, 6.1f,  0.05f, 1.2f, 2.65f,  6.4f, 12,
-            hardenedAlloy,    2.0f,  6.3f,  1.25f,  5.8f, 0.0f,  0.0f, 12,
-            magneticAlloy,    2.2f,  6.3f,  14.0f, 6.6f, 0.75f,  5.7f, 18,
-            logicAlloy,       0.4f,  3.5f,  0.3f,  3.1f, 1.25f,  5.2f, 8
-        );
-
         for(var unit : plans)
-            unitValues.put(unit, FRMath.getValue(unit));
-
-        //omicron is removed from T3 recipe so put it here
-        unitValues.put(omicron, new UnitValue(2.5f, 3.9f, 3.2f));
+            if(!unitValues.containsKey(unit)) unitValues.put(unit, FRMath.getValue(unit));
     }
 
     @Override
@@ -171,12 +137,21 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 var value = itemValues.get(item);
                 if(value == null) continue;
 
+                var sb = new StringBuilder();
+                boolean hasArmor = value.armorXp != 0.0f,
+                    hasEnergy = value.energyXp != 0.0f,
+                    hasLogic = value.logicXp != 0.0f;
+                if(hasArmor) sb.append(String.format(tooltips[0], value.armorXp, value.armorMaxLv));
+                if(hasArmor && hasEnergy) sb.append("\n");
+                if(hasEnergy) sb.append(String.format(tooltips[1], value.energyXp, value.energyMaxLv));
+                if(hasEnergy && hasLogic) sb.append("\n");
+                if(hasLogic) sb.append(String.format(tooltips[2], value.logicXp, value.logicMaxLv));
+
                 var buttonCell = itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit);
-                var tip = Core.bundle.format("tooltip.element", value.armorXp, value.energyXp, value.logicXp, value.armorMaxLv, value.energyMaxLv, value.logicMaxLv);
                 if(mobile)
-                    ui.addDescTooltip(buttonCell.get(), tip);
+                    ui.addDescTooltip(buttonCell.get(), sb.toString());
                 else
-                    buttonCell.tooltip(tip);
+                    buttonCell.tooltip(sb.toString());
 
                 if(++i % 10 == 0) itemTable.row();
             }
@@ -236,15 +211,15 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         addBar("armor", (ElementUnitFactoryBuild b) -> new Bar(
             () -> Core.bundle.format("bar.armorlv", Strings.fixed(b.armorXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).armorLv, 1))),
             () -> Pal.powerBar,
-            () -> b.currentPlan == -1 ? 0.0f : b.armorXpToLv() / unitValues.get(b.unit()).armorLv));
+            () -> b.currentPlan == -1 ? Mathf.num(b.armorXp > 0.0f) : b.armorXpToLv() / unitValues.get(b.unit()).armorLv));
         addBar("energy", (ElementUnitFactoryBuild b) -> new Bar(
             () -> Core.bundle.format("bar.energylv", Strings.fixed(b.energyXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).energyLv, 1))),
             () -> Pal.reactorPurple,
-            () -> b.currentPlan == -1 ? 0.0f : b.energyXpToLv() / unitValues.get(b.unit()).energyLv));
+            () -> b.currentPlan == -1 ? Mathf.num(b.energyXp > 0.0f) : b.energyXpToLv() / unitValues.get(b.unit()).energyLv));
         addBar("logic", (ElementUnitFactoryBuild b) -> new Bar(
             () -> Core.bundle.format("bar.logiclv", Strings.fixed(b.logicXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).logicLv, 1))),
             () -> Pal.logicControl,
-            () -> b.currentPlan == -1 ? 0.0f : b.logicXpToLv() / unitValues.get(b.unit()).logicLv)
+            () -> b.currentPlan == -1 ? Mathf.num(b.logicXp > 0.0f) : b.logicXpToLv() / unitValues.get(b.unit()).logicLv)
         );
     }
 
@@ -273,7 +248,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     }
 
     private int time(UnitValue value){
-        return FRUtils.round((Mathf.sqr(value.armorLv) + Mathf.sqr(value.energyLv) + Mathf.sqr(value.logicLv)) * timeScl, 300);
+        return Math.max(300, FRUtils.round((Mathf.sqr(value.armorLv) + Mathf.sqr(value.energyLv) + Mathf.sqr(value.logicLv)) * timeScl, 300));
     }
 
     private float lvToXp(float lv){
@@ -308,6 +283,10 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
             var output = unit();
             return output != null && output.commands.size > 1 && output.allowChangeCommands &&
                 !(output.commands.size == 2 && output.commands.get(1) == UnitCommand.enterPayloadCommand);
+        }
+
+        public boolean valid(UnitValue value){
+            return (armorXp >= lvToXp(value.armorLv) && energyXp >= lvToXp(value.energyLv) && logicXp >= lvToXp(value.logicLv)) || cheating();
         }
 
         @Override
@@ -408,7 +387,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         }
 
         @Override
-        public Object config(){
+        public Integer config(){
             return currentPlan;
         }
 
@@ -443,8 +422,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 var plan = plans.get(currentPlan);
                 var value = unitValues.get(plan);
 
-                boolean valid = (armorXp >= lvToXp(value.armorLv) && energyXp >= lvToXp(value.energyLv) && logicXp >= lvToXp(value.logicLv)) || cheating();
-                if(currentPlan != -1 && valid){
+                if(currentPlan != -1 && valid(value) && efficiency > 0.0f){
                     time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
                     progress += edelta() * state.rules.unitBuildSpeed(team);
                     speedScl = Mathf.lerpDelta(speedScl, 1f, 0.05f);
@@ -488,7 +466,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null && speedScl > 0.0f;
+            return enabled && payload == null && team.activateUnitFactories() && valid(unitValues.get(unit()));
         }
 
         @Override
@@ -501,7 +479,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         @Override
         public void handleItem(Building source, Item item){
             var value = itemValues.get(item);
-            float v = lvToXp(tier != 0 ? tier + 0.9f : Float.MAX_VALUE);
+            float v = lvToXp(tier != 0 ? tier + 0.999f : Float.MAX_VALUE);
             armorXp = Mathf.clamp(armorXp + value.armorXp, armorXp, Math.min(lvToXp(value.armorMaxLv), v));
             energyXp = Mathf.clamp(energyXp + value.energyXp, energyXp, Math.min(lvToXp(value.energyMaxLv), v));
             logicXp = Mathf.clamp(logicXp + value.logicXp, logicXp, Math.min(lvToXp(value.logicMaxLv), v));

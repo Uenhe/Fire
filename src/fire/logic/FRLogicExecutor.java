@@ -8,7 +8,6 @@ import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
 import arc.scene.ui.Image;
 import fire.content.FRFx;
-import fire.entities.bullets.FusionBombType;
 import fire.ui.FRUI;
 import mindustry.content.Blocks;
 import mindustry.core.UI;
@@ -66,15 +65,16 @@ public class FRLogicExecutor{
                 var mask = masks[i];
                 final float p = 0.2f,
                 height = Core.graphics.getHeight(),
-                y1 = i == 0 ? height * -p : height * (1.0f + p);
+                y0 = height * i == 0 ? -p : 1.0f,
+                yt = height * i == 0 ? 0.0f : 1.0f - p;
 
                 if(!out){
                     mask.color.set(Color.black);
                     mask.touchable = Touchable.disabled;
                     mask.setSize(Core.graphics.getWidth(), height * p);
-                    mask.y = y1;
+                    mask.y = y0;
 
-                    mask.actions(Actions.moveTo(0.0f, i == 0 ? 0.0f : height * (1.0f - p), t, Interp.smoother));
+                    mask.actions(Actions.moveTo(0.0f, yt, t, Interp.smoother));
                     mask.update(() -> {
                         mask.toFront();
                         if(state.isMenu()) mask.remove();
@@ -83,10 +83,8 @@ public class FRLogicExecutor{
                     Core.scene.add(mask);
 
                 }else{
-                    mask.actions(
-                        Actions.moveTo(0.0f, y1, t, Interp.smoother),
-                        Actions.delay(t, Actions.remove())
-                    );
+                    mask.actions(Actions.moveTo(0.0f, y0, t, Interp.smoother),
+                        Actions.delay(t, Actions.remove()));
                 }
             }
         }
@@ -104,7 +102,7 @@ public class FRLogicExecutor{
         public void run(LExecutor exec){
             if(!(block.obj() instanceof Block b)) return;
 
-            for(int i = 0, sum = 0; i < Team.all.length; i++){
+            for(int i = 0, sum = 0; i < 256; i++){
                 var builds = Team.get(i).data().buildingTypes.get(b);
                 if(builds == null) continue;
 
@@ -122,28 +120,8 @@ public class FRLogicExecutor{
         @Override
         public void run(LExecutor exec){
             var tile = exec.thisv.building().tile;
-            tile.setNet(tile.floor().wall instanceof StaticWall w ? w : Blocks.stoneWall);
-        }
-    }
-
-    public static class FusionBombSpawnI implements LExecutor.LInstruction{
-        LVar lifetime;
-        LVar x;
-        LVar y;
-        LVar rotation;
-        LVar team;
-
-        public FusionBombSpawnI(LVar lifetime,LVar x,LVar y,LVar rotation,LVar team){
-            this.lifetime = lifetime;
-            this.x = x;
-            this.y = y;
-            this.rotation = rotation;
-            this.team = team;
-        }
-
-        @Override
-        public void run(LExecutor exec){
-            new FusionBombType(lifetime.numf() * 60).create(exec.build, Team.get(team.numi()), x.numf() * 8, y.numf() * 8, rotation.numf());
+            var wall = tile.floor().wall;
+            tile.setNet(wall instanceof StaticWall ? wall : Blocks.stoneWall);
         }
     }
 

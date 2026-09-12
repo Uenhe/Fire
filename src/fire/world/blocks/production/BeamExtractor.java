@@ -22,6 +22,7 @@ import arc.util.Time;
 import arc.util.Tmp;
 import arc.util.io.Reads;
 import arc.util.io.Writes;
+import fire.annotation.Modified;
 import mindustry.content.Fx;
 import mindustry.content.UnitTypes;
 import mindustry.entities.Effect;
@@ -139,8 +140,8 @@ public class BeamExtractor extends mindustry.world.Block{
         return regions.toArray(TextureRegion.class);
     }
 
-    /** Modified from super's one. */
     @Override
+    @Modified
     public void createIcons(MultiPacker packer){
         var toDispose = new Seq<Pixmap>();
 
@@ -306,8 +307,8 @@ public class BeamExtractor extends mindustry.world.Block{
             warmup *= 0.6f;
         }
 
-        /** Modified from super's one. */
         @Override
+        @Modified
         public BlockStatus status(){
             if(!enabled)
                 return BlockStatus.logicDisable;

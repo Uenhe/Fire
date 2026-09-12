@@ -6,17 +6,19 @@ import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.math.Mathf;
-import arc.math.geom.Intersector;
+import arc.math.geom.Geometry;
 import arc.scene.ui.layout.Table;
 import arc.util.Strings;
 import arc.util.Time;
 import mindustry.content.Fx;
-import mindustry.gen.Groups;
+import mindustry.entities.Fires;
 import mindustry.gen.Unit;
 import mindustry.graphics.Layer;
 
-import static mindustry.Vars.renderer;
-import static mindustry.Vars.tilesize;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static mindustry.Vars.*;
+import static mindustry.Vars.world;
 
 public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability{
 
@@ -41,20 +43,21 @@ public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability
         t.add(Core.bundle.format("bullet.range", Strings.autoFixed(range / tilesize, 2))).row();
     }
 
-    /** @see mindustry.entities.Fires#extinguish(mindustry.world.Tile, float)*/
+    /** @see Fires#extinguish(mindustry.world.Tile, float)*/
     @Override
     public void update(Unit unit){
-        boolean any = false;
+        var any = new AtomicBoolean(false);
 
-        var fires = Groups.fire;
-        for(var fire : fires)
-            if(Intersector.isInRegularPolygon(24, unit.x, unit.y, range, 0.0f, fire.x, fire.y)){
-                any = true;
-                fire.time(fire.time + 100.0f * Time.delta);
+        Geometry.circle(unit.tileX(), unit.tileY(), Mathf.ceil(range / tilesize), ((x, y) -> {
+            var fire = Fires.get(world.tile(x, y));
+            if(fire != null){
+                fire.time += 100.0f * Time.delta;
                 Fx.steam.at(fire);
+                warmup = Math.min(warmup + 0.001f * Time.delta, 0.8f);
+                any.set(true);
             }
-
-        warmup = Math.min(Mathf.lerpDelta(warmup, Mathf.num(any), 0.04f), 0.8f);
+        }));
+        warmup = Math.min(Mathf.lerpDelta(warmup, Mathf.num(any.get()), 0.04f), 0.8f);
     }
 
     @Override

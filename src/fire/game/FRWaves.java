@@ -16,7 +16,7 @@ import static fire.content.FRUnitTypes.*;
 import static mindustry.content.UnitTypes.*;
 
 /** @see mindustry.game.Waves */
-public class FRWaves2{
+public class FRWaves{
 
     public static Seq<SpawnGroup> generate(float difficulty, Rand rand, boolean airOnly, boolean naval){
         UnitType[][] species = {

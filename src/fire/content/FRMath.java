@@ -89,19 +89,23 @@ public class FRMath{
             w = 5.05f;
         }else if(unit == arkyid){
             u = 4.15f;
-            v = 4.95f;
+            v = 4.90f;
             w = 3.80f;
+        }else if(unit == omicron){
+            u = 2.5f;
+            v = 3.9f;
+            w = 3.2f;
         }else if(unit == pioneer){
             u = 3.8f;
-            v = 4.4f;
-            w = 4.6f;
+            v = 4.8f;
+            w = 4.8f;
         }else if(unit == firefly){
             u = 1.2f;
             v = 1.4f;
             w = 0.5f;
         }else if(unit == candlight){
             u = 2.3f;
-            v = 2.5f;
+            v = 2.7f;
             w = 1.8f;
         }else if(unit == lampryo){
             u = 3.4f;
@@ -128,15 +132,15 @@ public class FRMath{
             v = 3.4f;
             w = 2.95f;
         }else if(unit == shelter){
-            u = 4.5f;
-            v = 4.9f;
-            w = 4.75f;
+            u = 4.1f;
+            v = 4.6f;
+            w = 4.55f;
         }else if(unit == blessing){
-            u = 5.9f;
-            v = 5.9f;
-            w = 5.9f;
+            u = 5.35f;
+            v = 5.4f;
+            w = 5.6f;
         }else if(unit == apollo){
-            u = 5.95f;
+            u = 6.05f;
             v = 6.3f;
             w = 5.6f;
         }else if(unit == pluto){

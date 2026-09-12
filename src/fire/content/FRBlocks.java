@@ -1141,7 +1141,7 @@ public class FRBlocks{
         dawn = new PowerTurret("dawn"){{
             requirements(Category.turret, with(
                 plastanium, 275,
-                surgeAlloy, 195,
+                surgeAlloy, 180,
                 logicAlloy, 225,
                 hardenedAlloy, 80
             ));
@@ -1162,13 +1162,18 @@ public class FRBlocks{
             consumePower(n(1200));
             consumeCoolant(n(30));
 
-            shootType = new FusionBombType(240.0f){{
-                speed = 4.5f;
+            shootType = new BasicBulletType(){{
+                shootEffect = Fx.none;
                 chargeEffect = new Effect(shoot.firstShotDelay, 0, e -> {
                     Draw.color(Pal.surge);
                     Fill.circle(e.x + e.fin(Interp.pow5Out) * 22.0f * Mathf.cosDeg(e.rotation), e.y + e.fin(Interp.pow5Out) * 22.0f * Mathf.sinDeg(e.rotation), e.fin(Interp.pow5Out) * FRMath.getRange_fusionBomb(180.0f));
                     Draw.color();
                 }).rotWithParent(true);
+                shake = 1f;
+                speed = 0f;
+                keepVelocity = false;
+                collidesAir = false;
+                spawnUnit = new FusionBombType(180.0f, 4.5f);
             }};
         }};
 
@@ -4156,7 +4161,7 @@ public class FRBlocks{
             increasePattern = Interp.pow2Out;
         }};
 
-        fleshWall = new FleshWall("xrq"){{
+        fleshWall = new FleshWall("xrq", 20){{
             requirements(Category.defense, with(
                 flesh, 24,
                 logicAlloy, 12
@@ -4173,7 +4178,6 @@ public class FRBlocks{
             chanceDeflect = 15.0f;
             flashHit = true;
             flashColor = Pal.health;
-            frames = 20;
             frameTime = 6;
             enableDrawStatus = false;
 
@@ -5020,7 +5024,7 @@ public class FRBlocks{
             liquidCapacity = 360.0f;
 
             base = 3.0f;
-            timeScl = 90.0f;
+            timeScl = 60.0f;
             consumePower(n(48000));
             consumeLiquid(FRLiquids.liquidNitrogen, n(150));
         }};

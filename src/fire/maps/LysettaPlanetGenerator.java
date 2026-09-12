@@ -15,7 +15,7 @@ import arc.util.Tmp;
 import arc.util.noise.Ridged;
 import arc.util.noise.Simplex;
 import fire.content.FRPlanets;
-import fire.game.FRWaves2;
+import fire.game.FRWaves;
 import mindustry.ai.Astar;
 import mindustry.ai.BaseRegistry;
 import mindustry.content.Blocks;
@@ -657,7 +657,7 @@ public class LysettaPlanetGenerator extends mindustry.maps.generators.PlanetGene
 
         //why I have to delay this???
         Events.on(EventType.WorldLoadEvent.class, e ->
-            state.rules.spawns = FRWaves2.generate(sector.threat, new Rand(sector.id), spawner.countGroundSpawns() == 0, naval)
+            state.rules.spawns = FRWaves.generate(sector.threat, new Rand(sector.id), spawner.countGroundSpawns() == 0, naval)
         );
     }
 
