@@ -207,6 +207,18 @@ public class FROverride{
         flare.speed += 0.5f;
         flare.trailLength += 3;
 
+        scepter.armor -= 10.0f;
+        vela.armor -= 7.0f;
+        arkyid.armor -= 8.0f;
+        antumbra.armor -= 8.0f;
+        quad.armor -= 2.0f;
+        reign.armor -= 12.0f;
+        corvus.armor -= 5.0f;
+        toxopid.armor -= 9.0f;
+        eclipse.armor -= 9.0f;
+        oct.armor -= 2.0f;
+        navanax.armor -= 2.0f;
+
 
         //region liquid
         Liquids.neoplasm.effect = FRStatusEffects.overgrown;

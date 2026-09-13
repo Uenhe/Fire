@@ -1792,6 +1792,7 @@ public class FRUnitTypes{
                     x = 3.75f;
                     y = 2.25f;
                     inaccuracy = 1.0f;
+                    layerOffset -= 0.001f;
                     top = false;
                     shootSound = Sounds.shootLaser;
                     bullet = new LaserBoltBulletType(10.0f, 22.0f){{

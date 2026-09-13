@@ -1,5 +1,6 @@
 package fire.world.blocks.power;
 
+import arc.func.Boolf;
 import arc.graphics.Color;
 import arc.graphics.g2d.Fill;
 import arc.math.Mathf;
@@ -7,6 +8,7 @@ import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
 import arc.util.pooling.Pools;
+import fire.FRUtils;
 import fire.content.FRStatusEffects;
 import fire.content.FRUnitTypes;
 import mindustry.content.Fx;
@@ -15,6 +17,7 @@ import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
+import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
 import mindustry.world.meta.Stat;
@@ -60,12 +63,15 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
     public class BurstReactorBuild extends ImpactReactorBuild{
 
         private float burstAlpha;
-        private float powerConsSum;
         private final Vec2[] burstPos = new Vec2[6];
 
         {
             for(int i = 0, n = burstPos.length; i < n; i++)
                 burstPos[i] = new Vec2();
+        }
+
+        private Boolf<Building> detectPred(){
+            return b -> b.block.consPower != null && b != this;
         }
 
         @Override
@@ -96,21 +102,21 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
 
         @Override
         public float getPowerProduction(){
-            powerConsSum = 0.0f;
-            indexer.eachBlock(this, detectRadius, other -> other.block.consPower != null && other != this, other -> {
-                float powerCons = other.power.status * other.block.consPower.usage * Mathf.num(other.shouldConsume());
-                if(!other.block.canOverdrive) powerCons /= timeScale;
-                powerConsSum += powerCons;
+            FRUtils.AtomicFloat powerConsSum = new FRUtils.AtomicFloat(0.0f);
+            indexer.eachBlock(this, detectRadius, detectPred(), other -> {
+                if(!other.shouldConsumePower) return;
+                powerConsSum.addAndGet(other.block.consPower.requestedPower(other) * other.timeScale());
             });
-            return super.getPowerProduction() <= 0.0f ? 0.0f : super.getPowerProduction() + powerConsSum * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
+            return super.getPowerProduction() <= 0.0f ?
+                0.0f :
+                super.getPowerProduction() + powerConsSum.get() * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
         }
 
         @Override
         public void drawSelect(){
             super.drawSelect();
             Drawf.dashCircle(x, y, detectRadius, Pal.surge);
-            indexer.eachBlock(player.team(), x, y, detectRadius, other -> other.block.consPower != null && other.block != block, other ->
-                Drawf.selected(other, Tmp.c4.set(Pal.surge).a(Mathf.absin(4.0f, 1.0f))));
+            indexer.eachBlock(this, detectRadius, detectPred(), other -> Drawf.selected(other, Tmp.c4.set(Pal.surge).a(Mathf.absin(4.0f, 1.0f))));
         }
 
         @Override
@@ -143,7 +149,7 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
         }
     }
 
-    private static class BurstBullet extends mindustry.gen.Bullet {
+    private static class BurstBullet extends mindustry.gen.Bullet{
 
         private float timer;
         private static final BasicBulletType burstType = new BasicBulletType(2.0f, 100.0f){{
@@ -181,8 +187,8 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
 
         @Override
         public void remove(){
-            super.remove();
             FRUnitTypes.radiance.weapons.get(0).bullet.create(this, team, x, y, 0.0f, 0.0f);
+            super.remove();
         }
     }
 }
