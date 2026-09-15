@@ -30,9 +30,9 @@ import mindustry.graphics.Pal;
 import mindustry.type.UnitType;
 import mindustry.ui.Styles;
 
-import java.awt.*;
-
-import static mindustry.Vars.*;
+import static fire.FRVars.layerFlyingUnitAbove;
+import static mindustry.Vars.state;
+import static mindustry.Vars.tilesize;
 
 public class FRFx{
 
@@ -279,14 +279,15 @@ public class FRFx{
     }
 
     public static void circleDraw_3D(float x, float y, float h, float rad, float stroke, float rot, boolean asLine){
-        float space = 360.0f / (float)Lines.circleVertices(rad);
+        int vertices = Lines.circleVertices(rad);
+        float space = 360.0f / vertices;
         float hstep = stroke / 2.0F / Mathf.cosDeg(space / 2.0F);
         float r1 = rad - hstep;
         float r2 = rad + hstep;
 
-        Draw.z(Layer.flyingUnit + 0.2f);
-        for(int i = 0; i < Lines.circleVertices(rad) * 0.5; ++i){
-            float a = space * (float)i;
+        Draw.z(layerFlyingUnitAbove);
+        for(int i = 0; i < vertices / 2; i++){
+            float a = space * i;
             float cb = Mathf.cosDeg(rot);
             float sb = Mathf.sinDeg(rot);
             float cos = Mathf.cosDeg(a);
@@ -308,8 +309,8 @@ public class FRFx{
         }
 
         Draw.z(Layer.bullet - 0.5f);
-        for(int i = (int)(Lines.circleVertices(rad) * 0.5); i < Lines.circleVertices(rad); ++i){
-            float a = space * (float)i;
+        for(int i = vertices / 2; i < vertices; i++){
+            float a = space * i;
             float cb = Mathf.cosDeg(rot);
             float sb = Mathf.sinDeg(rot);
             float cos = Mathf.cosDeg(a);
@@ -338,14 +339,14 @@ public class FRFx{
     }
 
     public static Effect waveEffect_3D(float lifetime, float sizeFrom, float sizeTo, float rot, float strokeFrom, float strokeTo, Color colorFrom, Color colorTo, Interp strokeInterp, Interp sizeInterp, Interp colorInterp){
-        return new Effect(lifetime, e->{
+        return new Effect(lifetime, e -> {
             float fin = e.fin();
             float ifin = e.fin(colorInterp);
             float rad = sizeInterp.apply(sizeFrom, sizeTo, fin);
             float stroke = strokeInterp.apply(strokeFrom, strokeTo, fin);
 
             Draw.color(colorFrom, colorTo, ifin);
-            circleDraw_3D(e.x,e.y,0,rad,stroke,rot,true);
+            circleDraw_3D(e.x, e.y, 0, rad, stroke, rot, true);
         });
     }
 

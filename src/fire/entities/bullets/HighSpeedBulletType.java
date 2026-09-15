@@ -1,13 +1,9 @@
 package fire.entities.bullets;
 
-import arc.math.Mathf;
-import arc.struct.ObjectIntMap;
 import arc.util.Nullable;
-import arc.util.Time;
 import fire.content.FRFx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Damage;
-import mindustry.entities.Effect;
 import mindustry.entities.bullet.BasicBulletType;
 import mindustry.entities.bullet.BulletType;
 import mindustry.gen.Bullet;

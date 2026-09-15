@@ -7,7 +7,6 @@ import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
 import arc.scene.ui.layout.Table;
 import fire.FRVars;
-import fire.content.FRMath;
 /** @author fy */
 public class FRTable extends Table{
     static float x;

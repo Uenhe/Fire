@@ -23,7 +23,8 @@ import mindustry.world.meta.BuildVisibility;
 
 import java.lang.reflect.Field;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.indexer;
+import static mindustry.Vars.state;
 
 public class DEBUG{
 

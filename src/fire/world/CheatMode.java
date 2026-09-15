@@ -6,7 +6,6 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.struct.ObjectIntMap;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Time;
 import fire.content.FRBlocks;
 import fire.content.FRFx;

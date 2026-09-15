@@ -3,11 +3,14 @@ package fire;
 import arc.Core;
 import arc.Events;
 import arc.graphics.Color;
+import arc.graphics.g2d.Bloom;
+import arc.graphics.g2d.Draw;
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
 import arc.util.Time;
 import fire.content.FRStatusEffects;
 import fire.content.FRUnitTypes;
+import fire.logic.FRLogicExecutor;
 import fire.ui.dialogs.FRContentInfoDialog;
 import fire.world.CheatMode;
 import mindustry.content.Blocks;
@@ -15,6 +18,7 @@ import mindustry.content.StatusEffects;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Unit;
+import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.dialogs.BaseDialog;
 
@@ -41,6 +45,8 @@ public final class FRVars{
 
     public static short equivalentWidth;
     public static FRContentInfoDialog moddedContent;
+    public static final float layerFlyingUnitAbove = Layer.flyingUnit + 1;
+    public static final Bloom bloomFlyingUnitAbove = new Bloom(true);
 
     private static float contentDialogTimer;
     private static BaseDialog cheatDialog;
@@ -71,6 +77,14 @@ public final class FRVars{
                         u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
                     else
                         spawnedUnits.remove(u);
+                }
+
+                final float ratio = FRLogicExecutor.MaskCutsceneI.ratio, height = Core.graphics.getHeight();
+                var mask = FRLogicExecutor.MaskCutsceneI.masks[0];
+                if(mask.hasActions() && mask.y >= -height * ratio * 0.5f){
+                    ui.hudfrag.shown = false;
+                }else if(mask.y <= -height * ratio * 0.5f && mask.y > -height * ratio && FRLogicExecutor.MaskCutsceneI.maskOut && FRLogicExecutor.MaskCutsceneI.previousShown){
+                    ui.hudfrag.shown = true;
                 }
 
                 if(frame % 60 == 0){
@@ -115,11 +129,15 @@ public final class FRVars{
             }
         });
 
-        if(!headless)
-            Events.run(EventType.Trigger.draw, () -> {
-                if(Core.graphics.getFrameId() % 60 == 0)
-                    equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
-            });
+        if(!headless) Events.run(EventType.Trigger.draw, () -> {
+            if(Core.graphics.getFrameId() % 60 == 0)
+                equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
+
+            final float epsilon = 0.0001f;
+            bloomFlyingUnitAbove.resize(Core.graphics.getWidth(), Core.graphics.getHeight());
+            Draw.draw(layerFlyingUnitAbove - epsilon, bloomFlyingUnitAbove::capture);
+            Draw.draw(layerFlyingUnitAbove + epsilon, bloomFlyingUnitAbove::render);
+        });
 
         Events.on(EventType.UnitSpawnEvent.class, e -> {
             if(e.unit.type.flying && e.unit.type != FRUnitTypes.pioneer)

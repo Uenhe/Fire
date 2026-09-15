@@ -121,9 +121,8 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
         @Modified
         public void craft(){
             consume();
-            var items = outputItems;
-            if(items != null)
-                for(var output : items)
+            if(outputItems != null)
+                for(var output : outputItems)
                     for(int i = 0, n = output.amount; i < n; i++)
                         offload(output.item);
                         
@@ -155,8 +154,7 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
                 Time.run(delay, () -> {
                     for(int j = 0; j < bullets; j++)
                         fragBullet.create(this, Team.derelict, x, y, Mathf.random(360.0f),
-                            Mathf.random(fragBullet.fragVelocityMin, fragBullet.fragVelocityMax)
-                        );
+                            Mathf.random(fragBullet.fragVelocityMin, fragBullet.fragVelocityMax));
                 });
             }
         }
@@ -227,11 +225,10 @@ public class EnergyCrafter extends mindustry.world.blocks.production.GenericCraf
             craftSound.at(tile, Mathf.random(0.45f, 0.55f));
 
             int amount = (int)(lightningAmount * (1 + instability / maxInstability));
-            if(instability <= maxInstability * 0.5f){
-                for(int i = 0; i < amount; i++)
+            for(int i = 0; i < amount; i++){
+                if(instability <= maxInstability * 0.5f)
                     Lightning.create(team, circleColor[counter], lightningDamage, x, y, i * (360.0f / amount), (int)(size * 2.0f + instability * 0.03f));
-            }else{
-                for(int i = 0; i < amount; i++)
+                else
                     LightningBranch.create(this, circleColor[counter], lightningDamage, i * (360.0f / amount), (int)(size + instability * 0.024f), 2, 2);
             }
         }

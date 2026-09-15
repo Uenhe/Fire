@@ -39,7 +39,8 @@ import mindustry.world.meta.StatUnit;
 
 import static fire.FRVars.moddedContent;
 import static fire.entities.abilities.DebuffRemoveFieldAbility.DEBUFFS;
-import static mindustry.Vars.*;
+import static mindustry.Vars.content;
+import static mindustry.Vars.headless;
 import static mindustry.content.StatusEffects.wet;
 
 public class FRStatusEffects{

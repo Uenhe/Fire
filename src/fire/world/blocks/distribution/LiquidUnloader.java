@@ -18,7 +18,6 @@ import mindustry.world.meta.BlockGroup;
 
 import static mindustry.Vars.content;
 
-
 public class LiquidUnloader extends mindustry.world.Block{
 
     private String centerRegion;
@@ -73,11 +72,12 @@ public class LiquidUnloader extends mindustry.world.Block{
     @Override
     public void drawPlanConfig(BuildPlan plan, Eachable<BuildPlan> list){
         drawPlanConfigCenter(plan, plan.config, centerRegion, true);
-        drawNearbyBuilding(plan.x,plan.y,(Liquid)plan.config);
+        drawNearbyBuilding(plan.x, plan.y, (Liquid)plan.config);
         //drawPlanConfigCenter(plan, plan.config, edgeRegion, true);
     }
 
-    public class LiquidUnloaderBuild extends Building {
+    public class LiquidUnloaderBuild extends Building{
+
         public Liquid sortLiquid;
 
         @Override
@@ -112,29 +112,29 @@ public class LiquidUnloader extends mindustry.world.Block{
         }
 
         @Override
-        public void drawSelect() {
+        public void drawSelect(){
             super.drawSelect();
             drawItemSelection(sortLiquid);
-            drawNearbyBuilding((int)this.x,(int)this.y,sortLiquid);
+            drawNearbyBuilding((int)this.x, (int)this.y, sortLiquid);
         }
 
         @Override
-        public void buildConfiguration(Table table) {
+        public void buildConfiguration(Table table){
             ItemSelection.buildTable(LiquidUnloader.this, table, content.liquids(), () -> sortLiquid, this::configure);
         }
 
         @Override
-        public Liquid config() {
+        public Liquid config(){
             return this.sortLiquid;
         }
 
         @Override
-        public byte version() {
+        public byte version(){
             return 1;
         }
 
         @Override
-        public void write(Writes write) {
+        public void write(Writes write){
             super.write(write);
             write.s(sortLiquid == null ? -1 : sortLiquid.id);
         }

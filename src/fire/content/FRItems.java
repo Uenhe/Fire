@@ -7,7 +7,6 @@ import mindustry.type.Item;
 
 import static fire.FRVars.find;
 import static mindustry.content.Items.*;
-import static mindustry.content.Items.pyratite;
 
 public class FRItems{
     

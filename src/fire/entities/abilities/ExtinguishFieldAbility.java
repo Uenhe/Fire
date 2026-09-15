@@ -18,7 +18,6 @@ import mindustry.graphics.Layer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static mindustry.Vars.*;
-import static mindustry.Vars.world;
 
 public class ExtinguishFieldAbility extends mindustry.entities.abilities.Ability{
 

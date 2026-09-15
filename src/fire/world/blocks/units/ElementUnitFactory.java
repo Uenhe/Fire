@@ -141,10 +141,14 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                 boolean hasArmor = value.armorXp != 0.0f,
                     hasEnergy = value.energyXp != 0.0f,
                     hasLogic = value.logicXp != 0.0f;
-                if(hasArmor) sb.append(String.format(tooltips[0], value.armorXp, value.armorMaxLv));
-                if(hasArmor && hasEnergy) sb.append("\n");
-                if(hasEnergy) sb.append(String.format(tooltips[1], value.energyXp, value.energyMaxLv));
-                if(hasEnergy && hasLogic) sb.append("\n");
+                if(hasArmor){
+                    sb.append(String.format(tooltips[0], value.armorXp, value.armorMaxLv));
+                    if(hasEnergy && hasLogic) sb.append("\n");
+                }
+                if(hasEnergy){
+                    sb.append(String.format(tooltips[1], value.energyXp, value.energyMaxLv));
+                    if(hasLogic) sb.append("\n");
+                }
                 if(hasLogic) sb.append(String.format(tooltips[2], value.logicXp, value.logicMaxLv));
 
                 var buttonCell = itemTable.button(new TextureRegionDrawable(item.fullIcon), Styles.emptyi, 32.0f, () -> ui.content.show(item)).size(32.0f).pad(8.0f).scaling(Scaling.fit);

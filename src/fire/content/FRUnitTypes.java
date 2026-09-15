@@ -50,8 +50,7 @@ import mindustry.world.blocks.units.UnitFactory;
 import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
-import static fire.FRVars.find;
-import static fire.FRVars.lancer_a04;
+import static fire.FRVars.*;
 import static mindustry.Vars.indexer;
 import static mindustry.Vars.tilePayload;
 
@@ -519,26 +518,26 @@ public class FRUnitTypes{
                                 strokeTo = 0.0f;
                                 interp = Interp.pow3Out;
                                 colorFrom = color;
-                            }}.at(b.x,b.y);
+                            }}.at(b.x, b.y);
                             super.removed(b);
                         }
 
-                        private final Effect trail = new Effect(120.0f,e->{
+                        final int[] sides = {3, 4, 5, 6, 4, 36, 36};
+                        private final Effect trail = new Effect(120.0f, e -> {
                             Draw.color(e.color);
                             float a = e.fout(Interp.pow5Out);
                             float move = e.fin(Interp.pow5Out);
                             float length = 6.0f * a;
                             Draw.alpha(a * 0.9f);
                             Draw.z(Layer.effect + 0.8f);
-                            int[] sides ={3,4,5,6,4,36,36};
-                            Fill.poly(e.x + move * 20.0f * Mathf.cosDeg(e.rotation),e.y + move * 4.0f * Mathf.sinDeg(e.rotation),sides[e.id%7],length,e.rotation);
+                            Fill.poly(e.x + move * 20.0f * Mathf.cosDeg(e.rotation), e.y + move * 4.0f * Mathf.sinDeg(e.rotation), sides[e.id % 7], length, e.rotation);
                             Draw.reset();
                         });
+
                         @Override
                         public void draw(Bullet b){
-                            if(b.timer.get(2, 1.0f)){
-                                trail.create(b.x + Mathf.random(-6.0f,6.0f),b.y + Mathf.random(-6.0f,6.0f),b.rotation() + Mathf.random(-20.0f,20.0f),color,null);
-                            }
+                            if(b.timer.get(2, 1.0f))
+                                trail.create(b.x + Mathf.random(-6.0f, 6.0f), b.y + Mathf.random(-6.0f, 6.0f), b.rotation() + Mathf.random(-20.0f, 20.0f), color, null);
                         }
                         {
                             keepVelocity = false;
@@ -569,19 +568,21 @@ public class FRUnitTypes{
             public void draw(Unit unit){
                 super.draw(unit);
                 if(unit.shield > 0.0f){
-                    float phase = unit.shield / unit.maxHealth * 0.4f;
-                    if(phase > 0.4f)
-                        phase = 0.4f;
+                    float phase = Math.min(unit.shield / unit.maxHealth * 0.4f, 0.4f);
                     float rad = unit.hitSize * 1.2f * Mathf.sqrt2;
                     float angle = Time.time;
-                    Vec2 ps = FRMath.get3DPos(unit.x, unit.y, rad, true), pq = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle), unit.y + rad * Mathf.sinDeg(angle), 0, true), pz = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 90.0f), unit.y + rad * Mathf.sinDeg(angle + 90.0f), 0, true), ph = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 180.0f), unit.y + rad * Mathf.sinDeg(angle + 180.0f), 0, true), py = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 270.0f), unit.y + rad * Mathf.sinDeg(angle + 270.0f), 0, true), px = FRMath.get3DPos(unit.x, unit.y, 0 - rad, true);
+                    Vec2 ps = FRMath.get3DPos(unit.x, unit.y, rad, true),
+                        pq = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle), unit.y + rad * Mathf.sinDeg(angle), 0, true),
+                        pz = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 90.0f), unit.y + rad * Mathf.sinDeg(angle + 90.0f), 0, true),
+                        ph = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 180.0f), unit.y + rad * Mathf.sinDeg(angle + 180.0f), 0, true),
+                        py = FRMath.get3DPos(unit.x + rad * Mathf.cosDeg(angle + 270.0f), unit.y + rad * Mathf.sinDeg(angle + 270.0f), 0, true),
+                        px = FRMath.get3DPos(unit.x, unit.y, -rad, true);
 
-                    Draw.z(Layer.flyingUnit + 1f);
                     Draw.alpha(phase);
-
                     Draw.color(Color.white, unit.team.color, phase);
-
                     Lines.stroke(phase * 5.0f);
+
+                    Draw.z(layerFlyingUnitAbove);
                     line(ps, pq);
                     line(ps, pz);
                     line(ps, ph);
@@ -590,7 +591,8 @@ public class FRUnitTypes{
                     line(py, pq);
                     line(pz, ph);
                     line(py, ph);
-                    Draw.z(Layer.flyingUnit - 1f);
+
+                    Draw.z(layerFlyingUnitAbove - 2f);
                     line(px, pq);
                     line(px, pz);
                     line(px, ph);
@@ -599,7 +601,6 @@ public class FRUnitTypes{
                 Draw.blend();
                 Draw.color();
             }
-
             {
                 constructor = UnitEntity::create;
                 flying = true;
@@ -615,7 +616,6 @@ public class FRUnitTypes{
                 engineOffset = 10.0f;
                 itemCapacity = 60;
                 weapons.add(new Weapon("railGun"){
-
                     @Override
                     public void addStats(UnitType u, Table t){
                         super.addStats(u, t);
@@ -628,10 +628,23 @@ public class FRUnitTypes{
                         float progress1 = Math.min(0.7f, weapon.warmup) * 2.0f;
                         Draw.blend(Blending.additive);
                         Draw.color(Color.white);
-                        FRFx.circleDraw_3D(unit.x + 7 * Mathf.cosDeg(unit.rotation) * progress1, unit.y + 7 * Mathf.sinDeg(unit.rotation) * progress1, 0, 60 - 24 * progress1, progress1 * 3, unit.rotation + 90.0f, true);
+                        FRFx.circleDraw_3D(unit.x + 7 * Mathf.cosDeg(unit.rotation) * progress1,
+                            unit.y + 7 * Mathf.sinDeg(unit.rotation) * progress1,
+                            0,
+                            60 - 24 * progress1,
+                            progress1 * 2.0f,
+                            unit.rotation + 90.0f,
+                            true);
+
                         if(weapon.warmup > 0.4f){
                             float progress2 = (weapon.warmup - 0.4f) / 0.6f;
-                            FRFx.circleDraw_3D(unit.x + (8 + 14 * progress2) * Mathf.cosDeg(unit.rotation), unit.y + (8 + 14 * progress2) * Mathf.sinDeg(unit.rotation), 0, 60 - 42 * progress2, progress2 * 3, unit.rotation + 90.0f, true);
+                            FRFx.circleDraw_3D(unit.x + (8 + 14 * progress2) * Mathf.cosDeg(unit.rotation),
+                                unit.y + (8 + 14 * progress2) * Mathf.sinDeg(unit.rotation),
+                                0,
+                                60 - 42 * progress2,
+                                progress2 * 2.0f,
+                                unit.rotation + 90.0f,
+                                true);
                         }
                         Draw.blend();
                         super.draw(unit, weapon);
@@ -641,7 +654,6 @@ public class FRUnitTypes{
                     public float dps(){
                         return 777;
                     }
-
                     {
                         shootWarmupSpeed = 0.04f;
                         minWarmup = 0.99f;
@@ -651,16 +663,14 @@ public class FRUnitTypes{
                         bullet = new HighSpeedBulletType(16, 100.0f){
                             @Override
                             public void init(Bullet b){
-                                Time.run(3.0f, () -> {
-                                    FRFx.waveEffect_3D(90, 0, 40.0f, b.rotation() + 90.0f, 8, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                                });
+                                Time.run(3.0f, () ->
+                                    FRFx.waveEffect_3D(90, 0, 40.0f, b.rotation() + 90.0f, 6, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                                 super.init(b);
                             }
-
                             {
                                 buildingDamageMultiplier = 2.0f;
-                                height = 24;
                                 width = 12.0f;
+                                height = 24.0f;
                                 status = StatusEffects.melting;
                                 statusDuration = 600.0f;
                                 lifetime = 20.0f;
@@ -1534,7 +1544,7 @@ public class FRUnitTypes{
                             Groups.unit.intersect(b.x - 150f, b.y - 150f, 300.0f, 300.0f, other -> {
                                 if(b.team != other.team && counter < intervalBullet.pierceCap){
                                     counter++;
-                                    FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2().set(other));
+                                    FRFx.chainLightningThin.at(b.x, b.y, b.rotation(), frontColor, new Vec2(other.x, other.y));
                                     other.damage(intervalBullet.damage);
                                     //intervalBullet.create(b, b.x, b.y, angle(other.x - b.x, other.y - b.y), Mathf.dst(b.x, b.y, other.x, other.y) / 300f);
                                     other.apply(StatusEffects.electrified, 120.0f);
@@ -1611,9 +1621,10 @@ public class FRUnitTypes{
 //                    }
 //                }
 
-                boolean shouldAttack(float x1,float y1,float x2, float y2,float rot, float rotX){
-                    if(!Angles.within(Math.abs(x1-x2),Math.abs(x1-x2),300.0f))return false;
-                    return Angles.angleDist(Angles.angle(x1,y1,x2,y2),rot) <= rotX;
+                boolean shouldAttack(float x1, float y1, float x2, float y2, float rot, float rotX){
+                    if(!Angles.within(Math.abs(x1 - x2), Math.abs(x1 - x2), 300.0f))
+                        return false;
+                    return Angles.angleDist(Angles.angle(x1, y1, x2, y2), rot) <= rotX;
                 }
 
                 @Override
@@ -1621,18 +1632,18 @@ public class FRUnitTypes{
                     if(unit.health <= unit.maxHealth * 0.5f){
                         super.shoot(unit, mount, shootX, shootY, rotation);
                         Time.run(43.0f, () -> {
-                            Effect.shake(2, 20.0f, shootX,shootY);
-                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
+                            Effect.shake(2, 20.0f, shootX, shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX, shootY);
                             Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
-                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
-                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y + 48.0f, other.x - 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
-                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y + 48.0f, other.x + 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                if(unit.team != other.team && shouldAttack(unit.x, unit.y, other.x, other.y, unit.rotation, 128.0f)){
+                                    FRFx.swordMarkEffect(40.0f, other.x + 48.0f, other.y + 48.0f, other.x - 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
+                                    FRFx.swordMarkEffect(40.0f, other.x - 48.0f, other.y + 48.0f, other.x + 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
                                     other.damagePierce(3000.0f);
                                     other.apply(FRStatusEffects.disintegrated, 180.0f);
                                 }
                             });
                             indexer.allBuildings(shootX, shootY, 300.0f, b -> {
-                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
+                                if(unit.team != b.team && shouldAttack(unit.x, unit.y, b.x, b.y, unit.rotation, 128.0f)){
                                     float rang = 18.0f + b.block.size * 8.0f;
                                     if(rang >= 28.0f){
                                         float tri = (b.block.size % 2) * 45.0f + 45.0f;
@@ -1645,18 +1656,18 @@ public class FRUnitTypes{
                             });
                         });
                         Time.run(94.0f, () -> {
-                            Effect.shake(2,20.0f, shootX,shootY);
-                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
+                            Effect.shake(2, 20.0f, shootX, shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX, shootY);
                             Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
-                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
-                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y - 48.0f, other.x - 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
-                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y - 48.0f, other.x + 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                if(unit.team != other.team && shouldAttack(unit.x, unit.y, other.x, other.y, unit.rotation, 128.0f)){
+                                    FRFx.swordMarkEffect(40.0f, other.x + 48.0f, other.y - 48.0f, other.x - 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
+                                    FRFx.swordMarkEffect(40.0f, other.x - 48.0f, other.y - 48.0f, other.x + 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
                                     other.damagePierce(3000.0f);
                                     other.apply(FRStatusEffects.disintegrated, 180.0f);
                                 }
                             });
                             indexer.allBuildings(shootX, shootY, 300.0f, b -> {
-                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
+                                if(unit.team != b.team && shouldAttack(unit.x, unit.y, b.x, b.y, unit.rotation, 128.0f)){
                                     float rang = 18.0f + b.block.size * 8.0f;
                                     if(rang >= 28.0f){
                                         float tri = (b.block.size % 2) * 45.0f + 45.0f;
@@ -1750,8 +1761,7 @@ public class FRUnitTypes{
                     despawnEffect = Fx.none;
                     shootSound = Sounds.shootArc;
                 }};
-            }}
-            );
+            }});
         }};
 
         //region air support

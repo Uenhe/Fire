@@ -8,7 +8,6 @@ import arc.math.geom.Vec2;
 import arc.util.Time;
 import arc.util.Tmp;
 import arc.util.pooling.Pools;
-import fire.FRUtils;
 import fire.content.FRStatusEffects;
 import fire.content.FRUnitTypes;
 import mindustry.content.Fx;
@@ -63,6 +62,7 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
     public class BurstReactorBuild extends ImpactReactorBuild{
 
         private float burstAlpha;
+        private float powerConsSum;
         private final Vec2[] burstPos = new Vec2[6];
 
         {
@@ -77,39 +77,37 @@ public class BurstReactor extends mindustry.world.blocks.power.ImpactReactor{
         @Override
         public void updateTile(){
             super.updateTile();
-            burstAlpha -= Time.delta * 0.05f;
-            if(burstAlpha < 0.0f) burstAlpha = 0.0f;
+            burstAlpha = Math.max(burstAlpha - Time.delta * 0.05f, 0.0f);
 
-            if(warmup != 1.0f || healthf() <= 0.5f) return;
+            powerConsSum = 0;
+            indexer.eachBlock(this, detectRadius, detectPred(), other -> {
+                if(!other.shouldConsumePower) return;
+                powerConsSum += other.block.consPower.requestedPower(other) * other.timeScale();
+            });
 
-            if(Mathf.chanceDelta(0.005)){
-                warmup = Mathf.random(warmupMin, warmupMax);
-                burstAlpha = 0.8f;
-                for(var pos : burstPos){
-                    float x = this.x + Mathf.range(size * 30.0f), y = this.y + Mathf.range(size * 30.0f);
-                    pos.set(x, y);
-                    for(int i = 0; i < 5; i++)
-                        Lightning.create(team, Pal.surge, 120.0f, x, y, Mathf.random(360.0f), 28);
-                }
+            if(warmup != 1.0f || healthf() <= 0.5f || !Mathf.chanceDelta(0.005)) return;
 
-                Fx.dynamicWave.at(x, y, statusRadius, Pal.surge);
-                Units.nearby(null, x, y, statusRadius, u -> u.apply(StatusEffects.burning, 300.0f));
-                Units.nearby(null, x, y, statusRadius, u -> u.apply(FRStatusEffects.magnetized, 300.0f));
-
-                damage(health * 0.3f);
+            warmup = Mathf.random(warmupMin, warmupMax);
+            burstAlpha = 0.8f;
+            for(var pos : burstPos){
+                float x = this.x + Mathf.range(size * 30.0f), y = this.y + Mathf.range(size * 30.0f);
+                pos.set(x, y);
+                for(int i = 0; i < 5; i++)
+                    Lightning.create(team, Pal.surge, 120.0f, x, y, Mathf.random(360.0f), 28);
             }
+
+            Fx.dynamicWave.at(x, y, statusRadius, Pal.surge);
+            Units.nearby(null, x, y, statusRadius, u -> u.apply(StatusEffects.burning, 300.0f));
+            Units.nearby(null, x, y, statusRadius, u -> u.apply(FRStatusEffects.magnetized, 300.0f));
+
+            damage(health * 0.3f);
         }
 
         @Override
         public float getPowerProduction(){
-            FRUtils.AtomicFloat powerConsSum = new FRUtils.AtomicFloat(0.0f);
-            indexer.eachBlock(this, detectRadius, detectPred(), other -> {
-                if(!other.shouldConsumePower) return;
-                powerConsSum.addAndGet(other.block.consPower.requestedPower(other) * other.timeScale());
-            });
             return super.getPowerProduction() <= 0.0f ?
                 0.0f :
-                super.getPowerProduction() + powerConsSum.get() * (healthf() > 0.5f ? 1.0f : 0.5f) * 0.8f;
+                super.getPowerProduction() + powerConsSum * 0.8f * (healthf() > 0.5f ? 1.0f : 0.5f) / timeScale;
         }
 
         @Override

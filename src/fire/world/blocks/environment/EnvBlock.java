@@ -38,9 +38,10 @@ public class EnvBlock extends mindustry.world.Block{
                 rm();
                 return;
             }
-
-            if(isStarter()) updateStart();
-            else updateStop();
+            if(isStarter())
+                updateStart();
+            else
+                updateStop();
         }
 
         protected void rm(){
@@ -51,7 +52,7 @@ public class EnvBlock extends mindustry.world.Block{
 
         protected void updateStop(){}
 
-        /** Use position to decide to start or stop. */
+        /** Uses position to decide to start or stop. */
         protected boolean isStarter(){
             return tileX() % 2 == 0;
         }

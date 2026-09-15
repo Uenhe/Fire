@@ -28,7 +28,7 @@ public class SpritesBulletType extends mindustry.entities.bullet.BulletType{
     @Override
     public void load(){
         super.load();
-        for(int i = 0, len = (byte)regions.length; i < len;)
+        for(int i = 0, n = regions.length; i < n;)
             regions[i] = Core.atlas.find(name + ++i);
     }
 
@@ -36,7 +36,7 @@ public class SpritesBulletType extends mindustry.entities.bullet.BulletType{
     public void draw(Bullet b){
         super.draw(b);
         Draw.z(Layer.effect + 1.0f); //not affected by bloom
-        Draw.rect(regions[(int)(Time.time * speedScale(b) / frameTime) % regions.length], b.x, b.y, width * sizeScale(b), height * sizeScale(b), b.rotation() - 90.0f);
+        Draw.rect(regions[(int)((Time.time * speedScale(b) / frameTime) % regions.length)], b.x, b.y, width * sizeScale(b), height * sizeScale(b), b.rotation() - 90.0f);
     }
 
     protected float speedScale(Bullet b){

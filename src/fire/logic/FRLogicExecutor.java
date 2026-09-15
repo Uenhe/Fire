@@ -19,7 +19,8 @@ import mindustry.logic.LVar;
 import mindustry.world.Block;
 import mindustry.world.blocks.environment.StaticWall;
 
-import static mindustry.Vars.*;
+import static mindustry.Vars.state;
+import static mindustry.Vars.ui;
 
 public class FRLogicExecutor{
 
@@ -42,7 +43,9 @@ public class FRLogicExecutor{
 
     public static class MaskCutsceneI implements LExecutor.LInstruction{
 
-        private static final Image[] masks = {new Image(), new Image()};
+        public static final float ratio = 0.2f;
+        public static boolean previousShown, maskOut;
+        public static final Image[] masks = {new Image(), new Image()};
 
         static{
             Events.on(EventType.ResetEvent.class, e -> {
@@ -60,18 +63,19 @@ public class FRLogicExecutor{
 
         @Override
         public void run(LExecutor exec){
+            maskOut = out;
+            if(!out) previousShown = ui.hudfrag.shown;
             float t = duration.numf();
             for(int i = 0; i < 2; i++){
                 var mask = masks[i];
-                final float p = 0.2f,
-                height = Core.graphics.getHeight(),
-                y0 = height * i == 0 ? -p : 1.0f,
-                yt = height * i == 0 ? 0.0f : 1.0f - p;
+                float height = Core.graphics.getHeight(),
+                y0 = height * (i == 0 ? -ratio : 1.0f),
+                yt = height * (i == 0 ? 0.0f : 1.0f - ratio);
 
                 if(!out){
                     mask.color.set(Color.black);
                     mask.touchable = Touchable.disabled;
-                    mask.setSize(Core.graphics.getWidth(), height * p);
+                    mask.setSize(Core.graphics.getWidth(), height * ratio);
                     mask.y = y0;
 
                     mask.actions(Actions.moveTo(0.0f, yt, t, Interp.smoother));

@@ -87,6 +87,7 @@ public class FleshBulletType extends SpritesBulletType{
             }
 
         }else{
+            assert entity instanceof Unit;
             if(intensity(b) < maxSpread && ((Unit)entity).hasEffect(StatusEffects.wet)){
                 ((Unit)entity).apply(StatusEffects.wet, ((Unit)entity).getDuration(StatusEffects.wet) - 10.0f);
                 intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
