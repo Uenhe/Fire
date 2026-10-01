@@ -70,7 +70,6 @@ public class DEBUG{
                 if(!isDeveloper()) return;
                 unit.ammo(60.0f);
                 super.updateTile();
-
             }
 
             @Override
@@ -94,11 +93,10 @@ public class DEBUG{
                 super.findTarget();
                 if(!(target instanceof Unit u)) return;
 
-                if(u.hasEffect(StatusEffects.invincible)){
+                if(u.hasEffect(StatusEffects.invincible))
                     target = null;
-                }else if(Float.isNaN(u.shield)){
+                else if(Float.isNaN(u.shield))
                     u.shield = 0.0f;
-                }
             }
         }
     }
@@ -131,7 +129,10 @@ public class DEBUG{
             @Override
             @SuppressWarnings("unchecked")
             public void placed(){
-                if(!isDeveloper()) return;
+                if(!isDeveloper()){
+                    tile.setNet(Blocks.air);
+                    return;
+                }
                 try{
                     var activeTeams = (Seq<Team>)field_activeTeams.get(indexer);
                     for(var team : activeTeams)

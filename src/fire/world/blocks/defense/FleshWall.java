@@ -39,7 +39,7 @@ public class FleshWall extends mindustry.world.blocks.defense.Wall{
     public void load(){
         super.load();
         for(int i = 0; i < frames;)
-            regions[i] = Core.atlas.find(name + ++i);
+            regions[i++] = Core.atlas.find(name + i);
     }
 
     @Override

@@ -1,20 +1,25 @@
 package fire.content;
 
 import arc.Core;
+import arc.Events;
 import arc.graphics.Blending;
 import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Intersector;
 import arc.math.geom.Vec2;
 import arc.scene.ui.layout.Table;
+import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.FRUtils;
 import fire.ai.types.DashBuilderAI;
+import fire.annotation.Modified;
 import fire.entities.abilities.*;
 import fire.entities.bullets.HighSpeedBulletType;
 import fire.entities.bullets.SpecialIntervalBulletType;
@@ -22,6 +27,7 @@ import fire.entities.weapons.MinerLikedWeapon;
 import fire.type.AirFleshUnitType;
 import fire.type.FleshUnitType;
 import fire.world.meta.FRStat;
+import mindustry.Vars;
 import mindustry.ai.UnitCommand;
 import mindustry.content.*;
 import mindustry.entities.Damage;
@@ -51,6 +57,7 @@ import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
 import static fire.FRVars.*;
+import static fire.FRVars.layerFlyingUnitAbove;
 import static mindustry.Vars.indexer;
 import static mindustry.Vars.tilePayload;
 
@@ -518,7 +525,7 @@ public class FRUnitTypes{
                                 strokeTo = 0.0f;
                                 interp = Interp.pow3Out;
                                 colorFrom = color;
-                            }}.at(b.x, b.y);
+                            }}.at(b.x,b.y);
                             super.removed(b);
                         }
 
@@ -533,11 +540,11 @@ public class FRUnitTypes{
                             Fill.poly(e.x + move * 20.0f * Mathf.cosDeg(e.rotation), e.y + move * 4.0f * Mathf.sinDeg(e.rotation), sides[e.id % 7], length, e.rotation);
                             Draw.reset();
                         });
-
                         @Override
                         public void draw(Bullet b){
-                            if(b.timer.get(2, 1.0f))
-                                trail.create(b.x + Mathf.random(-6.0f, 6.0f), b.y + Mathf.random(-6.0f, 6.0f), b.rotation() + Mathf.random(-20.0f, 20.0f), color, null);
+                            if(b.timer.get(2, 1.0f)){
+                                trail.create(b.x + Mathf.random(-6.0f,6.0f),b.y + Mathf.random(-6.0f,6.0f),b.rotation() + Mathf.random(-20.0f,20.0f),color,null);
+                            }
                         }
                         {
                             keepVelocity = false;
@@ -620,7 +627,7 @@ public class FRUnitTypes{
                     public void addStats(UnitType u, Table t){
                         super.addStats(u, t);
                         t.row();
-                        t.add(FRStat.minerweapon3.localized() + "50%");
+                        t.add(FRStat.minerweapon3.localized() + "50%\n" + FRStat.highspeed.localized());
                     }
 
                     @Override
@@ -635,7 +642,6 @@ public class FRUnitTypes{
                             progress1 * 2.0f,
                             unit.rotation + 90.0f,
                             true);
-
                         if(weapon.warmup > 0.4f){
                             float progress2 = (weapon.warmup - 0.4f) / 0.6f;
                             FRFx.circleDraw_3D(unit.x + (8 + 14 * progress2) * Mathf.cosDeg(unit.rotation),
@@ -669,8 +675,8 @@ public class FRUnitTypes{
                             }
                             {
                                 buildingDamageMultiplier = 2.0f;
+                                height = 24;
                                 width = 12.0f;
-                                height = 24.0f;
                                 status = StatusEffects.melting;
                                 statusDuration = 600.0f;
                                 lifetime = 20.0f;
@@ -723,19 +729,247 @@ public class FRUnitTypes{
             forceMultiTarget = true;
             targetFlags = new BlockFlag[]{BlockFlag.core, null};
 
-            abilities.add(new ForceFieldAbility(200.0f, 12.0f, 12000.0f, 480.0f){
-                @Override
-                public void update(Unit unit){
-                    //doubles regen when health below the half
-                    if(unit.shield < max && unit.health < unit.maxHealth * 0.5f)
-                        unit.shield += Time.delta * regen;
 
-                    super.update(unit);
+            immunities.addAll(StatusEffects.blasted,StatusEffects.burning,StatusEffects.melting,StatusEffects.muddy,StatusEffects.freezing,StatusEffects.electrified);
+
+
+
+            final Color color = Color.valueOf("e4ffd6");
+
+            final BulletType laser = new BasicBulletType(10.0f, 60.0f){{
+                width = height = 0;
+                hitSize = 12.0f;
+                lifetime = 6.0f;
+                trailColor = frontColor = backColor = Pal.surge;
+                absorbable = hittable = reflectable = false;
+                shootEffect = Fx.none;
+                hitEffect = despawnEffect = Fx.none;
+                pierce = true;
+                pierceBuilding = true;
+                status = StatusEffects.melting;
+                statusDuration = 600.0f;
+            }};
+
+            final BulletType LaserSpawningBullet = new FlakBulletType(20f, 800.0f){
+                @Override
+                public void removed(Bullet b){
+                    var owner = (Unit)b.owner;
+                    if(owner.health >= owner.maxHealth * 0.75f){
+                        super.removed(b);
+                        return;
+                    }
+                    float px = (owner.maxHealth * 0.75f - owner.health) / owner.maxHealth / 0.75f + 1.0f;
+                    indexer.allBuildings(b.x, b.y, 30, bd -> {
+                        if(b.team != bd.team){
+                            float rang = 18.0f + bd.block.size * 8.0f;
+                            if(rang >= 28.0f){
+                                float tri = (bd.block.size % 2) * 45.0f + 45.0f;
+                                FRFx.swordMarkEffect(40.0f, bd.x + rang * Mathf.cosDeg(tri), bd.y + rang * Mathf.sinDeg(tri), bd.x - rang * Mathf.cosDeg(tri), bd.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(bd.x, bd.y);
+                                tri += 90.0f;
+                                FRFx.swordMarkEffect(40.0f, bd.x + rang * Mathf.cosDeg(tri), bd.y + rang * Mathf.sinDeg(tri), bd.x - rang * Mathf.cosDeg(tri), bd.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, Pal.surge, rang >= 40.0f).at(bd.x, bd.y);
+                            }
+                            bd.damagePierce(400.0f * bd.block.size * px);
+                            owner.heal(Math.min(bd.health,200.0f * bd.block.size * px));
+                        }
+                    });
+
+                    Units.nearbyEnemies(b.team, b.x, b.y, 30, unit -> {
+                        if(unit.health <= 0 || unit.team == b.team)return;
+                        float x = unit.x;
+                        float y = unit.y;
+                        FRFx.swordMarkEffect((30.0f + 20.0f * px), x + 28.0f + 20.0f * px, y + 28.0f + 20.0f * px, x - (28.0f + 20.0f * px), y - (28.0f + 20.0f * px), 8.0f, 8.0f, Pal.surge, true).at(x, y);
+                        FRFx.swordMarkEffect((30.0f + 20.0f * px), x - (28.0f + 20.0f * px), y + 28.0f + 20.0f * px, x + 28.0f + 20.0f * px, y - (28.0f + 20.0f * px), 8.0f, 8.0f, Pal.surge, true).at(x, y);
+                        unit.apply(StatusEffects.electrified, 1200.0f);
+                        unit.apply(StatusEffects.melting, 1800.0f);
+                        unit.apply(StatusEffects.burning, 2400.0f);
+                        unit.apply(StatusEffects.shocked);
+                        unit.apply(FRStatusEffects.magnetized, 300.0f);
+                        unit.apply(FRStatusEffects.disintegrated, 300.0f);
+                        owner.heal(damage * 0.5f * px);
+                        unit.damage(damage * px);
+                    });
+
+                    super.removed(b);
                 }
-            });
+
+                {
+                    splashDamage = 1200.0f;
+                    splashDamageRadius = 40.0f;
+                    lifetime = 30.0f;
+                    width = height = 0.0f;
+                    hitSize = 20.0f;
+                    collidesGround = true;
+                    absorbable = hittable = reflectable = false;
+                    status = StatusEffects.blasted;
+                    bulletInterval = 1.0f;
+                    intervalBullet = new BasicBulletType(15f, 200.0f){
+                        @Override
+                        public void hitEntity(Bullet b, Hitboxc entity, float health){
+                            if(entity instanceof Unit unit){
+                                float x = unit.x;
+                                float y = unit.y;
+                                unit.apply(StatusEffects.melting, 300.0f);
+                                unit.apply(StatusEffects.burning, 600.0f);
+                                if(b.owner instanceof Unit owner){
+                                    unit.damage(300.0f);
+                                    unit.apply(FRStatusEffects.disintegrated, 300.0f);
+                                    unit.apply(StatusEffects.electrified, 600.0f);
+                                    owner.heal(300.0f);
+                                    FRFx.swordMarkEffect(40.0f, x + 42.0f, y + 42.0f, x - 42.0f, y - 42.0f, 8.0f, 8.0f, Color.white, true).at(x, y);
+                                    FRFx.swordMarkEffect(40.0f, x - 42.0f, y + 42.0f, x + 42.0f, y - 42.0f, 8.0f, 8.0f, Color.white, true).at(x, y);
+                                }else {
+                                    FRFx.swordMarkEffect(30.0f, x + 32.0f, y + 32.0f, x - 32.0f, y - 32.0f, 6.0f, 8.0f, Pal.surge, true).at(x, y);
+                                    FRFx.swordMarkEffect(30.0f, x - 32.0f, y + 32.0f, x + 32.0f, y - 32.0f, 6.0f, 8.0f, Pal.surge, true).at(x, y);
+                                }
+                            }
+                            super.hitEntity(b, entity,health);
+                        }
+
+                        @Override
+                        public void init(Bullet b){
+                            super.init(b);
+
+                            if(b.owner instanceof Unit)return;
+                            final float rot = Mathf.randomSeed(b.id,360.0f);
+                            b.vel.setAngle(rot);
+                            b.x = b.x + 60 * Mathf.cosDeg(rot + 180.0f);
+                            b.y = b.y + 60 * Mathf.sinDeg(rot + 180.0f);
+                            laser.create(b,b.x + 30 * Mathf.cosDeg(rot),b.y + 30 * Mathf.sinDeg(rot),rot);
+                            FRFx.swordMarkEffect(40.0f, b.x + 30 * Mathf.cosDeg(rot), b.y + 30 * Mathf.sinDeg(rot),
+                                b.x + 90 * Mathf.cosDeg(rot), b.y + 90 * Mathf.sinDeg(rot), 6.0f, 8.0f, Pal.surge, false).at(b.x + 60 * Mathf.cosDeg(rot), b.y + 60 * Mathf.sinDeg(rot));
+                            Sounds.shootLancer.at(b.x, b.y);
+                        }
+
+                        @Override
+                        public Bullet create(Bullet parent, float x, float y, float angle) {
+                            return this.create(parent, parent.shooter, parent.team, x, y, angle, -1.0F, Mathf.random(0.8f, 1.2f), 1.0F, null, null, -1.0F, -1.0F);
+                        }
+
+                        @Override
+                        public void update(Bullet b){
+                            super.update(b);
+                            if(b.owner instanceof Bullet owner){
+                                var owner2 = (Unit)b.shooter;
+
+                                if(!owner.isAdded() && b.time < 60.0f && owner2.health <= owner2.maxHealth * 0.75f){
+                                    b.vel.setLength(12.5f);
+                                    b.hitSize(12.0f);
+                                    Sounds.shootLancer.at(b.x, b.y);
+                                    FRFx.swordMarkEffect(20.0f, b.x, b.y, b.x + 100.0f * Mathf.cosDeg(b.rotation()), b.y + 100.0f * Mathf.sinDeg(b.rotation()), 8.0f, 8.0f, Pal.surge, true).at(b.x, b.y);
+                                    b.time = b.lifetime - 8.0f;
+                                }
+                            }
+                            else if(b.time < 60.0f){
+                                float vel = Mathf.randomSeed(b.id, 10.0f, 20.0f);
+                                b.vel.setLength(vel);
+                                b.hitSize(12.0f);
+                                Sounds.shootLancer.at(b.x, b.y);
+                                FRFx.swordMarkEffect(30.0f + vel * 2.0f, b.x, b.y, b.x + 8.0f * vel * Mathf.cosDeg(b.rotation()), b.y + 8.0f * vel * Mathf.sinDeg(b.rotation()), 8.0f, 8.0f, Color.white, true).at(b.x, b.y);
+                                b.time = b.lifetime - 8.0f;
+                            }
+                        }
+
+                        {
+                            width = height = 0;
+                            hitSize = 0;
+                            speed = 0.0001f;
+                            lifetime = 120.0f;
+                            trailColor = frontColor = backColor = Pal.surge;
+                            absorbable = hittable = reflectable = false;
+                            shootEffect = Fx.none;
+                            hitEffect = despawnEffect = Fx.none;
+                            pierce = true;
+                            pierceBuilding = true;
+                            keepVelocity = false;
+                        }
+                    };
+                }
+            };
+
+            final BulletType infectIntervalBullet = new BasicBulletType(){
+                {
+                    lifetime = damage = 0;
+                    despawnEffect = hitEffect = Fx.none;
+                }
+
+                @Override
+                public void removed(Bullet b){
+                    final float radius = 140.0f + 60.0f * (1.0f - ((Unit)b.owner).health / ((Unit)b.owner).maxHealth);
+                    new Effect(60.0f, e -> {
+                        FRFx.arcs(e.x,e.y,radius, 4.0f * e.fout(Interp.pow5In),  Mathf.randomSeed((long)(e.y * 10 + e.x + e.id), 0.3f, 90.0f), 6 - Mathf.randomSeed((long)(e.y * 10 + e.x), -1, 2), -1, color);
+                    }).at(b.x,b.y);
+                    Damage.damage(b.team, b.x,b.y,radius, 800.0f * (1.0f - ((Unit)b.owner).health / ((Unit)b.owner).maxHealth));
+                    indexer.allBuildings(b.x, b.y, radius, bd -> {
+                        if(b.team != bd.team && Mathf.within(b.x,b.y,bd.x,bd.y, radius)){
+                            float rang = 18.0f + bd.block.size * 8.0f;
+                            if(rang >= 28.0f){
+                                float tri = (bd.block.size % 2) * 45.0f + 45.0f;
+                                FRFx.swordMarkEffect(40.0f, bd.x + rang * Mathf.cosDeg(tri), bd.y + rang * Mathf.sinDeg(tri), bd.x - rang * Mathf.cosDeg(tri), bd.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, color, rang >= 40.0f).at(bd.x, bd.y);
+                                tri += 90.0f;
+                                FRFx.swordMarkEffect(40.0f, bd.x + rang * Mathf.cosDeg(tri), bd.y + rang * Mathf.sinDeg(tri), bd.x - rang * Mathf.cosDeg(tri), bd.y - rang * Mathf.sinDeg(tri), 6.0f, 8.0f, color, rang >= 40.0f).at(bd.x, bd.y);
+                            }
+                            bd.damagePierce(200.0f * bd.block.size);
+                            ((Unit)b.owner).heal(Math.min(bd.health,100.0f * bd.block.size));
+                        }
+                    });
+
+                    Units.nearbyEnemies(b.team, b.x, b.y, radius, unit -> {
+                        if(unit.health <= 0||!Mathf.within(b.x,b.y,unit.x,unit.y,radius)||unit.team == b.team)return;
+                        float x = unit.x;
+                        float y = unit.y;
+                        FRFx.swordMarkEffect(25.0f, x + 16.0f, y + 16.0f, x - 16.0f, y - 16.0f, 4.0f, 8.0f, color, false).at(b.x, b.y);
+                        FRFx.swordMarkEffect(25.0f, x - 16.0f, y + 16.0f, x + 16.0f, y - 16.0f, 4.0f, 8.0f, color, false).at(b.x, b.y);
+                        unit.apply(StatusEffects.corroded, 600.0f - 1.5f * Mathf.dst(b.x, b.y, unit.x, unit.y));
+                        if(unit.health <= 600.0f){
+                            if(unit.type == UnitTypes.flare){
+                                wanderer.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else if(unit.type == UnitTypes.horizon){
+                                hunter.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else if(unit.type == UnitTypes.mega){
+                                rioter.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else if(unit.type == UnitTypes.dagger){
+                                blade.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else if(unit.type == UnitTypes.mace){
+                                hatchet.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else if(unit.type == UnitTypes.fortress){
+                                castle.spawn(b.team, unit.x, unit.y, unit.rotation);
+                                unit.remove();
+                            }else{
+                                var owner = (Unit)b.owner;
+                                owner.heal(unit.maxHealth * 0.1f);
+                                if(unit.maxHealth >= 7000){
+                                    owner.apply(StatusEffects.overclock, unit.maxHealth * 0.06f);
+                                    owner.apply(StatusEffects.overdrive, unit.maxHealth * 0.06f);
+                                }
+                                if(unit.maxHealth >= 17000)owner.apply(StatusEffects.boss, unit.maxHealth * 0.04f);
+                                if(unit.maxHealth >= 50000)owner.apply(FRStatusEffects.inspired, unit.maxHealth * 0.02f);
+                            }
+                        }
+                        else{
+                            ((Unit)b.owner).heal(300);
+                            unit.damage(600.0f);
+                        }
+                    });
+                    super.removed(b);
+                }
+            };
+
+            final BulletType infectFragBullet = new BasicBulletType(){{
+                speed = width = height = 0;
+                lifetime = 160.0f;
+                hittable = collides = absorbable = reflectable = false;
+                despawnEffect = hitEffect = Fx.none;
+
+                bulletInterval = 30.0f;
+                intervalBullet = infectIntervalBullet;
+            }};
 
             final BulletType infectBullet = new BasicBulletType(){
-                private final Color color = Color.valueOf("e4ffd6");
 
                 @Override
                 public void removed(Bullet b){
@@ -750,44 +984,25 @@ public class FRUnitTypes{
                         }
                         unit.apply(StatusEffects.overclock, 300.0f);
                     }
-                    new WaveEffect(){{
-                        lifetime = 40.0f;
-                        sizeFrom = 0.0f;
-                        sizeTo = 120.0f;
-                        strokeFrom = 12.0f;
-                        strokeTo = 0.0f;
-                        interp = Interp.pow3Out;
-                        colorFrom = color;
-                    }}.at(b.x, b.y);
-
-                    for(int i = 0; i < 120; i++){
-                        {
-                            float r = Mathf.random(100);
-                            float rot = Mathf.random(360);
-                            trail.create(b.x + r * Mathf.cosDeg(rot), b.y + r * Mathf.sinDeg(rot), rot - 30.0f + Mathf.random(60), color, null);
+                    new Effect(180.0f, e -> {
+                        float progress;
+                        if(e.time <= 20.0f){
+                            progress = FRMath.smooth(e.time / 20.0f, 3);
+                        }else if(e.time <= 160.0f){
+                            progress = 1.0f + 0.02f * Mathf.sinDeg((e.time - 20.0f) * 5.0f);
+                        }else{
+                            progress = 1 + (e.time - 160.0f) * 0.025f;
+                            progress *= progress;
                         }
-                    }
+                        FRFx.arcs(e.x, e.y, progress * 140.0f, 4 - 2.0f * progress, Mathf.cosDeg(e.time * 3.0f * Mathf.randomSeed((long)(e.y * 10 + e.x), 0.3f, 1.8f)) * 90.0f, 6 - Mathf.randomSeed((long)(e.y * 10 + e.x), -1, 2), -1, color);
+                    }).at(b.x, b.y);
 
-                    Units.nearbyEnemies(b.team, b.x, b.y, splashDamageRadius * 4, unit -> {
-                        unit.apply(StatusEffects.corroded, 600.0f - 1.5f * Mathf.dst(b.x, b.y, unit.x, unit.y));
-                        if(unit.health <= 400.0f){
-                            if(unit.maxHealth <= 300.0f){
-                                wanderer.spawn(b.team, unit.x, unit.y);
-                                unit.remove();
-                            }else if(unit.maxHealth <= 600.0f){
-                                hunter.spawn(b.team, unit.x, unit.y);
-                                unit.remove();
-                            }else if(unit.maxHealth <= 1300.0f){
-                                rioter.spawn(b.team, unit.x, unit.y);
-                                unit.remove();
-                            }
-                        }
-                        unit.damage(400.0f);
-                    });
+                    //infectFragBullet.create(b.owner,b.team,b.x,b.y,b.rotation());
 
                     super.removed(b);
                 }
 
+                final int[] sides = {3, 4, 5, 6, 4, 36, 36};
                 private final Effect trail = new Effect(120.0f, e -> {
                     Draw.color(e.color);
                     float a = e.fout(Interp.pow5Out);
@@ -795,7 +1010,6 @@ public class FRUnitTypes{
                     float length = 6.0f * a;
                     Draw.alpha(a * 0.9f);
                     Draw.z(Layer.effect + 0.8f);
-                    int[] sides = {3, 4, 5, 6, 4, 36, 36};
                     Fill.poly(e.x + move * 20.0f * Mathf.cosDeg(e.rotation), e.y + move * 4.0f * Mathf.sinDeg(e.rotation), sides[e.id % 7], length, e.rotation);
                     Draw.reset();
                 });
@@ -821,25 +1035,114 @@ public class FRUnitTypes{
                     drag = -0.04f;
                     homingPower = 0.12f;
                     homingRange = 360.0f;
+                    fragBullets = 1;
+                    fragBullet = infectFragBullet;
                 }
             };
 
-            weapons.addAll(new Weapon("fire-rioter"){{
+
+            abilities.add(new ForceFieldAbility(200.0f, 30.0f, 57500.0f, 900.0f, 36, 0){
+                protected boolean regening = true;
+                protected float realShield = max;
+
+                @Override
+                public void draw(Unit unit){
+                    checkRadius(unit);
+
+                    if(unit.shield > 0){
+                        Draw.color(unit.type.shieldColor(unit), Color.white, Mathf.clamp(alpha));
+                        //Draw.color(Color.white, unit.team.color, unit.health / max);
+                        FRFx.arcs(unit.x,unit.y, radius , 2 + 3 * Math.min(1.0f, unit.shield / max), Mathf.cosDeg(Time.time * 2) * 120.0f, 6, -1, Draw.getColor());
+                        FRFx.arcs(unit.x,unit.y, radius * 0.9f , 3 * Math.min(1.0f, unit.shield / max), Mathf.sinDeg(Time.time * 2) * 120.0f + 30.0f, 6, -1, Draw.getColor());
+                    }else
+                        FRFx.arcs(unit.x,unit.y, radius , 2, Mathf.cosDeg(Time.time * 2) * 120.0f, 6, -1, Pal.gray);
+                }
+                @Override
+                public void update(Unit unit){
+                    if(regening){
+                        realShield += Time.delta * regen * 5;
+                        unit.shield(realShield);
+                        unit.heal(Time.delta * 2.5f);
+                    }
+
+                    realShield = unit.shield;
+                    if(unit.shield >= max * 0.8f)regening = false;
+
+                    if(unit.shield <= 0f && !wasBroken){
+                        unit.shield -= cooldown * regen;
+                        unit.apply(StatusEffects.shielded, 600.0f - 480.0f * unit.health / unit.maxHealth);
+                        if(unit.health <= unit.maxHealth * 0.5f){
+                            for(int i=0;i< 30;i++){
+                                int finalI = i;
+                                Time.run(i * 1.0f, () -> {
+                                    final float rot = Mathf.randomSeed((long)(unit.x + unit.y + finalI * 2), 360.0f);
+                                    final float rot2 = Mathf.randomSeed((long)(unit.x * 2 + unit.y + finalI * 3), 360.0f);
+                                    final float r = Mathf.randomSeed((long)(unit.x + unit.y + finalI), radius);
+                                    LaserSpawningBullet.intervalBullet.create(unit, unit.x + r * Mathf.cosDeg(rot), unit.y + r * Mathf.sinDeg(rot), rot2);
+                                });
+                            }
+                        }
+                    }
+
+                    if(unit.shield <= 0 && unit.shield >= -600.0f){
+                        realShield = 0;
+                        regening = true;
+                    }
+
+                    wasBroken = unit.shield <= 0f;
+
+                    super.update(unit);
+                }
+            }, new RegenAbility(){
+                @Override
+                public void addStats(Table t){
+                    super.addStats(t);
+                    t.row();
+                    t.add("[lightgray]" + FRStat.shieldmaxboost.localized() + "10x");
+                }
+                @Override
+                public void update(Unit unit){
+                    unit.heal((unit.maxHealth * percentAmount / 100f + amount) * Time.delta);
+                    if(unit.shield >= 57500.0f)unit.heal((unit.maxHealth * percentAmount / 100f + amount) * Time.delta * 9);
+                }
+                {
+                    percentAmount = 0.5f / 60.0f;
+                }
+            });
+
+            weapons.addAll(new Weapon("fire-rioter"){
+                @Override
+                public void addStats(UnitType u, Table t){
+                    super.addStats(u, t);
+                    t.row();
+                    t.add(FRStat.highspeed.localized());
+                }
+
+                @Override
+                public void update(Unit unit, WeaponMount mount){
+                    float px = Math.min(6.5f ,Math.max(0, 0.9f - unit.health / unit.maxHealth) * 8f);
+                    //reload to 120(7.5x)
+                    mount.reload = Math.max(mount.reload - Time.delta * unit.reloadMultiplier * px, 0);
+                    super.update(unit,mount);
+                }
+                {
                     reload = 900.0f;
                     x = 17.5f;
                     y = -60.0f;
                     rotateSpeed = 1.0f;
                     rotate = true;
 
+                    range = 800.0f;
                     shoot.shots = 5;
                     shoot.shotDelay = 20.0f;
                     mirror = false;
 
                     shootSound = Sounds.shootForeshadow;
 
-                    bullet = new HighSpeedBulletType(25.6f, 600.0f){
+                    bullet = new HighSpeedBulletType(25.6f, 1300.0f){
                         @Override
                         public void init(Bullet b){
+                            b.lifetime = 20.0f;
                             Time.run(8.0f, () -> {
                                 FRFx.waveEffect_3D(90, 0, 45.0f, b.rotation() + 90.0f, 6, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
                             });
@@ -853,20 +1156,23 @@ public class FRUnitTypes{
                         }
 
                         {
-                            despawnSplashDamage = 1800.0f;
+                            despawnSplashDamage = 3800.0f;
 
                             height = 32;
                             width = 16.0f;
                             status = FRStatusEffects.disintegrated;
                             statusDuration = 300.0f;
-                            lifetime = 20.0f;
+                            lifetime = 40.0f;
                             knockback = 12.5f;
                             pierceArmor = true;
                             pierce = true;
+
+                            velDamageBoost = 100.0f;
+
                             trailWidth = 3.2f;
                             trailLength = 16;
                             trailColor = find("ffd8e8");
-                            frag = new HighSpeedBulletType(0.8f, 300.0f){{
+                            frag = new HighSpeedBulletType(0.8f, 400.0f){{
                                 despawnSplashDamage = 600.0f;
 
                                 height = 32;
@@ -877,11 +1183,14 @@ public class FRUnitTypes{
                                 knockback = 12.5f;
                                 pierceArmor = true;
                                 pierce = true;
+
+                                velDamageBoost = 50.0f;
+
                                 trailWidth = 3.2f;
                                 trailLength = 16;
                                 trailColor = find("ffd8e8");
                                 hitFrags = 3;
-                                frag = new LaserBulletType(160.0f){{
+                                frag = new LaserBulletType(230.0f){{
                                     length = 160.0f;
                                     hitSize = 4.5f;
                                     colors(colors, Pal.surgeAmmoFront, Pal.surgeAmmoBack, Color.white);
@@ -905,7 +1214,7 @@ public class FRUnitTypes{
                     public void addStats(UnitType u, Table t){
                         super.addStats(u, t);
                         t.row();
-                        t.add(FRStat.minerweapon3.localized() + "80%");
+                        t.add(FRStat.infectable.localized());
                     }
 
                     {
@@ -920,8 +1229,16 @@ public class FRUnitTypes{
                     }
                 },
 
-                new Weapon("fire-hunter"){{
+                new Weapon("fire-hunter"){
+                    @Override
+                    public void addStats(UnitType u, Table t){
+                        super.addStats(u, t);
+                        t.row();
+                        t.add(FRStat.infectable.localized());
+                    }
+                    {
                     reload = 300.0f;
+                    shoot.firstShotDelay = 150.0f;
                     x = 27f;
                     y = 30.5f;
                     rotateSpeed = 6.0f;
@@ -936,13 +1253,13 @@ public class FRUnitTypes{
                     y = -50.0f;
                     rotateSpeed = 2.0f;
 
-                    range = 280.0f;
-                    reload = 10.0f;
+                    reload = 60.0f;
                     rotate = true;
                     mirror = false;
-                    minWarmup = 0.9f;
-                    shootWarmupSpeed = 0.08f;
-                    shootSound = Sounds.none;
+
+                    ejectEffect = Fx.casing1;
+                    shootSound = Sounds.shoot;
+                    bullet = LaserSpawningBullet;
                 }},
 
                 new Weapon("fire-wanderer"){{
@@ -950,13 +1267,14 @@ public class FRUnitTypes{
                     y = 9.0f;
                     rotateSpeed = 2.0f;
 
-                    range = 280.0f;
-                    reload = 10.0f;
+                    reload = 60.0f;
+                    shoot.firstShotDelay = 30.0f;
                     rotate = true;
                     mirror = false;
-                    minWarmup = 0.9f;
-                    shootWarmupSpeed = 0.08f;
-                    shootSound = Sounds.none;
+
+                    ejectEffect = Fx.casing1;
+                    shootSound = Sounds.shoot;
+                    bullet = LaserSpawningBullet;
                 }},
 
                 new PointDefenseWeapon("fire-dusk-point-defense-mount"){{
@@ -975,6 +1293,7 @@ public class FRUnitTypes{
                         shootEffect = Fx.sparkShoot;
                         hitEffect = Fx.pointHit;
                         shootSound = Sounds.shootArc;
+
                     }};
                 }},
 
@@ -1621,10 +1940,9 @@ public class FRUnitTypes{
 //                    }
 //                }
 
-                boolean shouldAttack(float x1, float y1, float x2, float y2, float rot, float rotX){
-                    if(!Angles.within(Math.abs(x1 - x2), Math.abs(x1 - x2), 300.0f))
-                        return false;
-                    return Angles.angleDist(Angles.angle(x1, y1, x2, y2), rot) <= rotX;
+                boolean shouldAttack(float x1,float y1,float x2, float y2,float rot, float rotX){
+                    if(!Angles.within(Math.abs(x1-x2),Math.abs(x1-x2),300.0f))return false;
+                    return Angles.angleDist(Angles.angle(x1,y1,x2,y2),rot) <= rotX;
                 }
 
                 @Override
@@ -1632,18 +1950,18 @@ public class FRUnitTypes{
                     if(unit.health <= unit.maxHealth * 0.5f){
                         super.shoot(unit, mount, shootX, shootY, rotation);
                         Time.run(43.0f, () -> {
-                            Effect.shake(2, 20.0f, shootX, shootY);
-                            Sounds.explosionArtilleryShockBig.at(shootX, shootY);
+                            Effect.shake(2, 20.0f, shootX,shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
                             Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
-                                if(unit.team != other.team && shouldAttack(unit.x, unit.y, other.x, other.y, unit.rotation, 128.0f)){
-                                    FRFx.swordMarkEffect(40.0f, other.x + 48.0f, other.y + 48.0f, other.x - 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
-                                    FRFx.swordMarkEffect(40.0f, other.x - 48.0f, other.y + 48.0f, other.x + 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
+                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
+                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y + 48.0f, other.x - 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y + 48.0f, other.x + 48.0f, other.y - 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
                                     other.damagePierce(3000.0f);
                                     other.apply(FRStatusEffects.disintegrated, 180.0f);
                                 }
                             });
                             indexer.allBuildings(shootX, shootY, 300.0f, b -> {
-                                if(unit.team != b.team && shouldAttack(unit.x, unit.y, b.x, b.y, unit.rotation, 128.0f)){
+                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
                                     float rang = 18.0f + b.block.size * 8.0f;
                                     if(rang >= 28.0f){
                                         float tri = (b.block.size % 2) * 45.0f + 45.0f;
@@ -1656,18 +1974,18 @@ public class FRUnitTypes{
                             });
                         });
                         Time.run(94.0f, () -> {
-                            Effect.shake(2, 20.0f, shootX, shootY);
-                            Sounds.explosionArtilleryShockBig.at(shootX, shootY);
+                            Effect.shake(2,20.0f, shootX,shootY);
+                            Sounds.explosionArtilleryShockBig.at(shootX,shootY);
                             Groups.unit.intersect(shootX - 300.0f, shootY - 300.0f, 600.0f, 600.0f, other -> {
-                                if(unit.team != other.team && shouldAttack(unit.x, unit.y, other.x, other.y, unit.rotation, 128.0f)){
-                                    FRFx.swordMarkEffect(40.0f, other.x + 48.0f, other.y - 48.0f, other.x - 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
-                                    FRFx.swordMarkEffect(40.0f, other.x - 48.0f, other.y - 48.0f, other.x + 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x, other.y);
+                                if(unit.team != other.team && shouldAttack(unit.x,unit.y,other.x,other.y,unit.rotation,128.0f)){
+                                    FRFx.swordMarkEffect(40.0f,other.x + 48.0f,other.y - 48.0f, other.x - 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
+                                    FRFx.swordMarkEffect(40.0f,other.x - 48.0f,other.y - 48.0f, other.x + 48.0f, other.y + 48.0f, 6.0f, 8.0f, Pal.surge, false).at(other.x,other.y);
                                     other.damagePierce(3000.0f);
                                     other.apply(FRStatusEffects.disintegrated, 180.0f);
                                 }
                             });
                             indexer.allBuildings(shootX, shootY, 300.0f, b -> {
-                                if(unit.team != b.team && shouldAttack(unit.x, unit.y, b.x, b.y, unit.rotation, 128.0f)){
+                                if(unit.team != b.team && shouldAttack(unit.x,unit.y,b.x,b.y,unit.rotation,128.0f)){
                                     float rang = 18.0f + b.block.size * 8.0f;
                                     if(rang >= 28.0f){
                                         float tri = (b.block.size % 2) * 45.0f + 45.0f;
@@ -1761,7 +2079,8 @@ public class FRUnitTypes{
                     despawnEffect = Fx.none;
                     shootSound = Sounds.shootArc;
                 }};
-            }});
+            }}
+            );
         }};
 
         //region air support
@@ -1802,7 +2121,6 @@ public class FRUnitTypes{
                     x = 3.75f;
                     y = 2.25f;
                     inaccuracy = 1.0f;
-                    layerOffset -= 0.001f;
                     top = false;
                     shootSound = Sounds.shootLaser;
                     bullet = new LaserBoltBulletType(10.0f, 22.0f){{
@@ -2894,16 +3212,13 @@ public class FRUnitTypes{
             rotateToBuilding = false;
             faceTarget = false;
 
-            immunities.addAll(
-                StatusEffects.burning, StatusEffects.melting,
+            immunities.addAll(StatusEffects.burning, StatusEffects.melting,
                 StatusEffects.electrified, StatusEffects.sapped,
-                StatusEffects.shocked, StatusEffects.freezing
-            );
+                StatusEffects.shocked, StatusEffects.freezing);
 
             abilities.add(
                 new UnitSpawnAbility(){{
                     unit = UnitTypes.cyerce;
-                    spawnX = 0.0f;
                     spawnY = 30.0f;
                     spawnTime = 540.0f;
                 }},
@@ -2969,7 +3284,7 @@ public class FRUnitTypes{
                 new Weapon("fire-mechanical-tide-laser-large"){{
                     reload = 300.0f;
                     x = 0.0f;
-                    y = 4.0f;
+                    y = -13.0f;
                     shootY = 12.0f;
                     recoil = 4.5f;
                     rotate = true;
@@ -3105,8 +3420,8 @@ public class FRUnitTypes{
 
                 new Weapon("fire-mechanical-tide-laser-small"){{
                     reload = 60f;
-                    x = 30f;
-                    y = -18f;
+                    x = 25.0f;
+                    y = 8.0f;
                     recoil = 1.5f;
                     rotate = true;
                     mirror = true;
@@ -3187,7 +3502,27 @@ public class FRUnitTypes{
                     }};
                 }}
             );
-        }};
+        }
+            final TextureRegion bottom = new TextureRegion();
+
+            @Override
+            public void load(){
+                super.load();
+                bottom.set(Core.atlas.find(name + "-bottom"));
+            }
+
+            @Override
+            @Modified
+            public void drawBody(Unit unit){
+                float z = Draw.z();
+                applyColor(unit);
+                Draw.z(z - 0.1f);
+                Draw.rect(bottom, unit.x, unit.y, unit.rotation - 90);
+                Draw.z(z);
+                Draw.rect(region, unit.x, unit.y, unit.rotation - 90);
+                Draw.reset();
+            }
+        };
     }
 
     public static void load(){

@@ -63,7 +63,7 @@ public class MinerLikedWeapon extends mindustry.type.Weapon{
                         Unit[] result = {null};
                         float[] cdist = {0.0f};
                         Units.nearbyEnemies(b.team, b.x - 1.0f, b.y - 1.0f, 2.0F, 2.0F, (e) -> {
-                            if(!e.dead() && e.checkTarget(this.collidesAir, this.collidesGround) && e.hittable()){
+                            if(!e.dead() && e.checkTarget(collidesAir, collidesGround) && e.hittable()){
                                 e.hitbox(Tmp.r1);
                                 if(Tmp.r1.contains(b.x, b.y)){
                                     float dst = e.dst(b.x, b.y) - e.hitSize;
@@ -136,8 +136,9 @@ public class MinerLikedWeapon extends mindustry.type.Weapon{
         super.draw(unit, mount);
 
         float xx = 0, yy = 0;
-        final float rotation = unit.rotation - 90, weaponRotation = rotation + (rotate ? mount.rotation : baseRotation), realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil;
-        final float wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil) + Angles.trnsx(weaponRotation, mount.weapon.shootX, mount.weapon.shootY), wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil) + Angles.trnsy(weaponRotation, mount.weapon.shootX, mount.weapon.shootY);
+        float rotation = unit.rotation - 90, weaponRotation = rotation + (rotate ? mount.rotation : baseRotation), realRecoil = Mathf.pow(mount.recoil, recoilPow) * recoil;
+        float wx = unit.x + Angles.trnsx(rotation, x, y) + Angles.trnsx(weaponRotation, 0, -realRecoil) + Angles.trnsx(weaponRotation, mount.weapon.shootX, mount.weapon.shootY),
+            wy = unit.y + Angles.trnsy(rotation, x, y) + Angles.trnsy(weaponRotation, 0, -realRecoil) + Angles.trnsy(weaponRotation, mount.weapon.shootX, mount.weapon.shootY);
         if(mount.target != null){
             xx = mount.target.x();
             yy = mount.target.y();

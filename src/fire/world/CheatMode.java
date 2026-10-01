@@ -133,7 +133,7 @@ public class CheatMode{
 
     public static void update(){
         var playerRules = player.team().rules();
-        if(playerRules.cheat && !state.rules.editor){
+        if(cheatMode && playerRules.cheat && !state.rules.editor){
             if(threat == 0){
                 threat = getThreatLevel();
                 if(state.wave == 1){
@@ -163,6 +163,10 @@ public class CheatMode{
             }
 
             switch(threat){
+                case 1:
+                    state.rules.buildCostMultiplier = 1.0f;
+                    playerRules.buildSpeedMultiplier = 1.0f;
+                    break;
                 case 2:
                     state.rules.buildCostMultiplier = 1.2f;
                     playerRules.buildSpeedMultiplier = 0.9f;

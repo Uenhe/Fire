@@ -251,7 +251,7 @@ public class FRLogicStatements{
                     table.add(" sec");
                 }
             }
-            if(LCanvas.isCompact()) table.row();
+            //if(LCanvas.isCompact()) table.row();
         }
 
         @Override

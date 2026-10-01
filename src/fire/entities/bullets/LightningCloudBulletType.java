@@ -9,6 +9,7 @@ import arc.math.Mathf;
 import arc.util.Time;
 import arc.util.pooling.Pools;
 import fire.FRUtils;
+import fire.annotation.Modified;
 import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Mover;
@@ -39,7 +40,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
 
     @Override
     public void load(){
-        if(region.u == 0.0f) region.set(FRUtils.find("lightning-cloud"));
+        if(region.width == 0) region.set(FRUtils.find("lightning-cloud"));
         super.load();
     }
 
@@ -47,8 +48,8 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
         return create(owner, null, null, x, y ,0.0f, damage, 0.0f, 0.0f, null, null, 0.0f, 0.0f);
     }
 
-    /** Highly customized. */
     @Override
+    @Modified
     public LightningCloud create(Entityc owner, Entityc e, Team t, float x, float y, float a, float damage, float v, float l, Object d, Mover m, float p, float q){
         var bullet = LightningCloud.create();
         bullet.type = this;

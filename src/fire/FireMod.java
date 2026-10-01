@@ -60,7 +60,7 @@ public class FireMod extends Mod{
     private static final Field field_container;
 
     public static final Seq<Block> cheatBlocks = new Seq<>();
-    public static boolean multipleMods;
+    public static final Seq<String> multipleModList = new Seq<>(8);
 
     static{
         try{
@@ -116,15 +116,15 @@ public class FireMod extends Mod{
             }else if(block instanceof ItemTurret){
                 Item item = null;
                 if(block == FRBlocks.aerolite){
-                    item = Items.plastanium;
+                    AdaptiveSource.turretItemMap.put(block.id, Items.plastanium.id);
+
                 }else{
                     var keys = ((ItemTurret)block).ammoTypes.keys();
                     while(keys.hasNext())
                         item = keys.next();
+                    if(item != null)
+                        AdaptiveSource.turretItemMap.put(block.id, item.id);
                 }
-
-                if(item != null)
-                    AdaptiveSource.turretItemMap.put(block.id, item.id);
 
             }else if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
                 cheatBlocks.add(block);
@@ -145,12 +145,13 @@ public class FireMod extends Mod{
     static CheatStatusCode checkCheating(){
         if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
             return CheatStatusCode.OK;
+        else if(multipleModList.any())
+            return CheatStatusCode.CHEAT_MODS;
 
         var buildingTypes = player.team().data().buildingTypes;
         for(var block : cheatBlocks){
             var builds = buildingTypes.get(block);
-            if(builds == null) continue;
-            if(builds.size > 0) return CheatStatusCode.CHEAT_BLOCK;
+            if(builds != null && builds.any()) return CheatStatusCode.CHEAT_BLOCK;
         }
 
         if(Groups.player.size() == 1 &&
@@ -225,9 +226,11 @@ public class FireMod extends Mod{
     }
 
     static void checkMultipleMods(){
-        if(!mods.orderedMods().contains(mod -> !"fire".equals(mod.meta.name) && !mod.meta.hidden)) return;
-        if(DEBUG.isDeveloper()) return;
-        multipleMods = true;
+        for(var mod : mods.orderedMods()){
+            if(mod.meta.hidden || "fire".equals(mod.meta.name)) continue;
+            multipleModList.add(mod.meta.displayName);
+        }
+        if(multipleModList.isEmpty() || DEBUG.isDeveloper()) return;
         fkgame();
     }
 
@@ -241,15 +244,19 @@ public class FireMod extends Mod{
 
         if(mainDialog == null || !mainDialog.isShown()) showLog(true);
 
+        String c1 = Core.bundle.get("fire.content1");
+        if("".equals(c1)) return;
         new DelayClosableDialog("Update Notice", 300.0f).show().cont.pane(t -> {
             t.table(tt -> {
                 try{
-                    tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png")))).size(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) * 0.33f).padRight(120.0f);
+                    tt.image(new TextureRegion(new Texture(FIRE.root.child("preview.png"))))
+                        .size(Math.min(Core.graphics.getWidth(), Core.graphics.getHeight()) * 0.33f)
+                        .padRight(120.0f);
                 }catch(Throwable e){
                     Log.err("Failed to load preview for mod Fire", e);
                 }
             });
-            t.add(Core.bundle.format("fire.content1", "v" + now.substring(0, 3))).center();
+            t.add(String.format(c1, "v" + now.substring(0, 3))).center();
         });
     }
 
@@ -265,7 +272,7 @@ public class FireMod extends Mod{
         if(index == 0) //"Today is the @th Day of God's Creation of Planet Lysetta" picked
             title = String.format(title, ChronoUnit.DAYS.between(LocalDate.of(2022, 11, 19), LocalDate.now()));
         else if(index == 1) //"Probability of drawing this title is @%" picked
-            title = String.format(title, Math.round(10000.0f / titles.length) * 0.01f + "%");
+            title = String.format(title, Math.round(10000.0f / titles.length) * 0.01f);
 
         Core.graphics.setTitle("Mindustry: " + title);
     }
@@ -304,12 +311,6 @@ public class FireMod extends Mod{
     }
 
     static void fkgame(){
-        Events.on(EventType.WorldLoadBeginEvent.class, e -> {
-            if(!noMultiMods && state.getPlanet() != FRPlanets.lysetta) return;
-            Log.info("what r u fking doing");
-            Core.app.exit();
-        });
-
         if(!noMultiMods) return;
 
         mulModDialog = new BaseDialog("What happened");
@@ -317,9 +318,11 @@ public class FireMod extends Mod{
         mulModDialog.cont.pane(t -> t.add("@fire.nomultimods").center());
 
         if(mobile){
-            int m = 1, n = 3;
-            if(mods.locateMod("mindustryx") != null){
-                m += 1; n += 2;
+            int m, n;
+            if(mods.locateMod("mindustryx") == null){
+                m = 1; n = 3;
+            }else{
+                m = 2; n = 5;
             }
             ((WidgetGroup)ui.menuGroup.getChildren().get(0)).getChildren().removeRange(m, n);
 
@@ -328,7 +331,7 @@ public class FireMod extends Mod{
                     try{
                         field_container.set(ui.menufrag, cont);
                     }catch(IllegalAccessException e){
-                        throw new RuntimeException(e);
+                        Log.err(e);
                     }
                     cont.name = "menu container";
 
@@ -339,13 +342,9 @@ public class FireMod extends Mod{
             );
 
         }else{
-            Seq<MenuFragment.MenuButton> buttons = ui.menufrag.desktopButtons, tmp = new Seq<>(4);
-            for(var b : buttons)
-                if(b != null && ("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text)))
-                    tmp.add(b);
-
-            buttons.removeAll(tmp);
-            buttons.add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulModDialog::show));
+            ui.menufrag.desktopButtons
+                .removeAll(b -> b != null && ("@play".equals(b.text) || "@database.button".equals(b.text) || "@editor".equals(b.text) || "@workshop".equals(b.text)))
+                .add(new MenuFragment.MenuButton("@fire.what", Icon.warning, mulModDialog::show));
         }
     }
 
@@ -361,8 +360,7 @@ public class FireMod extends Mod{
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
         container.defaults().size(120.0f).pad(5.0f).padTop(4.0f);
 
-        MobileButton
-            settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+        MobileButton settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
             what = new MobileButton(Icon.warning, "@fire.what", mulModDialog::show),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),
@@ -391,9 +389,9 @@ public class FireMod extends Mod{
             container.add(mods);
             container.row();
 
-            for(int i = 0, n = customs.size; i < n; i++){
+            for(int i = 0, n = customs.size; i < n;){
                 container.add(customs.get(i));
-                if(i % 2 == 0) container.row();
+                if(i++ % 2 == 0) container.row();
             }
         }
 
@@ -404,6 +402,7 @@ public class FireMod extends Mod{
     enum CheatStatusCode{
         OK,
         CHEAT_BLOCK,
-        CHEAT_RULE
+        CHEAT_RULE,
+        CHEAT_MODS
     }
 }

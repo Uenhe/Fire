@@ -21,6 +21,9 @@ public class FRStat{
         minerweapon3 = new Stat("minerweapon3"),
         minerweapon4 = new Stat("minerweapon4"),
         minerweapon5 = new Stat("minerweapon5"),
+        infectable = new Stat("infectable"),
+        highspeed = new Stat("highspeed"),
+        shieldmaxboost = new Stat("shieldmaxboost"),
 
     statusEffectApplied = new Stat("statusEffectApplied", StatCat.function),
         maxTargets = new Stat("maxTargets", StatCat.function),

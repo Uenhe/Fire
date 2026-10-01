@@ -65,7 +65,7 @@ public class FRFx{
             Draw.color(color);
 
             float f = Interp.pow4Out.apply(Mathf.curve(e.fin(), 0.0f, 0.3f)), rad = range * f,
-            stroke = Mathf.clamp(range * 0.0125f, 3.0f, 8.0f);
+                stroke = Mathf.clamp(range * 0.0125f, 3.0f, 8.0f);
 
             Lines.stroke(2.0f * e.fout());
             Lines.circle(e.x, e.y, rad * 0.125f);
@@ -160,8 +160,8 @@ public class FRFx{
 
         Draw.color(data.spawned.team.color);
         float stroke = (oldType.hitSize + data.spawned.type.hitSize) * 0.5f * scl,
-        cos = Mathf.cosDeg(e.rotation) * stroke,
-        sin = Mathf.sinDeg(e.rotation) * stroke;
+            cos = Mathf.cosDeg(e.rotation) * stroke,
+            sin = Mathf.sinDeg(e.rotation) * stroke;
 
         Fill.quad(
             e.x + cos * 0.25f, e.y + sin * 0.25f,
@@ -177,14 +177,14 @@ public class FRFx{
     /** Yoshu ...? **/
     public static Effect errTransitionEffect(TextureRegion image, float rotation, float lifetime, float aimX, float aimY, Color color, boolean fade){
         return new Effect(lifetime, e -> {
-                float x,y;
-                float progress = e.fin(Interp.pow5Out);
-                x = e.x * (1 - progress) + aimX * progress;
-                y = e.y * (1 - progress) + aimY * progress;
-                Draw.color(color);
-                Draw.z(Layer.darkness + 0.1f);
-                if(fade)Draw.alpha(e.fout(Interp.pow5Out));
-                Draw.rect(image,x,y,rotation - 90.0f);
+            float x,y;
+            float progress = e.fin(Interp.pow5Out);
+            x = e.x * (1 - progress) + aimX * progress;
+            y = e.y * (1 - progress) + aimY * progress;
+            Draw.color(color);
+            Draw.z(Layer.darkness + 0.1f);
+            if(fade)Draw.alpha(e.fout(Interp.pow5Out));
+            Draw.rect(image,x,y,rotation - 90.0f);
         });
     }
 
@@ -276,6 +276,16 @@ public class FRFx{
             Draw.z(Layer.effect * 0.8f);
             Drawf.tri(x + px, y + py, L / sides, length, space * (float)i + startRot + 180.0f);
         }
+    }
+
+    public static void arcs(float x,float y,float range,float stroke, float rot, int arcs, float arc, Color color){
+
+        if(arc < 0)arc = 0.7f / arcs;
+        Draw.z(Layer.effect);
+        Draw.color(color);
+        Lines.stroke(stroke);
+        for(int i = 0; i < arcs; i++)
+            Lines.arc(x, y, range, arc, i * 360.0f / arcs + rot);
     }
 
     public static void circleDraw_3D(float x, float y, float h, float rad, float stroke, float rot, boolean asLine){
@@ -472,6 +482,7 @@ public class FRFx{
         Core.scene.add(t);
     }
 
+
     public static Effect swordMarkEffect(float lifetime, float x1, float y1, float x2, float y2, float width, float moveTime, Color color, boolean hasHeart){
         return new Effect(lifetime, e -> {
             float progress = Math.min(e.time / moveTime, 1.0f);
@@ -649,7 +660,7 @@ public class FRFx{
                     float rad = e.fout(Interp.pow5Out) * rand.random(0.5f, 1.0f) * ((2.0f + intensity) * 2.3f);
                     Fill.circle(e.x + x, e.y + y, rad);
                     Drawf.light(e.x + x, e.y + y, rad * 2.5f, Pal.reactorPurple, 0.5f);
-            }));
+                }));
         }
 
         b.scaled(baseLifetime, e -> {
@@ -676,7 +687,7 @@ public class FRFx{
         Draw.color(e.color, e.fout());
         Draw.rect(region, e.x, e.y, e.rotation);
     });
-    
+
     private static void tri(float x, float y, float width, float length, float angle) {
         float wx = Angles.trnsx(angle + 90, width), wy = Angles.trnsy(angle + 90, width);
         Fill.tri(x + wx, y + wy, x - wx, y - wy, Angles.trnsx(angle, length) + x, Angles.trnsy(angle, length) + y);

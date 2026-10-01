@@ -346,8 +346,7 @@ public class BeamExtractor extends mindustry.world.Block{
                 Drawf.laser(UnitTypes.mono.mineLaserRegion, UnitTypes.mono.mineLaserEndRegion,
                     bx + Angles.trnsx(rot, 0.0f, barrel.shootY), by + Angles.trnsy(rot, 0.0f, barrel.shootY),
                     beamX + Mathf.sin(Time.time, swingScl, swingMag), beamY + Mathf.sin(Time.time, swingScl + 2.0f, swingMag),
-                    0.75f * barrel.laserStrokeScale
-                );
+                    0.75f * barrel.laserStrokeScale);
                 Draw.blend();
             }
 
@@ -395,7 +394,7 @@ public class BeamExtractor extends mindustry.world.Block{
             drillTimer = read.f();
             warmup = read.f();
             boostWarmup = read.f();
-            for(int i = 0, len = barrels.size; i < len; i++) drawrots[i] = read.f();
+            for(int i = 0, n = barrels.size; i < n;) drawrots[i++] = read.f();
         }
 
         private void init(){

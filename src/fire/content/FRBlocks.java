@@ -119,7 +119,7 @@ import static mindustry.type.ItemStack.with;
 
 public class FRBlocks{
 
-    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(6); //composite one -> its inferior
+    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(Mathf.ceil(6 / 0.8f)); //composite one -> its inferior
     public static final Block
     //environment
     neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite,
@@ -896,6 +896,7 @@ public class FRBlocks{
             inaccuracy = 2.7f;
             recoil = 2.0f;
             velocityRnd = 0.1f;
+            shootY = 10.0f;
             shootEffect = Fx.shootLiquid;
             shoot.shots = 3;
 

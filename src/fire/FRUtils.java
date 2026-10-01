@@ -5,7 +5,6 @@ import arc.graphics.Color;
 import arc.graphics.g2d.TextureAtlas;
 
 import java.lang.reflect.Field;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public final class FRUtils{
 
@@ -74,33 +73,33 @@ public final class FRUtils{
         }
     }
 
-    public static class AtomicFloat{
-
-        private final AtomicInteger bits;
-
-        public AtomicFloat(float initialValue){
-            bits = new AtomicInteger(Float.floatToIntBits(initialValue));
-        }
-
-        public float get(){
-            return Float.intBitsToFloat(bits.get());
-        }
-
-        public void set(float newValue){
-            bits.set(Float.floatToIntBits(newValue));
-        }
-
-        public boolean compareAndSet(float expectValue, float newValue){
-            return bits.compareAndSet(Float.floatToIntBits(expectValue), Float.floatToIntBits(newValue));
-        }
-
-        public float addAndGet(float delta){
-            float prev, next;
-            do{
-                prev = get();
-                next = prev + delta;
-            }while(!compareAndSet(prev, next));
-            return next;
-        }
-    }
+//    public static class AtomicFloat{
+//
+//        private final AtomicInteger bits;
+//
+//        public AtomicFloat(float initialValue){
+//            bits = new AtomicInteger(Float.floatToIntBits(initialValue));
+//        }
+//
+//        public float get(){
+//            return Float.intBitsToFloat(bits.get());
+//        }
+//
+//        public void set(float newValue){
+//            bits.set(Float.floatToIntBits(newValue));
+//        }
+//
+//        public boolean compareAndSet(float expectValue, float newValue){
+//            return bits.compareAndSet(Float.floatToIntBits(expectValue), Float.floatToIntBits(newValue));
+//        }
+//
+//        public float addAndGet(float delta){
+//            float prev, next;
+//            do{
+//                prev = get();
+//                next = prev + delta;
+//            }while(!compareAndSet(prev, next));
+//            return next;
+//        }
+//    }
 }

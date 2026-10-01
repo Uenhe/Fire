@@ -180,18 +180,16 @@ public class FRMath{
     public static Vec2 get3DPos(float x, float y, float h, boolean real){
         float cameraX = Core.camera.position.x;
         float cameraY = Core.camera.position.y;
-        float cameraH = Mathf.dst(Core.camera.width,Core.camera.height);
-        float drawX = x + (x - cameraX) * h / cameraH;
-        float drawY = y + (y - cameraY) * h / cameraH;
-        if(!real){
-            drawX = x + (x - cameraX) * h;
-            drawY = y + (y - cameraY) * h;
+        if(real){
+            float cameraH = Mathf.dst(Core.camera.width, Core.camera.height);
+            return new Vec2(x + (x - cameraX) * h / cameraH, y + (y - cameraY) * h / cameraH);
+        }else{
+            return new Vec2(x + (x - cameraX) * h, y + (y - cameraY) * h);
         }
-        return new Vec2(drawX, drawY);
     }
 
     public static float smooth(float progress, float level){
-        progress = progress * 2;
+        progress *= 2;
         if(progress <= 1){
             return Mathf.pow(progress, level) * 0.5f;
         }
@@ -199,11 +197,13 @@ public class FRMath{
     }
 
     public static float mix(float a, float b, float progress){
-        return a * (1 - smooth(progress, 3)) + b * smooth(progress, 3);
+        float frac = smooth(progress, 3);
+        return a * (1 - frac) + b * frac;
     }
 
     public static float getDamage_fusionBomb(float lifetime, float maxTime){
-        float damage = maxTime, cnt = 1;
+        final float cnt = 1.0f;
+        float damage = maxTime;
         while(lifetime >= 300.0f){
             damage += 300.0f * cnt;
             lifetime -= 300.0f;
@@ -213,7 +213,7 @@ public class FRMath{
     }
 
     public static float getRange_fusionBomb(float lifetime){
-        return Mathf.pow(lifetime,0.3f) * 4;
+        return Mathf.pow(lifetime, 0.3f) * 4;
     }
 
     public static float getReload1_fusionBomb(float lifetime){
