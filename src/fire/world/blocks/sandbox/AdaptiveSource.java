@@ -1,6 +1,7 @@
 package fire.world.blocks.sandbox;
 
-import arc.struct.IntIntMap;
+import arc.struct.IntMap;
+import mindustry.type.Item;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.meta.BlockGroup;
 import mindustry.world.meta.Stat;
@@ -9,7 +10,7 @@ import static mindustry.Vars.content;
 
 public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
 
-    public static final IntIntMap turretItemMap = new IntIntMap(); //TurretBlock ID -> Item ID
+    public static final IntMap<Item> turretItemMap = new IntMap<>();
 
     protected AdaptiveSource(String name){
         super(name);
@@ -51,7 +52,7 @@ public class AdaptiveSource extends mindustry.world.blocks.sandbox.PowerSource{
         public void updateTile(){
             for(var other : proximity){
                 if(other instanceof ItemTurret.ItemTurretBuild){
-                    var item = content.item(turretItemMap.get(other.block.id));
+                    var item = turretItemMap.get(other.block.id);
                     if(other.acceptItem(this, item)) other.handleItem(this, item);
 
                 }else{

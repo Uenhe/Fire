@@ -11,7 +11,7 @@ import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
 import arc.math.geom.Geometry;
-import arc.struct.ObjectMap;
+import arc.struct.IntMap;
 import arc.struct.Seq;
 import arc.util.Time;
 import arc.util.Tmp;
@@ -49,7 +49,6 @@ import fire.world.kits.EnergyField;
 import fire.world.kits.MeltingFurnace;
 import fire.world.meta.FRAttribute;
 import mindustry.content.*;
-import mindustry.ctype.UnlockableContent;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
@@ -119,7 +118,7 @@ import static mindustry.type.ItemStack.with;
 
 public class FRBlocks{
 
-    public static final ObjectMap<UnlockableContent, Block> compositeMap = new ObjectMap<>(Mathf.ceil(6 / 0.8f)); //composite one -> its inferior
+    public static final IntMap<Block> compositeMap = new IntMap<>(Mathf.ceil(6 / 0.8f)); //composite one -> its inferior
     public static final Block
     //environment
     neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite,
@@ -3024,6 +3023,7 @@ public class FRBlocks{
             final float chargeTime = 150.0f,
             baseRange = 1200.0f, extraRange = 400.0f;
 
+            //noinspection UnnecessaryLocalVariable
             Item
             item_1 = hardenedAlloy,
             item_2 = magneticAlloy;
@@ -3041,15 +3041,12 @@ public class FRBlocks{
             bullet_1_1 = new BasicBulletType(speed_1_1, 18000.0f){
                 @Override
                 public void init(Bullet b){
-                    Time.run(5.0f, () -> {
-                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
-                    Time.run(10.0f, () -> {
-                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
-                    Time.run(15.0f, () -> {
-                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
+                    Time.run(5.0f, () ->
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                    Time.run(10.0f, () ->
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                    Time.run(15.0f, () ->
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     super.init(b);
                 }
                 {
@@ -3113,7 +3110,7 @@ public class FRBlocks{
                 frontColor = Color.white;
                 trailColor = find("ec7458");
                 chargeEffect = new MultiEffect(
-                    FRFx.railChargeEffect(chargeTime, find("ec7458"), 3.0f, baseRange, 80f)
+                    FRFx.railChargeEffect(chargeTime, find("ec7458"), 3.0f, baseRange, 80.0f)
                 );
                 despawnEffect = new MultiEffect(
                     //wave
@@ -3214,15 +3211,12 @@ public class FRBlocks{
             bullet_2_3 = new BasicBulletType(18f, 2400f){
                 @Override
                 public void init(Bullet b){
-                    Time.run(6.0f, () -> {
-                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
-                    Time.run(12.0f, () -> {
-                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
-                    Time.run(18.0f, () -> {
-                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y);
-                    });
+                    Time.run(6.0f, () ->
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                    Time.run(12.0f, () ->
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                    Time.run(18.0f, () ->
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     super.init(b);
                 }
                 {
@@ -3860,7 +3854,7 @@ public class FRBlocks{
             displayedSpeed = 25.0f;
             junctionReplacement = Blocks.invertedSorter;
 
-            compositeMap.put(this, Blocks.titaniumConveyor);
+            compositeMap.put(id, Blocks.titaniumConveyor);
         }};
 
         hardenedAlloyConveyor = new StackConveyor("hardened-alloy-conveyor"){{
@@ -3891,7 +3885,7 @@ public class FRBlocks{
             pulse = true;
             ((Conveyor)compositeConveyor).bridgeReplacement = this;
 
-            compositeMap.put(this, Blocks.itemBridge);
+            compositeMap.put(id, Blocks.itemBridge);
         }};
 
         compositeRouter = new AdaptRouter("composite-router"){{
@@ -3902,7 +3896,7 @@ public class FRBlocks{
             ));
             health = 85;
 
-            compositeMap.put(this, Blocks.router);
+            compositeMap.put(id, Blocks.router);
         }};
 
         compositeUnloader = new AdaptDirectionalUnloader("composite-unloader"){{
@@ -3918,7 +3912,7 @@ public class FRBlocks{
             allowCoreUnload = true;
             speed = 25.0f;
 
-            compositeMap.put(this, Blocks.unloader);
+            compositeMap.put(id, Blocks.unloader);
         }};
 
         //region liquid
@@ -3950,7 +3944,7 @@ public class FRBlocks{
             solid = false;
             underBullets = true;
 
-            compositeMap.put(this, Blocks.liquidRouter);
+            compositeMap.put(id, Blocks.liquidRouter);
         }};
 
         hardenedLiquidTank = new LiquidRouter("hardened-liquid-tank"){{
@@ -3977,7 +3971,7 @@ public class FRBlocks{
             range = 8;
             pulse = true;
 
-            compositeMap.put(this, Blocks.bridgeConduit);
+            compositeMap.put(id, Blocks.bridgeConduit);
         }};
 
         liquidUnloader = new LiquidUnloader("liquid-unloader"){{
@@ -5101,36 +5095,7 @@ public class FRBlocks{
             consumeItem(silicon).boost();
         }};
 
-        campfire = new Campfire.CampfireBlock("gh"){{
-            requirements(Category.effect, with(
-                copper, 300,
-                metaglass, 220,
-                plastanium, 175,
-                timber, 200
-            ));
-            size = 5;
-            itemCapacity = 20;
-            separateItemCapacity = true;
-            updateEffectChance = 0.03f;
-            updateEffect = new MultiEffect(
-                Fx.blastsmoke,
-                Fx.generatespark
-            );
-            drawArrows = new DrawArrows(2, Pal.lightishOrange, find("c75807"));
-
-            reload = 30.0f;
-            range = 20 * tilesize;
-            useTime = 240.0f;
-            speedBoost = 1.5f;
-            speedBoostPhase = 0.25f;
-            phaseRangeBoost = 32.0f;
-            statusDuration = 180.0f;
-            allyStatus = FRStatusEffects.inspired;
-            enemyStatus = StatusEffects.sapped;
-
-            consume(new ConsumePowerCustom(n(2160), 0.0f, false, this));
-            consume(new Campfire.ConsumeCampfire(this));
-        }};
+        campfire = new Campfire.CampfireBlock();
 
         skyDome = new ForceProjector("sky-dome"){{
             requirements(Category.effect, with(

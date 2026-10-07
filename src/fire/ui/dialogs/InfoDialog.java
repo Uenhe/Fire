@@ -31,6 +31,7 @@ import mindustry.ctype.UnlockableContent;
 import mindustry.gen.Icon;
 import mindustry.gen.Tex;
 import mindustry.graphics.Pal;
+import mindustry.type.SectorPreset;
 import mindustry.ui.Styles;
 import mindustry.ui.layout.BranchTreeLayout;
 import mindustry.ui.layout.TreeLayout;
@@ -363,15 +364,13 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
             infoTable.left();
             infoTable.background(Tex.button).margin(8.0f);
             infoTable.table(b -> {
-                b.margin(0.0f).left().defaults().left();
+                b.left().margin(0.0f).left().defaults().left();
+
+                if(!locked(node))
+                    b.button(Icon.info, Styles.flati, () -> ui.content.show(node.content)).growY().width(50.0f);
+
                 b.add().grow();
-
-                if(!locked(node)) b.button(Icon.info, Styles.flati, () -> {
-                    ui.content.show(node.content);
-                    hide();
-                }).growY().width(50.0f);
-
-                var t = b.table(desc -> {
+                b.table(desc -> {
                     desc.left().defaults().left();
                     desc.add(locked(node) ? "@fire.lockedcontent" : node.content.localizedName);
                     desc.row();
@@ -379,23 +378,21 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
                     if(locked(node))
                         desc.table(Table::left);
                     else
-                        desc.add("@completed");
+                        desc.add(node.content instanceof SectorPreset ? "@fire.captured" : "@completed");
 
-                }).pad(9.0f);
-                if(locked(node))
-                    t.minWidth(120.0f);
-                else if(hasInfo(node))
-                    t.minWidth(400.0f * fontScale);
+                }).pad(9.0f).left().growX();
             });
 
             infoTable.row();
 
-            if(!locked(node) && hasInfo(node))
-                infoTable.table(t -> t.margin(3.0f).left().labelWrap(
-                    FRBlocks.compositeMap.containsKey(node.content)
-                    ? Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", FRBlocks.compositeMap.get(node.content).localizedName)
-                    : Core.bundle.get(getKey(node))
-                ).fontScale(fontScale).color(Color.lightGray).growX()).fillX();
+            if(!locked(node) && hasInfo(node)){
+                var composite = FRBlocks.compositeMap.get(node.content.id);
+                infoTable.table(t -> t.margin(3.0f).left()
+                    .labelWrap(composite != null ?
+                        Core.bundle.get(getKey(node)) + Core.bundle.format("composite.info", composite.localizedName) :
+                        Core.bundle.get(getKey(node))).fontScale(fontScale).color(Color.lightGray).maxWidth(450.0f * fontScale).growX()
+                ).fillX();
+            }
 
             addChild(infoTable);
 

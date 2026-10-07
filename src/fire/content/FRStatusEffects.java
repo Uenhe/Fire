@@ -9,9 +9,7 @@ import arc.graphics.g2d.Lines;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
-import arc.struct.IntFloatMap;
-import arc.struct.IntIntMap;
-import arc.struct.Seq;
+import arc.struct.*;
 import arc.util.Reflect;
 import arc.util.Time;
 import arc.util.Tmp;
@@ -19,7 +17,6 @@ import fire.entities.abilities.DebuffRemoveFieldAbility;
 import fire.type.FleshUnitType;
 import fire.world.meta.FRStat;
 import fire.world.meta.FRStatUnit;
-import mindustry.Vars;
 import mindustry.content.Fx;
 import mindustry.content.Liquids;
 import mindustry.content.StatusEffects;
@@ -38,10 +35,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
 import static fire.FRVars.moddedContent;
-import static fire.entities.abilities.DebuffRemoveFieldAbility.DEBUFFS;
-import static mindustry.Vars.content;
-import static mindustry.Vars.headless;
-import static mindustry.content.StatusEffects.wet;
+import static mindustry.Vars.*;
 
 public class FRStatusEffects{
 
@@ -117,14 +111,14 @@ public class FRStatusEffects{
         overgrown = new StatusEffect("overgrown"){
 
             /** Health Multiplier for neoplasm-about unit. For general unit, use {@code healthMultiplier}. */
-            private static final float neo_healthMultiplier = 1.1f;
+            final float neo_healthMultiplier = 1.1f;
             /** Health and Shield regen percent for neoplasm-about unit per second. */
-            private static final float neo_regenPercent = 0.024f;
+            final float neo_regenPercent = 0.024f;
             /** Extra regen percent for reaction on neoplasm-about unit per second. */
-            private static final float neo_extraRegenPercent = 0.012f;
+            final float neo_extraRegenPercent = 0.012f;
             /** Damage percent for reaction to deal on general unit per second. */
-            private static final float damagePercent = 0.01f;
-            private static final StatusEffect status = StatusEffects.wet;
+            final float damagePercent = 0.01f;
+            final StatusEffect status = StatusEffects.wet;
 
             @Override
             public void setStats(){
@@ -193,7 +187,7 @@ public class FRStatusEffects{
         disintegrated = new StatusEffect("disintegrated"){
 
             /** The armor that unit reduces at most. */
-            private static final byte maxArmorReduction = 10;
+            final byte maxArmorReduction = 10;
 
             @Override
             public void setStats(){
@@ -207,7 +201,7 @@ public class FRStatusEffects{
 
                 if(entry.time >= 60.0f)
                     //linearly reduces armor in 1s
-                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f, unit.type.armor - maxArmorReduction);
+                    unit.armor = Math.max(unit.armor - maxArmorReduction / 60.0f * Time.delta, unit.type.armor - maxArmorReduction);
 
                 else
                     //linearly puts armor back in 1s
@@ -262,7 +256,7 @@ public class FRStatusEffects{
             static final IntFloatMap timerMap = new IntFloatMap();
             static final IntFloatMap timerMap2 = new IntFloatMap();
             static final IntIntMap shootingMap = new IntIntMap();
-            static final BulletType[] bullets = new BulletType[256];
+            static BulletType[] bullets;
 
             static final String censored = Core.bundle.get("fire.censored");
             static final String normalOne = censored.repeat(6);
@@ -276,8 +270,8 @@ public class FRStatusEffects{
                     str = normalOne; // 80%
 
                 else if(Mathf.chance(0.75))
-                    str = "[#" + Integer.toHexString(Mathf.random(127, 255)) + "0000]" +
-                        censored.repeat(Mathf.random(5, 20)) + "[]"; // 15%
+                    str = "[#" + Integer.toHexString(Mathf.random(127, 255)) + "0000]" + censored.repeat(Mathf.random(5, 20)) + "[]"; // 15%
+
                 else
                     return brokenOne; // 5%
 
@@ -305,7 +299,9 @@ public class FRStatusEffects{
 
                 Events.on(EventType.ContentInitEvent.class, e -> {
                     var units = content.units();
-                    for(int i = 0, n = units.size; i < n; i++){
+                    int n = units.size;
+                    bullets = new BulletType[n];
+                    for(int i = 0; i < n; i++){
                         var u = units.get(i);
                         int type = checkBullet(units.get(i));
                         float Damage = Math.min(u.health * 0.05f + 40.0f, u.health * 0.01f + 60.0f);
@@ -484,7 +480,7 @@ public class FRStatusEffects{
                 super.onRemoved(unit);
                 timerMap.remove(unit.id, 0.0f);
                 timerMap2.remove(unit.id, 0.0f);
-                shootingMap.remove(unit.id, 0);
+                shootingMap.remove(unit.id);
             }
 
             @Override
@@ -530,10 +526,7 @@ public class FRStatusEffects{
                 damage = 1.0f;
                 effectChance = 0.05f;
             }
-
         };
-
-
 
         informationalPerturbation = new StatusEffect("informational-perturbation"){
 
@@ -543,14 +536,14 @@ public class FRStatusEffects{
             @Override
             public void onRemoved(Unit unit){
                 super.onRemoved(unit);
-                transpedMap.remove(unit.id, 0);
+                transpedMap.remove(unit.id);
             }
 
             @Override
             public void update(Unit unit, StatusEntry entry){
                 super.update(unit, entry);
 
-                if(!headless && Mathf.chanceDelta(0.15f - (0.1f * unit.health / unit.maxHealth)) && !unit.inFogTo(Vars.player.team())){
+                if(!headless && Mathf.chanceDelta(0.15f - (0.1f * unit.health / unit.maxHealth)) && !unit.inFogTo(player.team())){
                     Tmp.v1.rnd(Mathf.range(unit.type.hitSize / 2.0f));
                     FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 20, unit.x + Mathf.random(-0.3f * unit.hitSize, 0.3f * unit.hitSize), unit.y + Mathf.random(-0.3f * unit.hitSize, 0.3f * unit.hitSize), colors[Mathf.random(2)], true).at(unit.x, unit.y);
                 }
@@ -559,23 +552,19 @@ public class FRStatusEffects{
                     transpedMap.put(unit.id, 1);
 
                 if(unit.health <= unit.maxHealth * 0.3f && transpedMap.get(unit.id) == 1){
-                    transpedMap.remove(unit.id, 0);
+                    transpedMap.remove(unit.id);
                     unit.health += unit.maxHealth * 0.3f;
                     float rot = unit.rotation + Mathf.randomSeed(unit.id,-15,15);
                     float range = Math.min(320.0f, Mathf.randomSeed(unit.id,2 * unit.hitSize) + unit.hitSize * 2 + 80.0f);
                     float transX = Mathf.cosDeg(rot) * range,
                         transY = Mathf.sinDeg(rot) * range;
-                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 20, unit.x + transX,unit.y + transY, Color.green,false).at(unit.x,unit.y);
-                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 30, unit.x + transX,unit.y + transY, Color.blue,false).at(unit.x,unit.y);
-                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 50, unit.x + transX,unit.y + transY, Color.red,false).at(unit.x,unit.y);
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 20, unit.x + transX, unit.y + transY, Color.green, false).at(unit);
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 30, unit.x + transX, unit.y + transY, Color.blue, false).at(unit);
+                    FRFx.errTransitionEffect(unit.type.fullIcon, unit.rotation, 50, unit.x + transX, unit.y + transY, Color.red, false).at(unit);
                     unit.x += transX;
                     unit.y += transY;
-                    unit.vel.x = 0;
-                    unit.vel.y = 0;
-                    for(var fx : DEBUFFS){
-                        if(!unit.hasEffect(fx) || (unit.type instanceof FleshUnitType && (fx == wet || fx == overgrown))) continue;
-                        unit.unapply(fx);
-                    }
+                    unit.vel.setZero();
+                    DebuffRemoveFieldAbility.removeDebuff(unit);
                     unit.apply(StatusEffects.unmoving, 50.0f);
                     unit.apply(StatusEffects.invincible, 30.0f);
                     unit.apply(StatusEffects.shielded, 300.0f);
@@ -590,55 +579,6 @@ public class FRStatusEffects{
                 speedMultiplier = 1.2f;
             }
         };
-
-        /*starfire = new StatusEffect("starfire"){
-
-            private static final Color[] colors = {Color.red, Color.green, Color.blue};
-            private static final IntFloatMap timerMap = new IntFloatMap();
-
-            static{
-                Events.on(EventType.ResetEvent.class, e -> timerMap.clear());
-            }
-
-            @Override
-            public void setStats(){
-                super.setStats();
-                stats.add(FRStat.percentageHealing, 1, FRStatUnit.percentPerSec);
-            }
-
-            @Override
-            public void onRemoved(Unit unit){
-                super.onRemoved(unit);
-                timerMap.remove(unit.id, 0.0f);
-            }
-
-            @Override
-            public void update(Unit unit, StatusEntry entry){
-                super.update(unit, entry);
-                unit.damagePierce(damage * entry.time / 60f);
-            }
-            {
-                effect = new Effect(40.0F, (e) -> {
-                    Draw.color(Pal.lightFlame, Pal.darkFlame, e.fin());
-                    Angles.randLenVectors((long)e.id, 5, 3.0F + e.fin() * 8.0F, (x, y) -> {
-                        Fill.circle(e.x + x, e.y + y, 0.1F + e.fout() * 1.2F);
-                    });
-                });
-                outline = false;
-                healthMultiplier = 0.95f;
-                reloadMultiplier = 0.9f;
-                effectChance = 0.05f;
-                init(() -> {
-                    opposite(StatusEffects.wet, StatusEffects.freezing);
-                    affinity(StatusEffects.tarred, (unit, result, time) -> {
-                        unit.damagePierce(transitionDamage);
-                        Fx.burning.at(unit.x + Mathf.range(unit.bounds() / 2f), unit.y + Mathf.range(unit.bounds() / 2f));
-                        unit.apply(StatusEffects.burning, 300.0f);
-                        unit.apply(StatusEffects.melting, 180.0f);
-                    });
-                });
-            }
-        };*/
     }
 
     public static void load(){}

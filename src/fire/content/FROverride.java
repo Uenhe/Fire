@@ -173,6 +173,7 @@ public class FROverride{
 
         //region block distribution
         ((BufferedItemBridge)itemBridge).speed *= 0.82f;
+        ((BufferedItemBridge)itemBridge).displayedSpeed += 2.0f;
         phaseConveyor.itemCapacity += 5;
         ((ItemBridge)phaseConveyor).transportTime -= 1.0f;
         ((MassDriver)massDriver).rotateSpeed += 5.0f;

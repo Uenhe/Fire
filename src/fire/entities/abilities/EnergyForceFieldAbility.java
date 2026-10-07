@@ -5,7 +5,7 @@ import arc.graphics.Color;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
-import arc.struct.IntIntMap;
+import arc.struct.IntMap;
 import arc.struct.Seq;
 import arc.util.Strings;
 import arc.util.Time;
@@ -15,6 +15,7 @@ import mindustry.content.Fx;
 import mindustry.entities.Lightning;
 import mindustry.entities.Units;
 import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.gen.Bullet;
 import mindustry.gen.Groups;
@@ -22,8 +23,6 @@ import mindustry.gen.Sounds;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.ui.Bar;
-
-import static mindustry.Vars.content;
 
 public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceFieldAbility{
 
@@ -46,7 +45,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     private boolean regenable;
     private Seq<Bullet> bullets = new Seq<>(false);
 
-    private static final IntIntMap bulletMap = new IntIntMap();
+    private static final IntMap<BulletType> bulletMap = new IntMap<>();
 
     public EnergyForceFieldAbility(float radius, float regen, float max, float cooldown, int length, int amount, int damage, float chance){
         super(radius, regen, max, cooldown);
@@ -129,8 +128,8 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         Fx.shieldBreak.at(u.x, u.y, radius, u.team.color, u);
 
                         Sounds.shootArc.at(u, Mathf.random(0.45f, 0.55f));
-                        for(int i = 0, lightningAmount = this.lightningAmount; i < lightningAmount; i++)
-                            Lightning.create(u.team, lightningColor, lightningDamage, u.x, u.y, i * (360.0f / lightningAmount), lightningLength);
+                        for(int i = 0, n = lightningAmount; i < n; i++)
+                            Lightning.create(u.team, lightningColor, lightningDamage, u.x, u.y, i * (360.0f / n), lightningLength);
                     }
                 }
             });
@@ -138,7 +137,6 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
         }else if(extended && !regenable){
             float sum = 0.0f;
             boolean isOverloaded = false;
-            var bullets = this.bullets;
             for(var b : bullets){
                 if(b.type == null) continue;
                 sum += b.type.shieldDamage(b);
@@ -162,36 +160,42 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                         bullet.time = 0.0f;
                         bullet.lifetime = ext_node.last() + tt;
 
-                        if(bulletMap.containsValue(bullet.type.id)){
-                            bullet.type = content.bullet(bulletMap.get(bullet.type.id));
+                        var value = bulletMap.get(bullet.type.id);
+                        final float markValue = 1437; //prevent duplicate BulletType
+                        if(bullet.type.ammoMultiplier != markValue){
+                            if(value != null){
+                                bullet.type = value;
 
-                        }else{
-                            var type = bullet.type.copy();
+                            }else{
+                                var type = bullet.type.copy();
 
-                            //make artillery collides building
-                            type.collidesTiles = type.collides = true;
-                            type.buildingDamageMultiplier *= 1.6f;
+                                //make artillery collides building
+                                type.collidesTiles = type.collides = true;
+                                type.buildingDamageMultiplier *= 1.6f;
 
-                            //pierce here is just annoying
-                            type.pierce = type.pierceBuilding = false;
+                                //pierce here is just annoying
+                                type.pierce = type.pierceBuilding = false;
 
-                            //handled by mover later
-                            type.drag = 0.0f;
+                                //handled by mover later
+                                type.drag = 0.0f;
 
-                            //add a default trail to bullet that doesn't have one
-                            if(type.trailLength <= 0){
-                                if(type instanceof BasicBulletType bt){
-                                    type.trailWidth = bt.width * 0.21f;
-                                    type.trailLength = (int)(bt.height * 0.5f);
-                                    type.trailColor = bt.backColor;
-                                }else{
-                                    type.trailLength = 11;
+                                //add a default trail if it doesn't have one
+                                if(type.trailLength <= 0){
+                                    if(type instanceof BasicBulletType bt){
+                                        type.trailWidth = bt.width * 0.21f;
+                                        type.trailLength = (int)(bt.height * 0.5f);
+                                        type.trailColor = bt.backColor;
+                                    }else{
+                                        type.trailLength = 11;
+                                    }
                                 }
-                            }
 
-                            bulletMap.put(bullet.type.id, type.id);
-                            bullet.type = type;
-                            bullets.add(bullet);
+                                type.ammoMultiplier = markValue;
+
+                                bulletMap.put(bullet.type.id, type);
+                                bullet.type = type;
+                                bullets.add(bullet);
+                            }
                         }
 
                         bullet.mover = b -> {

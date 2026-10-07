@@ -58,8 +58,8 @@ public class EnergyField{
                 Draw.color(type().lightningColor);
                 Lines.stroke(Lines.getStroke() * shootWarmup * 0.8f);
                 Drawf.light(x, y, range * 1.2f, type().lightningColor, shootWarmup * 0.6f);
-                for(int i = 0, n = 6; i < n; i++)
-                    Lines.arc(x, y, range, 0.12f, i * 360.0f / n + Time.time * rotateSpeed * 0.5f);
+                for(int i = 0; i < 6; i++)
+                    Lines.arc(x, y, range, 0.12f, i * 360.0f / 6 + Time.time * rotateSpeed * 0.5f);
 
                 Draw.reset();
             }

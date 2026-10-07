@@ -48,8 +48,7 @@ public class MeltingFurnace{
             stats.add(Stat.basePowerGeneration, basePowerProduction * 60.0f, StatUnit.powerSecond);
             stats.add(Stat.input, mt -> {
                 mt.row().table(Styles.grayPanel, t ->
-                    t.left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f)
-                );
+                    t.left().add(Core.bundle.format("stat.consumefurnace", (int)(cons.value * 100))).growX().pad(10.0f));
 
                 int i = 0;
                 Table tableSlag = mt.row().table(Styles.grayPanel, t -> t.add("@stat.furnaceslag").minWidth(size).maxWidth(size).pad(10.0f).row()).left().get(),
@@ -84,14 +83,7 @@ public class MeltingFurnace{
             @Override
             public float getPowerProduction(){
                 if(efficiency == 0.0f) return 0.0f;
-
-                float[] sum = {0.0f};
-                items.each((item, n) -> {
-                    if(item.flammability > cons.value)
-                        sum[0] += item.flammability;
-                });
-
-                return sum[0] * basePowerProduction;
+                return items.sum((item, n) -> item.flammability > cons.value ? item.flammability : 0.0f) * basePowerProduction;
             }
 
             /** To scale liquid dump amount. */
@@ -123,8 +115,7 @@ public class MeltingFurnace{
 
         @Override
         public void trigger(Building build){
-            build.items.each((item, n) ->
-                build.items.remove(item, 1));
+            build.items.each((item, n) -> build.items.remove(item, 1));
         }
 
         @Override
@@ -134,13 +125,7 @@ public class MeltingFurnace{
 
         @Override
         public float efficiencyMultiplier(Building build){
-            byte[] sum = {0};
-            build.items.each((item, n) -> {
-                if(item.flammability <= value)
-                    sum[0]++;
-            });
-
-            return sum[0];
+            return build.items.sum((item, n) -> Mathf.num(item.flammability <= value));
         }
     }
 }

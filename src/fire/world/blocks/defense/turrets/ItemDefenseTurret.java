@@ -16,7 +16,8 @@ public class ItemDefenseTurret extends mindustry.world.blocks.defense.turrets.It
         @Override
         protected Posc findEnemy(float range){
             if(peekAmmo() instanceof SegmentalBulletType){
-                var target = Groups.bullet.intersect(x - range, y - range, range * 2.0f, range * 2.0f).min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
+                var target = Groups.bullet.intersect(x - range, y - range, range * 2.0f, range * 2.0f)
+                    .min(b -> b.team != team && b.type().hittable, b -> b.dst2(this));
                 return target != null && target.isAdded() ? target : super.findEnemy(range);
             }else{
                 return super.findEnemy(range);

@@ -9,6 +9,7 @@ import arc.struct.Queue;
 import arc.util.Time;
 import arc.util.Tmp;
 import fire.content.FRFx;
+import fire.content.FRItems;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.bullet.BasicBulletType;

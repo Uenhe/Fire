@@ -87,19 +87,19 @@ public class FusionBombType extends mindustry.type.UnitType{
 
 
     @Override
-    public void update(Unit b){
-        float time = b.health * 0.01f;
+    public void update(Unit u){
+        float time = u.health * 0.01f;
         float size = FRMath.getRange_fusionBomb(time);
         float radius = size * 35.0f;
         final float G = 3.4f;
 
-        b.hitSize(size * 2);
-        b.maxHealth(Math.max(b.maxHealth, b.health));
+        u.hitSize(size * 2);
+        u.maxHealth(Math.max(u.maxHealth, u.health));
 
         if(time > 60.0f){
-            Groups.bullet.intersect(b.x - radius, b.y - radius, radius * 2.0f, radius * 2.0f, other -> {
-                if(b.isAdded() && !(other.type instanceof LaserBulletType) && !(other.type instanceof ContinuousBulletType) && !(other.type instanceof LightningBulletType)){
-                    float force = Time.delta * Mathf.pow(size, 2f) * 150.0f * G / Mathf.dst2(b.x, b.y, other.x, other.y) / other.damage;
+            Groups.bullet.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, other -> {
+                if(u.isAdded() && !(other.type instanceof LaserBulletType) && !(other.type instanceof ContinuousBulletType) && !(other.type instanceof LightningBulletType)){
+                    float force = Time.delta * Mathf.pow(size, 2f) * 150.0f * G / Mathf.dst2(u.x, u.y, other.x, other.y) / other.damage;
                     if(force >= 10.0f)
                         force = 10.0f;
                     /*
@@ -107,27 +107,27 @@ public class FusionBombType extends mindustry.type.UnitType{
                         force *= 3;
                         if(other.vel.len() >= 3.0f)other.vel.set(other.vel.x / other.vel.len() * 3.0f,other.vel.y / other.vel.len() * 3.0f);
                     }*/
-                    float angle = Mathf.angle(other.x - b.x, other.y - b.y);
+                    float angle = Mathf.angle(other.x - u.x, other.y - u.y);
                     other.vel.x -= force * Mathf.cosDeg(angle);
                     other.vel.y -= force * Mathf.sinDeg(angle);
-                    if(Mathf.within(b.x, b.y, other.x, other.y, size * 0.4f)){
-                        if(other.team != b.team)
-                            b.damagePierce(other.damage * 0.5f);
+                    if(Mathf.within(u.x, u.y, other.x, other.y, size * 0.4f)){
+                        if(other.team != u.team)
+                            u.damagePierce(other.damage * 0.5f);
                         other.remove();
                     }
                 }
             });
         }
-        Groups.unit.intersect(b.x - radius, b.y - radius, radius * 2.0f, radius * 2.0f, unit -> {
-            if(unit != b){
-                float force = Time.delta * Mathf.pow(size, 2f) * G / Mathf.dst(b.x, b.y, unit.x, unit.y) / Mathf.pow(unit.hitSize, 2f);
-                float angle = Mathf.angle(unit.x - b.x, unit.y - b.y);
+        Groups.unit.intersect(u.x - radius, u.y - radius, radius * 2.0f, radius * 2.0f, unit -> {
+            if(unit != u){
+                float force = Time.delta * Mathf.pow(size, 2f) * G / Mathf.dst(u.x, u.y, unit.x, unit.y) / Mathf.pow(unit.hitSize, 2f);
+                float angle = Mathf.angle(unit.x - u.x, unit.y - u.y);
                 unit.vel.x -= force * Mathf.cosDeg(angle);
                 unit.vel.y -= force * Mathf.sinDeg(angle);
                 if(unit.vel.len() >= 20.0f)
                     unit.vel.set(unit.vel.x / unit.vel.len() * 20.0f, unit.vel.y / unit.vel.len() * 20.0f);
-                if(unit.team != b.team){
-                    unit.damagePierce(time * Time.delta / Mathf.dst(b.x, b.y, unit.x, unit.y) * 0.2f);
+                if(unit.team != u.team){
+                    unit.damagePierce(time * Time.delta / Mathf.dst(u.x, u.y, unit.x, unit.y) * 0.2f);
                     unit.apply(StatusEffects.burning, time * 2.0f);
                     if(time >= 360.0f)
                         unit.apply(StatusEffects.melting, (time - 360.0f) * 1.5f);
@@ -135,34 +135,34 @@ public class FusionBombType extends mindustry.type.UnitType{
                         unit.apply(StatusEffects.electrified, time - 600.0f);
                 }
 
-                if(Mathf.within(b.x, b.y, unit.x, unit.y, size * 0.4f)){
-                    if(unit.team == b.team && unit.type instanceof FusionBombType && b.health > unit.health){
-                        final float aimH = b.health + Math.min(unit.health, Math.max(0, unit.health * 3 - b.health));
-                        if(aimH >= b.maxHealth)
-                            b.maxHealth(aimH);
-                        b.health(aimH);
-                        b.apply(StatusEffects.burning, 60f);
+                if(Mathf.within(u.x, u.y, unit.x, unit.y, size * 0.4f)){
+                    if(unit.team == u.team && unit.type instanceof FusionBombType && u.health > unit.health){
+                        final float aimH = u.health + Math.min(unit.health, Math.max(0, unit.health * 3 - u.health));
+                        if(aimH >= u.maxHealth)
+                            u.maxHealth(aimH);
+                        u.health(aimH);
+                        u.apply(StatusEffects.burning, 60f);
                         unit.remove();
                     }
                 }
 
-                if(Mathf.within(b.x, b.y, unit.x, unit.y, radius * 0.4f)){
-                    if(unit.team == b.team && unit.type instanceof FusionBombType && b.health > unit.health){
-                        FRFx.lineTrailEffect(30.0f, b.x, b.y, unit.x, unit.y, 1.0f, Pal.surge, 4).at(b.x, b.y);
-                        float willHeal = Math.min(Time.delta * 300, Math.max(0, unit.health * 3 - b.health));
+                if(Mathf.within(u.x, u.y, unit.x, unit.y, radius * 0.4f)){
+                    if(unit.team == u.team && unit.type instanceof FusionBombType && u.health > unit.health){
+                        FRFx.lineTrailEffect(30.0f, u.x, u.y, unit.x, unit.y, 1.0f, Pal.surge, 4).at(u.x, u.y);
+                        float willHeal = Math.min(Time.delta * 300, Math.max(0, unit.health * 3 - u.health));
                         if(unit.health >= willHeal * 2.0f){
                             unit.damagePierce(willHeal);
-                            final float aimH = b.health + willHeal;
-                            if(aimH >= b.maxHealth)
-                                b.maxHealth(aimH);
-                            b.health(aimH);
-                            b.apply(StatusEffects.burning, 4f);
+                            final float aimH = u.health + willHeal;
+                            if(aimH >= u.maxHealth)
+                                u.maxHealth(aimH);
+                            u.health(aimH);
+                            u.apply(StatusEffects.burning, 4f);
                         }else{
-                            final float aimH = b.health + unit.health;
-                            if(aimH >= b.maxHealth)
-                                b.maxHealth(aimH);
-                            b.health(aimH);
-                            b.apply(StatusEffects.burning, 2f);
+                            final float aimH = u.health + unit.health;
+                            if(aimH >= u.maxHealth)
+                                u.maxHealth(aimH);
+                            u.health(aimH);
+                            u.apply(StatusEffects.burning, 2f);
                             unit.remove();
                         }
                     }
@@ -171,7 +171,7 @@ public class FusionBombType extends mindustry.type.UnitType{
         });
 
         if(time >= 600.0f){
-            float timer = timerMap.get(b.id);
+            float timer = timerMap.get(u.id);
             if(timer >= FRMath.getReload1_fusionBomb(time)){
                 float rot = Mathf.randomSeed((long)(Time.time), 360);
                 float rot2 = Mathf.randomSeed((long)(Time.time), -30, 30);
@@ -200,22 +200,22 @@ public class FusionBombType extends mindustry.type.UnitType{
                         trailWidth = size * 0.08f;
                         lifetime = 60.0f;
                     }
-                }.create(b, b.x + size * Mathf.cosDeg(rot), b.y + size * Mathf.sinDeg(rot), rot + rot2);
+                }.create(u, u.x + size * Mathf.cosDeg(rot), u.y + size * Mathf.sinDeg(rot), rot + rot2);
                 timer -= FRMath.getReload1_fusionBomb(time);
             }
-            timerMap.put(b.id, timer + Time.delta);
+            timerMap.put(u.id, timer + Time.delta);
         }
 
-        if(!b.hasEffect(StatusEffects.burning))
-            b.damagePierce(Time.delta * 100.0f);
-        super.update(b);
+        if(!u.hasEffect(StatusEffects.burning))
+            u.damagePierce(Time.delta * 100.0f);
+        super.update(u);
     }
 
     @Override
-    public void killed(Unit b){
-        float time = b.maxHealth * 0.01f;
-        FRFx.powerfulBlastEffect(60.0f + FRMath.getRange_fusionBomb(time) * 0.5f, FRMath.getRange_fusionBomb(time) * 5, 0, 0, Pal.surge, Color.clear).at(b.x, b.y);
-        Damage.damage(b.team, b.x, b.y, FRMath.getRange_fusionBomb(time) * 5, FRMath.getDamage_fusionBomb(time, time));
+    public void killed(Unit u){
+        float time = u.maxHealth * 0.01f;
+        FRFx.powerfulBlastEffect(60.0f + FRMath.getRange_fusionBomb(time) * 0.5f, FRMath.getRange_fusionBomb(time) * 5, 0, 0, Pal.surge, Color.clear).at(u.x, u.y);
+        Damage.damage(u.team, u.x, u.y, FRMath.getRange_fusionBomb(time) * 5, FRMath.getDamage_fusionBomb(time, time));
         if(time >= 1200.0f){
             float size = FRMath.getRange_fusionBomb(time);
             var blast1 = new BasicBulletType(){{
@@ -259,8 +259,8 @@ public class FusionBombType extends mindustry.type.UnitType{
                 }
             }};
             for(int i = 0; i * i * 100 <= time; i++)
-                blast1.create(b, b.team, b.x, b.y, Mathf.randomSeed((long)(i + time), 360), Mathf.randomSeed((long)(i + time * 2.0f), 0.2f, 1.2f), Mathf.randomSeed((long)(i + time), 0.95f, 1.85f));
+                blast1.create(u, u.team, u.x, u.y, Mathf.randomSeed((long)(i + time), 360), Mathf.randomSeed((long)(i + time * 2.0f), 0.2f, 1.2f), Mathf.randomSeed((long)(i + time), 0.95f, 1.85f));
         }
-        b.remove();
+        u.remove();
     }
 }

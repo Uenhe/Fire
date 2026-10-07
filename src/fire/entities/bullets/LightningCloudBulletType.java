@@ -40,8 +40,9 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
 
     @Override
     public void load(){
-        if(region.width == 0) region.set(FRUtils.find("lightning-cloud"));
         super.load();
+        if(region.width == 0)
+            region.set(FRUtils.find("lightning-cloud"));
     }
 
     public LightningCloud create(Entityc owner, float x, float y){

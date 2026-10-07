@@ -42,31 +42,21 @@ public final class FRVars{
     public static boolean
         mineSand = false, displayRange = true, showLog = true, noMultiMods = true, cheatMode = false;
 
-    public static short equivalentWidth;
     public static FRContentInfoDialog moddedContent;
     public static final float layerFlyingUnitAbove = Layer.flyingUnit + 0.5f;
     public static final Bloom bloomFlyingUnitAbove;
 
     private static float contentDialogTimer;
     private static BaseDialog cheatDialog;
-    private static final Toolkit toolkit;
 
     static{
-        Toolkit tk;
-        try{ //java.awt is not available on JRE but JDK
-            tk = Toolkit.getDefaultToolkit();
-        }catch(Throwable e){
-            Log.err(e);
-            tk = null;
-        }
-        toolkit = tk;
-
         Bloom bl;
-        try{
+        if(headless) bl = null;
+        else try{
             bl = new Bloom(true);
         }catch(Throwable e){
-            if(!headless) ui.showErrorMessage("@error.bloom");
-            Log.err(e);
+            ui.showErrorMessage("@error.bloom");
+            Log.err("Fire: Bloom unavailable; ", e);
             bl = null;
         }
         bloomFlyingUnitAbove = bl;
@@ -89,12 +79,14 @@ public final class FRVars{
                         spawnedUnits.remove(u);
                 }
 
-                final float ratio = FRLogicExecutor.MaskCutsceneI.ratio, height = Core.graphics.getHeight();
-                var mask = FRLogicExecutor.MaskCutsceneI.masks[0];
-                if(mask.hasActions() && mask.y >= -height * ratio * 0.5f){
-                    ui.hudfrag.shown = false;
-                }else if(mask.y <= -height * ratio * 0.5f && mask.y > -height * ratio && FRLogicExecutor.MaskCutsceneI.maskOut && FRLogicExecutor.MaskCutsceneI.previousShown){
-                    ui.hudfrag.shown = true;
+                if(!headless){
+                    final float ratio = FRLogicExecutor.MaskCutsceneI.ratio, height = Core.graphics.getHeight();
+                    var mask = FRLogicExecutor.MaskCutsceneI.masks[0];
+                    if(mask.hasActions() && mask.y >= -height * ratio * 0.5f){
+                        ui.hudfrag.shown = false;
+                    }else if(mask.y <= -height * ratio * 0.5f && mask.y > -height * ratio && FRLogicExecutor.MaskCutsceneI.maskOut && FRLogicExecutor.MaskCutsceneI.previousShown){
+                        ui.hudfrag.shown = true;
+                    }
                 }
 
                 if(frame % 60 == 0){
@@ -139,9 +131,6 @@ public final class FRVars{
         });
 
         if(!headless) Events.run(EventType.Trigger.draw, () -> {
-            if(Core.graphics.getFrameId() % 60 == 0)
-                equivalentWidth = (short)(100.0f * Core.graphics.getWidth() / Core.settings.getInt("uiscale", 100) / (toolkit != null ? toolkit.getScreenResolution() / 96.0f : 1.0f));
-
             if(bloomFlyingUnitAbove != null){
                 final float epsilon = 0.0001f;
                 bloomFlyingUnitAbove.resize(Core.graphics.getWidth(), Core.graphics.getHeight());

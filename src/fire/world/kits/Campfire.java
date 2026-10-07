@@ -5,10 +5,14 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.math.Angles;
 import arc.math.Mathf;
+import arc.math.geom.Vec2;
 import arc.scene.style.TextureRegionDrawable;
 import arc.util.Scaling;
 import arc.util.Tmp;
+import fire.annotation.Modified;
+import fire.content.FRStatusEffects;
 import fire.world.DEBUG;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
@@ -17,40 +21,79 @@ import mindustry.content.Fx;
 import mindustry.content.StatusEffects;
 import mindustry.entities.Effect;
 import mindustry.entities.Units;
+import mindustry.entities.effect.MultiEffect;
 import mindustry.gen.Building;
 import mindustry.graphics.Drawf;
 import mindustry.graphics.Pal;
+import mindustry.type.Category;
 import mindustry.type.StatusEffect;
 import mindustry.ui.Styles;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 
 import static fire.FRVars.displayRange;
+import static fire.FRVars.find;
+import static fire.content.FRItems.timber;
 import static mindustry.Vars.*;
+import static mindustry.content.Items.*;
+import static mindustry.type.ItemStack.with;
 
 public class Campfire{
 
     public static class CampfireBlock extends mindustry.world.blocks.defense.OverdriveProjector{
 
-        public StatusEffect
-            allyStatus = StatusEffects.overclock,
-            enemyStatus = StatusEffects.sapped;
-        public float statusDuration;
-        public float updateEffectChance;
-        public Effect updateEffect = Fx.none;
-        public DrawArrows drawArrows;
+        public final StatusEffect allyStatus, enemyStatus;
+        public final float statusDuration;
+        public final float updateEffectChance;
+        public final Effect updateEffect;
+        public final Effect updateEffectSp = new Effect(48f, e -> {
+            if(!(e.data instanceof Vec2 origin)) return;
+            Draw.color(Pal.lightFlame, Pal.darkFlame, Color.gray, e.fin());
+            Angles.randLenVectors(e.id, 8, 8f + e.finpow() * 36f, Angles.angle(e.x - origin.x, e.y - origin.y), 35f, (x, y) ->
+                Fill.circle(e.x + x, e.y + y, 0.6f + e.fout() * 3.0f));
+        });
+        public final DrawArrows drawArrows;
 
-        final float maxBoost = 3.38f; //hardcoded
+        final float maxBoost = 3.3625f; //hardcoded; equals to 'Vars.content.items().sumf(item => item.flammability) - 0.1'
 
-        public CampfireBlock(String name){
-            super(name);
+        public CampfireBlock(){
+            super("gh");
             buildType = CampfireBuild::new;
+
+            requirements(Category.effect, with(
+                copper, 300,
+                metaglass, 220,
+                plastanium, 175,
+                timber, 200
+            ));
+            size = 5;
+            itemCapacity = 20;
+            separateItemCapacity = true;
+            updateEffectChance = 0.03f;
+            updateEffect = new MultiEffect(
+                Fx.blastsmoke,
+                Fx.generatespark
+            );
+            drawArrows = new DrawArrows(2, Pal.lightishOrange, find("c75807"));
+
+            reload = 30.0f;
+            range = 20 * tilesize;
+            useTime = 240.0f;
+            speedBoost = 1.5f;
+            speedBoostPhase = 0.25f;
+            phaseRangeBoost = 32.0f;
+            statusDuration = 180.0f;
+            allyStatus = FRStatusEffects.inspired;
+            enemyStatus = StatusEffects.sapped;
+
+            consume(new ConsumePowerCustom(2160 / 60, 0.0f, false, this));
+            consume(new ConsumeCampfire(this));
         }
 
         @Override
         public void load(){
             super.load();
-            if(drawArrows != null) drawArrows.load(this);
+            drawArrows.load(this);
         }
 
         @Override
@@ -59,8 +102,8 @@ public class Campfire{
             stats.add(FRStat.statusEffectApplied, table -> {
                 table.row();
 
-                for(int i = 0; i < 2; i++){
-                    var sfx = i == 0 ? allyStatus : enemyStatus;
+                for(int i = 0; i < 2;){
+                    var sfx = i++ == 0 ? allyStatus : enemyStatus;
 
                     table.table(Styles.grayPanel, t -> {
                         t.left().button(new TextureRegionDrawable(sfx.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(sfx)).size(40.0f).pad(10.0f).scaling(Scaling.fit);
@@ -79,19 +122,21 @@ public class Campfire{
         }
 
         @Override
+        @Modified
         public void drawPlace(int x, int y, int rotation, boolean valid){
             if(DEBUG.isDeveloper()){
                 float wx = x * tilesize + offset, wy = y * tilesize + offset;
                 drawPotentialLinks(x, y);
-                drawOverlay(wx, wy, rotation);
 
                 float[] ranges = {range, range + phaseRangeBoost * (2.25f - speedBoost) / speedBoostPhase, range + phaseRangeBoost * (4.2f - speedBoost) / speedBoostPhase};
                 Color[] colors = {baseColor, phaseColor, phaseColor.cpy().mul(1.15f)};
                 for(int i = 0; i < 3; i++)
                     Drawf.dashCircle(wx, wy, ranges[i], colors[i]);
                 for(int i = 2; i >= 0; i--){
-                    var j = i;
-                    indexer.eachBlock(player.team(), wx, wy, ranges[i], other -> other.block.canOverdrive, other -> Drawf.selected(other, Tmp.c1.set(colors[j]).a(Mathf.absin(4.0f, 1.0f))));
+                    var color = colors[i];
+                    indexer.eachBlock(player.team(), wx, wy, ranges[i],
+                        other -> other.block.canOverdrive,
+                        other -> Drawf.selected(other, Tmp.c1.set(color).a(Mathf.absin(4.0f, 1.0f))));
                 }
 
             }else{
@@ -151,16 +196,19 @@ public class Campfire{
 
                 if(wasVisible && Mathf.chanceDelta(updateEffectChance))
                     updateEffect.at(x + Mathf.range(size * tilesize / 2), y + Mathf.range(size * tilesize / 2));
+
+                if(wasVisible && phaseHeat >= 4.0f && Mathf.chanceDelta(0.015f + (phaseHeat - 4.0f) * 0.007f))
+                    updateEffectSp.at(x + Mathf.range(8, 16), y + Mathf.range(8, 16), 0, new Vec2(x, y));
             }
 
             @Override
+            @Modified
             public void draw(){
-                super.draw();
-
-                if(drawArrows != null) drawArrows.draw(this);
+                Draw.rect(block.region, x, y, drawrot());
+                drawArrows.draw(this);
 
                 if(!displayRange) return;
-                Draw.color(efficiency > 0.0f ? Pal.redLight : Color.black, 0.8f);
+                Draw.color(efficiency > 0 ? Pal.redLight : Color.black, 0.8f);
                 Lines.stroke(1.2f);
                 Lines.circle(x, y, range());
                 Draw.alpha(0.15f);
@@ -201,10 +249,9 @@ public class Campfire{
         public void display(Stats stats){
             stats.remove(Stat.booster);
             stats.add(Stat.booster, c -> {
-                c.row().table(Styles.grayPanel, t ->
-                    t.row().left().add(
-                        Core.bundle.format("stat.consumecampfire", block.speedBoostPhase * 100, block.phaseRangeBoost / tilesize)
-                    ).growX().pad(5.0f));
+                c.row().table(Styles.grayPanel, t -> t.row().left()
+                    .add(Core.bundle.format("stat.consumecampfire", block.speedBoostPhase * 100, block.phaseRangeBoost / tilesize))
+                    .growX().pad(5.0f));
 
                 int i = 0;
                 for(var item : content.items()){

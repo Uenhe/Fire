@@ -2,7 +2,7 @@ package fire.entities.bullets;
 
 import arc.Events;
 import arc.math.Mathf;
-import arc.struct.ObjectFloatMap;
+import arc.struct.IntFloatMap;
 import arc.util.Time;
 import fire.content.FRItems;
 import fire.content.FRStatusEffects;
@@ -22,7 +22,7 @@ public class FleshBulletType extends SpritesBulletType{
     private final FleshBulletType adhereType;
     private static final Item ITEM = FRItems.flesh;
 
-    private static final ObjectFloatMap<Bullet> intensityMap = new ObjectFloatMap<>();
+    private static final IntFloatMap intensityMap = new IntFloatMap();
 
     static{
         Events.on(EventType.ResetEvent.class, e -> intensityMap.clear());
@@ -49,7 +49,7 @@ public class FleshBulletType extends SpritesBulletType{
     }
 
     private float intensity(Bullet b){
-        return intensityMap.get(b, 1.0f);
+        return intensityMap.get(b.id, 1.0f);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class FleshBulletType extends SpritesBulletType{
             float amount = removeAmount * Time.delta;
             if(intensity(b) < maxSpread && build.liquids != null && build.liquids.get(Liquids.water) > amount){
                 build.liquids.remove(Liquids.water, amount);
-                intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
+                intensityMap.increment(b.id, 1.0f, spreadIntensity * Time.delta);
                 b.time -= Time.delta * 0.95f;
             }
 
@@ -90,7 +90,7 @@ public class FleshBulletType extends SpritesBulletType{
             assert entity instanceof Unit;
             if(intensity(b) < maxSpread && ((Unit)entity).hasEffect(StatusEffects.wet)){
                 ((Unit)entity).apply(StatusEffects.wet, ((Unit)entity).getDuration(StatusEffects.wet) - 10.0f);
-                intensityMap.increment(b, 1.0f, spreadIntensity * Time.delta);
+                intensityMap.increment(b.id, 1.0f, spreadIntensity * Time.delta);
                 b.time -= Time.delta * 0.95f;
             }
             entity.damageContinuousPierce(damage * intensity(b));
@@ -99,7 +99,7 @@ public class FleshBulletType extends SpritesBulletType{
 
     @Override
     public void removed(Bullet b){
-        intensityMap.remove(b, 0.0f);
+        intensityMap.remove(b.id, 0.0f);
         super.removed(b);
     }
 

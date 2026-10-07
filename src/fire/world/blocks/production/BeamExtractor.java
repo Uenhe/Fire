@@ -13,8 +13,8 @@ import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Mathf;
 import arc.scene.ui.layout.Table;
-import arc.struct.IntSet;
 import arc.struct.ObjectFloatMap;
+import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.Nullable;
 import arc.util.Strings;
@@ -123,18 +123,18 @@ public class BeamExtractor extends mindustry.world.Block{
         checkOre(x, y, true, null, null);
     }
 
-    @Override
     protected TextureRegion[] icons(){
-        var regions = Seq.with(base, region);
+        int n = barrelRegions.length;
+        if(n <= 1)
+            return new TextureRegion[]{base, region};
 
-        if(barrelRegions.length > 1){
-            var names = new Seq<String>(barrelRegions.length);
+        var regions = new Seq<TextureRegion>(n + 2);
+        regions.add(base, region);
 
-            for(var region : barrelRegions){
-                if(names.contains(region.asAtlas().name)) continue;
-                regions.add(region);
-                names.add(region.asAtlas().name);
-            }
+        var names = new ObjectSet<String>(n + 1);
+        for(int i = 0; i < n;){
+            var reg = barrelRegions[i++];
+            if(names.add(reg.asAtlas().name)) regions.add(reg);
         }
 
         return regions.toArray(TextureRegion.class);
@@ -158,37 +158,39 @@ public class BeamExtractor extends mindustry.world.Block{
         pixmap.draw(Core.atlas.getPixmap(region), true);
         packer.add(MultiPacker.PageType.main, "block-" + name + "-full", pixmap);
 
-        for(var pm : toDispose) pm.dispose();
+        toDispose.each(Pixmap::dispose);
     }
 
-    private void checkOre(int x, int y, boolean draw, @Nullable IntSet set, @Nullable Entry entry){
+    private void checkOre(int x, int y, boolean draw, @Nullable ObjectSet<Item> set, @Nullable Entry entry){
         if(set != null) set.clear();
         Tile closest = null;
         float min = Float.MAX_VALUE;
 
         int r = range,
         mx = Mathf.ceil((wp(x) + r) / tilesize), my = Mathf.ceil((wp(y) + r) / tilesize);
-        for    (int tx = (int)((wp(x) - r) / tilesize); tx <= mx; tx++)
+        for(int tx = (int)((wp(x) - r) / tilesize); tx <= mx; tx++){
             for(int ty = (int)((wp(y) - r) / tilesize); ty <= my; ty++){
                 float dst = Mathf.dst(wp(x), wp(y), tx * tilesize, ty * tilesize);
-                if(dst > r || dst <= closeDst()) continue;
+                if(dst > r || dst <= closeDst())
+                    continue;
                 var tile = world.tile(tx, ty);
-                if(tile == null || !tile.block().isAir() || tile.drop() == null || tile.drop().hardness > tier) continue;
+                if(tile == null || !tile.block().isAir() || tile.drop() == null || tile.drop().hardness > tier)
+                    continue;
 
                 if(draw){
                     Draw.color(Tmp.c1.set(baseColor).lerp(tile.drop().color, 1.0f).a(Mathf.absin(4.0f, 0.4f)));
-                    Fill.square(tx * tilesize, ty * tilesize , tilesize * 0.5f);
+                    Fill.square(tx * tilesize, ty * tilesize, tilesize * 0.5f);
                     Draw.reset();
                 }
 
                 if(set != null)
-                    set.add(tile.drop().id);
+                    set.add(tile.drop());
 
-                if(entry != null)
-                    if(tile.drop().id == entry.item && min > dst){
-                        closest = tile;
-                        min = dst;
-                    }
+                if(entry != null && tile.drop().id == entry.item && min > dst){
+                    closest = tile;
+                    min = dst;
+                }
+            }
         }
 
         if(entry != null) entry.cons.get(closest);
@@ -208,7 +210,7 @@ public class BeamExtractor extends mindustry.world.Block{
         private byte selected = -1;
         private float drillTimer, warmup, boostWarmup, beamX, beamY;
         private Tile mining;
-        private final IntSet available = new IntSet();
+        private final ObjectSet<Item> available = new ObjectSet<>();
         private final float[] drawrots = new float[barrels.size];
 
         @Override
@@ -216,8 +218,8 @@ public class BeamExtractor extends mindustry.world.Block{
             init();
             if(available.isEmpty()) return;
 
-            var items = new Seq<Item>();
-            available.each(id -> items.add(content.item(id)));
+            var items = new Seq<Item>(8);
+            available.each(items::add);
             ItemSelection.buildTable(block, table, items, this::config, this::configure, selectionRows, selectionColumns);
         }
 
@@ -245,10 +247,8 @@ public class BeamExtractor extends mindustry.world.Block{
             }
             drillTimer += edelta() * warmup * Mathf.lerp(1.0f, boostScale, boostWarmup);
 
-            if(wasVisible){
-                if(Mathf.chanceDelta(updateEffectChancePercentage * warmup * 0.01))
-                    updateEffect.at(x + Mathf.range(size * 2.0f), y + Mathf.range(size * 2.0f));
-            }
+            if(wasVisible && Mathf.chanceDelta(updateEffectChancePercentage * warmup * 0.01))
+                updateEffect.at(x + Mathf.range(size * 2.0f), y + Mathf.range(size * 2.0f));
 
             if(drillTimer >= getDrillTime() && items.total() < itemCapacity){
                 for(int i = 0, amount = (int)(drillTimer / getDrillTime()); i < amount; i++)

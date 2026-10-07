@@ -25,6 +25,7 @@ public class HighSpeedBulletType extends BasicBulletType{
 
     public HighSpeedBulletType(float speed,float damage){
         super(speed,damage);
+        this.reflectable = false;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class HighSpeedBulletType extends BasicBulletType{
     }
 
     public void specialHeal(Bullet b, float amount, @Nullable StatusEffect effect, float duration){
-        Unit unit = (Unit)b.owner;
+        if(!(b.owner instanceof Unit unit))return;
         if(unit.health >= unit.maxHealth){
             if(unit.shield < unit.maxHealth * extraShield){
                 unit.shield(Math.min(unit.shield + amount, unit.maxHealth));

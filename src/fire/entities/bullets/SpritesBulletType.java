@@ -29,7 +29,7 @@ public class SpritesBulletType extends mindustry.entities.bullet.BulletType{
     public void load(){
         super.load();
         for(int i = 0, n = regions.length; i < n;)
-            regions[i] = Core.atlas.find(name + ++i);
+            regions[i++] = Core.atlas.find(name + i);
     }
 
     @Override

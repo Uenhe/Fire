@@ -11,6 +11,7 @@ import mindustry.type.UnitType;
 
 /** @author fy */
 public class AirFleshUnitType extends FleshUnitType{
+
     public final boolean drawShield = true;
 
     public AirFleshUnitType(String name, UnitType origin){

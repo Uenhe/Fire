@@ -19,6 +19,7 @@ import arc.util.Align;
 import arc.util.Nullable;
 import arc.util.Time;
 import arc.util.Tmp;
+import fire.FRUtils;
 import fire.type.FleshUnitType;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
@@ -36,9 +37,13 @@ import static mindustry.Vars.tilesize;
 
 public class FRFx{
 
+    static final TextureRegion aimShoot = new TextureRegion();
+
     /** Special thanks to Extra Utilities mod. */
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){
         return new Effect(lifetime, range * 2.0f, e -> {
+            if(aimShoot.width == 0)
+                aimShoot.set(FRUtils.find("aim-shoot"));
 
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0.0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0.0f, 0.3f) * e.fin();
             Draw.color(color);
@@ -47,7 +52,7 @@ public class FRFx{
             for(int i = 0, interval = (int)(range / spacing); i <= interval; i++){
                 v.trns(e.rotation, i * spacing);
                 float f = Interp.pow3Out.apply(Mathf.clamp((e.fin() * range - i * spacing) / spacing)) * (0.6f + track * 0.4f);
-                Draw.rect("fire-aim-shoot", e.x + v.x, e.y + v.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
+                Draw.rect(aimShoot, e.x + v.x, e.y + v.y, 144.0f * Draw.scl * f, 144.0f * Draw.scl * f, e.rotation - 90.0f);
             }
 
             v.trns(e.rotation, 0.0f, (2.0f - track) * tilesize * width);
@@ -146,52 +151,45 @@ public class FRFx{
     public static Effect fleshTeleportEffect = new Effect(80.0f, e -> {
         if(!(e.data instanceof TpFxData data)) return;
 
-        var oldType = ((FleshUnitType)data.spawned.type).origin;
+        var origin = FleshUnitType.fleshUnitMap.get(data.spawned.type.id);
         float scl = e.fout(Interp.pow2Out), p = Draw.scl, z = Draw.z();
 
         Draw.z(Layer.effect + 0.1f);
         Draw.scl *= scl;
         Draw.mixcol(data.spawned.team.color, 1.0f);
-        Draw.rect(oldType.fullIcon, e.x, e.y, e.rotation);
+        Draw.rect(origin.fullIcon, e.x, e.y, e.rotation);
         Draw.rect(data.spawned.type.fullIcon, data.x, data.y, e.rotation);
         Draw.reset();
         Draw.scl = p;
         Draw.z(z);
 
         Draw.color(data.spawned.team.color);
-        float stroke = (oldType.hitSize + data.spawned.type.hitSize) * 0.5f * scl,
+        float stroke = (origin.hitSize + data.spawned.type.hitSize) * 0.5f * scl,
             cos = Mathf.cosDeg(e.rotation) * stroke,
             sin = Mathf.sinDeg(e.rotation) * stroke;
 
-        Fill.quad(
-            e.x + cos * 0.25f, e.y + sin * 0.25f,
+        Fill.quad(e.x + cos * 0.25f, e.y + sin * 0.25f,
             data.x + cos, data.y + sin,
             data.x - cos, data.y - sin,
-            e.x - cos * 0.25f, e.y - sin * 0.25f
-        );
+            e.x - cos * 0.25f, e.y - sin * 0.25f);
     });
-
-
-
 
     /** Yoshu ...? **/
     public static Effect errTransitionEffect(TextureRegion image, float rotation, float lifetime, float aimX, float aimY, Color color, boolean fade){
         return new Effect(lifetime, e -> {
-            float x,y;
-            float progress = e.fin(Interp.pow5Out);
-            x = e.x * (1 - progress) + aimX * progress;
-            y = e.y * (1 - progress) + aimY * progress;
+            float progress = e.fin(Interp.pow5Out),
+                x = e.x * (1 - progress) + aimX * progress,
+                y = e.y * (1 - progress) + aimY * progress;
             Draw.color(color);
             Draw.z(Layer.darkness + 0.1f);
-            if(fade)Draw.alpha(e.fout(Interp.pow5Out));
-            Draw.rect(image,x,y,rotation - 90.0f);
+            if(fade) Draw.alpha(e.fout(Interp.pow5Out));
+            Draw.rect(image, x, y, rotation - 90.0f);
         });
     }
 
     public static Effect jackpotChargeEffect(float lifetime, float speed, float radius, int amount, Color[] colors){
         return new Effect(lifetime, e -> {
             float orbSize = 2.0f * e.fout() + 1.0f;
-
             for(int i = 0; i < amount; i++){
                 float theta = e.time * e.fout(Interp.swingOut) + Mathf.PI2 * (float)i / amount / speed,
                     mag = radius * e.fout(),
@@ -462,7 +460,7 @@ public class FRFx{
                 r * 0.1f * rand1 ,  r * 0.1f * rand1);
 
         });
-    };
+    }
 
     public static void wordDisplay(String words, Color color, float size, float x, float y, float lifetime){
         Table t = new Table(Styles.none);
@@ -675,7 +673,7 @@ public class FRFx{
             Lines.stroke((2.0f * e.fout()));
 
             Draw.z(Layer.effect + 0.001f);
-            Angles.randLenVectors(e.id + 1, e.finpow() + 0.001f, (int)(8.0f * intensity), 28.0f * intensity, (x, y, in, out) -> {
+            Angles.randLenVectors(e.id + 1, e.finpow() + 0.001f, (int)(intensity * 8), 28.0f * intensity, (x, y, in, out) -> {
                 Lines.lineAngle(e.x + x, e.y + y, Mathf.angle(x, y), 1.0f + out * 4.0f * (4.0f + intensity));
                 Drawf.light(e.x + x, e.y + y, (out * 4.0f * (3.0f + intensity)) * 3.5f, Draw.getColor(), 0.8f);
             });

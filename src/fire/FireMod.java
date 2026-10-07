@@ -116,14 +116,14 @@ public class FireMod extends Mod{
             }else if(block instanceof ItemTurret){
                 Item item = null;
                 if(block == FRBlocks.aerolite){
-                    AdaptiveSource.turretItemMap.put(block.id, Items.plastanium.id);
+                    AdaptiveSource.turretItemMap.put(block.id, Items.plastanium);
 
                 }else{
                     var keys = ((ItemTurret)block).ammoTypes.keys();
                     while(keys.hasNext())
                         item = keys.next();
                     if(item != null)
-                        AdaptiveSource.turretItemMap.put(block.id, item.id);
+                        AdaptiveSource.turretItemMap.put(block.id, item);
                 }
 
             }else if(block instanceof PayloadSource || block instanceof PowerSource || block instanceof ItemSource){
@@ -145,7 +145,7 @@ public class FireMod extends Mod{
     static CheatStatusCode checkCheating(){
         if(!state.isCampaign() || state.getPlanet() != FRPlanets.lysetta || DEBUG.isDeveloper())
             return CheatStatusCode.OK;
-        else if(multipleModList.any())
+        else if(multipleModList.any() || content.items().size != FRItems.expectedItemCount)
             return CheatStatusCode.CHEAT_MODS;
 
         var buildingTypes = player.team().data().buildingTypes;
@@ -230,7 +230,7 @@ public class FireMod extends Mod{
             if(mod.meta.hidden || "fire".equals(mod.meta.name)) continue;
             multipleModList.add(mod.meta.displayName);
         }
-        if(multipleModList.isEmpty() || DEBUG.isDeveloper()) return;
+        if(multipleModList.isEmpty() || DEBUG.isDeveloper() || content.items().size == FRItems.expectedItemCount) return;
         fkgame();
     }
 
@@ -282,6 +282,7 @@ public class FireMod extends Mod{
         dialog.buttons.button("@close", Icon.cancel, dialog::hide).size(210.0f, 64.0f);
     }
 
+    @SuppressWarnings("SameParameterValue")
     static void addContent(Table table, Object... objects){
         String strend = Core.bundle.get("fire.strend");
         for(var obj : objects){
@@ -360,7 +361,8 @@ public class FireMod extends Mod{
         container.setSize(Core.graphics.getWidth(), Core.graphics.getHeight());
         container.defaults().size(120.0f).pad(5.0f).padTop(4.0f);
 
-        MobileButton settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
+        MobileButton
+            settings = new MobileButton(Icon.settings, "@settings", ui.settings::show),
             mods = new MobileButton(Icon.book, "@mods", ui.mods::show),
             what = new MobileButton(Icon.warning, "@fire.what", mulModDialog::show),
             exit = new MobileButton(Icon.exit, "@quit", () -> Core.app.exit()),

@@ -120,7 +120,7 @@ public class CheatMode{
         Events.on(EventType.WorldLoadEndEvent.class, e -> {
             threat = 0;
             getSettings();
-            player.team().rules().cheat = cheatMode;
+            state.rules.defaultTeam.rules().cheat = cheatMode;
         });
     }
 
@@ -132,21 +132,18 @@ public class CheatMode{
     }
 
     public static void update(){
-        var playerRules = player.team().rules();
+        var playerRules = state.rules.defaultTeam.rules();
         if(cheatMode && playerRules.cheat && !state.rules.editor){
             if(threat == 0){
                 threat = getThreatLevel();
                 if(state.wave == 1){
-                    FRFx.wordDisplay(bundle.get("fire.cheat1A"), player.team().color, 1f, 0.3f, 0.8f, 5);
-                    Time.run(30, () -> {
-                        FRFx.wordDisplay(bundle.get("fire.cheat1B"), player.team().color, 1f, 0.3f, 0.77f, 4.3f);
-                    });
-                    Time.run(60, () -> {
-                        FRFx.wordDisplay(bundle.get("fire.cheat1C") + threat, player.team().color, 1f, 0.3f, 0.74f, 3.6f);
-                    });
-                    Time.run(90, () -> {
-                        FRFx.wordDisplay(bundle.get("fire.cheat1D"), player.team().color, 1f, 0.3f, 0.71f, 2.9f);
-                    });
+                    FRFx.wordDisplay(bundle.get("fire.cheat1A"), state.rules.defaultTeam.color, 1f, 0.3f, 0.8f, 5);
+                    Time.run(30, () ->
+                        FRFx.wordDisplay(bundle.get("fire.cheat1B"), state.rules.defaultTeam.color, 1f, 0.3f, 0.77f, 4.3f));
+                    Time.run(60, () ->
+                        FRFx.wordDisplay(bundle.get("fire.cheat1C") + threat, state.rules.defaultTeam.color, 1f, 0.3f, 0.74f, 3.6f));
+                    Time.run(90, () ->
+                        FRFx.wordDisplay(bundle.get("fire.cheat1D"), state.rules.defaultTeam.color, 1f, 0.3f, 0.71f, 2.9f));
                 }
             }
 
@@ -200,12 +197,12 @@ public class CheatMode{
                 state.wavetime = state.rules.initialWaveSpacing == 0 ? state.rules.waveSpacing : state.rules.initialWaveSpacing * 0.6f;
 
             if(Core.graphics.getFrameId() % 7 == 0){
-                for(var build : player.team().data().buildings){
+                for(var build : state.rules.defaultTeam.data().buildings){
                     if(!(build instanceof ItemTurret.ItemTurretBuild))
                         continue;
 
                     var ammo = ((ItemTurret.ItemTurretBuild)build).ammo;
-                    var item = content.item(AdaptiveSource.turretItemMap.get(build.block.id));
+                    var item = AdaptiveSource.turretItemMap.get(build.block.id);
                     if(ammo.isEmpty())
                         build.handleItem(build, item);
 
@@ -223,13 +220,13 @@ public class CheatMode{
     public static int getThreatLevel(){
         int threat = 0;
 
-        threat += (int)player.team().items().sum((i, a) -> {
-            var value = ElementUnitFactory.itemValues.get(i);
+        threat += (int)state.rules.defaultTeam.items().sum((i, a) -> {
+            var value = ElementUnitFactory.itemValues.get(i.id);
             return value == null ? 0 : value.threat;
         });
 
         for(var block : threateningBlocks){
-            var builds = player.team().data().buildingTypes.get(block);
+            var builds = state.rules.defaultTeam.data().buildingTypes.get(block);
             if(builds == null || builds.isEmpty()) continue;
             threat += blockThreatMap.get(block);
         }
@@ -271,7 +268,7 @@ public class CheatMode{
         );
 
         for(var item : content.items()){
-            var value = ElementUnitFactory.itemValues.get(item);
+            var value = ElementUnitFactory.itemValues.get(item.id);
             if(value == null) continue;
             maxThreat += value.threat;
         }

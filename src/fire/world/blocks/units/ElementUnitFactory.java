@@ -10,9 +10,10 @@ import arc.math.geom.Vec2;
 import arc.scene.style.TextureRegionDrawable;
 import arc.scene.ui.ButtonGroup;
 import arc.scene.ui.ImageButton;
+import arc.scene.ui.layout.Scl;
 import arc.scene.ui.layout.Table;
 import arc.scene.utils.Elem;
-import arc.struct.ObjectMap;
+import arc.struct.IntMap;
 import arc.struct.Seq;
 import arc.util.Eachable;
 import arc.util.Nullable;
@@ -47,7 +48,6 @@ import mindustry.world.blocks.payloads.UnitPayload;
 import mindustry.world.meta.Stat;
 import mindustry.world.meta.StatUnit;
 
-import static fire.FRVars.equivalentWidth;
 import static mindustry.Vars.*;
 
 /** @see mindustry.world.blocks.units.UnitFactory */
@@ -58,13 +58,13 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected float timeScl;
     protected final Seq<UnitType> plans = new Seq<>();
 
-    public static final ObjectMap<Item, ItemValue> itemValues = new ObjectMap<>(content.items().size - 6); //6 Erekir items
-    private static final ObjectMap<UnitType, UnitValue> unitValues = new ObjectMap<>();
+    public static final IntMap<ItemValue> itemValues = new IntMap<>(Mathf.ceil((content.items().size - 6) / 0.8f)); //6 Erekir items
+    private static final IntMap<UnitValue> unitValues = new IntMap<>();
     private static final String[] tooltips = new String[3];
 
     public static void putAllValues(Object... values){
         for(int i = 0, n = values.length; i < n; i += 8)
-            itemValues.put((Item)values[i], new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6], (int)values[i + 7]));
+            itemValues.put(((Item)values[i]).id, new ItemValue((float)values[i + 1], (float)values[i + 2], (float)values[i + 3], (float)values[i + 4], (float)values[i + 5], (float)values[i + 6], (int)values[i + 7]));
     }
 
     public ElementUnitFactory(String name, int t){
@@ -104,8 +104,8 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         });
 
         if(tooltips[0] == null)
-            for(int i = 0; i < 3; i++)
-                tooltips[i] = Core.bundle.get("tooltip.element" + (i + 1));
+            for(int i = 0; i < 3;)
+                tooltips[i++] = Core.bundle.get("tooltip.element" + i);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         plans.sort(u -> u.id);
 
         for(var unit : plans)
-            if(!unitValues.containsKey(unit)) unitValues.put(unit, FRMath.getValue(unit));
+            if(!unitValues.containsKey(unit.id)) unitValues.put(unit.id, FRMath.getValue(unit));
     }
 
     @Override
@@ -134,7 +134,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
             int i = 0;
             for(var item : content.items()){
                 if(!item.unlockedNowHost()) continue;
-                var value = itemValues.get(item);
+                var value = itemValues.get(item.id);
                 if(value == null) continue;
 
                 var sb = new StringBuilder();
@@ -143,7 +143,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                     hasLogic = value.logicXp != 0.0f;
                 if(hasArmor){
                     sb.append(String.format(tooltips[0], value.armorXp, value.armorMaxLv));
-                    if(hasEnergy && hasLogic) sb.append("\n");
+                    if(hasEnergy || hasLogic) sb.append("\n");
                 }
                 if(hasEnergy){
                     sb.append(String.format(tooltips[1], value.energyXp, value.energyMaxLv));
@@ -164,12 +164,12 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         });
 
         stats.add(Stat.output, table -> {
-            int r = equivalentWidth > 2560.0f ? 8 : 4;
+            int columns = Core.graphics.getWidth() / Scl.scl() >= 1600 ? 8 : 4;
 
             table.row();
             for(int i = 0, n = plans.size; i < n;){
                 var unit = plans.get(i);
-                var value = unitValues.get(unit) == null ? unitValues.get(UnitTypes.dagger) : unitValues.get(unit);
+                var value = unitValues.get(unit.id) == null ? unitValues.get(UnitTypes.dagger.id) : unitValues.get(unit.id);
                 boolean banned = unit.isBanned(), unlocked = unit.unlockedNowHost();
 
                 table.table(Styles.grayPanel, t -> {
@@ -191,7 +191,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
                     t.row();
                     t.add(Core.bundle.format("stat.logiclv", unlocked ? Strings.fixed(value.logicLv, 2) : "???")).left();
                 }).growX().pad(5.0f).margin(10.0f);
-                if(++i % r == 0) table.row();
+                if(++i % columns == 0) table.row();
             }
         });
     }
@@ -213,17 +213,17 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         ));
 
         addBar("armor", (ElementUnitFactoryBuild b) -> new Bar(
-            () -> Core.bundle.format("bar.armorlv", Strings.fixed(b.armorXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).armorLv, 1))),
+            () -> Core.bundle.format("bar.armorlv", Strings.fixed(b.armorXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit().id).armorLv, 1))),
             () -> Pal.powerBar,
-            () -> b.currentPlan == -1 ? Mathf.num(b.armorXp > 0.0f) : b.armorXpToLv() / unitValues.get(b.unit()).armorLv));
+            () -> b.currentPlan == -1 ? Mathf.num(b.armorXp > 0.0f) : b.armorXpToLv() / unitValues.get(b.unit().id).armorLv));
         addBar("energy", (ElementUnitFactoryBuild b) -> new Bar(
-            () -> Core.bundle.format("bar.energylv", Strings.fixed(b.energyXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).energyLv, 1))),
+            () -> Core.bundle.format("bar.energylv", Strings.fixed(b.energyXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit().id).energyLv, 1))),
             () -> Pal.reactorPurple,
-            () -> b.currentPlan == -1 ? Mathf.num(b.energyXp > 0.0f) : b.energyXpToLv() / unitValues.get(b.unit()).energyLv));
+            () -> b.currentPlan == -1 ? Mathf.num(b.energyXp > 0.0f) : b.energyXpToLv() / unitValues.get(b.unit().id).energyLv));
         addBar("logic", (ElementUnitFactoryBuild b) -> new Bar(
-            () -> Core.bundle.format("bar.logiclv", Strings.fixed(b.logicXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit()).logicLv, 1))),
+            () -> Core.bundle.format("bar.logiclv", Strings.fixed(b.logicXpToLv(), 1) + (b.currentPlan == -1 ? "" : " / " + Strings.fixed(unitValues.get(b.unit().id).logicLv, 1))),
             () -> Pal.logicControl,
-            () -> b.currentPlan == -1 ? Mathf.num(b.logicXp > 0.0f) : b.logicXpToLv() / unitValues.get(b.unit()).logicLv)
+            () -> b.currentPlan == -1 ? Mathf.num(b.logicXp > 0.0f) : b.logicXpToLv() / unitValues.get(b.unit().id).logicLv)
         );
     }
 
@@ -280,7 +280,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
         public float fraction(){
             if(currentPlan == -1) return 0.0f;
-            return progress / time(unitValues.get(plans.get(currentPlan)));
+            return progress / time(unitValues.get(plans.get(currentPlan).id));
         }
 
         public boolean canSetCommand(){
@@ -402,7 +402,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
             if(currentPlan != -1){
                 var plan = plans.get(currentPlan);
-                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan, rotdeg() - 90.0f, progress / time(unitValues.get(plan)), speedScl, time));
+                Draw.draw(Layer.blockOver, () -> Drawf.construct(this, plan, rotdeg() - 90.0f, progress / time(unitValues.get(plan.id)), speedScl, time));
             }
 
             Draw.z(Layer.blockOver);
@@ -424,7 +424,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
 
             if(currentPlan != -1 && payload == null){
                 var plan = plans.get(currentPlan);
-                var value = unitValues.get(plan);
+                var value = unitValues.get(plan.id);
 
                 if(currentPlan != -1 && valid(value) && efficiency > 0.0f){
                     time += edelta() * speedScl * state.rules.unitBuildSpeed(team);
@@ -470,19 +470,19 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
         @Override
         public boolean shouldConsume(){
             if(currentPlan == -1) return false;
-            return enabled && payload == null && team.activateUnitFactories() && valid(unitValues.get(unit()));
+            return enabled && payload == null && team.activateUnitFactories() && valid(unitValues.get(unit().id));
         }
 
         @Override
         public boolean acceptItem(Building source, Item item){
-            var value = itemValues.get(item);
+            var value = itemValues.get(item.id);
             float v = lvToXp(tier != 0 ? tier + 0.9f : Float.MAX_VALUE);
             return value != null && (armorXp < Math.min(lvToXp(value.armorMaxLv), v) || energyXp < Math.min(lvToXp(value.energyMaxLv), v) || logicXp < Math.min(lvToXp(value.logicMaxLv), v));
         }
 
         @Override
         public void handleItem(Building source, Item item){
-            var value = itemValues.get(item);
+            var value = itemValues.get(item.id);
             float v = lvToXp(tier != 0 ? tier + 0.999f : Float.MAX_VALUE);
             armorXp = Mathf.clamp(armorXp + value.armorXp, armorXp, Math.min(lvToXp(value.armorMaxLv), v));
             energyXp = Mathf.clamp(energyXp + value.energyXp, energyXp, Math.min(lvToXp(value.energyMaxLv), v));

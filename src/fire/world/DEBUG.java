@@ -1,6 +1,5 @@
 package fire.world;
 
-import arc.Core;
 import arc.struct.Seq;
 import arc.util.OS;
 import fire.FRUtils;
@@ -148,8 +147,7 @@ public class DEBUG{
     }
 
     public static boolean isDeveloper(){
-        return "KochiyaUeneh".equals(OS.username)
-            || "12879".equals(OS.username)
-            || "aaaaaa".equals(Core.settings.getString("name")); //username="root" on Android
+        return "KochiyaUeneh".equals(OS.username) ||
+            "12879".equals(OS.username);
     }
 }

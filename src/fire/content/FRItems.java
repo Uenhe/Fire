@@ -9,6 +9,9 @@ import static fire.FRVars.find;
 import static mindustry.content.Items.*;
 
 public class FRItems{
+
+    /** Required to be maintained when new item is added. */
+    public static final byte expectedItemCount = 34;
     
     public static final Item
         glass, mirrorglass, sulflameAlloy, kindlingAlloy,
@@ -92,6 +95,7 @@ public class FRItems{
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static class FRItem extends Item{
 
         public FRItem(String name, Color color){

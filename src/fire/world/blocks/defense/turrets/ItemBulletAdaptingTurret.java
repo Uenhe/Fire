@@ -9,6 +9,7 @@ import mindustry.type.Item;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 
 public class ItemBulletAdaptingTurret extends ItemTurret{
+
     public static IntMap<Seq<BulletStack>> bulletStack;
 
     public ItemBulletAdaptingTurret(String name){
@@ -23,13 +24,12 @@ public class ItemBulletAdaptingTurret extends ItemTurret{
     public class ItemBulletAdaptingTurretBuild extends ItemTurretBuild{
         public float adaptTimer, timer2;
 
-        public BulletType findAmmo(int x){
-            for(int i = 0; i < bulletStack.get(x).size - 1; i++){
-                if(adaptTimer < bulletStack.get(x).get(i).req){
-                    return bulletStack.get(x).get(i).type;
-                }
-            }
-            BulletStack a = bulletStack.get(x).get(bulletStack.get(x).size - 1), b = bulletStack.get(x).get(bulletStack.get(x).size - 2);
+        public BulletType findAmmo(int item){
+            for(int i = 0; i < bulletStack.get(item).size - 1; i++)
+                if(adaptTimer < bulletStack.get(item).get(i).req)
+                    return bulletStack.get(item).get(i).type;
+
+            BulletStack a = bulletStack.get(item).get(bulletStack.get(item).size - 1), b = bulletStack.get(item).get(bulletStack.get(item).size - 2);
             adaptTimer -= a.req;
             shoot(a.type);
             return b.type;
@@ -37,7 +37,7 @@ public class ItemBulletAdaptingTurret extends ItemTurret{
 
         @Override
         public BulletType peekAmmo() {
-            return this.ammo.size == 0 ? null : bulletStack.get(item().id).size < 3 ? bulletStack.get(item().id).get(0).type : findAmmo(item().id);
+            return ammo.size == 0 ? null : bulletStack.get(item().id).size < 3 ? bulletStack.get(item().id).get(0).type : findAmmo(item().id);
         }
 
 
@@ -45,9 +45,8 @@ public class ItemBulletAdaptingTurret extends ItemTurret{
         public void updateTile(){
             if(!wasShooting){
                 timer2 = Math.min(5.0f, timer2 + delta() * 0.001f);
-                adaptTimer = Math.max(0.0f,adaptTimer - delta() * timer2);
-            }
-            else {
+                adaptTimer = Math.max(0.0f, adaptTimer - delta() * timer2);
+            }else{
                 timer2 = 0.0f;
                 adaptTimer += delta();
             }
