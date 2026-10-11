@@ -3,6 +3,7 @@ package fire.content;
 import arc.graphics.g2d.Draw;
 import arc.math.Interp;
 import arc.math.Mathf;
+import arc.math.geom.Position;
 import arc.util.Time;
 import fire.entities.bullets.SpriteBulletType;
 import fire.logic.FRLogicStatements;
@@ -11,6 +12,8 @@ import mindustry.ai.UnitCommand;
 import mindustry.content.Fx;
 import mindustry.content.Items;
 import mindustry.content.Liquids;
+import mindustry.entities.bullet.BasicBulletType;
+import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Bullet;
@@ -20,6 +23,7 @@ import mindustry.graphics.Pal;
 import mindustry.logic.LAssembler;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
+import mindustry.world.blocks.defense.turrets.PowerTurret;
 import mindustry.world.blocks.distribution.BufferedItemBridge;
 import mindustry.world.blocks.distribution.ItemBridge;
 import mindustry.world.blocks.distribution.MassDriver;
@@ -122,6 +126,45 @@ public class FROverride{
                 pierceCap = 50;
                 keepVelocity = false;
                 despawnEffect = hitEffect = Fx.none;
+            }
+        };
+
+        assert arc instanceof PowerTurret;
+        ((PowerTurret)arc).shootType = new BulletType(0, 0){{
+            lifetime = 900;
+            intervalBullets = 6;
+            intervalSpread = 360 / intervalBullets;
+            intervalRandomSpread = 0;
+            bulletInterval = 3;
+            intervalBullet = new BasicBulletType(2.0f, 100.0f){{
+                lifetime = 50.0f;
+                width = 3.0f;
+                height = 8.0f;
+                pierceCap = 3;
+                trailWidth = 2.4f;
+                trailLength = 5;
+                drag = -0.01f;
+                hitEffect = despawnEffect = Fx.hitBulletColor;
+                backColor = trailColor = Pal.surgeAmmoBack;
+                frontColor = hitColor = Pal.surgeAmmoFront;
+                lightning = 2;
+                lightningColor = Pal.surge;
+                lightningLength = 5;
+                lightningDamage = 10.0f;
+                lightningLengthRand = 2;
+            }};
+        }
+
+            @Override
+            public void init(Bullet b){
+                super.init(b);
+                b.set((Position)b.owner);
+            }
+
+            @Override
+            public void update(Bullet b){
+                super.update(b);
+                b.rotation((Mathf.sqr(b.time) * 0.035f) % 360 - 180);
             }
         };
     }

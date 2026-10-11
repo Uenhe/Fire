@@ -133,7 +133,7 @@ public class CheatMode{
 
     public static void update(){
         var playerRules = state.rules.defaultTeam.rules();
-        if(cheatMode && playerRules.cheat && !state.rules.editor){
+        if(playerRules.cheat && !state.rules.editor){
             if(threat == 0){
                 threat = getThreatLevel();
                 if(state.wave == 1){

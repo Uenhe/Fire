@@ -32,7 +32,7 @@ import mindustry.world.meta.Stat;
 import mindustry.world.meta.Stats;
 
 import static fire.FRVars.displayRange;
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 import static fire.content.FRItems.timber;
 import static mindustry.Vars.*;
 import static mindustry.content.Items.*;
@@ -74,7 +74,7 @@ public class Campfire{
                 Fx.blastsmoke,
                 Fx.generatespark
             );
-            drawArrows = new DrawArrows(2, Pal.lightishOrange, find("c75807"));
+            drawArrows = new DrawArrows(2, Pal.lightishOrange, findColor("c75807"));
 
             reload = 30.0f;
             range = 20 * tilesize;

@@ -21,6 +21,7 @@ import fire.entities.abilities.*;
 import fire.entities.bullets.HighSpeedBulletType;
 import fire.entities.bullets.SpecialIntervalBulletType;
 import fire.entities.weapons.MinerLikedWeapon;
+import fire.test.Reimu;
 import fire.type.AirFleshUnitType;
 import fire.type.FleshUnitType;
 import fire.world.meta.FRStat;
@@ -56,9 +57,11 @@ import static fire.FRVars.*;
 import static fire.FRVars.layerFlyingUnitAbove;
 import static mindustry.Vars.*;
 
+@SuppressWarnings("SameParameterValue")
 public class FRUnitTypes{
 
     static final TextureRegion def = headless ? null : Core.atlas.white();
+
     public static final UnitType
         //legs support
         guarding, resisting, garrison, shelter, blessing,
@@ -82,9 +85,10 @@ public class FRUnitTypes{
         javelin, apollo,
 
         //naval
-        mechanicalTide;
+        mechanicalTide, reimu;
 
     static{
+        reimu = new Reimu();
 
         //region legs support
 
@@ -155,7 +159,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new ForceFieldAbility(54f, 0.6f, 300.0f, 360.0f),
-                new RegenFieldAbility(0.75f, 40.0f, find("8cfffb"))
+                new RegenFieldAbility(0.75f, 40.0f, findColor("8cfffb"))
             );
         }};
 
@@ -243,7 +247,7 @@ public class FRUnitTypes{
 
             abilities.add(
                 new EnergyForceFieldAbility(80f, 2.5f, 1080f, 270f, 20, 16, 10, 10.0f),
-                new RegenFieldAbility(2.5f, 120f, find("8cfffb"))
+                new RegenFieldAbility(2.5f, 120f, findColor("8cfffb"))
             );
         }};
 
@@ -290,12 +294,12 @@ public class FRUnitTypes{
                     ext_node = new FRUtils.TimeNode(140, 180, 240, 300);
                 }},
 
-                new RegenFieldAbility(3.0f, 120.0f, find("8cfffb")),
+                new RegenFieldAbility(3.0f, 120.0f, findColor("8cfffb")),
 
-                new ExtinguishFieldAbility(120.0f, find("8cfffb")),
+                new ExtinguishFieldAbility(120.0f, findColor("8cfffb")),
 
                 new DebuffRemoveFieldAbility(120.0f, 120.0f, new Effect(30.0f, e -> {
-                    Draw.color(find("8cfffb"), Color.lightGray, e.fin());
+                    Draw.color(findColor("8cfffb"), Color.lightGray, e.fin());
                     Angles.randLenVectors(e.id, 3, 6.0f + e.finpow() * 20.0f, (x, y) ->
                         Fill.square(e.x + x, e.y + y, e.fout() * 4.0f + 0.5f, 45.0f));
                 }))
@@ -332,8 +336,8 @@ public class FRUnitTypes{
                         width = 5.4f;
                         height = 10.8f;
 
-                        backColor = find("f9a27a");
-                        frontColor = find("ffd8e8");
+                        backColor = findColor("f9a27a");
+                        frontColor = findColor("ffd8e8");
                     }};
                 }}
             );
@@ -402,7 +406,7 @@ public class FRUnitTypes{
                     statusDuration = 40.0f;
                     status = StatusEffects.burning;
 
-                    color = find("ff3300");
+                    color = findColor("ff3300");
                 }}
             );
 
@@ -430,8 +434,8 @@ public class FRUnitTypes{
                         splashDamageRadius = 40.0f;
 
                         hitEffect = Fx.blastExplosion;
-                        backColor = find("f9a27a");
-                        frontColor = find("ffd8e8");
+                        backColor = findColor("f9a27a");
+                        frontColor = findColor("ffd8e8");
                     }};
                 }}
             );
@@ -547,7 +551,7 @@ public class FRUnitTypes{
                     bullet = new LaserBulletType(288.0f){{
                         length = 288.0f;
                         width = 12.0f;
-                        colors(colors, find("f6efa1"), find("f6efa1"), Color.white);
+                        colors(colors, findColor("f6efa1"), findColor("f6efa1"), Color.white);
                         lightningSpacing = 20.0f;
                         lightningLength = 2;
                         lightningLengthRand = 2;
@@ -877,7 +881,7 @@ public class FRUnitTypes{
                             @Override
                             public void init(Bullet b){
                                 Time.run(3.0f, () ->
-                                    FRFx.waveEffect_3D(90, 0, 40.0f, b.rotation() + 90.0f, 6, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                                    FRFx.waveEffect_3D(90, 0, 40.0f, b.rotation() + 90.0f, 6, 0, findColor("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                                 super.init(b);
                             }
                             {
@@ -895,7 +899,7 @@ public class FRUnitTypes{
                                 pierce = true;
                                 trailWidth = 2.8f;
                                 trailLength = 18;
-                                trailColor = find("ffd8e8");
+                                trailColor = findColor("ffd8e8");
                                 frag = new HighSpeedBulletType(0.8f, 100){{
                                     height = 24;
                                     width = 12.0f;
@@ -908,7 +912,7 @@ public class FRUnitTypes{
                                     pierceCap = 2;
                                     trailWidth = 2.2f;
                                     trailLength = 12;
-                                    trailColor = find("ffd8e8");
+                                    trailColor = findColor("ffd8e8");
                                 }};
                             }
                         };
@@ -943,7 +947,7 @@ public class FRUnitTypes{
                 StatusEffects.freezing, StatusEffects.electrified
             );
 
-            Color color = find("e4ffd6");
+            Color color = findColor("e4ffd6");
 
             BulletType laser = new BasicBulletType(10.0f, 60.0f){{
                 width = height = 0;
@@ -1391,11 +1395,11 @@ public class FRUnitTypes{
                         public void init(Bullet b){
                             b.lifetime = 20.0f;
                             Time.run(8.0f, () ->
-                                FRFx.waveEffect_3D(90, 0, 45.0f, b.rotation() + 90.0f, 6, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                                FRFx.waveEffect_3D(90, 0, 45.0f, b.rotation() + 90.0f, 6, 0, findColor("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                             Time.run(10.0f, () ->
-                                FRFx.waveEffect_3D(90, 0, 65.0f, b.rotation() + 90.0f, 10, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                                FRFx.waveEffect_3D(90, 0, 65.0f, b.rotation() + 90.0f, 10, 0, findColor("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                             Time.run(12.0f, () ->
-                                FRFx.waveEffect_3D(90, 0, 45.0f, b.rotation() + 90.0f, 6, 0, find("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                                FRFx.waveEffect_3D(90, 0, 45.0f, b.rotation() + 90.0f, 6, 0, findColor("ffd8e8"), Color.white, Interp.pow5In, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                             super.init(b);
                         }
 
@@ -1415,7 +1419,7 @@ public class FRUnitTypes{
 
                             trailWidth = 3.2f;
                             trailLength = 16;
-                            trailColor = find("ffd8e8");
+                            trailColor = findColor("ffd8e8");
                             frag = new HighSpeedBulletType(0.8f, 400.0f){{
                                 despawnSplashDamage = 600.0f;
 
@@ -1432,7 +1436,7 @@ public class FRUnitTypes{
 
                                 trailWidth = 3.2f;
                                 trailLength = 16;
-                                trailColor = find("ffd8e8");
+                                trailColor = findColor("ffd8e8");
                                 hitFrags = 3;
                                 frag = new LaserBulletType(230.0f){{
                                     length = 160.0f;
@@ -1609,7 +1613,7 @@ public class FRUnitTypes{
                         knockback = -1.0f;
                         sapStrength = 0.6f;
 
-                        color = hitColor = find("990003");
+                        color = hitColor = findColor("990003");
                         shootEffect = Fx.shootSmall;
                     }};
                 }},
@@ -1632,7 +1636,7 @@ public class FRUnitTypes{
                         damage = 525f;
                         length = 320f;
                         width = 20f;
-                        toColor = find("990003");
+                        toColor = findColor("990003");
                     }};
                 }}
             );
@@ -2817,7 +2821,7 @@ public class FRUnitTypes{
                                 sizeTo = 80.0f;
                                 strokeFrom = 8.0f;
                                 strokeTo = 4.0f;
-                                colorFrom.set(colorTo.set(find("ffa166")));
+                                colorFrom.set(colorTo.set(findColor("ffa166")));
                             }},
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -2825,7 +2829,7 @@ public class FRUnitTypes{
                                 sizeTo = 120.0f;
                                 strokeFrom = 4.0f;
                                 strokeTo = 3.0f;
-                                colorFrom.set(colorTo.set(find("ffa166")));
+                                colorFrom.set(colorTo.set(findColor("ffa166")));
                             }}.startDelay(15.0f),
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -2833,7 +2837,7 @@ public class FRUnitTypes{
                                 sizeTo = 140.0f;
                                 strokeFrom = 3.0f;
                                 strokeTo = 2.0f;
-                                colorFrom.set(colorTo.set(find("ffa166")));
+                                colorFrom.set(colorTo.set(findColor("ffa166")));
                             }}.startDelay(30.0f),
                             new WaveEffect(){{
                                 lifetime = 15.0f;
@@ -2841,7 +2845,7 @@ public class FRUnitTypes{
                                 sizeTo = 150.0f;
                                 strokeFrom = 2.0f;
                                 strokeTo = 0.0f;
-                                colorFrom.set(colorTo.set(find("ffa166")));
+                                colorFrom.set(colorTo.set(findColor("ffa166")));
                             }}.startDelay(45.0f),
                             new ParticleEffect(){{
                                 particles = 10;
@@ -2887,7 +2891,7 @@ public class FRUnitTypes{
                             splashDamage = 85.0f;
                             buildingDamageMultiplier = 2.5f;
 
-                            frontColor = backColor = find("ffa166");
+                            frontColor = backColor = findColor("ffa166");
                             status = StatusEffects.burning;
                             statusDuration = 600.0f;
 
@@ -3130,7 +3134,7 @@ public class FRUnitTypes{
                                 trailLength = 54;
                                 trailWidth = 10f;
                                 drag = 0.01f;
-                                trailColor = find("fdffc7");
+                                trailColor = findColor("fdffc7");
                                 status = FRStatusEffects.magnetized;
                                 statusDuration = 180f;
                                 pierce = true;
@@ -3182,7 +3186,7 @@ public class FRUnitTypes{
                         splashDamageRadius = 20f;
                         weaveScale = 8f;
                         weaveMag = 2f;
-                        trailColor = find("b6c6fd");
+                        trailColor = findColor("b6c6fd");
                         hitEffect = Fx.blastExplosion;
                         despawnEffect = Fx.blastExplosion;
                         backColor = Pal.bulletYellowBack;

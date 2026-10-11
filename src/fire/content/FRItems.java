@@ -5,7 +5,7 @@ import fire.world.blocks.units.ElementUnitFactory;
 import mindustry.content.Items;
 import mindustry.type.Item;
 
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 import static mindustry.content.Items.*;
 
 public class FRItems{
@@ -104,7 +104,7 @@ public class FRItems{
         }
 
         public FRItem(String name, String hex){
-            super(name, find(hex));
+            super(name, findColor(hex));
             Items.serpuloItems.add(this);
         }
 

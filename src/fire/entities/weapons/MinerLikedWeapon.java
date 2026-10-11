@@ -26,7 +26,7 @@ import mindustry.type.StatusEffect;
 import mindustry.type.UnitType;
 import mindustry.world.meta.StatValues;
 
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 
 public class MinerLikedWeapon extends mindustry.type.Weapon{
     public final float dps;
@@ -36,8 +36,8 @@ public class MinerLikedWeapon extends mindustry.type.Weapon{
     public float healingPercent = 100.0f;
     public float extraShield = 1.0f;
     public float range = 160.0f;
-    public Color baseColor = find("f9a27a");
-    public Color boostColor = find("ffd8e8");
+    public Color baseColor = findColor("f9a27a");
+    public Color boostColor = findColor("ffd8e8");
 
     public MinerLikedWeapon(String name, float dps){
         super(name);

@@ -39,6 +39,7 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.storage.NumbDelusion;
+import fire.test.ChainShield;
 import fire.world.blocks.units.ElementUnitFactory;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumePowerCustom;
@@ -99,6 +100,7 @@ import mindustry.world.blocks.liquid.LiquidRouter;
 import mindustry.world.blocks.payloads.PayloadConveyor;
 import mindustry.world.blocks.payloads.PayloadRouter;
 import mindustry.world.blocks.power.ConsumeGenerator;
+import mindustry.world.blocks.power.PowerGenerator;
 import mindustry.world.blocks.production.*;
 import mindustry.world.blocks.units.RepairTower;
 import mindustry.world.blocks.units.UnitFactory;
@@ -109,7 +111,7 @@ import mindustry.world.meta.BuildVisibility;
 
 import static arc.math.Angles.angle;
 import static fire.FRUtils.colors;
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 import static fire.content.FRItems.*;
 import static mindustry.Vars.*;
 import static mindustry.content.Items.*;
@@ -121,10 +123,10 @@ public class FRBlocks{
     public static final IntMap<Block> compositeMap = new IntMap<>(Mathf.ceil(6 / 0.8f)); //composite one -> its inferior
     public static final Block
     //environment
-    neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite,
+    neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite, envStgCenter,
 
     //sandbox & misc
-    adaptiveSource, fireCompany,
+    adaptiveSource, fireCompany, test,
 
     //turret
     smasher, nightmare, fulmination,
@@ -217,6 +219,8 @@ public class FRBlocks{
             requirements(Category.effect, BuildVisibility.hidden, with());
             size = 2;
         }};
+
+        test = new ChainShield("ea");
 
         //region turret
 
@@ -448,7 +452,7 @@ public class FRBlocks{
                 titanium, new LaserBulletType(50.0f){{
                     length = 196.0f;
                     width = 12.0f;
-                    colors(colors, find("ccccff66"), find("ccccff"), Color.white);
+                    colors(colors, findColor("ccccff66"), findColor("ccccff"), Color.white);
                     status = StatusEffects.corroded;
                     statusDuration = 240.0f;
                     reloadMultiplier = 1.15f;
@@ -481,7 +485,7 @@ public class FRBlocks{
                 silicon, new LaserBulletType(65.0f){{
                     length = 196.0f;
                     width = 12.0f;
-                    colors(colors, find("40404066"), find("404040"), Color.white);
+                    colors(colors, findColor("40404066"), findColor("404040"), Color.white);
                     colors(colors, Pal.siliconAmmoFront, Pal.siliconAmmoBack, Color.white);
                     ammoMultiplier = 3.0f;
                     buildingDamageMultiplier = 0.5f;
@@ -1399,7 +1403,7 @@ public class FRBlocks{
                 }},
 
                 blastCompound, new ArtilleryBulletType(4.0f, 0.0f){{
-                    var color1 = find("ea88787f").cpy().lerp(Pal.redLight, 0.5f);
+                    var color1 = findColor("ea88787f").cpy().lerp(Pal.redLight, 0.5f);
 
                     lifetime = 160.0f;
                     width = 16.0f;
@@ -1622,7 +1626,7 @@ public class FRBlocks{
             shootType = new BulletType(15.5f, 1800.0f){
 
                 /** Prevent endless creating instances, since its terminal state is always the same. */
-                private BulletType type;
+                BulletType type;
 
                 @Override
                 public void update(Bullet b){
@@ -1633,16 +1637,16 @@ public class FRBlocks{
                         e -> e != null && e.checkTarget(collidesAir, collidesGround) && !b.hasCollided(e.id),
                         t -> t != null && collidesGround && !b.hasCollided(t.id)) == null
                     ){
-                        b.hit = true;    //if there's no target nearby, remove and don't create frag bullets
-                        hitEffect.at(b); //but keep effect
                         b.remove();
 
                     }else{
-                        type = b.type.copy();
-                        type.speed = b.vel.setLength(8.0f).len();
-                        type.drag = 0.0f;
-
+                        if(type == null){
+                            type = b.type.copy();
+                            type.speed = 8.0f;
+                            type.drag = 0.0f;
+                        }
                         b.type = type;
+                        b.vel.setLength(8.0f);
                     }
                 }
 
@@ -1653,10 +1657,11 @@ public class FRBlocks{
                     //special thanks to Extra Utilities mod
                     //this is really lazy
                     for(int i = 0; i < 4; i++){
-                        Draw.color(find("92f3fd"));
+                        Draw.color(findColor("92f3fd"));
                         Draw.alpha(0.3f + Mathf.absin(Time.time, 2.0f + i * 2.0f, 0.3f + i * 0.05f));
                         Draw.blend(Blending.additive);
-                        Draw.rect(Core.atlas.find("impact-reactor-plasma-" + i), b.x, b.y, 28.0f, 28.0f, Time.time * (12.0f + i * 6.0f));
+                        //pure cast hell... fortunately I'm not writing C++
+                        Draw.rect(((DrawPlasma)((DrawMulti)((PowerGenerator)Blocks.impactReactor).drawer).drawers[1]).regions[i], b.x, b.y, 28.0f, 28.0f, Time.time * (12.0f + i * 6.0f));
                         Draw.blend();
                     }
                     Draw.reset();
@@ -1668,6 +1673,7 @@ public class FRBlocks{
                     drag = 0.024f;
                     displayAmmoMultiplier = false;
                     collidesGround = false;
+                    fragOnDespawn = false;
                     status = FRStatusEffects.magnetized;
                     statusDuration = 240.0f;
 
@@ -1677,7 +1683,7 @@ public class FRBlocks{
 
                     trailChance = 0.4f;
                     trailRotation = true;
-                    trailColor = find("92f3fd");
+                    trailColor = findColor("92f3fd");
                     trailEffect = new Effect(25.0f, e -> {
                         Draw.color(Color.white, e.color, e.fin());
                         Lines.stroke(1.4f + e.fout() * 3.4f);
@@ -1691,27 +1697,27 @@ public class FRBlocks{
                     });
 
                     chargeEffect = new Effect(shoot.firstShotDelay, 20.0f, e -> {
-                        Draw.color(find("92f3fd"));
+                        Draw.color(findColor("92f3fd"));
                         Lines.stroke(e.fin() * 2.0f);
                         Lines.circle(e.x, e.y, 4.0f + e.fout() * 20.0f);
                         Fill.circle(e.x, e.y, e.fin() * 16.0f);
                         Angles.randLenVectors(e.id, 16, 32.0f * e.fout(), (x, y) -> {
                             Fill.circle(e.x + x, e.y + y, e.fin() * 4.0f);
-                            Drawf.light(e.x + x, e.y + y, e.fin() * 12.0f, find("92f3fd"), 0.7f);
+                            Drawf.light(e.x + x, e.y + y, e.fin() * 12.0f, findColor("92f3fd"), 0.7f);
                         });
                         Draw.color();
                         Fill.circle(e.x, e.y, e.fin() * 8);
-                        Drawf.light(e.x, e.y, e.fin() * 16.0f, find("92f3fd"), 0.7f);
+                        Drawf.light(e.x, e.y, e.fin() * 16.0f, findColor("92f3fd"), 0.7f);
                     }).rotWithParent(true);
 
                     shootEffect = new Effect(18.0f, e -> {
-                        Draw.color(find("92f3fd"), Color.lightGray, e.fin());
+                        Draw.color(findColor("92f3fd"), Color.lightGray, e.fin());
                         Angles.randLenVectors(e.id, 18, 7.0f + e.finpow() * 19.0f, (x, y) ->
                             Fill.square(e.x + x, e.y + y, e.fout() * 2.8f + 0.7f, 0.0f));
                     });
 
                     hitEffect = new Effect(14.0f, e -> {
-                        Draw.color(find("92f3fd"), Color.lightGray, e.fin());
+                        Draw.color(findColor("92f3fd"), Color.lightGray, e.fin());
                         Angles.randLenVectors(e.id, 12, 9.0f + e.finpow() * 22.0f, (x, y) ->
                             Fill.square(e.x + x, e.y + y, e.fout() * 3.2f + 1.5f, 45.0f));
                     });
@@ -1721,7 +1727,7 @@ public class FRBlocks{
                     intervalBullets = 1;
                     intervalBullet = new LightningBulletType(){{
                         damage = 5;
-                        lightningColor = find("92f3fd");
+                        lightningColor = findColor("92f3fd");
                         lightningLength = 10;
                         collidesGround = false;
 
@@ -1729,7 +1735,7 @@ public class FRBlocks{
                         fragBullet = new LightningPointBulletType(165.0f){{
                             homingRange = 120.0f;
                             lightningChancePercentage = 60;
-                            lightningColor = find("92f3fd");
+                            lightningColor = findColor("92f3fd");
                             collidesGround = false;
                             status = StatusEffects.shocked;
                         }};
@@ -1750,12 +1756,12 @@ public class FRBlocks{
                         homingPower = 0.4f;
                         homingDelay = 5.0f;
 
-                        backColor = find("92f3fd");
+                        backColor = findColor("92f3fd");
                         frontColor = Color.white;
                         trailLength = 8;
                         trailWidth = 4;
-                        trailColor = find("92f3fd");
-                        hitEffect = despawnEffect = FRFx.hitBulletSmall(find("92f3fd"));
+                        trailColor = findColor("92f3fd");
+                        hitEffect = despawnEffect = FRFx.hitBulletSmall(findColor("92f3fd"));
                     }};
                 }
             };
@@ -1799,10 +1805,10 @@ public class FRBlocks{
 
                     trailLength = 3;
                     trailWidth = 2.2f;
-                    trailColor = find("f57946");
+                    trailColor = findColor("f57946");
                     trailEffect = FRStatusEffects.overgrown.effect;
                     trailChance = 0.15f;
-                    despawnEffect = hitEffect = FRFx.hitBulletSmall(find("f57946"));
+                    despawnEffect = hitEffect = FRFx.hitBulletSmall(findColor("f57946"));
 
                     adhereChancePercentage = 40;
                     removeAmount = 10;
@@ -2048,7 +2054,7 @@ public class FRBlocks{
                     splashDamageRadius = 90.0f;
                     ammoMultiplier = 3.0f;
                     frontColor = Color.white;
-                    backColor = trailColor = hitColor = find("f4ba6e");
+                    backColor = trailColor = hitColor = findColor("f4ba6e");
                     trailWidth = 3f;
                     trailLength = 8;
                     trailChance = 0.5f;
@@ -2063,7 +2069,7 @@ public class FRBlocks{
                             sizeFrom = 0f;
                             sizeTo = 4.5f;
                             region = "fire-obstruction-ammoEffect-2";
-                            colorFrom.set(find("f4ba6e"));
+                            colorFrom.set(findColor("f4ba6e"));
                             Color.valueOf(colorTo, "f4ba6e00");
                         }},
                         new ParticleEffect(){{
@@ -2076,7 +2082,7 @@ public class FRBlocks{
                             sizeFrom = 0f;
                             sizeTo = 4.0f;
                             region = "fire-obstruction-ammoEffect-1";
-                            colorFrom.set(find("f4ba6e"));
+                            colorFrom.set(findColor("f4ba6e"));
                             Color.valueOf(colorTo, "f4ba6e00");
                         }},
                         new ParticleEffect(){{
@@ -2089,7 +2095,7 @@ public class FRBlocks{
                             sizeFrom = 0f;
                             sizeTo = 3.5f;
                             region = "fire-obstruction-ammoEffect-3";
-                            colorFrom.set(find("f4ba6e"));
+                            colorFrom.set(findColor("f4ba6e"));
                             Color.valueOf(colorTo, "f4ba6e00");
                         }}
                     );
@@ -2097,7 +2103,7 @@ public class FRBlocks{
                     hitEffect = new MultiEffect(
                         new WaveEffect(){{
                             lifetime = 50.0f;
-                            colorFrom = find("f4ba6e");
+                            colorFrom = findColor("f4ba6e");
                             colorTo = Color.white;
                             sizeFrom = 0.0f;
                             sizeTo = 90.0f;
@@ -2109,7 +2115,7 @@ public class FRBlocks{
                         }},
                         new WaveEffect(){{
                             lifetime = 50.0f;
-                            colorFrom = find("f4ba6e");
+                            colorFrom = findColor("f4ba6e");
                             colorTo = Color.white;
                             sizeFrom = 0.0f;
                             sizeTo = 90.0f;
@@ -2130,7 +2136,7 @@ public class FRBlocks{
                             sizeTo = 0f;
                             region = "fire-obstruction-ammoEffect-2";
                             colorFrom.set(Color.white);
-                            colorTo.set(find("f4ba6e"));
+                            colorTo.set(findColor("f4ba6e"));
                         }},
                         new ParticleEffect(){{
                             lifetime = 55.0f;
@@ -2143,7 +2149,7 @@ public class FRBlocks{
                             sizeTo = 0f;
                             region = "fire-obstruction-ammoEffect-1";
                             colorFrom.set(Color.white);
-                            colorTo.set(find("f4ba6e"));
+                            colorTo.set(findColor("f4ba6e"));
                         }},
                         new ParticleEffect(){{
                             lifetime = 50.0f;
@@ -2156,7 +2162,7 @@ public class FRBlocks{
                             sizeTo = 0f;
                             region = "fire-obstruction-ammoEffect-3";
                             colorFrom.set(Color.white);
-                            colorTo.set(find("f4ba6e"));
+                            colorTo.set(findColor("f4ba6e"));
                         }},
                         new ParticleEffect(){{
                             useRotation = false;
@@ -2169,7 +2175,7 @@ public class FRBlocks{
                             sizeFrom = 0f;
                             sizeTo = 30.0f;
                             region = "fire-obstruction-ammoEffect-2";
-                            colorFrom.set(find("f4ba6e"));
+                            colorFrom.set(findColor("f4ba6e"));
                             Color.valueOf(colorTo, "f4ba6e00");
                         }}
                     );
@@ -2179,7 +2185,7 @@ public class FRBlocks{
                     boolean shot;
                     final Effect stopEffect = new WaveEffect(){{
                         lifetime = 60.0f;
-                        colorFrom = find("f4ba6e");
+                        colorFrom = findColor("f4ba6e");
                         colorTo = Color.white;
                         sizeFrom = 0.0f;
                         sizeTo = 150.0f;
@@ -3042,11 +3048,11 @@ public class FRBlocks{
                 @Override
                 public void init(Bullet b){
                     Time.run(5.0f, () ->
-                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     Time.run(10.0f, () ->
-                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     Time.run(15.0f, () ->
-                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     super.init(b);
                 }
                 {
@@ -3060,13 +3066,13 @@ public class FRBlocks{
                 ammoMultiplier = 1.0f;
                 reflectable = absorbable = hittable = false;
 
-                backColor = find("ec7458");
+                backColor = findColor("ec7458");
                 frontColor = Color.white;
-                trailColor = find("ec7458");
+                trailColor = findColor("ec7458");
                 trailLength = 12;
                 trailWidth = 3.0f;
                 chargeEffect = new MultiEffect(
-                    FRFx.railChargeEffect(chargeTime, find("ec7458"), 3.0f, baseRange + extraRange, 80.0f)
+                    FRFx.railChargeEffect(chargeTime, findColor("ec7458"), 3.0f, baseRange + extraRange, 80.0f)
                 );
 
                 spawnBullets.add(
@@ -3080,9 +3086,9 @@ public class FRBlocks{
                         splashDamage = 14500.0f;
                         reflectable = absorbable = hittable = false;
 
-                        backColor = find("ec7458");
+                        backColor = findColor("ec7458");
                         frontColor = Color.white;
-                        trailColor = find("ec7458");
+                        trailColor = findColor("ec7458");
                         trailLength = 10;
                         trailWidth = 2.4f;
                     }}
@@ -3106,11 +3112,11 @@ public class FRBlocks{
                 pierceBuilding = true;
                 reflectable = absorbable = hittable = false;
 
-                backColor = find("ec7458");
+                backColor = findColor("ec7458");
                 frontColor = Color.white;
-                trailColor = find("ec7458");
+                trailColor = findColor("ec7458");
                 chargeEffect = new MultiEffect(
-                    FRFx.railChargeEffect(chargeTime, find("ec7458"), 3.0f, baseRange, 80.0f)
+                    FRFx.railChargeEffect(chargeTime, findColor("ec7458"), 3.0f, baseRange, 80.0f)
                 );
                 despawnEffect = new MultiEffect(
                     //wave
@@ -3151,7 +3157,7 @@ public class FRBlocks{
                 );
 
                 //create lightning upon despawn
-                lightningColor = find("ec7458");
+                lightningColor = findColor("ec7458");
                 lightning = 4;
                 lightningLength = 6;
                 lightningLengthRand = 2;
@@ -3164,7 +3170,7 @@ public class FRBlocks{
                 intervalBullets = 1;
                 intervalBullet = new LightningBulletType(){{
                     damage = 5.0f;
-                    lightningColor = find("ec7458");
+                    lightningColor = findColor("ec7458");
                     lightningLength = 4;
                 }};
 
@@ -3212,11 +3218,11 @@ public class FRBlocks{
                 @Override
                 public void init(Bullet b){
                     Time.run(6.0f, () ->
-                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(90.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     Time.run(12.0f, () ->
-                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(110.0f, 0, 160.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     Time.run(18.0f, () ->
-                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, find("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
+                        FRFx.waveEffect_3D(100.0f, 0, 90.0f, b.rotation() + 90.0f, 12.0f, 0.0f, findColor("ec7458"), Color.white, Interp.pow5Out, Interp.pow5Out, Interp.pow3Out).at(b.x, b.y));
                     super.init(b);
                 }
                 {
@@ -3236,9 +3242,9 @@ public class FRBlocks{
                 pierceBuilding = true;
                 reflectable = absorbable = hittable = false;
 
-                backColor = find("ec7458");
+                backColor = findColor("ec7458");
                 frontColor = Color.white;
-                trailColor = find("ec7458");
+                trailColor = findColor("ec7458");
                 despawnEffect = new MultiEffect(
                     //wave
                     new WaveEffect(){{
@@ -3275,7 +3281,7 @@ public class FRBlocks{
                 );
 
                 //create lightning upon despawn
-                lightningColor = find("ec7458");
+                lightningColor = findColor("ec7458");
                 lightning = 16;
                 lightningLength = 24;
                 lightningLengthRand = 4;
@@ -3288,7 +3294,7 @@ public class FRBlocks{
                 intervalBullets = 2;
                 intervalBullet = new LightningBulletType(){{
                     damage = 5.0f;
-                    lightningColor = find("ec7458");
+                    lightningColor = findColor("ec7458");
                     lightningLength = 16;
                 }};
 
@@ -3311,9 +3317,9 @@ public class FRBlocks{
                     absorbable = false;
                     hittable = false;
 
-                    backColor = find("ec7458");
+                    backColor = findColor("ec7458");
                     frontColor = Color.white;
-                    trailColor = find("ec7458");
+                    trailColor = findColor("ec7458");
                     despawnEffect = new MultiEffect(
                         //wave
                         new WaveEffect(){{
@@ -3350,7 +3356,7 @@ public class FRBlocks{
                     );
 
                     //create lightning upon despawn
-                    lightningColor = find("ec7458");
+                    lightningColor = findColor("ec7458");
                     lightning = 8;
                     lightningLength = 16;
                     lightningLengthRand = 2;
@@ -3363,7 +3369,7 @@ public class FRBlocks{
                     intervalBullets = 1;
                     intervalBullet = new LightningBulletType(){{
                         damage = 5.0f;
-                        lightningColor = find("ec7458");
+                        lightningColor = findColor("ec7458");
                         lightningLength = 12;
                     }};
 
@@ -3383,9 +3389,9 @@ public class FRBlocks{
                         reflectable = false;
                         absorbable = false;
                         hittable = false;
-                        backColor = find("ec7458");
+                        backColor = findColor("ec7458");
                         frontColor = Color.white;
-                        trailColor = find("ec7458");
+                        trailColor = findColor("ec7458");
                     }};
                 }};
             }};
@@ -3433,7 +3439,7 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
@@ -3445,7 +3451,7 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
@@ -3457,7 +3463,7 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         circle = true;
                         hollow = true;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new ShapePart(){{
                         progress = DrawPart.PartProgress.smoothReload;
@@ -3469,7 +3475,7 @@ public class FRBlocks{
                         strokeTo = 0.0f;
                         circle = true;
                         hollow = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3486,7 +3492,7 @@ public class FRBlocks{
                         sides = 5;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3503,7 +3509,7 @@ public class FRBlocks{
                         sides = 5;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3520,7 +3526,7 @@ public class FRBlocks{
                         sides = 5;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3537,7 +3543,7 @@ public class FRBlocks{
                         sides = 8;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3555,7 +3561,7 @@ public class FRBlocks{
                         shapes = 8;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }},
                     new HaloPart(){{
                         progress = DrawPart.PartProgress.smoothReload.delay(1f);
@@ -3573,7 +3579,7 @@ public class FRBlocks{
                         shapes = 6;
                         hollow = false;
                         tri = false;
-                        color = find("ec7458");
+                        color = findColor("ec7458");
                     }}
                 );
             }};
@@ -3614,7 +3620,7 @@ public class FRBlocks{
             hasPower = true;
             hasLiquids = true;
             updateEffect = new Effect(60.0f, e -> {
-                Draw.color(find("6aa85e"));
+                Draw.color(findColor("6aa85e"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
                 for(int i = 0; i < 2; i++){
@@ -3673,7 +3679,7 @@ public class FRBlocks{
             itemCapacity = 20;
             liquidCapacity = 30.0f;
             updateEffect = new Effect(60.0f, e -> {
-                Draw.color(find("9e78dc"));
+                Draw.color(findColor("9e78dc"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
                 for(int i = 0; i < 2; i++){
@@ -3710,7 +3716,7 @@ public class FRBlocks{
             itemCapacity = 75;
             liquidCapacity = 900.0f;
             updateEffect = new Effect(60f, e -> {
-                Draw.color(find("9e78dc"));
+                Draw.color(findColor("9e78dc"));
                 Draw.alpha(e.fslope());
                 Fx.rand.setSeed(e.id);
                 for(int i = 0; i < 4; i++){
@@ -3763,7 +3769,7 @@ public class FRBlocks{
             dumpTime = 1;
             shake = 4.0f;
             arrows = 1;
-            baseArrowColor = find("989aa4");
+            baseArrowColor = findColor("989aa4");
 
             consumeLiquid(Liquids.water, n(12));
         }};
@@ -4199,7 +4205,7 @@ public class FRBlocks{
             craftEffect = Fx.smeltsmoke;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(find("ffe099"))
+                new DrawFlame(findColor("ffe099"))
             );
 
             craftTime = 60f;
@@ -4285,7 +4291,7 @@ public class FRBlocks{
                 new DrawRegion("-bottom"),
                 new DrawLiquidTile(Liquids.slag),
                 new DrawDefault(),
-                new DrawFlame(find("ffcf99")){{
+                new DrawFlame(findColor("ffcf99")){{
                     flameRadius = 2.0f;
                 }}
             );
@@ -4492,7 +4498,7 @@ public class FRBlocks{
             craftEffect = Fx.smeltsmoke;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(find("ffef99"))
+                new DrawFlame(findColor("ffef99"))
             );
 
             craftTime = 10.0f;
@@ -4520,8 +4526,8 @@ public class FRBlocks{
                 new DrawLiquidTile(Liquids.neoplasm),
                 new DrawDefault(),
                 new DrawCultivator(){{
-                    plantColor.set(find("f45e4b"));
-                    plantColorLight.set(find("e45e4b"));
+                    plantColor.set(findColor("f45e4b"));
+                    plantColorLight.set(findColor("e45e4b"));
                 }}
             );
 
@@ -4584,7 +4590,7 @@ public class FRBlocks{
             craftEffect = Fx.smeltsmoke;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(find("ffcf99"))
+                new DrawFlame(findColor("ffcf99"))
             );
 
             craftTime = 60f;
@@ -4775,7 +4781,7 @@ public class FRBlocks{
             craftSound = Sounds.shootArc;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawArcSmelt(){{circleSpace=3.0f;flameColor=find("e3ae6f");}},
+                new DrawArcSmelt(){{circleSpace=3.0f;flameColor= findColor("e3ae6f");}},
                 new DrawDefault()
             );
             craftEffect = new Effect(45.0f, e -> {
@@ -4871,8 +4877,8 @@ public class FRBlocks{
             updateEffectChance = 0.01f;
             drawer = new DrawMulti(
                 new DrawDefault(),
-                new DrawFlame(find("ffcf99")){{flameRadius = 2.0f;}},
-                new DrawArrows(2, find("feb380"), find("6e7080"))
+                new DrawFlame(findColor("ffcf99")){{flameRadius = 2.0f;}},
+                new DrawArrows(2, findColor("feb380"), findColor("6e7080"))
             );
 
             craftTime = 120.0f;
@@ -4952,7 +4958,7 @@ public class FRBlocks{
             }};
 
             craftSound = Sounds.acceleratorLaunch;
-            baseColor.set(find("67474b"));
+            baseColor.set(findColor("67474b"));
             circleColor = new Color[]{Pal.reactorPurple, Pal.thoriumPink, Pal.lightishOrange, Pal.surge, Pal.plastanium};
 
             consumePower(n(18000));
@@ -5355,6 +5361,16 @@ public class FRBlocks{
                         Events.fire(new EventType.SectorInvasionEvent(s)); //fake invasions, visually only
 
                 rm();
+            }
+        });
+
+        envStgCenter = new EnvBlock("env-stg-center", () -> new EnvBlock.EnvBlockBuild(){
+            final Color col = findColor("5aed40");
+            @Override
+            public void draw(){
+                final float interval = 180;
+                Draw.color(col, 1 - (Time.time % interval) / interval);
+                Fill.rect(x, y, 8, 8);
             }
         });
 

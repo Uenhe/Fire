@@ -34,5 +34,11 @@ public class BatteryNode extends mindustry.world.blocks.power.PowerNode{
             if(Mathf.equal(power.status, 1.0f, 0.001f)) return BlockStatus.active;
             return BlockStatus.noOutput;
         }
+
+        @Override
+        public void dropped(){
+            super.dropped();
+            power.graph.checkAdd();
+        }
     }
 }

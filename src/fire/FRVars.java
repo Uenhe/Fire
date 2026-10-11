@@ -23,8 +23,6 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.dialogs.BaseDialog;
 
-import java.awt.*;
-
 import static fire.FireMod.*;
 import static fire.FireMod.CheatStatusCode.OK;
 import static mindustry.Vars.*;
@@ -153,7 +151,7 @@ public final class FRVars{
         cheatMode = Core.settings.getBool("cheatmode");
     }
 
-    public static Color find(String hex){
+    public static Color findColor(String hex){
         if(hex.length() == 6) hex += "ff";
         var color = colorPool.get(hex);
         if(color != null) return color;

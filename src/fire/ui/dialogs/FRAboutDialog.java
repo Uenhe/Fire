@@ -26,21 +26,21 @@ public class FRAboutDialog extends mindustry.ui.dialogs.BaseDialog{
 
         if("zh_CN".equals(Core.settings.getString("locale"))){
             var biliicon = Core.atlas.drawable("fire-bilibili");
-            var bilicol = FRVars.find("31a9d0");
+            var bilicol = FRVars.findColor("31a9d0");
 
             links = new Links.LinkEntry[]{
                 new Links.LinkEntry("changelog", "https://github.com/Uenhe/Fire/releases", changelog.icon, changelog.color),
                 new Links.LinkEntry("githubmod", "https://github.com/Uenhe/Fire", github.icon, github.color),
                 new Links.LinkEntry("bilify", "https://space.bilibili.com/516898377", biliicon, bilicol),
                 new Links.LinkEntry("biliue", "https://space.bilibili.com/327502129", biliicon, bilicol),
-                new Links.LinkEntry("qqgroup", "https://qm.qq.com/q/rVoc1MqbRI", Core.atlas.drawable("fire-qq"), FRVars.find("ff000e"))
+                new Links.LinkEntry("qqgroup", "https://qm.qq.com/q/rVoc1MqbRI", Core.atlas.drawable("fire-qq"), FRVars.findColor("ff000e"))
             };
 
         }else{
             links = new Links.LinkEntry[]{
                 new Links.LinkEntry("changelog", "https://github.com/Uenhe/Fire/releases", changelog.icon, changelog.color),
                 new Links.LinkEntry("githubmod", "https://github.com/Uenhe/Fire", github.icon, github.color),
-                new Links.LinkEntry("youtube", "https://www.youtube.com/watch?v=egBXmTStAbk", Core.atlas.drawable("fire-youtube"), FRVars.find("ff0033")),
+                new Links.LinkEntry("youtube", "https://www.youtube.com/watch?v=egBXmTStAbk", Core.atlas.drawable("fire-youtube"), FRVars.findColor("ff0033")),
             };
         }
     }

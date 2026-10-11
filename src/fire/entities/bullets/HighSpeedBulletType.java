@@ -10,7 +10,7 @@ import mindustry.gen.Bullet;
 import mindustry.gen.Unit;
 import mindustry.type.StatusEffect;
 
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 
 public class HighSpeedBulletType extends BasicBulletType{
     public float velDamageBoost = 30.0f; //speed + 1 -> damage + velDamageBoost
@@ -42,8 +42,8 @@ public class HighSpeedBulletType extends BasicBulletType{
         super.handlePierce(b, initialHealth, x, y);
         Damage.damage(x, y, 12, b.vel.len() * 40.0f);
         if(b.vel.len() >= 20.0f){
-            FRFx.swordMarkEffect(40.0f, x + 16.0f, y + 16.0f, x - 16.0f, y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
-            FRFx.swordMarkEffect(40.0f, x - 16.0f, y + 16.0f, x + 16.0f, y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+            FRFx.swordMarkEffect(40.0f, x + 16.0f, y + 16.0f, x - 16.0f, y - 16.0f, 4.0f, 8.0f, findColor("ffd8e8"), false).at(b.x, b.y);
+            FRFx.swordMarkEffect(40.0f, x - 16.0f, y + 16.0f, x + 16.0f, y - 16.0f, 4.0f, 8.0f, findColor("ffd8e8"), false).at(b.x, b.y);
         }
 
         specialHeal(b, b.vel.len() * velDamageBoost * healingPercent * 0.01f, shootStatus, statusDuration);
@@ -61,8 +61,8 @@ public class HighSpeedBulletType extends BasicBulletType{
     public void removed(Bullet b){
         if(b.vel.len() <= 1.25f){
             Damage.damage(b.x, b.y, 30.0f, despawnSplashDamage);
-            FRFx.swordMarkEffect(40.0f, b.x + 16.0f, b.y + 16.0f, b.x - 16.0f, b.y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
-            FRFx.swordMarkEffect(40.0f, b.x - 16.0f, b.y + 16.0f, b.x + 16.0f, b.y - 16.0f, 4.0f, 8.0f, find("ffd8e8"), false).at(b.x, b.y);
+            FRFx.swordMarkEffect(40.0f, b.x + 16.0f, b.y + 16.0f, b.x - 16.0f, b.y - 16.0f, 4.0f, 8.0f, findColor("ffd8e8"), false).at(b.x, b.y);
+            FRFx.swordMarkEffect(40.0f, b.x - 16.0f, b.y + 16.0f, b.x + 16.0f, b.y - 16.0f, 4.0f, 8.0f, findColor("ffd8e8"), false).at(b.x, b.y);
         }else if(frag != null){
             float rot = 360.0f / b.vel.len() / hitFrags;
             for(int i = 0; i < hitFrags; i++){

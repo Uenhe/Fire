@@ -123,13 +123,15 @@ public class NumbDelusion extends StorageBlock{
         public void drawSelect(){
             super.drawSelect();
             Drawf.dashCircle(x, y, range, Pal.placing);
-            indexer.eachBlock(this, range, other -> wasComplex.get(other.block) && !(other instanceof NumbDelusionBuild), other -> Drawf.selected(other, Tmp.c1.set(Pal.redSpark).a(Mathf.absin(4.0f, 1.0f))));
+            indexer.eachBlock(this, range,
+                other -> wasComplex.get(other.block) && !(other instanceof NumbDelusionBuild),
+                other -> Drawf.selected(other, Tmp.c1.set(Pal.redSpark).a(Mathf.absin(4.0f, 1.0f))));
         }
 
         @Override
         public void onDestroyed(){
             super.onDestroyed();
-            if(!items.any()) return;
+            if(items.empty()) return;
 
             Core.app.post(() -> {
                 final float threshold = 0.1f;

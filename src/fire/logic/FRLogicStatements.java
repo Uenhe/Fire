@@ -11,7 +11,7 @@ import static fire.logic.MessageTypePlus.*;
 public class FRLogicStatements{
 
     public static class TransitionEffectStatement extends LStatement{
-        public static String name = "transfx";
+        public static final String name = "transfx";
 
         public boolean out;
         public String unit = "unit";
@@ -59,7 +59,7 @@ public class FRLogicStatements{
     }
 
     public static class MaskCutsceneStatement extends LStatement{
-        public static String name = "maskcutscene";
+        public static final String name = "maskcutscene";
 
         public boolean out;
         public String duration = "2";
@@ -108,7 +108,7 @@ public class FRLogicStatements{
     }
 
     public static class FetchPlusPlusStatement extends LStatement{
-        public static String name = "fpp";
+        public static final String name = "fpp";
 
         public String block = "@router";
 
@@ -152,7 +152,7 @@ public class FRLogicStatements{
     }
 
     public static class RemoveProcessorStatement extends LStatement{
-        public static String name = "removeprocessor";
+        public static final String name = "removeprocessor";
 
         public RemoveProcessorStatement(){}
 
@@ -183,7 +183,7 @@ public class FRLogicStatements{
     }
 
     public static class FlushMessagePlus extends LStatement{
-        public static String name = "FlushMessagePlus";
+        public static final String name = "FlushMessagePlus";
         public MessageTypePlus type = ANNOUNCE;
         public String duration = "3", speaker = "you";
         public String x = "0.5", y = "0.5";
@@ -191,23 +191,13 @@ public class FRLogicStatements{
         public FlushMessagePlus(){}
 
         public FlushMessagePlus(String[] tokens){
-            switch(tokens[1]){
-                case "ANNOUNCE":
-                    type = ANNOUNCE;
-                    break;
-                case "BUTTON":
-                    type = BUTTON;
-                    break;
-                case "FREE":
-                    type = FREE;
-                    break;
-                case "SMOOTH":
-                    type = SMOOTH;
-                    break;
-                case "DIALOGBOXSHOW":
-                    type = DIALOGBOXSHOW;
-                    break;
-            }
+            type = switch(tokens[1]){
+                case "BUTTON" -> BUTTON;
+                case "FREE" -> FREE;
+                case "SMOOTH" -> SMOOTH;
+                case "DIALOGBOXSHOW" -> DIALOGBOXSHOW;
+                default -> ANNOUNCE;
+            };
             duration = tokens[2];
             speaker = tokens[3];
             x = tokens[4];
@@ -224,7 +214,7 @@ public class FRLogicStatements{
 
             table.button(b -> {
                 b.label(() -> type.name()).growX().wrap().labelAlign(Align.center);
-                b.clicked(() -> showSelect(b, MessageTypePlus.all, type, o -> {
+                b.clicked(() -> showSelect(b, all, type, o -> {
                     type = o;
                     rebuild(table);
                 }, 2, c -> c.width(150f)));
@@ -251,7 +241,6 @@ public class FRLogicStatements{
                     table.add(" sec");
                 }
             }
-            //if(LCanvas.isCompact()) table.row();
         }
 
         @Override

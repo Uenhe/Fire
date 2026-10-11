@@ -20,7 +20,7 @@ public class FRTable extends Table{
         h = 0f;
     }
 
-    static Color backCol = FRVars.find("333333AA");
+    static Color backCol = FRVars.findColor("333333AA");
 
     public static void rectPlus(float x1, float y1, float x2, float y2){
         rectPlus(x1, y1, x2, y2, backCol, Color.white);

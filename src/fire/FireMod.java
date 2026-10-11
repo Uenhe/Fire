@@ -287,7 +287,6 @@ public class FireMod extends Mod{
         String strend = Core.bundle.get("fire.strend");
         for(var obj : objects){
             if(obj instanceof UnlockableContent c){
-
                 table.table(Styles.grayPanel, t -> {
                     t.left().button(new TextureRegionDrawable(c.uiIcon), Styles.emptyi, 40.0f, () -> ui.content.show(c)).size(40.0f).pad(10.0f).scaling(Scaling.fit).left();
                     t.table(info -> {

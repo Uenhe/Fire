@@ -46,19 +46,19 @@ import static mindustry.Vars.*;
 /** @see mindustry.world.blocks.production.Drill */
 public class BeamExtractor extends mindustry.world.Block{
 
-    protected byte tier;
-    protected short range;
-    protected short drillTime;
-    protected byte hardnessDrillMultiplier;
-    protected float warmupSpeed;
-    protected float boostScale;
-    protected final Color baseColor = new Color();
-    protected final Color boostColor = new Color();
-    protected Effect updateEffect = Fx.none;
-    protected byte updateEffectChancePercentage; //a value of 50 -> 50%
-    protected final Seq<Barrel> barrels = new Seq<>();
+    public byte tier;
+    public short range;
+    public short drillTime;
+    public byte hardnessDrillMultiplier;
+    public float warmupSpeed;
+    public float boostScale;
+    public final Color baseColor = new Color();
+    public final Color boostColor = new Color();
+    public Effect updateEffect = Fx.none;
+    public byte updateEffectChancePercentage; //a value of 50 -> 50%
+    public final Seq<Barrel> barrels = new Seq<>(5);
 
-    private TextureRegion base = new TextureRegion();
+    private TextureRegion base;
     private TextureRegion[] barrelRegions;
     private TextureRegion[] heatRegions;
 
@@ -237,7 +237,7 @@ public class BeamExtractor extends mindustry.world.Block{
                 dump(items.first());
 
             if(selected == -1) return;
-            if(mining == null || selected != mining.drop().id || blocked())
+            if(mining == null || mining.drop() == null || selected != mining.drop().id || blocked())
                 checkOre(tile.x, tile.y, false, null, new Entry(selected, ore -> mining = ore));
             if(!valid()) return;
 

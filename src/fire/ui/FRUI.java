@@ -14,7 +14,7 @@ import arc.util.Time;
 import fire.content.FRMath;
 import mindustry.ui.Styles;
 
-import static fire.FRVars.find;
+import static fire.FRVars.findColor;
 import static mindustry.Vars.state;
 
 /** @author fy */
@@ -67,7 +67,7 @@ public class FRUI{
         freeShow(text, duration, x, y, 0, 0);
     }
 
-    public static void freeShow(String text, float duration, float x, float y, float dstx,float dsty){
+    public static void freeShow(String text, float duration, float x, float y, float dstx, float dsty){
         Table t = new Table(Styles.none);
         t.touchable = Touchable.disabled;
 
@@ -196,7 +196,7 @@ public class FRUI{
         Core.scene.add(t);
     }
 
-    static Color backCol = find("333333AA");
+    static Color backCol = findColor("333333AA");
 
     public static void rectPlus(float x1, float y1, float x2, float y2){
         rectPlus(x1, y1, x2, y2, backCol, Color.white);
