@@ -63,6 +63,8 @@ public class FRUnitTypes{
     static final TextureRegion def = headless ? null : Core.atlas.white();
 
     public static final UnitType
+        reimu,
+
         //legs support
         guarding, resisting, garrison, shelter, blessing,
 
@@ -85,7 +87,7 @@ public class FRUnitTypes{
         javelin, apollo,
 
         //naval
-        mechanicalTide, reimu;
+        mechanicalTide;
 
     static{
         reimu = new Reimu();
