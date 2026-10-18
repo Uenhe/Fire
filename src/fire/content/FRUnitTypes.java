@@ -21,6 +21,7 @@ import fire.entities.abilities.*;
 import fire.entities.bullets.HighSpeedBulletType;
 import fire.entities.bullets.SpecialIntervalBulletType;
 import fire.entities.weapons.MinerLikedWeapon;
+import fire.test.PlayerCharacter;
 import fire.test.Reimu;
 import fire.type.AirFleshUnitType;
 import fire.type.FleshUnitType;
@@ -54,7 +55,6 @@ import mindustry.world.meta.BlockFlag;
 
 import static fire.FRUtils.colors;
 import static fire.FRVars.*;
-import static fire.FRVars.layerFlyingUnitAbove;
 import static mindustry.Vars.*;
 
 @SuppressWarnings("SameParameterValue")
@@ -73,7 +73,7 @@ public class FRUnitTypes{
         wanderer, hunter, rioter, dusk,
 
         //ground
-        error, pluto,
+        error, pluto, alpha2,
 
         //air support
         omicron, pioneer,
@@ -1327,7 +1327,7 @@ public class FRUnitTypes{
                     unit.heal((unit.maxHealth * percentAmount / 100f + amount) * Time.delta);
                     if(unit.shield >= 57500.0f){
                         unit.heal((unit.maxHealth * percentAmount / 100f + amount) * Time.delta * 9);
-                        if(unit.health >= unit.maxHealth - 1.0f){
+                        if(unit.health >= unit.maxHealth - 1.0f && !unit.isShooting()){
                             unit.apply(StatusEffects.fast, 30.0f);
                             if(unit.moving()){
                                 coolant += Time.delta;
@@ -2067,11 +2067,10 @@ public class FRUnitTypes{
                                 }
                                 @Override
                                 public void handlePierce(Bullet b, float initialHealth, float x, float y){
-                                    if(!b.hit())((Unit)b.owner).heal(55.0f);
+                                    if(!b.hit()) ((Unit)b.owner).heal(55.0f);
                                     ((Unit)b.owner).heal(5.0f);
-                                    super.handlePierce( b, initialHealth, x, y);
+                                    super.handlePierce(b, initialHealth, x, y);
                                 }
-
                                 {
                                     width = height = 0;
                                     hitSize = 12.0f;
@@ -2328,9 +2327,32 @@ public class FRUnitTypes{
                     despawnEffect = Fx.none;
                     shootSound = Sounds.shootArc;
                 }};
-            }}
-            );
+            }});
         }};
+
+        //Reimu moves at a speed of 4px/tick in TH07
+        alpha2 = new PlayerCharacter("alpha2", 4, new PlayerCharacter.PlayerWeapon("small-basic-weapon"){{
+            reload = 3f;
+            x = 2.75f;
+            y = 2f;
+            recoil = 0.5f;
+            top = false;
+            shootSound = Sounds.shootAlpha;
+
+            bullet = new PlayerCharacter.PlayerBulletType(6, 11){{
+                lifetime = 45;
+                width = 1.5f;
+                height = 5.5f;
+                hitEffect = despawnEffect = shootEffect = smokeEffect = Fx.none;
+                trailWidth = 1.2f;
+                trailLength = 3;
+                backColor = trailColor = Pal.yellowBoltFront;
+                hitColor = Pal.yellowBoltFront;
+                frontColor = Color.white;
+                lightColor = Pal.yellowBoltFront;
+                buildingDamageMultiplier = 0;
+            }};
+        }});
 
         //region air support
 

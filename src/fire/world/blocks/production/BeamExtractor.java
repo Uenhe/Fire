@@ -56,7 +56,7 @@ public class BeamExtractor extends mindustry.world.Block{
     public final Color boostColor = new Color();
     public Effect updateEffect = Fx.none;
     public byte updateEffectChancePercentage; //a value of 50 -> 50%
-    public final Seq<Barrel> barrels = new Seq<>(5);
+    public final Seq<Barrel> barrels = new Seq<>(false, 5, Barrel.class);
 
     private TextureRegion base;
     private TextureRegion[] barrelRegions;
@@ -128,7 +128,7 @@ public class BeamExtractor extends mindustry.world.Block{
         if(n <= 1)
             return new TextureRegion[]{base, region};
 
-        var regions = new Seq<TextureRegion>(n + 2);
+        var regions = new Seq<TextureRegion>(false, n + 2, TextureRegion.class);
         regions.add(base, region);
 
         var names = new ObjectSet<String>(n + 1);
@@ -143,7 +143,7 @@ public class BeamExtractor extends mindustry.world.Block{
     @Override
     @Modified
     public void createIcons(MultiPacker packer){
-        var toDispose = new Seq<Pixmap>();
+        var toDispose = new Seq<Pixmap>(false, 16, Pixmap.class);
 
         for(var icon : icons()){
             var region = Pixmaps.outline(Core.atlas.getPixmap(icon), outlineColor, outlineRadius);
@@ -218,7 +218,7 @@ public class BeamExtractor extends mindustry.world.Block{
             init();
             if(available.isEmpty()) return;
 
-            var items = new Seq<Item>(8);
+            var items = new Seq<Item>(false, 8, Item.class);
             available.each(items::add);
             ItemSelection.buildTable(block, table, items, this::config, this::configure, selectionRows, selectionColumns);
         }

@@ -29,7 +29,7 @@ public class LightningBranch{
 
     private static final Rand random = new Rand();
     private static final Rect rect = new Rect();
-    private static final Seq<Unitc> entities = new Seq<>();
+    private static final Seq<Unitc> entities = new Seq<>(false, 16, Unitc.class);
     private static final IntSet hit = new IntSet();
     private static final byte maxChain = 8;
     private static final byte hitRange = 30;
@@ -50,9 +50,9 @@ public class LightningBranch{
         bhit = false;
         if(type == null) type = Bullets.damageLightning;
         var Type = type;
-        var lines = new Seq<Vec2>();
+        var lines = new Seq<Vec2>(false, length / 2, Vec2.class);
         for(int i = 0; i < length / 2; i++){
-            type.create(null, team, x, y, angle, damage * (hitter == null ? 1.0f : Type.damageMultiplier(hitter)), 1.0f, 1.0f, hitter);
+            type.create(null, team, x, y, angle, damage * (hitter == null ? 1.0f : type.damageMultiplier(hitter)), 1.0f, 1.0f, hitter);
             lines.add(new Vec2(x + Mathf.range(3.0f), y + Mathf.range(3.0f)));
             if(lines.size > 1){
                 bhit = false;
@@ -70,12 +70,12 @@ public class LightningBranch{
             }
             rect.setSize(hitRange).setCenter(x, y);
             entities.clear();
-            if(hit.size < maxChain){
+            if(hit.size < maxChain)
                 Units.nearbyEnemies(team, rect, u -> {
                     if(!hit.contains(u.id()) && (hitter == null || u.checkTarget(Type.collidesAir, Type.collidesGround)))
                         entities.add(u);
                 });
-            }
+
             var furthest = Geometry.findFurthest(x, y, entities);
             if(furthest != null){
                 hit.add(furthest.id());
@@ -89,7 +89,7 @@ public class LightningBranch{
         }
         Fx.lightning.at(x, y, angle, color, lines);
 
-        if(branchLeft <= 0) return;
+        if(bhit || branchLeft <= 0) return;
         float X = x, Y = y, Angle = angle;
         Time.run(1.5f, () -> {
             for(int i = 0; i < branchAmount; i++){

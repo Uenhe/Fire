@@ -5,20 +5,33 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Interp;
 import arc.scene.actions.Actions;
 import arc.scene.event.Touchable;
+import arc.scene.ui.Image;
+import arc.scene.ui.Label;
+import arc.scene.ui.layout.Cell;
 import arc.scene.ui.layout.Table;
 import arc.util.Align;
+import arc.util.Scaling;
 import arc.util.Time;
 import fire.content.FRMath;
+import mindustry.game.Team;
 import mindustry.ui.Styles;
 
 import static fire.FRVars.findColor;
+import static mindustry.Vars.player;
 import static mindustry.Vars.state;
 
 /** @author fy */
 public class FRUI{
+
+    public static String label;
+    public static TextureRegion image;
+    public static Team speakerTeam;
+    static Cell<Label> dialogBoxLabel;
+    static Cell<Image> dialogBoxImage;
 
     public static void numberDisplay(int number){
         Table t = new Table(Styles.none);
@@ -93,24 +106,18 @@ public class FRUI{
         float tme = 0;
         float tme2 = 0;
 
-        StringBuilder col = new StringBuilder();
-
-        col.append("[white]");
+        StringBuilder col = new StringBuilder().append("[white]");
 
         for(int i = 0; i < text.length(); i++){
             char character = text.charAt(i);
             switch(character){
-                //FIXME a char can't contain Chinese character?
-                case ',', '，':
+                case ',', '，' ->
                     tme += 20.0f;
-                    break;
-                case '。', '！', '？':
+                case '。', '！', '？' ->
                     tme += 30.0f;
-                    break;
-                case '\n' :
+                case '\n' ->
                     t.row();
-                    break;
-                case '[':
+                case '[' -> {
                     col = new StringBuilder();
                     while(character != ']'){
                         character = text.charAt(i);
@@ -118,26 +125,20 @@ public class FRUI{
                         i++;
                     }
                     i--;
-                    break;
-                default:
+                }
+                default ->
                     tme += 3.0f;
             }
             if(character == ']') continue;
-            char finalCharacter = character;
-            StringBuilder finalCol = col;
-            Time.run(tme2, () -> {
-                t.add(finalCol.toString() + finalCharacter).style(Styles.outlineLabel).labelAlign(Align.left);
-            });
+            String tx = col.toString() + character;
+            Time.run(tme2, () -> t.add(tx).style(Styles.outlineLabel).labelAlign(Align.left));
             tme2 = tme;
         }
 
         t.update(() -> {
             t.setPosition(Core.graphics.getWidth() * x, Core.graphics.getHeight() * y, Align.left);
             t.toFront();
-
-            if(state.isMenu()){
-                t.remove();
-            }
+            if(state.isMenu()) t.remove();
         });
         t.actions(Actions.delay(duration * 0.9f), Actions.fadeOut(duration * 0.1f, Interp.fade), Actions.remove());
         t.pack();
@@ -145,19 +146,22 @@ public class FRUI{
         Core.scene.add(t);
     }
 
-    public static void tableShow(String info, float duration){
+    public static void tableShow(float duration){
         float stTime = Time.time;
-        Table t = new Table(Styles.none);
+        var t = new Table(Styles.none);
         t.touchable = Touchable.disabled;
+        t.table(info -> {
+            dialogBoxImage = info.image(image).size(32).pad(10).scaling(Scaling.fit).visible(false);
+            dialogBoxLabel = info.margin(4).label(() -> label).color(speakerTeam.color).style(Styles.outlineLabel).left().labelAlign(Align.left).growX().visible(false);
+        });
 
         t.update(() -> {
-            float cx = Core.camera.position.x,cy = Core.camera.position.y;
             float cw = Core.camera.width, ch = Core.camera.height;
-            cy -= ch * 0.3f;
+            float cx = Core.camera.position.x, cy = Core.camera.position.y - ch * 0.3f;
             float xy = cy - ch * 0.05f;
             float sy = cy + ch * 0.05f;
-            float zx = cx - cw * 0.4f;
-            float yx = cx + cw * 0.4f;
+            float zx = cx - cw * 0.35f;
+            float yx = cx + cw * 0.35f;
             float time = Time.time - stTime;
 
             float stP1x = cx, stP1y = cy - ch * 0.3f;
@@ -172,20 +176,48 @@ public class FRUI{
             float edP1x = zx, edP1y = xy;
             float edP2x = yx, edP2y = sy;
 
-            if(time >= duration * 60.0f)t.remove();
+            if(time >= duration * 60.0f)
+                t.remove();
             if(time <= 30.0f){
-                rectPlus(FRMath.mix(stP1x, midP1x, time / 30.0f),FRMath.mix(stP1y, midP1y, time / 30.0f),
-                    FRMath.mix(stP2x, midP2x, time / 30.0f),FRMath.mix(stP2y, midP2y, time / 30.0f));
+                rectPlus(FRMath.mix(stP1x, midP1x, time / 30.0f),
+                    FRMath.mix(stP1y, midP1y, time / 30.0f),
+                    FRMath.mix(stP2x, midP2x, time / 30.0f),
+                    FRMath.mix(stP2y, midP2y, time / 30.0f));
             }else if(time <= 45.0f){
-                rectPlus(FRMath.mix(midP1x, lftP1x, (time - 30.0f) / 15.0f),FRMath.mix(midP1y, lftP1y, (time - 30.0f) / 15.0f),
-                    FRMath.mix(midP2x, lftP2x, (time - 30.0f) / 15.0f),FRMath.mix(midP2y, lftP2y, (time - 30.0f) / 15.0f));
+                rectPlus(FRMath.mix(midP1x, lftP1x, (time - 30.0f) / 15.0f),
+                    FRMath.mix(midP1y, lftP1y, (time - 30.0f) / 15.0f),
+                    FRMath.mix(midP2x, lftP2x, (time - 30.0f) / 15.0f),
+                    FRMath.mix(midP2y, lftP2y, (time - 30.0f) / 15.0f));
             }else if(time <= 65.0f){
-                rectPlus(FRMath.mix(lftP1x, edP1x, (time - 45.0f) / 20.0f),FRMath.mix(lftP1y, edP1y, (time - 45.0f) / 20.0f),
-                    FRMath.mix(lftP2x, edP2x, (time - 45.0f) / 20.0f),FRMath.mix(lftP2y, edP2y, (time - 45.0f) / 20.0f));
+                rectPlus(FRMath.mix(lftP1x, edP1x, (time - 45.0f) / 20.0f),
+                    FRMath.mix(lftP1y, edP1y, (time - 45.0f) / 20.0f),
+                    FRMath.mix(lftP2x, edP2x, (time - 45.0f) / 20.0f),
+                    FRMath.mix(lftP2y, edP2y, (time - 45.0f) / 20.0f));
             }else if(time >= duration * 60.0f - 40.0f){
-                rectPlus(FRMath.mix(edP1x, stP1x, (time - duration * 60.0f + 40.0f) / 20.0f),FRMath.mix(edP1y, stP1y, (time - duration * 60.0f + 40.0f) / 20.0f),
-                    FRMath.mix(edP2x, stP2x, (time - duration * 60.0f + 40.0f) / 20.0f),FRMath.mix(edP2y, stP2y, (time - duration * 60.0f + 40.0f) / 20.0f));
-            }else rectPlus(edP1x, edP1y, edP2x, edP2y);
+                dialogBoxLabel.visible(false);
+                dialogBoxImage.visible(false);
+
+                rectPlus(FRMath.mix(edP1x, stP1x, (time - duration * 60.0f + 40.0f) / 20.0f),
+                    FRMath.mix(edP1y, stP1y, (time - duration * 60.0f + 40.0f) / 20.0f),
+                    FRMath.mix(edP2x, stP2x, (time - duration * 60.0f + 40.0f) / 20.0f),
+                    FRMath.mix(edP2y, stP2y, (time - duration * 60.0f + 40.0f) / 20.0f));
+            }else{
+                if(speakerTeam == player.team()){
+                    t.setPosition(Core.graphics.getWidth() * 0.15f, Core.graphics.getHeight() * 0.26f, Align.left);
+                    dialogBoxLabel.left().labelAlign(Align.left);
+                    dialogBoxImage.left();
+                }else{
+                    t.setPosition(Core.graphics.getWidth() * 0.85f, Core.graphics.getHeight() * 0.26f, Align.right);
+                    dialogBoxLabel.right().labelAlign(Align.right);
+                    dialogBoxImage.right();
+                }
+
+                dialogBoxLabel.visible(true).get().setText(label);
+                dialogBoxLabel.get().setColor(speakerTeam.color);
+                dialogBoxImage.visible(!"".equals(label)).get().setDrawable(image);
+
+                rectPlus(edP1x, edP1y, edP2x, edP2y);
+            }
 
             if(state.isMenu()){
                 t.remove();
@@ -196,14 +228,10 @@ public class FRUI{
         Core.scene.add(t);
     }
 
-    static Color backCol = findColor("333333AA");
+    static final Color backCol = findColor("333333AA");
 
     public static void rectPlus(float x1, float y1, float x2, float y2){
         rectPlus(x1, y1, x2, y2, backCol, Color.white);
-    }
-
-    public static void rectPlus(float x1, float y1, float x2, float y2, Color color){
-        rectPlus(x1, y1, x2, y2, color, color);
     }
 
     public static void rectPlus(float x1, float y1, float x2, float y2, Color fillColor, Color edge){

@@ -23,14 +23,14 @@ import mindustry.graphics.Layer;
 import mindustry.graphics.Pal;
 import mindustry.ui.dialogs.BaseDialog;
 
-import static fire.FireMod.*;
 import static fire.FireMod.CheatStatusCode.OK;
+import static fire.FireMod.*;
 import static mindustry.Vars.*;
 
-public final class FRVars{
+public class FRVars{
 
     public static final ObjectMap<String, Color> colorPool = new ObjectMap<>(53);
-    public static final Seq<Unit> spawnedUnits = new Seq<>();
+    public static final Seq<Unit> spawnedUnits = new Seq<>(false, 16, Unit.class);
 
     /** Temporary colors. */
     public static final Color
@@ -72,7 +72,7 @@ public final class FRVars{
             if(frame % 10 == 0){
                 for(var u : spawnedUnits){
                     if(u.hasEffect(StatusEffects.invincible))
-                        u.vel.clamp(0.5f, 0.5f); //prevent enemy ejecting when spawned
+                        u.vel.limit(1.0f); //prevent enemy ejecting when spawned
                     else
                         spawnedUnits.remove(u);
                 }
@@ -103,22 +103,22 @@ public final class FRVars{
                             var sb = new StringBuilder();
 
                             switch(code){
-                                case CHEAT_BLOCK:
+                                case CHEAT_BLOCK -> {
                                     var buildingTypes = Team.get(player.team().id).data().buildingTypes;
                                     for(var block : cheatBlocks){
                                         var builds = buildingTypes.get(block);
                                         if(builds != null && builds.any()) sb.append("\n").append(block.localizedName);
                                     }
                                     table.add(Core.bundle.format("fire.err1", sb)).center().row();
-                                    break;
+                                }
 
-                                case CHEAT_RULE:
+                                case CHEAT_RULE ->
                                     table.add("@fire.err2").center();
-                                    break;
 
-                                case CHEAT_MODS:
+                                case CHEAT_MODS -> {
                                     for(String name : multipleModList) sb.append("\n").append(name);
                                     table.add(Core.bundle.format("fire.err3", sb)).center();
+                                }
                             }
                             table.row().add("@fire.err9").center();
                             cheatDialog.show();

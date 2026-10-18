@@ -42,7 +42,7 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
     public void load(){
         super.load();
         if(region.width == 0)
-            region.set(FRUtils.find("lightning-cloud"));
+            region.set(FRUtils.findSprite("lightning-cloud"));
     }
 
     public LightningCloud create(Entityc owner, float x, float y){
@@ -52,9 +52,9 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
     @Override
     @Modified
     public LightningCloud create(Entityc owner, Entityc e, Team t, float x, float y, float a, float damage, float v, float l, Object d, Mover m, float p, float q){
-        var bullet = LightningCloud.create();
+        LightningCloud bullet = LightningCloud.create();
         bullet.type = this;
-        bullet.owner = owner;
+        bullet.owner = bullet.shooter = owner;
         bullet.set(x, y);
         bullet.damage = damage * bullet.damageMultiplier();
         bullet.time = 0.0f;
@@ -85,17 +85,17 @@ public class LightningCloudBulletType extends mindustry.entities.bullet.BulletTy
 
         @Override
         public void draw(){
-            float alpha = 0.1f +
+            float size = size(), alpha = 0.1f +
                 (node.checkBelonging(time, 0) ? time / node.first()
                 : node.checkBelonging(time, 1) ? 1.0f
                 : 1.0f - (time - node.get(2)) / node.lastQuantum());
 
             Draw.color(type.lightningColor);
             Draw.alpha(alpha);
-            Fill.circle(x, y, size() * 0.1f);
-            Drawf.light(x, y, size(), type.lightningColor, alpha);
+            Fill.circle(x, y, size * 0.1f);
+            Drawf.light(x, y, size, type.lightningColor, alpha);
             Draw.blend(Blending.additive);
-            Draw.rect(region, x, y, size() * intensity, size() * intensity, time * intensity * Mathf.sign(id % 2 == 0));
+            Draw.rect(region, x, y, size * intensity, size * intensity, time * intensity * Mathf.sign(id % 2 == 0));
             Draw.blend();
         }
 

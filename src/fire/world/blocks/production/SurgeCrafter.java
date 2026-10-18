@@ -36,7 +36,7 @@ public class SurgeCrafter extends mindustry.world.blocks.production.GenericCraft
         @Override
         public void craft(){
             super.craft();
-            craftSound.at(tile, Mathf.random(0.9f, 1.1f));
+            craftSound.at(tile, 1, Mathf.random(0.9f, 1.1f));
             byte n = fragBullets;
             if(n == 0) return;
 

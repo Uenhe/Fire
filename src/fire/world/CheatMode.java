@@ -30,64 +30,44 @@ import static mindustry.Vars.*;
 /** @author fy */
 public class CheatMode{
     static final ObjectIntMap<Block> blockThreatMap = new ObjectIntMap<>();
-    static final Seq<Block> threateningBlocks = new Seq<>();
+    static final Seq<Block> threateningBlocks = new Seq<>(false, 16, Block.class);
     static int threat, maxThreat;
 
     static{
         Events.on(EventType.WaveEvent.class, e -> {
             Time.run(10, () -> {
                 switch(threat){
-                    case 0:
-                        break;
-                    case 1:
-                        state.wavetime = state.rules.waveSpacing * 0.9f;
-                        break;
-                    case 2:
-                        state.wavetime = state.rules.waveSpacing * 0.85f;
-                        break;
-                    case 3, 4:
-                        state.wavetime = state.rules.waveSpacing * 0.8f;
-                        break;
-                    case 5:
-                        state.wavetime = state.rules.waveSpacing * 0.7f;
-                        break;
-                    case 6:
-                        state.wavetime = state.rules.waveSpacing * 0.6f;
-                        break;
-                    case 7:
-                        state.wavetime = state.rules.waveSpacing * 0.5f;
-                        break;
-                    case 8, 9:
-                        state.wavetime = state.rules.waveSpacing * 0.4f;
-                        break;
-                    case 10:
-                        state.wavetime = state.rules.waveSpacing * 0.3f;
-                        break;
-                    default:
-                        break;
+                    case 1 -> state.wavetime = state.rules.waveSpacing * 0.9f;
+                    case 2 -> state.wavetime = state.rules.waveSpacing * 0.85f;
+                    case 3, 4 -> state.wavetime = state.rules.waveSpacing * 0.8f;
+                    case 5 -> state.wavetime = state.rules.waveSpacing * 0.7f;
+                    case 6 -> state.wavetime = state.rules.waveSpacing * 0.6f;
+                    case 7 -> state.wavetime = state.rules.waveSpacing * 0.5f;
+                    case 8, 9 -> state.wavetime = state.rules.waveSpacing * 0.4f;
+                    case 10 -> state.wavetime = state.rules.waveSpacing * 0.3f;
+                    default -> {}
                 }
+
 
                 state.rules.waveTeam.data().units.each(unit -> {
                     switch(threat){
-                        case 0, 1:
-                            break;
-                        case 2, 3, 4, 5:
+                        case 0, 1 -> {}
+                        case 2, 3, 4, 5 ->
                             unit.apply(FRStatusEffects.informationalPerturbation, 36000);
-                            break;
-                        case 6, 7:
+                        case 6, 7 -> {
                             unit.apply(FRStatusEffects.informationalPerturbation, 36000);
                             unit.apply(StatusEffects.overclock, 36000);
                             unit.apply(StatusEffects.overdrive, 36000);
-                            break;
-                        case 8:
+                        }
+                        case 8 -> {
                             unit.apply(FRStatusEffects.informationalPerturbation, 36000);
                             unit.apply(StatusEffects.overclock, 36000);
                             unit.apply(StatusEffects.overdrive, 36000);
                             unit.apply(StatusEffects.shielded, 36000);
                             if(unit.type instanceof FleshUnitType)
                                 unit.apply(FRStatusEffects.overgrown);
-                            break;
-                        case 9:
+                        }
+                        case 9 -> {
                             unit.apply(FRStatusEffects.informationalPerturbation, 36000);
                             unit.apply(FRStatusEffects.inspired, 36000);
                             unit.apply(StatusEffects.overclock, 36000);
@@ -97,8 +77,8 @@ public class CheatMode{
                                 unit.addItem(FRItems.detonationCompound, unit.itemCapacity());
                             if(unit.type instanceof FleshUnitType)
                                 unit.apply(FRStatusEffects.overgrown);
-                            break;
-                        case 10:
+                        }
+                        case 10 -> {
                             unit.apply(FRStatusEffects.informationalPerturbation, 36000);
                             unit.apply(FRStatusEffects.sanctuaryGuard, 36000);
                             unit.apply(FRStatusEffects.inspired, 36000);
@@ -111,7 +91,7 @@ public class CheatMode{
                                 unit.addItem(FRItems.detonationCompound, unit.itemCapacity());
                             if(unit.type instanceof FleshUnitType)
                                 unit.apply(FRStatusEffects.overgrown);
-                            break;
+                        }
                     }
                 });
             });
@@ -132,8 +112,10 @@ public class CheatMode{
     }
 
     public static void update(){
+        if(state.tick < 120 || state.rules.editor) return;
+
         var playerRules = state.rules.defaultTeam.rules();
-        if(playerRules.cheat && !state.rules.editor){
+        if(playerRules.cheat){
             if(threat == 0){
                 threat = getThreatLevel();
                 if(state.wave == 1){
@@ -155,44 +137,36 @@ public class CheatMode{
                 FRUI.numberDisplay(threat);
                 FRFx.wordDisplay(bundle.get("fire.cheat1E") + threat, Color.red, 1.3f, 0.5f, 0.3f, 10);
                 FRFx.wordDisplay(bundle.get("fire.cheat" + threat), Color.red, 1f, 0.5f, 0.2f, 10);
-
-                //ui.hudfrag.showToast(Icon.warning, iconLarge, bundle.get("fire.cheat2") + (threat >= 4?"[red]":"[accent]") + threat + "[white]");
             }
 
             switch(threat){
-                case 1:
-                    state.rules.buildCostMultiplier = 1.0f;
-                    playerRules.buildSpeedMultiplier = 1.0f;
-                    break;
-                case 2:
+                case 1 -> state.rules.buildCostMultiplier = playerRules.buildSpeedMultiplier = 1.0f;
+                case 2, 3 -> {
                     state.rules.buildCostMultiplier = 1.2f;
                     playerRules.buildSpeedMultiplier = 0.9f;
-                    break;
-                case 3:
-                    playerRules.buildSpeedMultiplier = 0.9f;
-                    state.rules.buildCostMultiplier = 1.2f;
-                    break;
-                case 4:
-                    playerRules.buildSpeedMultiplier = 0.9f;
+                }
+                case 4 -> {
                     state.rules.buildCostMultiplier = 1.3f;
-                    break;
-                case 5:
+                    playerRules.buildSpeedMultiplier = 0.9f;
+                }
+                case 5 -> {
                     state.rules.buildCostMultiplier = 1.7f;
                     playerRules.buildSpeedMultiplier = 0.75f;
-                    break;
-                case 6, 7, 8, 9:
+                }
+                case 6, 7, 8, 9 -> {
                     state.rules.buildCostMultiplier = 2f;
                     playerRules.buildSpeedMultiplier = 0.5f;
-                    break;
-                case 10:
+                }
+                case 10 -> {
                     state.rules.buildCostMultiplier = 2f;
+                    playerRules.buildSpeedMultiplier = 0.5f;
                     state.rules.pauseDisabled = true;
-                    playerRules.buildSpeedMultiplier = 0.5f;
-                    break;
+                }
             }
-            if(state.wave % 2 == 0 && state.wavetime >= 2 && threat >= 4){
+
+            if(state.wave % 2 == 0 && state.wavetime >= 2 && threat >= 4)
                 logic.runWave();
-            }
+
             if(state.wave == 1 && state.wavetime > state.rules.initialWaveSpacing * 0.6f)
                 state.wavetime = state.rules.initialWaveSpacing == 0 ? state.rules.waveSpacing : state.rules.initialWaveSpacing * 0.6f;
 

@@ -79,7 +79,7 @@ public class EnergyField{
         @Override
         public void init(Bullet b){
             super.init(b);
-            var targets = new Seq<Healthc>();
+            var targets = new Seq<Healthc>(false, 16, Healthc.class);
 
             Units.nearby(null, b.x, b.y, homingRange, unit -> {
                 if(unit.checkTarget(collidesAir, collidesGround) && unit.targetable(b.team) && unit.team != b.team)

@@ -166,7 +166,7 @@ public class AcceleratorCutscene extends mindustry.world.blocks.campaign.Acceler
                 width = Core.graphics.getWidth();
             for(int i = 0; i < 2; i++){
                 final float p = 0.2f,
-                y1 = i == 0 ? height * -p : height * (1.0f + p);
+                y1 = height * (i == 0 ? -p : 1.0f);
 
                 var mask = new Image();
                 mask.color.set(Color.black);

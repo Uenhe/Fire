@@ -15,7 +15,7 @@ import static mindustry.Vars.world;
 
 public class HydroelectricGenerator extends mindustry.world.blocks.power.PowerGenerator{
 
-    public static Seq<Floor> liquidFloors = new Seq<>();
+    public static Seq<Floor> liquidFloors = new Seq<>(false, 16, Floor.class);
 
     public HydroelectricGenerator(String name){
         super(name);

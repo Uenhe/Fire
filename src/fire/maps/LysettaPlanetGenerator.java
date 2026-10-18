@@ -278,7 +278,7 @@ public class LysettaPlanetGenerator extends mindustry.maps.generators.PlanetGene
         final float constraint = 1.3f;
         float radius = width / 2f / Mathf.sqrt3;
         int rooms = rand.random(2, 5);
-        Seq<Room> roomseq = new Seq<>();
+        Seq<Room> roomseq = new Seq<>(false, 16, Room.class);
 
         for(int i = 0; i < rooms; i++){
             Tmp.v1.trns(rand.random(360f), rand.random(radius / constraint));
@@ -291,7 +291,7 @@ public class LysettaPlanetGenerator extends mindustry.maps.generators.PlanetGene
 
         //check positions on the map to place the player spawn. this needs to be in the corner of the map
         Room spawn = null;
-        var enemies = new Seq<Room>();
+        var enemies = new Seq<Room>(false, 16, Room.class);
         int enemySpawns = rand.random(1, Math.max((int)(sector.threat * 4), 1));
         int offset = rand.nextInt(360);
         float length = width / 2.55f - rand.random(13, 23);

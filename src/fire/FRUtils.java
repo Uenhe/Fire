@@ -12,7 +12,7 @@ public final class FRUtils{
         System.arraycopy(color, 0, colors, 0, colors.length);
     }
 
-    public static TextureAtlas.AtlasRegion find(String name){
+    public static TextureAtlas.AtlasRegion findSprite(String name){
         return Core.atlas.find("fire-" + name);
     }
 

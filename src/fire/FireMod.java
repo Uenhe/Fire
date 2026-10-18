@@ -15,6 +15,7 @@ import arc.util.Scaling;
 import fire.ai.FRUnitCommand;
 import fire.content.*;
 import fire.input.FRBinding;
+import fire.logic.FRLogicStatements;
 import fire.ui.dialogs.DelayClosableDialog;
 import fire.ui.dialogs.FRAboutDialog;
 import fire.ui.dialogs.FRContentInfoDialog;
@@ -54,13 +55,12 @@ import static mindustry.Vars.*;
 
 @SuppressWarnings("unused")
 public class FireMod extends Mod{
+    static BaseDialog mainDialog, mulModDialog;
+    static final Field field_container;
 
-    private static Mods.LoadedMod FIRE;
-    private static BaseDialog mainDialog, mulModDialog;
-    private static final Field field_container;
-
-    public static final Seq<Block> cheatBlocks = new Seq<>();
-    public static final Seq<String> multipleModList = new Seq<>(8);
+    public static Mods.LoadedMod FIRE;
+    public static final Seq<Block> cheatBlocks = new Seq<>(false, 16, Block.class);
+    public static final Seq<String> multipleModList = new Seq<>(false, 8, String.class);
 
     static{
         try{
@@ -83,6 +83,7 @@ public class FireMod extends Mod{
 
         FRUnitCommand.loadAll();
         FRAttribute.load();
+        FRSounds.load();
         FRStatusEffects.load();
         FRItems.load();
         FRLiquids.load();
@@ -92,6 +93,7 @@ public class FireMod extends Mod{
         FRSectorPresets.load();
         FRPlanets.loadTree();
         FRWeathers.load();
+        FRLogicStatements.load();
         CheatMode.load();
 
         //FROverride.loadDebug();
@@ -203,7 +205,7 @@ public class FireMod extends Mod{
         mainDialog.buttons.button("@about.button", Icon.info, FRAboutDialog.dialog::show).size(210.0f, 64.0f);
 
         mainDialog.cont.pane(t -> {
-            t.image(FRUtils.find("logo")).size(438.0f, 136.0f).pad(3.0f).row();
+            t.image(FRUtils.findSprite("logo")).size(438.0f, 136.0f).pad(3.0f).row();
 
             addContent(t,
                 "[#F4BA6E]v1.5.7:",

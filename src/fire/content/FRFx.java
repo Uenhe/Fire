@@ -43,7 +43,7 @@ public class FRFx{
     public static Effect railChargeEffect(float lifetime, Color color, float width, float range, float spacing){
         return new Effect(lifetime, range * 2.0f, e -> {
             if(aimShoot.width == 0)
-                aimShoot.set(FRUtils.find("aim-shoot"));
+                aimShoot.set(FRUtils.findSprite("aim-shoot"));
 
             float track = Mathf.curve(e.fin(Interp.pow2Out), 0.0f, 0.25f) * Mathf.curve(e.fout(Interp.pow4Out), 0.0f, 0.3f) * e.fin();
             Draw.color(color);

@@ -465,23 +465,20 @@ public class InfoDialog extends mindustry.ui.dialogs.BaseDialog{
 
 
     public static class InfoTree{
-        public static final Seq<InfoNode> all = new Seq<>();
-        public static final Seq<InfoNode> roots = new Seq<>();
+        public static final Seq<InfoNode> roots = new Seq<>(false, 16, InfoNode.class);
         private static InfoNode context;
     }
 
     public static class InfoNode{
         private final short depth;
         private final UnlockableContent content;
-        private final Seq<InfoNode> children = new Seq<>();
+        private final Seq<InfoNode> children = new Seq<>(false, 16, InfoNode.class);
 
         private InfoNode(@Nullable InfoNode parent, UnlockableContent content){
             if(parent != null) parent.children.add(this);
 
             this.content = content;
             this.depth = (short)(parent == null ? 0 : parent.depth + 1);
-
-            InfoTree.all.add(this);
         }
 
         public static InfoNode dnode(UnlockableContent content){

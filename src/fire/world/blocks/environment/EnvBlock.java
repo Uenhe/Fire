@@ -3,6 +3,7 @@ package fire.world.blocks.environment;
 import arc.func.Prov;
 import mindustry.content.Blocks;
 import mindustry.gen.Building;
+import mindustry.gen.Bullet;
 import mindustry.type.Category;
 import mindustry.type.ItemStack;
 import mindustry.world.Tile;
@@ -21,6 +22,7 @@ public class EnvBlock extends mindustry.world.Block{
         targetable = false;
         forceDark = true;
         hasShadow = false;
+        drawTeamOverlay = false;
         buildType = type;
     }
 
@@ -34,7 +36,7 @@ public class EnvBlock extends mindustry.world.Block{
         @Override
         public void update(){
             super.update();
-            if(state.isCampaign() && state.rules.sector.info.wasCaptured){
+            if(state.isCampaign() && state.rules.sector.isCaptured()){
                 rm();
                 return;
             }
@@ -43,6 +45,14 @@ public class EnvBlock extends mindustry.world.Block{
             else
                 updateStop();
         }
+
+        @Override
+        public boolean collide(Bullet other){
+            return false;
+        }
+
+        @Override
+        public void damage(float damage){}
 
         protected void rm(){
             tile.setNet(tile.floor().wall instanceof StaticWall w ? w : Blocks.stoneWall);

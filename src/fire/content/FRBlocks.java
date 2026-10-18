@@ -7,6 +7,7 @@ import arc.graphics.Color;
 import arc.graphics.g2d.Draw;
 import arc.graphics.g2d.Fill;
 import arc.graphics.g2d.Lines;
+import arc.graphics.g2d.TextureRegion;
 import arc.math.Angles;
 import arc.math.Interp;
 import arc.math.Mathf;
@@ -17,6 +18,7 @@ import arc.util.Time;
 import arc.util.Tmp;
 import fire.entities.FRUnitSorts;
 import fire.entities.bullets.*;
+import fire.test.ChainShield;
 import fire.world.DEBUG;
 import fire.world.blocks.campaign.AcceleratorCutscene;
 import fire.world.blocks.defense.ArmorWall;
@@ -30,6 +32,7 @@ import fire.world.blocks.distribution.LiquidUnloader;
 import fire.world.blocks.environment.EnvBlock;
 import fire.world.blocks.power.BatteryNode;
 import fire.world.blocks.power.BurstReactor;
+import fire.world.blocks.power.FleshGenerator;
 import fire.world.blocks.power.HydroelectricGenerator;
 import fire.world.blocks.production.BeamExtractor;
 import fire.world.blocks.production.EnergyCrafter;
@@ -39,17 +42,18 @@ import fire.world.blocks.sandbox.AdaptiveSource;
 import fire.world.blocks.storage.AdaptDirectionalUnloader;
 import fire.world.blocks.storage.ForceCoreBlock;
 import fire.world.blocks.storage.NumbDelusion;
-import fire.test.ChainShield;
 import fire.world.blocks.units.ElementUnitFactory;
 import fire.world.blocks.units.MechPad;
 import fire.world.consumers.ConsumePowerCustom;
 import fire.world.draw.DrawArrows;
+import fire.world.draw.DrawWarmupRegionPlus;
 import fire.world.draw.DrawWeavePlus;
 import fire.world.kits.Campfire;
 import fire.world.kits.EnergyField;
 import fire.world.kits.MeltingFurnace;
 import fire.world.meta.FRAttribute;
 import mindustry.content.*;
+import mindustry.ctype.ContentType;
 import mindustry.entities.Effect;
 import mindustry.entities.UnitSorts;
 import mindustry.entities.Units;
@@ -126,7 +130,7 @@ public class FRBlocks{
     neoplasm, bloodyDirt, bloodyWall, granite, graniteWall, meltedSand, hardenedCovering, oreGraphite, oreSilicon, orePyratite, envStgCenter,
 
     //sandbox & misc
-    adaptiveSource, fireCompany, test,
+    adaptiveSource, fireCompany,
 
     //turret
     smasher, nightmare, fulmination,
@@ -145,7 +149,7 @@ public class FRBlocks{
     magneticRingPump, compositeLiquidRouter, hardenedLiquidTank, compositeBridgeConduit, liquidUnloader,
 
     //power
-    conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, burstReactor,
+    conductorPowerNode, flameGenerator, hydroelectricGenerator, hydroelectricGeneratorLarge, hybridGenerator, burstReactor,
 
     //defense
     damWall, damWallLarge, hardenedWall, hardenedWallLarge, fleshWall,
@@ -161,7 +165,7 @@ public class FRBlocks{
     fleshReconstructor, vectorialUnitFactory, fractalUnitFactory, unitHealer, payloadConveyorLarge, payloadRouterLarge,
 
     //effect
-    buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, primaryInterplanetaryAccelerator;
+    buildingHealer, campfire, skyDome, buildIndicator, coreBulwark, numbDelusion, javelinPad, primaryInterplanetaryAccelerator, chainShield;
 
     static{
         //region environment
@@ -220,158 +224,177 @@ public class FRBlocks{
             size = 2;
         }};
 
-        test = new ChainShield("ea");
-
         //region turret
 
-        smasher = new ItemTurret("js"){{
-            requirements(Category.turret, with(
-                copper, 65,
-                lead, 45,
-                titanium, 20
-            ));
-            researchCost = with(
-                copper, 150,
-                lead, 105,
-                titanium, 50
-            );
-            health = 800;
-            size = 2;
-            reload = 42.0f;
-            range = 250.0f;
-            shootCone = 10.0f;
-            inaccuracy = 2.0f;
-            rotateSpeed = 10.0f;
-            recoil = 1.6f;
-            targetAir = false;
-            shootSound = Sounds.shootArtillerySmall;
+        smasher = new ItemTurret("js"){
+            {
+                requirements(Category.turret, with(
+                    copper, 65,
+                    lead, 45,
+                    titanium, 20
+                ));
+                researchCost = with(
+                    copper, 150,
+                    lead, 105,
+                    titanium, 50
+                );
+                health = 800;
+                size = 2;
+                reload = 42.0f;
+                range = 250.0f;
+                shootCone = 10.0f;
+                inaccuracy = 2.0f;
+                rotateSpeed = 10.0f;
+                recoil = 1.6f;
+                targetAir = false;
+                shootSound = Sounds.shootArtillerySmall;
 
-            consumeCoolant(n(12));
+                consumeCoolant(n(12));
 
-            ammo(
-                copper, new ArtilleryBulletType(6f, 20f){{
-                    lifetime = 130f;
-                    knockback = 1.6f;
-                    width = 12f;
-                    height = 12f;
-                    splashDamageRadius = 13.75f;
-                    splashDamage = 24f;
-                    reloadMultiplier = 0.9f;
-                    pierceArmor = true;
-                }},
+                ammo(
+                    copper, new ArtilleryBulletType(6f, 20f){{
+                        lifetime = 130f;
+                        knockback = 1.6f;
+                        width = 12f;
+                        height = 12f;
+                        splashDamageRadius = 13.75f;
+                        splashDamage = 24f;
+                        reloadMultiplier = 0.9f;
+                        pierceArmor = true;
+                    }},
 
-                lead, new ArtilleryBulletType(12f, 10.0f){{
-                    lifetime = 78f;
-                    knockback = 1.6f;
-                    width = 8.0f;
-                    height = 8.0f;
-                    splashDamageRadius = 15.25f;
-                    splashDamage = 18f;
-                    reloadMultiplier = 1.8f;
-                    pierceArmor = true;
-                }},
-
-                metaglass, new ArtilleryBulletType(6f, 25f){{
-                    lifetime = 130f;
-                    knockback = 1.6f;
-                    width = 12f;
-                    height = 12f;
-                    splashDamageRadius = 20f;
-                    splashDamage = 25f;
-                    ammoMultiplier = 3.0f;
-                    reloadMultiplier = 1.15f;
-                    pierceArmor = true;
-                    fragBullets = 6;
-                    fragBullet = new BasicBulletType(2.0f, 10.0f){{
-                        lifetime = 16.0f;
+                    lead, new ArtilleryBulletType(12f, 10.0f){{
+                        lifetime = 78f;
+                        knockback = 1.6f;
                         width = 8.0f;
                         height = 8.0f;
-                        shrinkY = 1.0f;
-                        collidesAir = false;
-                    }};
-                }},
+                        splashDamageRadius = 15.25f;
+                        splashDamage = 18f;
+                        reloadMultiplier = 1.8f;
+                        pierceArmor = true;
+                    }},
 
-                plastanium, new ArtilleryBulletType(5.5f, 55.0f){{
-                    lifetime = 142.0f;
-                    knockback = 2.2f;
-                    width = 12.0f;
-                    height = 12.0f;
-                    splashDamageRadius = 26.0f;
-                    splashDamage = 45.0f;
-                    ammoMultiplier = 4.0f;
-                    pierceArmor = true;
-                    backColor = hitColor = Pal.plastaniumBack;
-                    frontColor = Pal.plastaniumFront;
-                    fragBullets = 8;
-                    fragBullet = new BasicBulletType(3.0f, 15.0f){{
-                        lifetime = 10.0f;
-                        width = 8.0f;
-                        height = 8.0f;
-                        shrinkY = 1.0f;
-                        collidesAir = false;
+                    metaglass, new ArtilleryBulletType(6f, 25f){{
+                        lifetime = 130f;
+                        knockback = 1.6f;
+                        width = 12f;
+                        height = 12f;
+                        splashDamageRadius = 20f;
+                        splashDamage = 25f;
+                        ammoMultiplier = 3.0f;
+                        reloadMultiplier = 1.15f;
+                        pierceArmor = true;
+                        fragBullets = 6;
+                        fragBullet = new BasicBulletType(2.0f, 10.0f){{
+                            lifetime = 16.0f;
+                            width = 8.0f;
+                            height = 8.0f;
+                            shrinkY = 1.0f;
+                            collidesAir = false;
+                        }};
+                    }},
+
+                    plastanium, new ArtilleryBulletType(5.5f, 55.0f){{
+                        lifetime = 142.0f;
+                        knockback = 2.2f;
+                        width = 12.0f;
+                        height = 12.0f;
+                        splashDamageRadius = 26.0f;
+                        splashDamage = 45.0f;
+                        ammoMultiplier = 4.0f;
+                        pierceArmor = true;
                         backColor = hitColor = Pal.plastaniumBack;
                         frontColor = Pal.plastaniumFront;
-                        despawnEffect = Fx.none;
-                    }};
-                }},
+                        fragBullets = 8;
+                        fragBullet = new BasicBulletType(3.0f, 15.0f){{
+                            lifetime = 10.0f;
+                            width = 8.0f;
+                            height = 8.0f;
+                            shrinkY = 1.0f;
+                            collidesAir = false;
+                            backColor = hitColor = Pal.plastaniumBack;
+                            frontColor = Pal.plastaniumFront;
+                            despawnEffect = Fx.none;
+                        }};
+                    }},
 
-                graphite, new ArtilleryBulletType(5f, 40f){{
-                    lifetime = 160f;
-                    knockback = 1.6f;
-                    width = 12f;
-                    height = 12f;
-                    splashDamageRadius = 19.25f;
-                    splashDamage = 45f;
-                    ammoMultiplier = 4;
-                    pierceArmor = true;
-                    backColor = hitColor = Pal.graphiteAmmoBack;
-                    frontColor = Pal.graphiteAmmoFront;
-                }},
-
-                sulflameAlloy, new ArtilleryBulletType(6f, 105f){{
-                    lifetime = 130f;
-                    knockback = 1.6f;
-                    width = 12f;
-                    height = 12f;
-                    splashDamageRadius = 22.25f;
-                    splashDamage = 80f;
-                    ammoMultiplier = 4;
-                    reloadMultiplier = 0.7f;
-                    pierceArmor = true;
-                    status = StatusEffects.blasted;
-                    backColor = hitColor = Pal.lightOrange;
-                    frontColor = Pal.lightishOrange;
-                    fragBullets = 8;
-                    fragBullet = new BasicBulletType(2.5f, 55f){{
-                        lifetime = 20.0f;
-                        width = 8.0f;
-                        height = 8.0f;
-                        shrinkY = 1.0f;
-                        status = StatusEffects.melting;
-                        statusDuration = 240f;
+                    graphite, new ArtilleryBulletType(5f, 40f){{
+                        lifetime = 160f;
+                        knockback = 1.6f;
+                        width = 12f;
+                        height = 12f;
+                        splashDamageRadius = 19.25f;
+                        splashDamage = 45f;
+                        ammoMultiplier = 4;
                         pierceArmor = true;
+                        backColor = hitColor = Pal.graphiteAmmoBack;
+                        frontColor = Pal.graphiteAmmoFront;
+                    }},
+
+                    sulflameAlloy, new ArtilleryBulletType(6f, 105f){{
+                        lifetime = 130f;
+                        knockback = 1.6f;
+                        width = 12f;
+                        height = 12f;
+                        splashDamageRadius = 22.25f;
+                        splashDamage = 80f;
+                        ammoMultiplier = 4;
+                        reloadMultiplier = 0.7f;
+                        pierceArmor = true;
+                        status = StatusEffects.blasted;
                         backColor = hitColor = Pal.lightOrange;
                         frontColor = Pal.lightishOrange;
-                        despawnEffect = Fx.none;
-                    }};
-                }},
+                        fragBullets = 8;
+                        fragBullet = new BasicBulletType(2.5f, 55f){{
+                            lifetime = 20.0f;
+                            width = 8.0f;
+                            height = 8.0f;
+                            shrinkY = 1.0f;
+                            status = StatusEffects.melting;
+                            statusDuration = 240f;
+                            pierceArmor = true;
+                            backColor = hitColor = Pal.lightOrange;
+                            frontColor = Pal.lightishOrange;
+                            despawnEffect = Fx.none;
+                        }};
+                    }},
 
-                detonationCompound, new ArtilleryBulletType(4f, 65f){{
-                    lifetime = 196f;
-                    knockback = 2.0f;
-                    width = 15f;
-                    height = 15f;
-                    splashDamageRadius = 32f;
-                    splashDamage = 220f;
-                    ammoMultiplier = 5;
-                    pierceArmor = true;
-                    status = StatusEffects.melting;
-                    statusDuration = 300f;
-                    backColor = hitColor = Pal.blastAmmoBack;
-                    frontColor = Pal.blastAmmoFront;
-                }}
-            );
-        }};
+                    detonationCompound, new ArtilleryBulletType(4f, 65f){{
+                        lifetime = 196f;
+                        knockback = 2.0f;
+                        width = 15f;
+                        height = 15f;
+                        splashDamageRadius = 32f;
+                        splashDamage = 220f;
+                        ammoMultiplier = 5;
+                        pierceArmor = true;
+                        status = StatusEffects.melting;
+                        statusDuration = 300f;
+                        backColor = hitColor = Pal.blastAmmoBack;
+                        frontColor = Pal.blastAmmoFront;
+                    }}
+                );
+
+                desc2 = Core.bundle.getOrNull(ContentType.block + "." + name + ".desc2");
+                desc3 = Core.bundle.getOrNull(ContentType.block + "." + name + ".desc3");
+                desc4 = Core.bundle.getOrNull(ContentType.block + "." + name + ".desc4");
+            }
+
+            final String desc2, desc3, desc4;
+
+            @Override
+            public String displayDescription(){
+                String desc = description;
+                if(FRSectorPresets.landingBase.sector.isCaptured())
+                    desc += "\n" + desc2;
+                if(FRSectorPresets.darksandPeakforest.sector.isCaptured())
+                    desc += "\n" + desc3;
+                if(detonationCompound.unlockedNowHost())
+                    desc += "\n" + desc4;
+
+                return desc + "\n" + Core.bundle.format("mod.display", minfo.mod.meta.displayName);
+            }
+        };
 
         nightmare = new ItemTurret("yg"){{
             requirements(Category.turret, with(
@@ -4082,6 +4105,35 @@ public class FRBlocks{
             ambientSoundVolume = 0.06f;
         }};
 
+        hybridGenerator = new FleshGenerator("flesh-generator"){{
+            requirements(Category.power, with(
+                logicAlloy, 120,
+                mirrorglass, 25,
+                flesh, 75,
+                hardenedAlloy, 105
+            ));
+            drawer = new DrawMulti(
+                new DrawDefault(),
+                new DrawWarmupRegionPlus(){{
+                    suffix = "-solid";
+                    color = Color.valueOf("ffbbcc");
+                }}
+            );
+            health = 1560;
+            armor = 24.0f;
+            size = 3;
+            powerProduction = 40.0f;
+            floating = true;
+            hasItems = true;
+            itemCapacity = 20;
+            ambientSound = Sounds.loopHum;
+            ambientSoundVolume = 0.06f;
+            itemDuration = 90.0f;
+
+            consume(new ConsumeItemFlammable(0.8f));
+
+        }};
+
         burstReactor = new BurstReactor("burst-reactor"){{
             requirements(Category.power, with(
                 conductor, 250,
@@ -4710,13 +4762,26 @@ public class FRBlocks{
             size = 5;
             hasPower = true;
             hasLiquids = true;
+            emitLight = true;
             itemCapacity = 30;
             liquidCapacity = 50.0f;
             craftEffect = Fx.formsmoke;
             updateEffect = Fx.plasticburn;
             drawer = new DrawMulti(
                 new DrawRegion("-bottom"),
-                new DrawPlasma(), //sprites are scaled from the vanilla ones by 1.25x  lol
+                new DrawPlasma(){
+                    @Override
+                    public void load(Block block){
+                        Time.run(10, () -> {
+                            regions = new TextureRegion[4];
+                            var origin = ((DrawPlasma)((DrawMulti)((PowerGenerator)Blocks.impactReactor).drawer).drawers[1]).regions;
+                            for(int i = 0; i < 4; i++){
+                                regions[i] = new TextureRegion(origin[i]);
+                                regions[i].scale = 1.25f;
+                            }
+                        });
+                    }
+                },
                 new DrawDefault(),
                 new DrawFade()
             );
@@ -5228,6 +5293,8 @@ public class FRBlocks{
             powerBufferRequirement = 500000.0f;
             consumePower(10.0f);
         }};
+
+        chainShield = new ChainShield();
 
         //region env
         //no references needed

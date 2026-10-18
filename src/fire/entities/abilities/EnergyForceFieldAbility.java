@@ -2,6 +2,7 @@ package fire.entities.abilities;
 
 import arc.Core;
 import arc.graphics.Color;
+import arc.math.Angles;
 import arc.math.Mathf;
 import arc.math.geom.Intersector;
 import arc.scene.ui.layout.Table;
@@ -43,7 +44,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
 
     private float timer;
     private boolean regenable;
-    private Seq<Bullet> bullets = new Seq<>(false);
+    private Seq<Bullet> bullets = new Seq<>(false, 16, Bullet.class);
 
     private static final IntMap<BulletType> bulletMap = new IntMap<>();
 
@@ -210,11 +211,11 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
                                 float scale = ext_node.checkBelonging(timer, 0) ? timer / ext_node.first()
                                             : ext_node.checkBelonging(timer, 1) ? 1.0f
                                             : 1.0f - (timer - ext_node.get(1)) / ext_node.getQuantum(2),
-                                    realrad = radius * scale,
-                                    val = u.angleTo(b) + b.type.speed * Time.delta / realrad * Mathf.radDeg;
+                                    r = radius * scale,
+                                    angle = u.angleTo(b) + b.type.speed * Time.delta / r * Mathf.radDeg;
 
                                 b.vel.setLength(b.type.speed * scale * ext_counterBulletSpeedFactor);
-                                b.rotation(b.angleTo(u.x + Mathf.cosDeg(val) * realrad, u.y + Mathf.sinDeg(val) * realrad));
+                                b.rotation(b.angleTo(u.x + Angles.trnsx(angle, r), u.y + Angles.trnsy(angle, r)));
 
                             }else{
                                 float mark = ext_node.last() + tt + 0.1f;
@@ -262,7 +263,7 @@ public class EnergyForceFieldAbility extends mindustry.entities.abilities.ForceF
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException{
+    public EnergyForceFieldAbility clone() throws CloneNotSupportedException{
         return ((EnergyForceFieldAbility)super.clone()).setBullets(bullets);
     }
 }

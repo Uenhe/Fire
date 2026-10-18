@@ -56,7 +56,7 @@ public class ElementUnitFactory extends mindustry.world.blocks.units.UnitBlock{
     protected final byte tier;
     protected float base;
     protected float timeScl;
-    protected final Seq<UnitType> plans = new Seq<>();
+    protected final Seq<UnitType> plans = new Seq<>(false, 16, UnitType.class);
 
     public static final IntMap<ItemValue> itemValues = new IntMap<>(Mathf.ceil((content.items().size - 6) / 0.8f)); //6 Erekir items
     private static final IntMap<UnitValue> unitValues = new IntMap<>();

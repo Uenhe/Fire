@@ -102,7 +102,7 @@ public class FirstAidAbility extends mindustry.entities.abilities.Ability{
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException{
+    public FirstAidAbility clone() throws CloneNotSupportedException{
         return ((FirstAidAbility)super.clone()).setHealthArray(healthArray.clone());
     }
 }

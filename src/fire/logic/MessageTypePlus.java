@@ -5,7 +5,8 @@ public enum MessageTypePlus{
     BUTTON,
     FREE,
     SMOOTH,
-    DIALOGBOXSHOW;
+    DIALOGBOXSHOW,
+    SETSPEAKER;
 
     public static final MessageTypePlus[] all = values();
 }

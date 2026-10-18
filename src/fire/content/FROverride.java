@@ -6,7 +6,6 @@ import arc.math.Mathf;
 import arc.math.geom.Position;
 import arc.util.Time;
 import fire.entities.bullets.SpriteBulletType;
-import fire.logic.FRLogicStatements;
 import fire.world.meta.FRAttribute;
 import mindustry.ai.UnitCommand;
 import mindustry.content.Fx;
@@ -17,10 +16,8 @@ import mindustry.entities.bullet.BulletType;
 import mindustry.entities.bullet.LiquidBulletType;
 import mindustry.entities.pattern.ShootSpread;
 import mindustry.gen.Bullet;
-import mindustry.gen.LogicIO;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
-import mindustry.logic.LAssembler;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
@@ -266,18 +263,5 @@ public class FROverride{
 
         //region liquid
         Liquids.neoplasm.effect = FRStatusEffects.overgrown;
-
-
-        //region logic
-        LAssembler.customParsers.put(FRLogicStatements.TransitionEffectStatement.name, FRLogicStatements.TransitionEffectStatement::new);
-        LAssembler.customParsers.put(FRLogicStatements.MaskCutsceneStatement.name, FRLogicStatements.MaskCutsceneStatement::new);
-        LAssembler.customParsers.put(FRLogicStatements.FetchPlusPlusStatement.name, FRLogicStatements.FetchPlusPlusStatement::new);
-        LAssembler.customParsers.put(FRLogicStatements.RemoveProcessorStatement.name, FRLogicStatements.RemoveProcessorStatement::new);
-        LAssembler.customParsers.put(FRLogicStatements.FlushMessagePlus.name, FRLogicStatements.FlushMessagePlus::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.TransitionEffectStatement::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.MaskCutsceneStatement::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.FetchPlusPlusStatement::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.RemoveProcessorStatement::new);
-        LogicIO.allStatements.addUnique(FRLogicStatements.FlushMessagePlus::new);
     }
 }

@@ -12,7 +12,7 @@ import mindustry.type.Item;
 
 public class JackpotTurret extends mindustry.world.blocks.defense.turrets.ItemTurret{
 
-    protected final Seq<JackpotAmmo> jackpotAmmo = new Seq<>();
+    protected final Seq<JackpotAmmo> jackpotAmmo = new Seq<>(false, 16, JackpotAmmo.class);
 
     protected JackpotTurret(String name){
         super(name);
